@@ -503,7 +503,7 @@ pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host)
 	return FindAddress(&conn->private_socket, host);
 }
 
-pascal OSErr ConnGetLocalIP(connectionPtr conn, struct in_addr *ip)
+OSErr ConnGetLocalIP(connectionPtr conn, struct sockaddr *sa)
 {
-	return TCPLocalIP(GetConnectionSocket(conn->private_socket), ip);
+	return TCPLocalIP(GetConnectionSocket(conn->private_socket), sa);
 }

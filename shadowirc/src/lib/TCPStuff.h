@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -35,6 +35,6 @@ OSErr TCPSendChars(int sockfd, const void* d, size_t len);
 
 int TCPLocalPort(int sockfd);
 int TCPRemoteIP(int sockfd, struct sockaddr *sa);
-int TCPLocalIP(int sockfd, struct in_addr *ip);
+int TCPLocalIP(int sockfd, struct sockaddr *sa);
 
 #endif

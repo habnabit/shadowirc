@@ -512,18 +512,6 @@ static size_t TCPCharsAvailable(int sockfd)
 }
 
 /*
- * sockaddr_union
- * utilized by getsockname below in:
- * TCPLocalIP
- */
-
-typedef union {
-        struct sockaddr sa;
-        struct sockaddr_in sin;
-        struct sockaddr_in6 sin6;
-} sockaddr_union;
-
-/*
  * TCPLocalPort
  * Return local port for sockfd, else return -1 on failure
  */
@@ -549,17 +537,16 @@ int TCPLocalPort(int sockfd)
     }
 }
 
-
-int TCPLocalIP(int sockfd, struct in_addr *ip)
+int TCPLocalIP(int sockfd, struct sockaddr *sa)
 {
-    sockaddr_union sau;
+    struct sockaddr_storage sas;
     int len;
     
-    len = sizeof(sockaddr_union);
-    if(getsockname(sockfd, (SA *) &sau.sa, &len) < 0)
+    len = sizeof(sas);
+    if(getsockname(sockfd, (SA *) &sas, &len) < 0)
         return (-1);
     
-    memcpy(ip, &sau.sin.sin_addr, sizeof(ip));
+    memcpy(sa, &sas, sizeof(struct sockaddr_storage));
     return (0);
 }
 

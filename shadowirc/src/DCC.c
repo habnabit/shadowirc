@@ -330,9 +330,12 @@ pascal char DCCCreate(linkPtr link, short typ, ConstStr255Param fr, connectionPt
 		return 0;
 	else
 	{
+		struct sockaddr_in sin;
+	
 		*c=newConnection(connDCC);
 		(*c)->link=link;
-		ConnGetLocalIP(link->conn, &(*c)->localip);
+		ConnGetLocalIP(link->conn, (struct sockaddr *)&sin);
+		memcpy(&(*c)->localip, &sin.sin_addr, sizeof(struct in_addr));
 		d=(*c)->dcc=(dccPtr)NewPtr(sizeof(dccRec));
 		pstrcpy(fr, d->dccUserName);
 		d->dccType=typ;

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -228,7 +228,7 @@ size_t ConnGetData(connectionPtr conn, Ptr d, size_t len);
 size_t ConnGetUntil(connectionPtr conn, Ptr d, char c, size_t len);
 int ConnGetLocalPort(connectionPtr conn);
 
-pascal OSErr ConnGetLocalIP(connectionPtr conn, struct in_addr *ip);
+OSErr ConnGetLocalIP(connectionPtr conn, struct sockaddr *sa);
 
 pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host);
 
