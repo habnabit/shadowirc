@@ -216,7 +216,7 @@
               </object>
               <object class="IBCarbonMenuItem" id="294">
                 <string name="title">Whois</string>
-                <string name="keyEquivalent">h</string>
+                <string name="keyEquivalent">b</string>
               </object>
               <object class="IBCarbonMenuItem" id="295">
                 <boolean name="separator">TRUE</boolean>
