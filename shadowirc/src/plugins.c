@@ -749,23 +749,13 @@ static int LoadPluginFromBundle(CFBundleRef pluginBundle, CFStringRef pluginName
 	}
 }
 
-/*
- * Loads the plugins in the ShadowIRC application bundle.
- */
-static void ProcessApplicationPlugins()
+static void ProcessPluginsInDirectory(CFURLRef pluginURL)
 {
-	CFBundleRef mainBundle;
-	CFURLRef pluginURL;
-	CFArrayRef pluginRefs;
 	CFBundleRef pluginBundle;
+	CFArrayRef pluginRefs;
 	int i;
-
-	// Get the main bundle for the app
-	mainBundle = CFBundleGetMainBundle();
-	pluginURL = CFBundleCopyBuiltInPlugInsURL(mainBundle);
-	pluginRefs = CFBundleCreateBundlesFromDirectory(NULL, pluginURL, CFSTR("bundle"));
-	CFRelease(pluginURL);
 	
+	pluginRefs = CFBundleCreateBundlesFromDirectory(NULL, pluginURL, CFSTR("bundle"));
 	if(pluginRefs != NULL)
 	{
 		CFStringRef pluginName;
@@ -783,6 +773,40 @@ static void ProcessApplicationPlugins()
 		CFRelease(pluginRefs);
 		UseResFile(gApplResFork);
 	}
+}
+
+static void ProcessDomainPlugins(short domain)
+{
+	CFURLRef pluginURL, u2;
+	FSRef fs;
+	
+	if(!FSFindFolder(domain, kApplicationSupportFolderType, false, &fs))
+	{
+		pluginURL = CFURLCreateFromFSRef(NULL, &fs);
+		u2 = CFURLCreateCopyAppendingPathComponent(NULL, pluginURL, CFSTR("/ShadowIRC/PlugIns"), true);
+		ProcessPluginsInDirectory(u2);
+		CFRelease(u2);
+		CFRelease(pluginURL);
+	}
+}
+
+/*
+ * Loads the plugins in the ShadowIRC application bundle.
+ */
+static void ProcessApplicationPlugins()
+{
+	CFBundleRef mainBundle;
+	CFURLRef pluginURL;
+
+	//app plugins
+	mainBundle = CFBundleGetMainBundle();
+	pluginURL = CFBundleCopyBuiltInPlugInsURL(mainBundle);
+	ProcessPluginsInDirectory(pluginURL);
+	CFRelease(pluginURL);
+	
+	ProcessDomainPlugins(kLocalDomain);
+	ProcessDomainPlugins(kNetworkDomain);
+	ProcessDomainPlugins(kUserDomain);
 }
 
 inline void initSIDR(void)
