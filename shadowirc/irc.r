@@ -618,16 +618,6 @@ resource 'DITL' (128, "About") {
 		{66, 147, 80, 307},
 		UserItem {
 			disabled
-		},
-		/* [4] */
-		{148, 2, 162, 359},
-		UserItem {
-			disabled
-		},
-		/* [5] */
-		{163, 2, 177, 359},
-		UserItem {
-			disabled
 		}
 	}
 };

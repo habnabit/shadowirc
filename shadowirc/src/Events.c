@@ -122,10 +122,6 @@ static void DoAbout(void)
 
 	GetDialogItem(d, 3, &itemType, &itemHandle, &itemRect);
 	SetDialogItem(d, 3, itemType, (Handle)AboutDlgVersionFilter, &itemRect);
-	GetDialogItem(d, 4, &itemType, &itemHandle, &itemRect);
-	SetDialogItem(d, 4, itemType, (Handle)AboutDlgVersionFilter, &itemRect);
-	GetDialogItem(d, 5, &itemType, &itemHandle, &itemRect);
-	SetDialogItem(d, 5, itemType, (Handle)AboutDlgVersionFilter, &itemRect);
 
 	do {
 		ModalDialog(StdDlgFilter, &i);
