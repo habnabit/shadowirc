@@ -200,7 +200,7 @@ pascal void MWMessage(MWPtr, const LongString *ls);
 
 pascal MWPtr MWFromWindow(WindowPtr w);
 
-pascal void MWVScrollTrack(ControlHandle vscr, short part);
+void MWHitContent(MWPtr mw, EventRecord *e);
 
 extern MWPtr mwl;
 

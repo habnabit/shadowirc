@@ -276,7 +276,7 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 }
 
 
-pascal void MWVScrollTrack(ControlHandle vscr, short part)
+static void MWVScrollTrack(ControlHandle vscr, short part)
 {
 	MWPtr mw;
 	long scrollStep;
@@ -388,6 +388,37 @@ static pascal void TextScrolled(WEReference we)
 		if(val>max)
 			WEScroll(0, viewRect.top-destRect.top-max, we);
 	}
+}
+
+void MWHitContent(MWPtr mw, EventRecord *e)
+{
+	ControlHandle c;
+	short pa;
+	ControlActionUPP upp;
+	
+	MWActive = mw;
+	GlobalToLocal(&e->where);
+	pa=FindControl(e->where, mw->w, &c);
+	if(c == mw->vscr) //kludge, since the only control I know about is the vscr.
+	{
+		switch(pa)
+		{
+			case kControlPageUpPart:
+			case kControlPageDownPart:
+			case kControlUpButtonPart:
+			case kControlDownButtonPart:
+				upp = NewControlActionUPP(MWVScrollTrack);
+				pa=TrackControl(c, e->where, upp);
+				DisposeControlActionUPP(upp);
+				break;
+			
+			case kControlIndicatorPart:
+				MWLiveScroll(mw, e->where);
+				break;
+		}
+	}
+	else
+		MWPaneClick(mw, e);
 }
 
 #pragma mark -

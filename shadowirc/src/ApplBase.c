@@ -665,49 +665,24 @@ static pascal void inGrowHandler(const EventRecord *e)
 
 static pascal void inContentHandler(EventRecord *e)
 {
-	MWPtr p;
-	ControlHandle c;
-	short pa;
-	ControlActionUPP upp;
+	MWPtr mw;
 	pUIMouseUpDownData pdd;
 	GrafPtr gp;
+	WindowPtr w;
 	
 	GetPort(&gp);
-	SetPortWindowPort((WindowPtr)e->message);
-	ContextWindow = (WindowPtr)e->message;
-	p=MWFromWindow((WindowPtr)e->message);
-	if(p)
-	{
-		MWActive=p;
-		GlobalToLocal(&e->where);
-		pa=FindControl(e->where, p->w, &c);
-		if(c == p->vscr) //kludge, since the only control I know about is the vscr.
-		{
-			switch(pa)
-			{
-				case kControlPageUpPart:
-				case kControlPageDownPart:
-				case kControlUpButtonPart:
-				case kControlDownButtonPart:
-					upp = NewControlActionUPP(MWVScrollTrack);
-					pa=TrackControl(c, e->where, upp);
-					DisposeControlActionUPP(upp);
-					break;
-				
-				case kControlIndicatorPart:
-					MWLiveScroll(p, e->where);
-					break;
-			}
-		}
-		else
-			MWPaneClick(p, e);
-	}
+	ContextWindow = w = (WindowPtr)e->message;
+	SetPortWindowPort(w);
+	
+	mw = MWFromWindow(w);
+	if(mw)
+		MWHitContent(mw, e);
 	else
 	{
-		pluginDlgInfoPtr pd = (pluginDlgInfoPtr)GetWRefCon((WindowPtr)e->message);
+		pluginDlgInfoPtr pd = (pluginDlgInfoPtr)GetWRefCon(w);
 		if(pd && (pd->magic==PLUGIN_MAGIC))
 		{
-			pdd.window=(WindowPtr)e->message;
+			pdd.window = w;
 			pdd.e = e;
 			pdd.down=true;
 			mouseDownPluginRef=pd->pluginRef;
