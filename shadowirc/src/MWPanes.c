@@ -63,14 +63,14 @@ static void UpdateInputRegion(mwPanePtr w)
 	WEUpdate(0, mw->il);
 }
 
-static void MWInputPaneClick(mwPanePtr o, const EventRecord *e)
+static void MWInputPaneClick(mwPanePtr o, Point where, float time, UInt32 modifiers)
 {
 	extern char iwFront;
 	
 	MWPtr mw = o->mw;
 	
 	iwFront = true;
-	if(e->where.v < o->drawArea.top + 8) //grow bar
+	if(where.v < o->drawArea.top + 8) //grow bar
 	{
 		unsigned long dragResult;
 		RgnHandle dragRgn;
@@ -87,7 +87,7 @@ static void MWInputPaneClick(mwPanePtr o, const EventRecord *e)
 		r.top = o->drawArea.bottom / 2;
 		r.bottom = o->drawArea.bottom - 32;
 		
-		dragResult = DragGrayRgn(dragRgn, e->where, &r, &r, vAxisOnly, 0);
+		dragResult = DragGrayRgn(dragRgn, where, &r, &r, vAxisOnly, 0);
 		DisposeRgn(dragRgn);
 		dragResult >>= 16;
 		if(dragResult != 0x8000)
@@ -103,9 +103,9 @@ static void MWInputPaneClick(mwPanePtr o, const EventRecord *e)
 		r.bottom = r.top + 5;
 		DrawBorder(&r, kThemeStateActive, true);
 	}
-	else if(e->where.v >= o->drawArea.top + 8) //field
+	else if(where.v >= o->drawArea.top + 8) //field
 	{
-		WEClick(e->where, e->modifiers, e->when, mw->il);
+		WEClick(where, modifiers, time, mw->il);
 	}
 }
 
@@ -288,13 +288,26 @@ pascal mwPanePtr MWFindPanePoint(MWPtr mw, Point p)
 	return 0;
 }
 
-pascal void MWPaneClick(MWPtr mw, EventRecord *e)
+void MWPaneClick(MWPtr mw, EventRef event)
 {
 	mwPanePtr o;
 	Rect textRect;
 	pMWPaneClickData p;
+	Point where;
+	UInt32 modifiers;
+	float time;
+	GrafPtr gp;
 	
-	o=MWFindPanePoint(mw,e->where);
+	GetPort(&gp);
+	
+	SetPortWindowPort(mw->w);
+	GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &where);
+	GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(modifiers), NULL, &modifiers);
+	time = GetEventTime(event);
+	
+	GlobalToLocal(&where);
+	
+	o=MWFindPanePoint(mw, where);
 	if(o)
 	{
 		if(o->creator == kApplicationSignature && !o->pluginRef)
@@ -306,21 +319,26 @@ pascal void MWPaneClick(MWPtr mw, EventRecord *e)
 				textRect.left = o->drawArea.left + 3;
 				textRect.bottom = o->drawArea.bottom - 3;
 				textRect.right = o->drawArea.right - 18;
-				if(PtInRect(e->where, &textRect))
-					WEClick(e->where, e->modifiers, e->when, mw->we);
+				if(PtInRect(where, &textRect))
+					WEClick(where, modifiers, time, mw->we);
 			}
 			else if(o->type == mwWidgetsPane)
-				MWStatusClick(mw, e->where);
+				MWStatusClick(mw, where);
 			else if(o->type == mwInputPane)
-				MWInputPaneClick(o, e);
+				MWInputPaneClick(o, where, time, modifiers);
 		}
 		else
 		{
 			p.pane = o;
-			p.e = e;
+			p.event = event;
+			p.where = where;
+			p.modifiers = modifiers;
+			p.when = time;
 			runIndPlugin(o->pluginRef, pMWPaneClickMessage, &p);
 		}
 	}
+
+	SetPort(gp);
 }
 
 pascal void MWPaneUpdate(MWPtr mw)

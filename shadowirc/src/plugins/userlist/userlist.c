@@ -68,7 +68,7 @@ static void ULResizeWin(ULI ul, short height, short wid);
 INLINE void ULNewMessageWindow(pMWNewData *p);
 static void SULPaneUpdate(pMWPaneUpdateData *p);
 static void SULPaneDestroy(pMWPaneDestroyData *p);
-static void ULPaneResize(ULI ul, mwPanePtr o, const EventRecord *e);
+static void ULPaneResize(ULI ul, mwPanePtr o, Point where, UInt32 modifiers);
 static void SULPaneClick(pMWPaneClickData *p);
 INLINE void SULPaneActivate(pMWPaneActivateData *p);
 INLINE void SULPaneResize(pMWPaneResizeData *p);
@@ -245,6 +245,7 @@ static void ULSActivateWin(pServiceActivateWinData *p)
 			if(ch && ch->active) //valid channel
 			{
 				ListGenerate(ul, ch);
+				ListScroll(ul);
 				ListSetWTitle(ul);
 			}
 			else if(ul)
@@ -1322,7 +1323,7 @@ static void SULPaneUpdate(pMWPaneUpdateData *p)
 	}
 }
 
-static void ULPaneResize(ULI ul, mwPanePtr o, const EventRecord *e)
+static void ULPaneResize(ULI ul, mwPanePtr o, Point where, UInt32 modifiers)
 {
 #pragma unused(ul)
 	Rect r;
@@ -1366,7 +1367,7 @@ static void ULPaneResize(ULI ul, mwPanePtr o, const EventRecord *e)
 		dragRect.right = r.right - kInWindowBorder;
 	}
 	
-	dragResult = DragGrayRgn(dragRgn, e->where, &dragRect, &dragRect, hAxisOnly, 0);
+	dragResult = DragGrayRgn(dragRgn, where, &dragRect, &dragRect, hAxisOnly, 0);
 	DisposeRgn(dragRgn);
 	
 	dragResult &= 0xFFFF;
@@ -1379,7 +1380,7 @@ static void ULPaneResize(ULI ul, mwPanePtr o, const EventRecord *e)
 		
 		MWPaneRecalculate(o->mw);
 
-		if(e->modifiers & shiftKey)
+		if(modifiers & shiftKey)
 			mainPrefs->userlistInWindowWidth = o->givenWidth;
 
 		MWPaneResize(o->mw);
@@ -1399,20 +1400,20 @@ static void SULPaneClick(pMWPaneClickData *p)
 		long l;
 		mwPanePtr o = p->pane;
 		
-		if((l = FindControl(p->e->where, ul->uwin, &c)) != 0)
+		if((l = FindControl(p->where, ul->uwin, &c)) != 0)
 		{
-			HandleControlClick(c, p->e->where, p->e->modifiers, NULL);
+			HandleControlClick(c, p->where, p->modifiers, NULL);
 		}
 		else
 		{
-			if((ul->rightSide && (p->e->where.h <= o->drawArea.left + kInWindowBorder )) || (!ul->rightSide && (p->e->where.h > o->drawArea.right - kInWindowBorder)))
+			if((ul->rightSide && (p->where.h <= o->drawArea.left + kInWindowBorder )) || (!ul->rightSide && (p->where.h > o->drawArea.right - kInWindowBorder)))
 			{
-				ULPaneResize(ul, o, p->e);
+				ULPaneResize(ul, o, p->where, p->modifiers);
 			}
 			else
 			{
-				p->e->where.h -= p->pane->drawArea.left;
-				p->e->where.v -= p->pane->drawArea.top;
+				p->where.h -= p->pane->drawArea.left;
+				p->where.v -= p->pane->drawArea.top;
 			}
 		}
 	}

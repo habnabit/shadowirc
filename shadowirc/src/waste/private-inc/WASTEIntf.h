@@ -691,7 +691,7 @@ typedef pascal OSErr (*WENewObjectProcPtr)(Point *defaultObjectSize,
 typedef pascal OSErr (*WEDisposeObjectProcPtr)(WEObjectDescHandle hObjectDesc);
 typedef pascal OSErr (*WEDrawObjectProcPtr)(const Rect *destRect,
 		WEObjectDescHandle hObjectDesc);
-typedef pascal Boolean (*WEClickObjectProcPtr)(Point hitPt, EventModifiers modifiers, UInt32 clickTime,
+typedef pascal Boolean (*WEClickObjectProcPtr)(Point hitPt, EventModifiers modifiers, float clickTime,
 		WEObjectDescHandle hObjectDesc);
 typedef pascal OSErr (*WEStreamObjectProcPtr)(SInt16 destKind, FlavorType *theType, Handle putDataHere, WEObjectDescHandle hObjectDesc);
 
@@ -817,7 +817,7 @@ enum
 		| RESULT_SIZE(SIZE_CODE(sizeof(Boolean)))
 		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Point /*hitPt*/)))
 		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt16 /*modifiers*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(UInt32 /*clickTime*/)))
+		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(float /*clickTime*/)))
 		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(WEObjectDescHandle /*hObjectDesc*/))),
 	uppWEStreamObjectProcInfo = kPascalStackBased
 		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
@@ -1133,7 +1133,7 @@ typedef struct WERec
 	UInt32 flags;							// 32 bits of miscellaneous flags (private)
 	UInt32 features;						// 32 bit of feature flags (public)
 	UInt32 caretTime;						// time of most recent caret drawing, in ticks
-	UInt32 clickTime;						// time of most recent click, in ticks
+	float fclickTime;						// time of most recent click, in seconds
 	SInt32 clickLoc;						// byte offset of most recent click
 	SInt32 anchorStart;						// start offset of anchor word/line
 	SInt32 anchorEnd;						// end offset of anchor word/line
@@ -1325,7 +1325,7 @@ pascal OSErr WETrackDrag(DragTrackingMessage message, DragReference drag,
 									WEHandle hWE);
 pascal OSErr WEReceiveDrag(DragReference drag, WEHandle hWE);
 pascal Boolean WEDraggedToTrash(DragReference drag);
-pascal void WEClick(Point mouseLoc, EventModifiers modifiers, UInt32 clickTime, WEHandle hWE);
+pascal void WEClick(Point mouseLoc, EventModifiers modifiers, float clickTime, WEHandle hWE);
 pascal UInt16 WEGetClickCount(WEHandle hWE);
 
 //	WEObjects.c (public)
@@ -1484,7 +1484,7 @@ pascal OSErr _WEExtractFlavor(DragReference drag, ItemReference dragItem,
 pascal void _WEUpdateDragCaret(SInt32 offset, WEHandle hWE);
 pascal RgnHandle _WEOutlineRgn(RgnHandle solidRgn);
 pascal OSErr _WEMakeDragImage(GWorldPtr *imageGWorld, RgnHandle *imageRgn, WEHandle hWE);
-pascal OSErr _WEDrag(Point mouseLoc, EventModifiers modifiers, UInt32 clickTime, WEHandle hWE);
+pascal OSErr _WEDrag(Point mouseLoc, EventModifiers modifiers, float clickTime, WEHandle hWE);
 pascal void _WEResolveURL(EventModifiers modifiers, SInt32 urlStart, SInt32 urlEnd, WEHandle hWE);
 
 //	WEObjects.c (private)
@@ -1494,7 +1494,7 @@ pascal OSErr _WENewObject(FlavorType objectType, Handle objectDataHandle, WEHand
 					WEObjectDescHandle *hObjectDesc);
 pascal OSErr _WEFreeObject(WEObjectDescHandle hObjectDesc);
 pascal OSErr _WEDrawObject(WEObjectDescHandle hObjectDesc);
-pascal Boolean _WEClickObject(Point hitPt, EventModifiers modifiers, UInt32 clickTime,
+pascal Boolean _WEClickObject(Point hitPt, EventModifiers modifiers, float clickTime,
 								WEObjectDescHandle hObjectDesc);
 pascal OSErr _WEStreamObject(SInt16 destKind, FlavorType *theType, Handle *theData,
 				Boolean *canDisposeData, WEObjectDescHandle hObjectDesc);

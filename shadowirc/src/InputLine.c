@@ -43,6 +43,7 @@
 #include "DragDrop.h"
 #include "MenuCommands.h"
 #include "TextManip.h"
+#include "CMenus.h"
 
 inputLineRec inputLine;
 
@@ -270,6 +271,29 @@ pascal char ILWEIsInput(WEReference we)
 
 #pragma mark -
 
+static void IWClick(WindowRef ilWindow, EventRef event)
+{
+	Point where;
+	UInt32 modifiers;
+	float time;
+	GrafPtr gp;
+	
+	GetPort(&gp);
+	
+	SetPortWindowPort(ilWindow);
+	GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &where);
+	GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(modifiers), NULL, &modifiers);
+	time = GetEventTime(event);
+	
+	GlobalToLocal(&where);
+	if(where.v > inputLine.statusLineHeight)
+		WEClick(where, modifiers, time, ILGetWE());
+	else
+		StatusLineClick(where, modifiers);
+	
+	SetPort(gp);
+}
+
 static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
@@ -303,11 +327,13 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 					break;
 				}
 				case kEventWindowHandleContentClick:
-				{
-					// NOTE: this part is coming -- will require work on WASTE
-					// since WEClick() isn't Carbon-friendly in 1.3 [smcgovern]
+					if(!CMClick(ilWindow, event))
+						IWClick(ilWindow, event);
+					
+					iwFront = 0;
+					result = noErr;
 					break;
-				}
+				
 				case kEventWindowGetMinimumSize:
 				{
 					const Point minSize = {32, 200};
@@ -348,7 +374,7 @@ void OpenInputLine()
 		Rect wr;
 		EventTypeSpec ilSpec[] = {
 			{kEventClassWindow, kEventWindowDrawContent},
-			// {kEventClassWindow, kEventWindowHandleContentClick},
+			{kEventClassWindow, kEventWindowHandleContentClick},
 			{kEventClassWindow, kEventWindowGetMinimumSize},
 			{kEventClassWindow, kEventWindowBoundsChanged},
 			{kEventClassWindow, kEventWindowActivated},

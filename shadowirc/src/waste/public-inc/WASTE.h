@@ -264,7 +264,7 @@ typedef pascal OSErr (*WENewObjectProcPtr)(Point *defaultObjectSize,
 typedef pascal OSErr (*WEDisposeObjectProcPtr)(WEObjectReference obj);
 typedef pascal OSErr (*WEDrawObjectProcPtr)(const Rect *destRect,
 		WEObjectReference obj);
-typedef pascal Boolean (*WEClickObjectProcPtr)(Point hitPt, EventModifiers modifiers, UInt32 clickTime,
+typedef pascal Boolean (*WEClickObjectProcPtr)(Point hitPt, EventModifiers modifiers, float clickTime,
 		WEObjectReference obj);
 typedef pascal OSErr (*WEStreamObjectProcPtr)(SInt16 destKind, FlavorType *theType,
 		Handle putDataHere, WEObjectReference obj);
@@ -391,7 +391,7 @@ enum
 		| RESULT_SIZE(SIZE_CODE(sizeof(Boolean)))
 		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Point /*hitPt*/)))
 		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(EventModifiers /*modifiers*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(UInt32 /*clickTime*/)))
+		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(float /*clickTime*/)))
 		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(WEObjectReference /*obj*/))),
 	uppWEStreamObjectProcInfo = kPascalStackBased
 		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
@@ -730,7 +730,7 @@ extern pascal void WEKey(SInt16 key, EventModifiers modifiers, WEReference we);
 
 /*	handling mouse-down events and mouse tracking */
 
-extern pascal void WEClick(Point hitPt, EventModifiers modifiers, UInt32 clickTime, WEReference we);
+extern pascal void WEClick(Point hitPt, EventModifiers modifiers, float clickTime, WEReference we);
 
 /*	adjusting the cursor shape */
 

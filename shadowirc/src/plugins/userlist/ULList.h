@@ -31,6 +31,7 @@ void ListSetWTitle(ULI ul);
 void ListDrawUser(ULI ul, int num, short po);
 void ListDrawOne(ULI ul, UserListPtr u);
 void ListDrawOneUser(ULI ul, UserListPtr u);
+void ListScroll(ULI ul);
 void ListGenerate(ULI ul, channelPtr ch);
 void ListRefresh(ULI ul);
 void ListTrash(ULI ul);

@@ -46,7 +46,7 @@ long lastInput, lastKey;
 char iwFront=0;
 char inputLocked = 0;
 
-static char MWNavKey(MWPtr mw, EventModifiers modifiers, long message);
+static char MWNavKey(MWPtr mw, UInt32 modifiers, long message);
 
 pascal void ServerCommands(LongString *ls, linkPtr link);
 inline void pluginMWGotText(LongString *ls, MWPtr win);
@@ -304,7 +304,7 @@ pascal void UnlockInput(void)
 
 #pragma mark -
 
-static char MWNavKey(MWPtr mw, EventModifiers modifiers, long message)
+static char MWNavKey(MWPtr mw, UInt32 modifiers, long message)
 {
 	char c = message % 256;
 	char cmd = (modifiers & cmdKey) == cmdKey;

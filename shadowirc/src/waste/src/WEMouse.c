@@ -444,7 +444,7 @@ cleanup :
 
 #endif	// WASTE_TRANSLUCENT_DRAGS
 
-pascal OSErr _WEDrag ( Point mouseLoc, EventModifiers modifiers, UInt32 clickTime, WEHandle hWE )
+pascal OSErr _WEDrag ( Point mouseLoc, EventModifiers modifiers, float clickTime, WEHandle hWE )
 {
 	WEPtr pWE = * hWE ;		//	assume WE record is already locked
 	DragReference drag = kNullDrag ;
@@ -481,7 +481,7 @@ pascal OSErr _WEDrag ( Point mouseLoc, EventModifiers modifiers, UInt32 clickTim
 	// fabricate an EventRecord for TrackDrag
 	event . what = mouseDown ;
 	event . message = 0 ;
-	event . when = clickTime ;
+	event . when = clickTime * 60 ;
 	event . where = mouseLoc ;
 	LocalToGlobal ( & event . where ) ;
 	event . modifiers = modifiers ;
@@ -792,7 +792,7 @@ pascal OSErr WETrackDrag ( DragTrackingMessage message, DragReference drag, WEHa
 			}
 
 			// reset clickTime
-			pWE -> clickTime = 0 ;
+			pWE -> fclickTime = 0 ;
 			break ;
 		}
 
@@ -849,7 +849,7 @@ pascal OSErr WETrackDrag ( DragTrackingMessage message, DragReference drag, WEHa
 					_WEUpdateDragCaret ( offset, hWE ) ;
 
 					// clear clickTime
-					pWE -> clickTime = 0 ;
+					pWE -> fclickTime = 0 ;
 				}
 				else
 				{
@@ -869,12 +869,12 @@ pascal OSErr WETrackDrag ( DragTrackingMessage message, DragReference drag, WEHa
 					// and this drag was created by this WE instance, call the click loop routine
 					if ( drag == pWE->currentDrag )
 					{
-						UInt32 currentTime = TickCount ( ) ;
-						if ( pWE -> clickTime == 0 )
+						float currentTime = TickCount ( ) /60;
+						if ( pWE -> fclickTime == 0 )
 						{
-							pWE -> clickTime = currentTime ;
+							pWE -> fclickTime = currentTime ;
 						}
-						else if ( currentTime > pWE -> clickTime + kAutoScrollDelay )
+						else if ( currentTime > pWE -> fclickTime + (kAutoScrollDelay/60) )
 						{
 							if ( pWE -> clickLoop != nil )
 							{
@@ -1514,7 +1514,7 @@ pascal void _WEResolveURL(EventModifiers modifiers, SInt32 urlStart, SInt32 urlE
 
 #endif	// WASTE_IC_SUPPORT
 
-pascal void WEClick(Point mouseLoc, EventModifiers modifiers, UInt32 clickTime, WEHandle hWE)
+pascal void WEClick(Point mouseLoc, EventModifiers modifiers, float clickTime, WEHandle hWE)
 {
 	WEPtr pWE;
 	LongPt thePoint;
@@ -1556,10 +1556,10 @@ pascal void WEClick(Point mouseLoc, EventModifiers modifiers, UInt32 clickTime, 
 
 	// determine whether this click is part of a sequence
 	// a single click inside an object selects it, so it's like a double click in a word
-	isMultipleClick = ((clickTime < pWE->clickTime + GetDblTime()) && (offset == pWE->clickLoc));
+	isMultipleClick = ((clickTime < pWE->fclickTime + (((float)GetDblTime())/60)) && (offset == pWE->clickLoc));
 
 	// remember click time, click offset and edge value
-	pWE->clickTime = clickTime;
+	pWE->fclickTime = clickTime;
 	pWE->clickLoc = offset;
 	pWE->clickEdge = edge;
 

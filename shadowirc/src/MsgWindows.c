@@ -381,12 +381,6 @@ static void TextScrolled(WEReference we)
 	}
 }
 
-void MWHitContent(MWPtr mw, EventRecord *e)
-{
-	GlobalToLocal(&e->where);
-	MWPaneClick(mw, e);
-}
-
 #pragma mark -
 
 pascal OSErr MWLogToFSp(MWPtr mw, const FSSpec *fs, long s0, long s1)

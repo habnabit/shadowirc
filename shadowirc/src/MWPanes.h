@@ -80,6 +80,6 @@ pascal void MWDestroyAllWidgets(MWPtr mw);
 pascal mwWidgetPtr MWFindWidgetPoint(MWPtr mw, Point p);
 pascal mwPanePtr MWFindPanePoint(MWPtr mw, Point p);
 pascal void MWPaneActivate(MWPtr mw, char activate);
-pascal void MWPaneClick(MWPtr mw, EventRecord *e);
+void MWPaneClick(MWPtr mw, EventRef event);
 
 #endif

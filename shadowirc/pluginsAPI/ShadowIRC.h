@@ -1716,7 +1716,12 @@ typedef struct pMWPaneActivateData {
 */
 typedef struct pMWPaneClickData {
 	mwPanePtr pane;
-	EventRecord *e;
+	EventRef event;
+	
+	//where, modifiers, and when are the values from the event, so you don't have to fetch them.
+	Point where;
+	UInt32 modifiers;
+	float when;
 } pMWPaneClickData, *pMWPaneClickDataPtr;
 
 /*	pMWPaneUpdateData

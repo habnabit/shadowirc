@@ -53,9 +53,6 @@
 #include "Events.h"
 #include "ApplBase.h"
 
-static void floatingWindowClick(EventRecord *e);
-static void inContentHandler(EventRecord *e);
-static void doMouseDown(EventRecord *e);
 static void doTCPEvent(CEPtr message);
 static void ApplEvents(EventRecord *e);
 static void ApplExit(void);
@@ -294,34 +291,6 @@ CantInstallDialogHandler:
 	return QuitRequest;
 }
 
-static void floatingWindowClick(EventRecord *e) //this also takes care of handling the float clicks
-{
-	GrafPtr p;
-	short i;
-	WindowPtr wp;
-	
-	i=FindWindow(e->where, &wp);
-	if(wp==inputLine.w)
-	{
-		if(i==inContent)
-		{
-			GetPort(&p);
-			SetPortWindowPort(wp);
-			GlobalToLocal(&e->where);
-			if(e->where.v>inputLine.statusLineHeight)
-				WEClick(e->where, e->modifiers, e->when, ILGetWE());
-			else
-				StatusLineClick(e->where, e->modifiers);
-			SetPort(p);
-		}
-		
-		iwFront=1;
-		return;
-	}
-	else //it's another floater...
-		iwFront=0;
-}
-
 #pragma mark -
 
 inline void checkConnections(void)
@@ -512,23 +481,6 @@ static void InitTimers()
 
 #pragma mark -
 
-static void inContentHandler(EventRecord *e)
-{
-	MWPtr mw;
-	GrafPtr gp;
-	WindowPtr w;
-	
-	GetPort(&gp);
-	w = (WindowPtr)e->message;
-	SetPortWindowPort(w);
-	
-	mw = MWFromWindow(w);
-	if(mw)
-		MWHitContent(mw, e);
-
-	SetPort(gp);
-}
-
 static OSStatus EventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
 {
 	OSStatus result = eventNotHandledErr;
@@ -574,6 +526,14 @@ static OSStatus EventHandler(EventHandlerCallRef handlerCallRef, EventRef event,
 						
 						runService(pServiceActivateWin, &ps);
 					}
+					
+					result = noErr;
+					break;
+				}
+				
+				case kEventWindowHandleContentClick:
+				{
+					iwFront = 0; //inputline doesn't fall through.
 					
 					result = noErr;
 					break;
@@ -639,43 +599,6 @@ static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef even
 	return noErr;
 }
 
-static void doMouseDown(EventRecord *e)
-{
-	short i;
-	WindowPtr p;
-	char ich = 1;
-	
-	i=FindWindow(e->where, &p);
-	switch(i)
-	{
-		case inMenuBar:
-			MenuBarClick(e);
-			break;
-		
-		case inContent:
-			e->message=(long)p;
-			if(p!=ActiveNonFloatingWindow())
-			{
-				if(!WIsFloater(p))
-					SelectWindow(p);
-				
-				ich = 0;
-			}
-			
-			if(!CMClick(p, e))
-			{
-				if(WIsFloater(p))
-					floatingWindowClick(e);
-				else
-				{
-					iwFront=0;
-					if(ich)
-						inContentHandler(e);
-				}
-			}
-	}
-}
-
 static void doTCPEvent(CEPtr c)
 {
 	connectionPtr conn;
@@ -722,8 +645,19 @@ static void ApplEvents(EventRecord *e)
 			break;
 			
 		case mouseDown:
-			doMouseDown(e);
+		{
+			short i;
+			WindowPtr p;
+			
+			i=FindWindow(e->where, &p);
+			switch(i)
+			{
+				case inMenuBar:
+					MenuBarClick(e);
+					break;
+			}
 			break;
+		}
 	}
 }
 
@@ -754,6 +688,7 @@ static void InitLocalEventHandlers()
 	{
 		{kEventClassWindow, kEventWindowActivated},
 		{kEventClassWindow, kEventWindowDeactivated},
+		{kEventClassWindow, kEventWindowHandleContentClick},
 	};
 	
 	MyIAEH(kEventClassApplication, kEventAppActivated, DoResumeEvent);

@@ -1842,7 +1842,7 @@ pascal Boolean WEAdjustCursor(Point mouseLoc, RgnHandle mouseRgn, WEHandle hWE)
 				// elapsed since the last mouse click, so that the cursor doesn't turn into an
 				// arrow while triple-clicking + dragging a range of lines)
 
-				if (PtInRgn(mouseLoc, hiliteRgn) && ((TickCount() > pWE->clickTime + GetDblTime()) ||
+				if (PtInRgn(mouseLoc, hiliteRgn) && ((TickCount() > pWE->fclickTime + (GetDblTime()/60)) ||
 					(pWE->clickEdge == kObjectEdge)))
 				{
 					cursorID = 0;				// use arrow cursor

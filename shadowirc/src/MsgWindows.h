@@ -204,8 +204,6 @@ pascal void MWMessage(MWPtr, const LongString *ls);
 
 pascal MWPtr MWFromWindow(WindowPtr w);
 
-void MWHitContent(MWPtr mw, EventRecord *e);
-
 extern MWPtr mwl;
 
 pascal char MWSetChannel(MWPtr mw, struct Channel* ch);

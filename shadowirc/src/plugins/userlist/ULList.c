@@ -57,6 +57,11 @@ void ListDrawOneUser(ULI ul, UserListPtr u)
 	UpdateDataBrowserItems(ul->browser, kDataBrowserNoItem, 1, &items, kDataBrowserItemNoProperty, kDataBrowserItemNoProperty);
 }
 
+void ListScroll(ULI ul)
+{
+	SetDataBrowserScrollPosition(ul->browser, 0, 0);
+}
+
 void ListGenerate(ULI ul, channelPtr ch)
 {
 	UserListPtr up;

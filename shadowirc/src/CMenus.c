@@ -76,12 +76,22 @@ static OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBal
 	return ret;
 }
 
-pascal char CMClick(WindowPtr w, const EventRecord *e)
+char CMClick(WindowPtr w, EventRef event)
 {
-	char stdCM = IsShowContextualMenuClick(e);
+	char stdCM = IsShowContextualMenuEvent(event);
 	char optCM = 0;
+	Point where;
+	UInt32 modifiers;
+	GrafPtr gp;
+	char ret;
 	
-	if(!stdCM&& ((e->modifiers & (optionKey | shiftKey | controlKey | cmdKey)) == optionKey))
+	GetPort(&gp);
+	
+	SetPortWindowPort(w);
+	GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &where);
+	GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(modifiers), NULL, &modifiers);
+	
+	if(!stdCM&& ((modifiers & (optionKey | shiftKey | controlKey | cmdKey)) == optionKey))
 		optCM = 1;
 	
 	if(stdCM || optCM)
@@ -89,10 +99,14 @@ pascal char CMClick(WindowPtr w, const EventRecord *e)
 		if(!WIsFloater(w) && !IsWindowHilited(w))
 			SelectWindow(w);
 		
-		return DetermineCM(w, e->where, optCM);
+		ret = DetermineCM(w, where, optCM);
 	}
 	else
-		return 0;
+		ret = 0;
+
+	SetPort(gp);
+	
+	return ret;
 }
 
 #pragma mark -

@@ -37,6 +37,7 @@
 #include "Shortcuts.h"
 #include "Floaters.h"
 #include "MenuCommands.h"
+#include "CMenus.h"
 #include "CommandsMenu.h"
 
 static void DoAbout(void);
@@ -208,6 +209,11 @@ static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef even
 					MWPart(mw);
 					result = noErr;
 					break;
+				
+				case kEventWindowHandleContentClick:
+					if(!CMClick(mw->w, event))
+						MWPaneClick(mw, event);
+					break;
 			}
 			break;
 		}
@@ -231,6 +237,7 @@ void MWInstallEventHandlers(MWPtr mw)
 			{kEventClassWindow, kEventWindowGetMinimumSize},
 			{kEventClassWindow, kEventWindowBoundsChanged},
 			{kEventClassWindow, kEventWindowClose},
+			{kEventClassWindow, kEventWindowHandleContentClick},
 	};
 	
 	if(!mouseWheelHandler)

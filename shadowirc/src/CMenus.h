@@ -117,6 +117,6 @@ pascal void CMSetCheckmark(struct cmmwData *d, long key, char checked);
 
 pascal char DetermineCM(WindowPtr w, Point where, char optCM);
 void CMSetCursor(char ctrlDown);
-pascal char CMClick(WindowPtr w, const EventRecord *e);
+char CMClick(WindowPtr w, EventRef event);
 
 #endif
