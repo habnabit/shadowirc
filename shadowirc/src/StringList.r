@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -31,7 +31,7 @@ resource 'STR#' (128, "About Box Strings", locked, preload)
 resource 'STR#' (130, "Files", locked, preload)
 {
 	{
-		"ShadowIRC Ä",
+		"ShadowIRC",
 		"ShadowIRC Preferences",
 		"Plugins"
 	};
