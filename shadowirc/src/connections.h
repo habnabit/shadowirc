@@ -106,12 +106,10 @@ struct Connection {
          * ip: store ip address
          * ip2: used w/ storing SOCKS proxy IP address
 	 * localip: local IP address (getsockname on sockfd)
-         * sockfd: hold TCP socket
          */
 	struct in_addr ip;
         struct in_addr ip2;
 	struct in_addr localip;
-        int sockfd;
 	Str255 name;
 	unsigned short port;
 	short connectStage;
