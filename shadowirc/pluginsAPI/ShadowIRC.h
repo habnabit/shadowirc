@@ -28,6 +28,8 @@
 
 #define _ShadowIRC_API_Version_ 0x02000001
 
+#include <Carbon/Carbon.h>
+
 #pragma mark еее ShadowIRC Message Definitions
 /*	------------------------------------------------------------------------------------------
 		ShadowIRC Message Definitions
@@ -4093,23 +4095,12 @@ pascal char DirectorySelectButton(FSSpec *fss);
 					return value: true if the user selected a directory, false if canceled.
 */
 
-pascal long MySendControlMessage(ControlHandle inControl, short inMessage, long inParam);
-/*	Sends a message to a control.
-*/
-
-pascal void GetQD(QDGlobals* *qdg);
-/*	Gets the qd global variable.
-		Input: none
-		Output:	qdg - the address of the qd variable.
-		Note:	е Don't use this function unless absolutely necessary. Incompatible with Carbon.
-*/
-
 pascal long _UndocumentedAPI(long, long);
 /*	This function is undocumented, and should never be called.
 */
 
-#define WGetBBox(w) ((**(((WindowPeek)w)->contRgn)).rgnBBox)
-#define WIsVisible(w) ((((WindowPeek)w)->visible))
-#define WIsActive(w) ((((WindowPeek)w)->hilited))
+#define WGetBBox(w, r) (GetPortBounds(GetWindowPort(w), r))
+#define WIsVisible(w) (IsWindowVisible(w))
+#define WIsActive(w) (IsWindowHilited(w))
 
 #endif
