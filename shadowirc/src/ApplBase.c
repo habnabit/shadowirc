@@ -957,8 +957,14 @@ static void doTCPEvent(CEPtr c)
 		case C_Found:
 			memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
 			DisplayLookupResult(conn);
+                        /*
+                         * The socket connect() can fail, even when non-blocking
+                         * If we do not immediately return when this occurs
+                         * then we'll jump off to 0x0 when running conn->InputFunc
+                         */
 			if(!conn->socks.secondLookup)
-				connection2(conn);
+				if(connection2(conn) != 0)
+                                    return;
 			break;
 		
 		case C_Established:

@@ -237,7 +237,7 @@ void DisplayLookupResult(connectionPtr conn)
 }
 
 //We found the IP for the server we're trying to connect to. Connect to the server.
-pascal void connection2(connectionPtr conn)
+int connection2(connectionPtr conn)
 {
 	if(ConnNewActive(conn)) //this makes the connection to the (socks) server
 	{
@@ -255,7 +255,9 @@ pascal void connection2(connectionPtr conn)
 			LinkSetStage(conn->link, csFailedToConnect);
 			ServerOK(C_FailedToOpen, conn->link);
 		}
+                return -1;
 	}
+        return 0;
 }
 
 pascal void startConnection(linkPtr link)

@@ -36,7 +36,7 @@ pascal void ConnPutLS(connectionPtr *conn, LongString *ls);
 pascal void StatusMsg(linkPtr link, short n);
 pascal char ValidPrefs(linkPtr link);
 pascal void ServerOK(short status, linkPtr link);
-pascal void connection2(connectionPtr conn);
+int connection2(connectionPtr conn);
 pascal void LinkSuccessfulConnection(linkPtr link, char reg);
 void LinkSetStage(linkPtr link, short stage);
 void DisplayLookupResult(connectionPtr conn);
