@@ -69,8 +69,6 @@ typedef struct dccsendbit {
 	char stuffDCC;
 } dccsendbit, *dccsendbitPtr;
 
-static void str10neg(StringPtr s);
-
 static connectionPtr DCCFindSendPort(unsigned short port);
 static void DCCSendReposition(connectionPtr conn, long newpos);
 
@@ -836,7 +834,7 @@ pascal void DCCOpen(connectionPtr *x)
 			i++;
 		}
 
-		ulongstr((long)d->refcon, pn);
+		ntohl_str((long)d->refcon, pn);
 		
 		sp = dccTypToStr(d->dccType);
 		LSStrCat(11, &ls, "\pPRIVMSG ", d->dccUserName, "\p :\1DCC REVERSE ", sp, "\p ", pn, "\p ", des, "\p 0 0 ", args, "\p\1");
@@ -852,13 +850,13 @@ pascal void DCCOpen(connectionPtr *x)
 			char hbuf[NI_MAXHOST];
 			
 			cc->port=ConnGetLocalPort(cc);
-                        /*
-                         * DCCCreate sets cc->localip to local IP address
-                         * based off of connected sockfd
-                         */
+			/*
+				* DCCCreate sets cc->localip to local IP address
+				* based off of connected sockfd
+			*/
   			getnameinfo((struct sockaddr *)cc->localsas, cc->localsas->ss_len, hbuf, sizeof(hbuf), NULL, 0, NI_NUMERICHOST);
   			CopyCStringToPascal(hbuf, ipa);
-			ulongstr(cc->port, pn);
+			ntohl_str(cc->port, pn);
 			args[0]=0;
 			
 			if(d->reverse)
@@ -2168,57 +2166,6 @@ pascal void DCCSendCookieReply(connectionPtr *x, long cky, LongString *ls)
 	
 	if(ConnSend(*x, &cookie.data[1], cookie.len))
 		DCCClose(x, false);
-}
-
-static void str10neg(StringPtr s)
-{
-	unsigned char y[]="\p4294967296";
-	int i,x,c=0;
-	
-	for(i=10;i>0;i--)
-	{
-		x=y[i]-s[i]-c;
-		if(x<0)
-		{
-			c=1;
-			x+=10;
-		}
-		else
-			c=0;
-		
-		s[i]=(x+48);
-	}
-}
-
-pascal void ulongstr(unsigned long l, StringPtr s)
-{
-	int i;
-	char n;
-	
-	if(l)
-	{
-		n=(l<0);
-		if(l<0)
-			l=-l;
-		
-		for(i=10;i>0;i--)
-		{
-			s[i]=(l%10)+48;
-			l/=10;
-		}
-		s[0]=10;
-		if(n)
-			str10neg(s);
-		n=0;
-		while(!s[n+1])
-			n++;
-		for(s[0]-=n, i=1;i<n;i++)
-			s[i]=s[n+i];
-	}
-	else
-		s[0]=0;
-	//else
-	//bad
 }
 
 pascal ConstStringPtr dccTypToStr(short d)
