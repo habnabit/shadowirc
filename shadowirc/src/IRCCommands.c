@@ -815,6 +815,7 @@ pascal void RegUser(linkPtr link)
 
 static void _ucBroadcast(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	doBroadcast(0, rest, false);
 	
 	s->len = 0;
@@ -822,6 +823,7 @@ static void _ucBroadcast(linkPtr link, ConstStr255Param com, LongString *rest, L
 
 static void _ucBract(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	doBroadcast(0, rest, true);
 	
 	s->len = 0;
@@ -829,6 +831,7 @@ static void _ucBract(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 
 static void _ucQuit(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	doQuit(rest);
 	
 	s->len = 0;
@@ -882,16 +885,19 @@ static void _ucConnectDisconnect(char connect, LongString *rest, LongString *s)
 
 static void _ucC(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	_ucConnectDisconnect(true, rest, s);
 }
 
 static void _ucD(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	_ucConnectDisconnect(false, rest, s);
 }
 
 static void _ucClear(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com,rest)
 	MWPtr mw = CurrentTarget.mw;
 	if(mw)
 	{
@@ -907,6 +913,7 @@ static void _ucClear(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 
 static void _ucDNS(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	Str255 s1;
 	
 	LSNextArg(rest, s1);
@@ -917,24 +924,28 @@ static void _ucDNS(linkPtr link, ConstStr255Param com, LongString *rest, LongStr
 
 static void _ucBans(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	doBanList(rest, false);
 	s->len = 0;
 }
 
 static void _ucExceptions(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	doBanList(rest, true);
 	s->len = 0;
 }
 
 static void _ucIgnore(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	DoIgnore(rest, false);
 	s->len = 0;
 }
 
 static void _ucJoin(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	if(rest->len)
 	{
 		LSMakeStr(*rest);
@@ -945,6 +956,7 @@ static void _ucJoin(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 
 static void _ucKill(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	Str255 s1;
 	
 	LSNextArg(rest, s1);
@@ -957,6 +969,7 @@ static void _ucKill(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 
 static void _ucPart(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	Str255 s1;
 	
 	s1[0]=0;
@@ -984,6 +997,7 @@ static void _ucPart(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 
 static void _ucRping(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	UnsignedWide t;
 	Str255 s1, s2, s3;
 	
@@ -998,6 +1012,7 @@ static void _ucRping(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 
 static void _ucSay(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	if(rest->len)
 		HandleMessage(rest, &CurrentTarget);
 	s->len = 0;
@@ -1005,6 +1020,7 @@ static void _ucSay(linkPtr link, ConstStr255Param com, LongString *rest, LongStr
 
 static void _ucTopic(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	Str255 s1;
 	
 	LSNextArg(rest, s1);
@@ -1019,6 +1035,7 @@ static void _ucTopic(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 
 static void _ucUnixtime(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	Str255 s1, s2, s3;
 	long l;
 	
@@ -1040,12 +1057,14 @@ static void _ucUnixtime(linkPtr link, ConstStr255Param com, LongString *rest, Lo
 
 static void _ucWallops(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	if(rest->len)
 		LSConcatStrAndLS("\pWALLOPS :", rest, s);
 }
 
 static void _ucWallchops(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	Str255 s1;
 	
 	LSNextArg(rest, s1);
@@ -1058,6 +1077,7 @@ static void _ucWallchops(linkPtr link, ConstStr255Param com, LongString *rest, L
 
 static void _ucNamesWho(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link)
 	if(!rest->len && !CurrentTarget.bad)
 	{
 		switch(CurrentTarget.type)
@@ -1073,11 +1093,13 @@ static void _ucNamesWho(linkPtr link, ConstStr255Param com, LongString *rest, Lo
 
 static void _ucQuote(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	LSCopy(rest, 0, 0, s);
 }
 
 static void _ucWhois(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	if(!rest->len && !CurrentTarget.bad)
 	{
 		switch(CurrentTarget.type)
@@ -1094,11 +1116,13 @@ static void _ucWhois(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 
 static void _ucWhowas(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	LSConcatStrAndLS("\pWHOWAS ", rest, s);
 }
 
 static void _ucVersion(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com,s)
 	LSConcatStrAndStrAndStr("\pClient is ShadowIRC ", CL_VERSION, "\p (", rest);
 	LSConcatLSAndStr(rest, cdt, rest);
 	LSAppend1(*rest, ')');
@@ -1107,6 +1131,7 @@ static void _ucVersion(linkPtr link, ConstStr255Param com, LongString *rest, Lon
 
 static void _ucDebug(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com,rest)
 	debugOn=!debugOn;
 	if(debugOn)
 		LSStrLS("\pDebug On", s);
@@ -1118,6 +1143,7 @@ static void _ucDebug(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 
 static void _ucHttp(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	LSConcatStrAndLS("\phttp://", rest, s);
 	LSMakeStr(*s);
 	OpenURL(s->data);
@@ -1126,6 +1152,7 @@ static void _ucHttp(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 
 static void _ucFtp(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	LSConcatStrAndLS("\pftp://", rest, s);
 	LSMakeStr(*s);
 	OpenURL(s->data);
@@ -1134,6 +1161,7 @@ static void _ucFtp(linkPtr link, ConstStr255Param com, LongString *rest, LongStr
 
 static void _ucNick(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	Str255 s1;
 	
 	LSNextArg(rest, s1);
@@ -1145,6 +1173,7 @@ static void _ucNick(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 
 static void _ucUmode(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	if(link)
 	{
 		LSConcatStrAndStr("\pMODE ", link->CurrentNick, s);
@@ -1155,6 +1184,7 @@ static void _ucUmode(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 
 static void _ucCTCP(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(link,com)
 	Str255 s1;
 	short i;
 	
@@ -1175,6 +1205,7 @@ static void _ucCTCP(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 
 static void _ucDCC(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	LSMakeStr(*rest);
 	DCCCommand(link, rest->data);
 	s->len=0;
@@ -1182,12 +1213,14 @@ static void _ucDCC(linkPtr link, ConstStr255Param com, LongString *rest, LongStr
 
 static void _ucSignoff(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	DoSignoff(link, rest);
 	s->len = 0;
 }
 
 static void _ucISON(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	HandleISON(link, rest);
 	s->len=0;
 }
@@ -1253,12 +1286,14 @@ static void _ucNotice(linkPtr link, ConstStr255Param com, LongString *rest, Long
 
 static void _ucNotify(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	DoNotify(link, rest);
 	s->len=0;
 }
 
 static void _ucONotice(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	if(CurrentTarget.chan)
 		DoONotice(CurrentTarget.chan, rest);
 	else
@@ -1271,6 +1306,7 @@ static void _ucONotice(linkPtr link, ConstStr255Param com, LongString *rest, Lon
 
 static void _ucQuery(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	Str255 s1;
 	char b;
 	
@@ -1309,12 +1345,14 @@ static void _ucQuery(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 
 static void _ucServer(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	s->len=0;
 	DoServer(link, rest, 0);
 }
 
 static void _ucAway(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	LSConcatStrAndLS("\pAWAY :", rest, s);
 	LSMakeStr(*rest);
 	if(link)
@@ -1330,6 +1368,7 @@ static void _ucAway(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 
 static void _ucCping(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	Str255 s1, s2;
 	UnsignedWide t;
 	short i;
@@ -1356,6 +1395,7 @@ static void _ucCping(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 
 static void _ucKick(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	Str255 s1, s2;
 	
 	if(rest->len)
@@ -1373,6 +1413,7 @@ static void _ucKick(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 
 static void _ucMe(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	Str255 s1;
 	ConstStringPtr sp;
 	
@@ -1408,6 +1449,7 @@ static void _ucMe(linkPtr link, ConstStr255Param com, LongString *rest, LongStri
 
 static void _ucUserhost(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com,rest,s)
 	if(link)
 		link->outstandingUSERHOST++;
 }
@@ -1415,6 +1457,7 @@ static void _ucUserhost(linkPtr link, ConstStr255Param com, LongString *rest, Lo
 pascal void ServerCommands(LongString *ls, linkPtr link);
 static void _ucServerCommand(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
+#pragma unused(com)
 	if(debugOn)
 		ServerCommands(rest, link);
 	s->len = 0;
