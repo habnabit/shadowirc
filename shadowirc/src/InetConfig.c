@@ -48,6 +48,41 @@ OSErr OpenURL(Str255 url)
 		return -1;
 }
 
+OSStatus GetFSRefForDownloadsFolder(FSRef *ref)
+{
+	OSStatus err = noErr;
+	SInt32 prefSize;
+	ICFileSpecHandle fileSpecHdl = NULL;
+	ICAttr attr;
+	AliasHandle fsAliasHdl = NULL;
+	
+	if(internetConfig)
+	{
+		err = ICGetPref(internetConfig, kICDownloadFolder, &attr, NULL, &prefSize);
+		if(err == noErr)
+		{
+			fileSpecHdl = (ICFileSpecHandle)NewHandle(prefSize);
+			if(fileSpecHdl)
+			{
+				err = ICFindPrefHandle(internetConfig, kICDownloadFolder, &attr, (Handle)fileSpecHdl);
+				
+				fsAliasHdl = (AliasHandle)fileSpecHdl;
+				err = HandToHand((Handle *)&fsAliasHdl);
+				Munger((Handle)fsAliasHdl, 0, NULL, kICFileSpecHeaderSize, (Ptr)-1, 0);
+				
+				err = FSResolveAlias(NULL, fsAliasHdl, ref, NULL);
+				
+				DisposeHandle((Handle)fileSpecHdl);
+				DisposeHandle((Handle)fsAliasHdl);
+			}
+		}
+	}
+	else
+		err = paramErr; // something intelligible in case IC didn't work/isn't here
+	
+	return err;
+}
+
 OSStatus MapFileTypeCreator(const CFStringRef fileName, ICMapEntry *mapEntry)
 {
 	if(internetConfig)
