@@ -323,9 +323,9 @@ void ShortcutsMenuInit(MenuHandle sm)
 		AppendMenuItemText(sm, "\p.");
 		SetMenuItemCommandID(sm, kShortcutsOffset + x, 'SHOR');
 		SetItemCmd(sm, kShortcutsOffset + x, '0' + x % 10);
-		if(x >= 10 && x <= 19)
+		if(x >= 11 && x <= 20)
 			SetMenuItemModifiers(sm, kShortcutsOffset + x, kMenuOptionModifier);
-		else if(x >= 20)
+		else if(x > 20)
 			SetMenuItemModifiers(sm, kShortcutsOffset + x, kMenuControlModifier | kMenuNoCommandModifier);
 	}
 }
