@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -628,7 +628,7 @@ static char CMMW(MWPtr mw, Point where, char optCM)
 					case mcCopyIL:
 						WECopy(mw->we);
 						WESetSelection(d.s0, d.s0, mw->we);
-						HitEditMenu(5);
+						HitEditMenu(mw, 5);
 						break;
 					
 					case mcClear:
@@ -793,7 +793,7 @@ static char CMIW(Point where)
 						break;
 						
 					case mcILPaste:
-						HitEditMenu(5);
+						HitEditMenu(0, 5);
 						break;
 						
 					case mcILClear:

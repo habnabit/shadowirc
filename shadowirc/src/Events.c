@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 2002-2003 John Bafford, Chris Campbell
+	Copyright (C) 2002-2004 John Bafford, Chris Campbell
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -251,7 +251,8 @@ static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef the
 						{
 							SInt32 selStart, selEnd;
 							WEGetSelection(&selStart, &selEnd, mw->we);
-							if (selStart != selEnd) {
+							if (selStart != selEnd)
+							{
 								EnableMenuCommand(NULL, hiCommand.commandID);
 								result = noErr;
 							}
@@ -276,20 +277,41 @@ static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef the
 						
 						case kHICommandClear:
 						case kHICommandSelectAll:
-							DisableMenuCommand(NULL, hiCommand.commandID);
-							break;
+						case 'FIND':
+						case 'FAGN':
+							EnableMenuCommand(NULL, hiCommand.commandID);
+							return noErr;
 					}
 					break;
 
 				case kEventProcessCommand:
 					switch(hiCommand.commandID)
 					{
+						//Edit Menu
+						case kHICommandUndo:
+						case kHICommandCut:
+						case kHICommandCopy:
+						case kHICommandPaste:
+						case kHICommandClear:
+						case kHICommandSelectAll:
+							HitEditMenu(mw, hiCommand.menu.menuItemIndex);
+							return noErr;
+						
 						case 'FIND':
-							DoFind(false);
+							DoFind(mw, false);
 							return noErr;
 						
 						case 'FAGN':
-							DoFind(true);
+							DoFind(mw, true);
+							return noErr;
+						
+						//Font Menu
+						case 'FONT':
+							HitFontsMenu(mw, hiCommand.menu.menuItemIndex);
+							return noErr;
+						
+						case 'FTSZ':
+							DoFontSizeWindow(mw);
 							return noErr;
 					}
 					break;
@@ -352,8 +374,6 @@ static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef even
 					
 					if(activate)
 					{
-						EnableMenuCommand(gEditMenu, 'FIND');
-						EnableMenuCommand(gEditMenu, 'FAGN');
 						SetTarget(mw, &CurrentTarget);
 						UpdateStatusLine();
 						DrawMWinStatus(consoleWin);
@@ -761,105 +781,112 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 {
 #pragma unused(nextHandler, userData)
 	OSStatus myErr = eventNotHandledErr;
+	UInt32 eventKind;
 	HICommand hiCommand;
 	
 	GetEventParameter(theEvent, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
 	
-	switch(hiCommand.commandID)
+	eventKind = GetEventKind(theEvent);
+	
+	switch(eventKind)
 	{
-		//Apple Menu
-		case kHICommandAbout:
-			DoAbout();
-			return noErr;
+		case kEventCommandUpdateStatus:
+			switch(hiCommand.commandID)
+			{
+				//Edit Menu
+				case kHICommandUndo:
+				case kHICommandCut:
+				case kHICommandCopy:
+				case kHICommandPaste:
+				case kHICommandClear:
+				case kHICommandSelectAll:
+				
+				//Font Menu
+				case 'FIND':
+				case 'FAGN':
+					DisableMenuCommand(NULL, hiCommand.commandID);
+					return noErr;
+			}
+			break;
 		
-		case kHICommandPreferences: // Open the Preferences window
-			OpenPreferencesWindow(-1);
-			return noErr;
-		
-		
-		//File Menu
-		case kHICommandSave:
-			writeAllFiles();
-			return noErr;
-		
-		case 'CONO':
-			HitConnectionListMenu(hiCommand.menu.menuItemIndex);
-			return noErr;
-		
-		case 'CONC':
-			HitSignoffConnectionListMenu(hiCommand.menu.menuItemIndex);
-			return noErr;
-		
-		case 'CONX':
-			HitSelectConnectionMenu(hiCommand.menu.menuItemIndex);
-			return noErr;
-		
-		//Edit Menu
-		case kHICommandUndo:
-		case kHICommandCut:
-		case kHICommandCopy:
-		case kHICommandPaste:
-		case kHICommandClear:
-		case kHICommandSelectAll:
-			HitEditMenu(hiCommand.menu.menuItemIndex);
-			return noErr;
-		
-		//Command Menu
-		case 'COMD':
-			HitCommandsMenu(hiCommand.menu.menuItemIndex);
-			return noErr;
-		
-		//Font Menu
-		case 'FONT':
-			HitFontsMenu(hiCommand.menu.menuItemIndex);
-			return noErr;
-		
-		case 'FTSZ':
-			DoFontSizeWindow();
-			return noErr;
-		
-		//Window Menu
-		case 'CONS':
-			ToggleConsoleWindow();
-			return noErr;
-		
-		case kCommandPrevWin:
-			DoCycleCommand(false);
-			return noErr;
-			
-		case kCommandNextWin:
-			DoCycleCommand(true);
-			return noErr;
-			
-		case 'WCAS':
-			DoCascadeWindows();
-			return noErr;
-		
-		case kCommandWindowService:
-			HitWindowPluginServiceMenu(hiCommand.menu.menuItemIndex);
-			return noErr;
-		
-		case kCommandWindowSelect:
-			HitWindowSelectWindowMenu(hiCommand.menu.menuItemIndex);
-			return noErr;
-			
-		case 'WTIL':
-			DoTileWindows();
-			return noErr;
-		
-		//Shortcuts Menu
-		case 'ESHT':
-			DoShortcutsEditor();
-			return noErr;
-		
-		case 'SHOR':
-			ShortcutsMenu(hiCommand.menu.menuItemIndex);
-			return noErr;
-		
-		//Apple URL Menu
-		case 'AURL':
-			HitApplicationURLMenu(hiCommand.menu.menuItemIndex);
-			return noErr;
+		case kEventProcessCommand:
+			switch(hiCommand.commandID)
+			{
+				//Apple Menu
+				case kHICommandAbout:
+					DoAbout();
+					return noErr;
+				
+				case kHICommandPreferences: // Open the Preferences window
+					OpenPreferencesWindow(-1);
+					return noErr;
+				
+				//File Menu
+				case kHICommandSave:
+					writeAllFiles();
+					return noErr;
+				
+				case 'CONO':
+					HitConnectionListMenu(hiCommand.menu.menuItemIndex);
+					return noErr;
+				
+				case 'CONC':
+					HitSignoffConnectionListMenu(hiCommand.menu.menuItemIndex);
+					return noErr;
+				
+				case 'CONX':
+					HitSelectConnectionMenu(hiCommand.menu.menuItemIndex);
+					return noErr;
+				
+				//Command Menu
+				case 'COMD':
+					HitCommandsMenu(hiCommand.menu.menuItemIndex);
+					return noErr;
+				
+				//Window Menu
+				case 'CONS':
+					ToggleConsoleWindow();
+					return noErr;
+				
+				case kCommandPrevWin:
+					DoCycleCommand(false);
+					return noErr;
+					
+				case kCommandNextWin:
+					DoCycleCommand(true);
+					return noErr;
+					
+				case 'WCAS':
+					DoCascadeWindows();
+					return noErr;
+				
+				case kCommandWindowService:
+					HitWindowPluginServiceMenu(hiCommand.menu.menuItemIndex);
+					return noErr;
+				
+				case kCommandWindowSelect:
+					HitWindowSelectWindowMenu(hiCommand.menu.menuItemIndex);
+					return noErr;
+					
+				case 'WTIL':
+					DoTileWindows();
+					return noErr;
+				
+				//Shortcuts Menu
+				case 'ESHT':
+					DoShortcutsEditor();
+					return noErr;
+				
+				case 'SHOR':
+					ShortcutsMenu(hiCommand.menu.menuItemIndex);
+					return noErr;
+				
+				//Apple URL Menu
+				case 'AURL':
+					HitApplicationURLMenu(hiCommand.menu.menuItemIndex);
+					return noErr;
+			}
+			break;
 	}
 	
 	return myErr;
@@ -867,7 +894,10 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 
 void InitEventHandlers(void)
 {
-	const EventTypeSpec commandType = {kEventClassCommand, kEventProcessCommand};
+	const EventTypeSpec commandType[] = {
+		{kEventClassCommand, kEventCommandUpdateStatus},
+		{kEventClassCommand, kEventProcessCommand},
+	};
 	
-	InstallApplicationEventHandler(NewEventHandlerUPP(DoCommandEvent), 1, &commandType, NULL, NULL);
+	InstallApplicationEventHandler(NewEventHandlerUPP(DoCommandEvent), 2, commandType, NULL, NULL);
 }

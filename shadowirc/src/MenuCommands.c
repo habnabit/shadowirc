@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -256,7 +256,7 @@ static void ActivateFindWindow(WindowPtr findWin)
 	SetKeyboardFocus(findWin, itemCtrl, kControlFocusNextPart);
 }
 
-void DoFind(char again)
+void DoFind(MWPtr mw, char again)
 {
 	static EventHandlerUPP fwUPP = NULL;
 	WindowRef findWin;
@@ -268,7 +268,7 @@ void DoFind(char again)
 	};
 	
 	if(again && find.searchFor[0])
-		DoFind2(0);
+		DoFind2(mw);
 	else //throw a dialog
 	{
 		if(++gFindWindowCount > 1)
@@ -291,7 +291,7 @@ void DoFind(char again)
 		
 		DisposeNibReference(findNib);
 		
-		status = InstallWindowEventHandler(findWin, fwUPP, GetEventTypeCount(ctSpec), ctSpec,(void *)findWin, NULL);
+		status = InstallWindowEventHandler(findWin, fwUPP, GetEventTypeCount(ctSpec), ctSpec, (void *)findWin, NULL);
 		require_noerr(status, CantInstallDialogHandler);
 		
 		FindWindowSet(findWin);
@@ -325,14 +325,17 @@ char ToggleConsoleWindow(void)
 
 #pragma mark -
 
-void HitEditMenu(short item)
+void HitEditMenu(MWPtr mw, short item)
 {
 	char mwFront, otherFront;
 	WEReference we;
 	long s0, s1;
 	MWPtr activeMW;
 	
-	activeMW = GetActiveMW();
+	activeMW = mw;
+	if(!activeMW)
+		activeMW = GetActiveMW();
+	
 	if(activeMW)
 	{
 		mwFront = 1;
@@ -497,9 +500,8 @@ static OSStatus FontSizeEventHandler(EventHandlerCallRef myHandler, EventRef eve
 	return result;
 }
 
-void DoFontSizeWindow(void)
+void DoFontSizeWindow(MWPtr mw)
 {
-	MWPtr mw = GetActiveMW();
 	static EventHandlerUPP swUPP = NULL;
 	WindowRef fsWin;
 	IBNibRef channelsNib;
@@ -513,10 +515,6 @@ void DoFontSizeWindow(void)
 	const EventTypeSpec ctSpec[] = {
 		{ kEventClassControl, kEventControlHit }
 	};
-	
-	//We don't do anything if there's no active mw
-	if(!mw)
-		return;
 	
 	if(!swUPP)
 		swUPP = NewEventHandlerUPP(FontSizeEventHandler);
@@ -563,15 +561,10 @@ CantInstallDialogHandler:
 	;
 }
 
-void HitFontsMenu(short item)
+void HitFontsMenu(MWPtr mw, short item)
 {
 	Str255 s;
 	long l;
-	MWPtr mw = GetActiveMW();
-	
-	//We don't do anything if there's no active mw
-	if(!mw)
-		return;
 	
 	GetMenuItemText(gFontsMenu, item, s);
 	if(item>fontsBegin)

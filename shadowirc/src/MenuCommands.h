@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -30,9 +30,9 @@ enum menuCommands
 
 extern MenuHandle gAppleMenu, gEditMenu, gFileMenu, gShortcutsMenu, gWindowMenu, gHelpMenu;
 
-void DoFind(char again);
-void DoFontSizeWindow(void);
-void HitFontsMenu(short item);
+void DoFind(MWPtr mw, char again);
+void DoFontSizeWindow(MWPtr mw);
+void HitFontsMenu(MWPtr mw, short item);
 
 void HitSelectConnectionMenu(short item);
 
@@ -42,7 +42,7 @@ pascal void HitSignoffConnectionListMenu(short item);
 int HitWindowPluginServiceMenu(const short item);
 int HitWindowSelectWindowMenu(const short item);
 
-void HitEditMenu(short item);
+void HitEditMenu(MWPtr mw, short item);
 
 void HitApplicationURLMenu(short item);
 
