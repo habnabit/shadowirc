@@ -388,17 +388,19 @@ static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 	ControlID topicOpsControlID = { kApplicationSignature, kSIRCTopicOpsControlID };
 	int maxLen = HTFindNumericDefault(ch->link->serverOptions, "\pTOPICLEN", 0);
 	TopicWindowInfoPtr twi = GetTopicWindowInfo(dlgWindow);
+	CFStringRef theString;
 	
 	GetControlByID(dlgWindow, &topicOpsControlID, &topicOpsControl);
 
 	if(!maxLen)
 	{
-		SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), CFSTR(""));
+		theString = CFStringCreateWithPascalString(NULL, "\p", kCFStringEncodingMacRoman);
+		SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
+		CFRelease(theString);
 		DrawOneControl(topicOpsControl);
 	}
 	else
 	{
-		CFStringRef theString;
 		LongString ls;
 		Str255 st, st2;
 		
