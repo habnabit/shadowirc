@@ -20,6 +20,7 @@
 */
 
 //#include <Appearance.h>
+#include <Carbon/Carbon.h>
 
 #include "userlist.h"
 #include "ULList.h"
@@ -40,8 +41,6 @@ const RGBColor white = {-1, -1, -1};
 const RGBColor black = {0, 0, 0};
 const RGBColor MedGrey = {cMedGrey, cMedGrey, cMedGrey};
 const RGBColor MDkGrey = {cMDkGrey, cMDkGrey, cMDkGrey};
-
-#pragma internal on
 
 INLINE ULI ULIFromMW(MWPtr mw);
 static ULI ULIFromChannel(channelPtr ch);
@@ -70,7 +69,7 @@ static void ULContextualMenu(pCMPopupsData *p);
 static void ULContextualMenuProcess(pCMPopupsReturnData *p);
 static void ProcessShortcuts(pShortcutProcessData *p);
 
-INLINE void IdleCursor(EventRecord *e);
+INLINE void IdleCursor(void);
 INLINE void CreateGlobalUserlistWindow(void);
 INLINE void DestroyGlobalUserlistWindow(void);
 INLINE void ULMoveWindow(pUIWindowMoveDataRec *p);
@@ -97,7 +96,6 @@ INLINE void SNick(pServerNICKDataRec *p);
 INLINE void SKick(pServerKICKDataRec *p);
 INLINE void STrashChannel(pServiceULTrashChannelData *p);
 INLINE void SULUserHosts(pServiceULUserhostsData *p);
-INLINE void SIdle(pIdleMessageData *p);
 
 static ULI ULINew(WindowPtr w, long type);
 static void ULIDestroy(ULI ul);
@@ -113,6 +111,9 @@ INLINE void PWClosed(void);
 static void displayOldVersionMsg(void);
 static void displayMultipleUserlistsMsg(void);
 INLINE void setupMessages(char captureMessages[numMessages]);
+
+static void SetIdleThreshold(long ticks);
+
 
 enum {
 	kUserlistSignature = 'ULST',
@@ -1812,7 +1813,7 @@ static void ULIAddAll(void)
 
 #pragma mark -
 
-INLINE void IdleCursor(EventRecord *e)
+INLINE void IdleCursor(void)
 {
 	static int inSep = 0;
 	GrafPtr gp;
@@ -1831,7 +1832,8 @@ INLINE void IdleCursor(EventRecord *e)
 	}
 	else
 	{
-		FindWindow(e->where, &w);
+		GetMouse(&pt);
+		FindWindow(pt, &w);
 		if(!w || !IsWindowActive(w))
 			in = 0;
 		else
@@ -1862,7 +1864,7 @@ INLINE void IdleCursor(EventRecord *e)
 		else
 		{
 			divider = ul->nickListWidth - 4;
-			sidr->yourInfo->idleThreshold = kIdleFast;
+			SetIdleThreshold(kIdleFast);
 			
 			if(ul->updateList && TickCount() - ul->lastUpdate > 10)
 				ListDraw(ul);
@@ -1907,41 +1909,8 @@ INLINE void IdleCursor(EventRecord *e)
 			ULIFinishDrawing(ul, gp);
 	}
 	else
-		sidr->yourInfo->idleThreshold = kIdleNormal;
+		SetIdleThreshold(kIdleNormal);
 }
-
-INLINE void SIdle(pIdleMessageData *p)
-{
-	if(globalUserlist)
-	{
-		if(gUserlist->updateList && TickCount() - gUserlist->lastUpdate > 15)
-			ListDraw(gUserlist);
-	}
-	else
-	{
-		long x = TickCount() - 15;
-		MWPtr mw = *sidr->mwList;
-		ULI ul;
-
-		while(mw)
-		{
-			if(mw->winType == chanWin)
-			{
-				mwPanePtr o = MWFindPane(mw, kUserlistPane);
-				if(o)
-				{
-					ul = (ULI)o->data;
-					if(ul->updateList && ul->lastUpdate <= x)
-						ListDraw(ul);
-				}
-			}
-			mw=mw->next;
-		} 
-	}
-	
-	IdleCursor(p->e);
-}
-
 
 INLINE void ULMoveWindow(pUIWindowMoveDataRec *p)
 {
@@ -2265,7 +2234,57 @@ INLINE void setupMessages(char captureMessages[numMessages])
 		captureMessages[pMWNewMessage] = 1;
 	captureMessages[pCMPopupsMessage] = 1;
 }
-#pragma internal off
+
+static void ULDoIdle(EventLoopTimerRef timer, void* data)
+{
+	if(globalUserlist)
+	{
+		if(gUserlist->updateList && TickCount() - gUserlist->lastUpdate > 15)
+			ListDraw(gUserlist);
+	}
+	else
+	{
+		long x = TickCount() - 15;
+		MWPtr mw = *sidr->mwList;
+		ULI ul;
+
+		while(mw)
+		{
+			if(mw->winType == chanWin)
+			{
+				mwPanePtr o = MWFindPane(mw, kUserlistPane);
+				if(o)
+				{
+					ul = (ULI)o->data;
+					if(ul->updateList && ul->lastUpdate <= x)
+						ListDraw(ul);
+				}
+			}
+			mw=mw->next;
+		} 
+	}
+	
+	IdleCursor();
+}
+
+static void SetIdleThreshold(long ticks)
+{
+	static EventLoopTimerUPP timerUPP = 0;
+	static EventLoopTimerRef timer = 0;
+	EventLoopRef mainLoop = GetMainEventLoop();
+	
+	if(timerUPP == 0)
+		timerUPP = NewEventLoopTimerUPP(ULDoIdle);
+	
+	if(timer)
+	{
+		RemoveEventLoopTimer(timer);
+		timer = 0;
+	}
+	
+	if(ticks)
+		InstallEventLoopTimer(mainLoop, TicksToEventTime(ticks), TicksToEventTime(ticks), timerUPP, NULL, &timer);
+}
 
 void pluginMain(ShadowIRCDataRecord* sidrIN)
 {
@@ -2300,7 +2319,7 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 				NewService(userlistServiceType); //We are registered
 				
 				setupMessages(sidrIN->yourInfo->captureMessages);
-				sidrIN->yourInfo->idleThreshold = kIdleNormal;
+				SetIdleThreshold(kIdleNormal);
 				
 				gSortForwardIcon = (CIconHandle)Get1IndResource('cicn', 500);
 				gSortReverseIcon = (CIconHandle)Get1IndResource('cicn', 501);
@@ -2405,10 +2424,6 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 		
 		case pServiceULUserhosts:
 			SULUserHosts((pServiceULUserhostsPtr)sidrIN->messageData);
-			break;
-		
-		case pIdleMessage:
-			SIdle((pIdleMessageDataPtr)sidrIN->messageData);
 			break;
 		
 		case pShortcutProcessMessage:
