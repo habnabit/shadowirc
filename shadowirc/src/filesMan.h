@@ -75,10 +75,6 @@ PicHandle LoadAppLogoFromResources(void);
 
 pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileName, long type, long creator, long navFlags, FSSpec *f, char allowReplace);
 
-#ifdef __NAVIGATION__
-extern NavEventUPP StdNavFilter;
-#endif
-
 pascal OSErr PFOpen(ConstStr255Param name, char resFork, short *refNum, FSSpec *fss);
 pascal char PFExists(ConstStr255Param name);
 pascal OSErr PFCreate(ConstStr255Param name, FourCharCode type, FourCharCode creator, char resFork);

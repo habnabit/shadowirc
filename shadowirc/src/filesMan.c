@@ -39,7 +39,6 @@
 	Best way to get fsspec of something in the app's dir:
 	GetProcessInformation() to get a spec to your application, then replace the name field of that spec with the other file name.
 */
-NavEventUPP StdNavFilter;
 
 enum aliases {
 	logAlias = 128,
@@ -253,7 +252,7 @@ pascal char DirectorySelectButton(FSSpec *fss)
 	
 	GetIntString(dialogOptions.message, spFile, sPleaseChooseAFolder);
 	
-	theErr = NavChooseFolder(NULL, &theReply, &dialogOptions, StdNavFilter, NULL, 0);
+	theErr = NavChooseFolder(NULL, &theReply, &dialogOptions, NULL, NULL, 0);
 
 	if ((theReply.validRecord)&&(theErr == noErr))
 	{
@@ -381,7 +380,7 @@ pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileNam
 		pstrcpy(fileName, dialogOptions.savedFileName);
 	pstrcpy("\pShadowIRC", dialogOptions.clientName);
 	
-	err = NavPutFile(0, &theReply, &dialogOptions, StdNavFilter, type, creator, 0);
+	err = NavPutFile(0, &theReply, &dialogOptions, NULL, type, creator, 0);
 
 	if(theReply.validRecord && !err)
 	{

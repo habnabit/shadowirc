@@ -32,10 +32,6 @@ pascal void ApplRun(void);
 pascal void ApplInit(void);
 pascal char doQuit(LongString *reason);
 
-pascal void doUpdateEvent(EventRecord *e);
-
-pascal void UpdateWindowPosition(WindowPtr win);
-
 pascal OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel);
 
 #endif

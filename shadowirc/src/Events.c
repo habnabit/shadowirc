@@ -24,11 +24,15 @@
 #include "IRCPreferences.h" // OpenPreferencesWindow()
 #include "IRCGlobals.h"
 #include "LongStrings.h"
+
+#include "channels.h"
+#include "MsgWindows.h"
+#include "MWPanes.h"
+#include "InputLine.h"
 #include "plugins.h"
 #include "filesMan.h"
 #include "ApplBase.h"
 #include "utils.h"
-#include "MsgWindows.h"
 #include "IRCChannels.h"
 #include "Shortcuts.h"
 #include "Floaters.h"
@@ -46,7 +50,6 @@ enum {
 	kSIRCBundleNameID = 130,
 	kSIRCVersionInfoID = 132
 };
-
 
 /*
 * Carbon Event Handlers
@@ -105,20 +108,133 @@ static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef the
 	return myErr;
 }
 
+static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
+{
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	MWPtr mw = (MWPtr)userData;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	switch(eventClass)
+	{
+		case kEventClassWindow:
+		{
+			switch(eventKind)
+			{
+				case kEventWindowActivated:
+				case kEventWindowDeactivated:
+				{
+					channelPtr ch;
+					pServiceActivateWinData ps;
+					char activate = eventKind == kEventWindowActivated;
+					
+					MWPaneActivate(mw, activate);
+					ch = MWGetChannel(mw);
+					
+					EnableMenuCommand(gEditMenu, 'FIND');
+					EnableMenuCommand(gEditMenu, 'FAGN');
+					
+					if(activate)
+					{
+						SetTarget(mw, &CurrentTarget);
+						UpdateStatusLine();
+						DrawMWinStatus(consoleWin);
+					}
+					
+					ps.ch = ch;
+					ps.activate = activate;
+					ps.w = mw->w;
+					ps.mw = mw;
+					runService(pServiceActivateWin, &ps);
+					
+					result = noErr;
+					break;
+				}
+					
+				case kEventWindowDrawContent:
+					MWPaneUpdate(mw);
+					result = noErr;
+					break;
+				
+				case kEventWindowGetMinimumSize:
+				{
+					const Point minSize = {60, 125};
+					
+					SetEventParameter(event, kEventParamDimensions, typeQDPoint, sizeof(Point), &minSize);
+					result = noErr;
+					break;
+				}
+				case kEventWindowBoundsChanged:
+				{
+					Rect growRect;
+					UInt32 attrib;
+					
+					GetEventParameter(event, kEventParamCurrentBounds, typeQDRectangle, NULL, sizeof(Rect), NULL, &growRect);
+					GetEventParameter(event, kEventParamAttributes, typeUInt32, NULL, sizeof(UInt32), NULL, &attrib);
+					
+					if(attrib & kWindowBoundsChangeSizeChanged)
+					{
+						MWPaneRecalculate(mw);
+						MWRecalculateRects(mw);
+						
+						MWPaneResize(mw);
+						MWReposition(mw);
+						result = noErr;
+					}
+					else if(attrib & kWindowBoundsChangeOriginChanged)
+					{
+						MWReposition(mw);
+						result = noErr;
+					}
+					break;
+				}
+				
+				case kEventWindowClose:
+					MWPart(mw);
+					result = noErr;
+					break;
+			}
+			break;
+		}
+	}
+	
+	return result;
+}
+
 void MWInstallEventHandlers(MWPtr mw)
 {
 	static EventHandlerUPP mouseWheelHandler = NULL;
 	static EventHandlerUPP uiCommandHandler = NULL;
+	static EventHandlerUPP mwEventHandler = NULL;
+	static ControlActionUPP caction = NULL;
 	const EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
 	const EventTypeSpec commandType = {kEventClassCommand, kEventProcessCommand};
+	const EventTypeSpec mwEvents[] = {
+			{kEventClassWindow, kEventWindowActivated},
+			{kEventClassWindow, kEventWindowDeactivated},
+			{kEventClassWindow, kEventWindowDrawContent},
+			{kEventClassWindow, kEventWindowGetMinimumSize},
+			{kEventClassWindow, kEventWindowBoundsChanged},
+			{kEventClassWindow, kEventWindowClose},
+	};
 	
 	if(!mouseWheelHandler)
 		mouseWheelHandler = NewEventHandlerUPP(MWDoMouseWheelEvent);
 	if(!uiCommandHandler)
 		uiCommandHandler = NewEventHandlerUPP(MWUICommandHandler);
+	if(!mwEventHandler)
+		mwEventHandler = NewEventHandlerUPP(MWEventHandler);
+	if(!caction)
+		caction = NewControlActionUPP(MWVScrollTrack);
 	
 	InstallWindowEventHandler(mw->w, mouseWheelHandler, 1, &wheelType, mw, NULL);
 	InstallWindowEventHandler(mw->w, uiCommandHandler, 1, &commandType, mw, NULL);
+	InstallWindowEventHandler(mw->w, mwEventHandler, GetEventTypeCount(mwEvents), mwEvents, mw, NULL);
+	
+	SetControlProperty(mw->vscr, kApplicationSignature, MW_MAGIC, sizeof(MWPtr), &mw);
+	SetControlAction(mw->vscr, caction);
 }
 
 #pragma mark -
@@ -315,7 +431,7 @@ static void cascade2(WindowPtr w)
 	{
 		MWNewPosition(&r);
 		MWSetDimen(mw, r.left, r.top, r.right-r.left, r.bottom-r.top);
-		UpdateWindowPosition(mw->w);
+		MWReposition(mw);
 		MWNewPosition(&r); //twice to give some more space
 	}
 }
@@ -400,7 +516,7 @@ static void DoTileWindows(void)
 				if(mw)
 				{
 					MWSetDimen(mw, r.left, r.top, r.right-r.left, r.bottom-r.top);
-					UpdateWindowPosition(mw->w);
+					MWReposition(mw);
 					r.top+=height + windowTopHeight + windowBotHeight;
 					r.bottom+=height + windowTopHeight + windowBotHeight;
 				}

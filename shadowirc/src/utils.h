@@ -62,10 +62,6 @@ pascal OSErr ParamString(StringPtr str, ConstStr255Param r0, ConstStr255Param r1
 pascal void SecsToHMS(long secs, LongString *ls);
 pascal void LightenColor(RGBColor *rgb);
 pascal unsigned char StandardDialogFilter(DialogPtr d, EventRecord *e, short *item);
-#ifndef __NAVIGATION__
-typedef struct NavCBRec* NavCBRecPtr;
-#endif
-pascal void NavDialogFilter(const long callBackSelector, NavCBRecPtr callBackParms, void* callBackUD);
 
 
 pascal void pstrcpymax(ConstStringPtr src, StringPtr dest, char max);

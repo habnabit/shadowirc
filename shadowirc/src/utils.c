@@ -684,24 +684,6 @@ pascal void LightenColor(RGBColor *rgb)
 	HSL2RGB(&hsl, rgb);
 }
 
-//pascal void NavDialogFilter(const NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD)
-pascal void NavDialogFilter(const long callBackSelector, NavCBRecPtr cbp, void* callBackUD)
-{
-	#pragma unused(callBackUD)
-
-	switch((NavEventCallbackMessage)callBackSelector)
-	{
-		case kNavCBEvent:
-			switch (cbp->eventData.eventDataParms.event->what)
-			{
-				case updateEvt:
-					doUpdateEvent(cbp->eventData.eventDataParms.event);
-					break;
-			}
-			break;
-	}
-}
-
 pascal void SetupModalDialog(DialogPtr d, short ok, short cancel)
 {
 	SetDialogDefaultItem(d, ok);
@@ -721,11 +703,6 @@ pascal unsigned char StandardDialogFilter(DialogPtr d, EventRecord *e, short *it
 	if(e->what == updateEvt)
 	{
 		*item = 0;
-		if((DialogPtr)e->message != d)
-		{
-			doUpdateEvent(e);
-			return true;
-		}
 	}
 	else if(e->what == nullEvent)
 	{

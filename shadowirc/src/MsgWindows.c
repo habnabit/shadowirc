@@ -114,7 +114,7 @@ static pascal void DoAddRGBColorHunk(myStScrpHandle sty, int i, int *nsty, const
 static WEScrollUPP sScrollerUPP = 0;
 static pascal void TextScrolled(WEReference we);
 
-static pascal void ScrollBarChanged(WEReference we, long val);
+static void ScrollBarChanged(WEReference we, long val);
 
 pascal OSErr FSpGetDirectoryID(FSSpec*, long*, char*); //for MWStartLogging
 
@@ -258,95 +258,7 @@ pascal char MWSetDCC(MWPtr mw, connectionPtr dcc, Str255 name)
 
 #pragma mark -
 
-static void MWLiveScroll(MWPtr mw, Point pt)
-{
-	IndicatorDragConstraint constraint;
-	MouseTrackingResult trackingResult;
-	Point mouse;
-	long initial, old, cur, max;
-	short range, delta;
-	ControlHandle bar = mw->vscr;
-	LongRect viewRect, destRect;
-	WEReference we = mw->we;
-	
-	HiliteControl(bar, kControlIndicatorPart);
-	
-	*(Point*)&constraint.limitRect = pt;
-	SendControlMessage(bar, thumbCntl, &constraint);
-	
-	range = constraint.limitRect.bottom - constraint.limitRect.top;
-	
-	initial=old=cur=GetControl32BitValue(bar);
-	
-	WEGetViewRect(&viewRect, we);
-	GetMouse(&mouse);
-	do
-	{
-		if(PtInRect(mouse, &constraint.slopRect))
-		{
-			max=GetControl32BitMaximum(bar); //Can't cache this because it might change.
-			
-			delta=mouse.v - pt.v;
-			
-			cur = initial + (float)max * (float)delta / (float)range;
-			if(cur<0)
-				cur=0;
-			if(cur>max)
-				cur=max;
-
-			if(cur != old)
-			{
-				WEGetDestRect(&destRect, we);
-				SetControl32BitValue(bar, cur);
-				WEScroll(0, viewRect.top-destRect.top-cur, we);
-				old=cur;
-			}
-		}
-		
-		TrackMouseLocation(NULL, &mouse, &trackingResult);
-	} while(trackingResult != kMouseTrackingMouseReleased);
-	
-	HiliteControl(bar, kControlNoPart);
-}
-
-
-static void MWVScrollTrack(ControlHandle vscr, short part)
-{
-	MWPtr mw;
-	long scrollStep;
-	long pageSize;
-	LongRect viewRect;
-	
-	if(part == kControlNoPart)
-		return;
-	
-	mw = MWFromWindow(GetControlOwner(vscr));
-	WEGetViewRect(&viewRect, mw->we);
-	pageSize = viewRect.bottom - viewRect.top;
-	
-	switch(part)
-	{
-		case kControlPageUpPart:
-			scrollStep = -(pageSize - mw->scrpHeight);
-			break;
-			
-		case kControlPageDownPart:
-			scrollStep = (pageSize - mw->scrpHeight);
-			break;
-			
-		case kControlUpButtonPart:
-			scrollStep=- mw->scrpHeight;
-			break;
-			
-		case kControlDownButtonPart:
-			scrollStep = mw->scrpHeight;
-			break;
-	}
-	
-	MWScroll(mw, scrollStep);
-}
-
-static pascal void ScrollBarChanged(WEReference we, long val)
+static void ScrollBarChanged(WEReference we, long val)
 {
 	LongRect viewRect, destRect;
 	
@@ -374,6 +286,48 @@ pascal void MWScroll(MWPtr mw, long delta)
 			ScrollBarChanged(mw->we, value);
 		}
 	}
+}
+
+void MWVScrollTrack(ControlRef vscr, ControlPartCode part)
+{
+	MWPtr mw;
+	long scrollStep;
+	long pageSize;
+	LongRect viewRect;
+	
+	if(part == kControlNoPart)
+		return;
+	
+	GetControlProperty(vscr, kApplicationSignature, MW_MAGIC, sizeof(MWPtr), NULL, &mw);
+	WEGetViewRect(&viewRect, mw->we);
+	pageSize = viewRect.bottom - viewRect.top;
+	
+	switch(part)
+	{
+		case kControlPageUpPart:
+			scrollStep = -(pageSize - mw->scrpHeight);
+			break;
+			
+		case kControlPageDownPart:
+			scrollStep = (pageSize - mw->scrpHeight);
+			break;
+			
+		case kControlUpButtonPart:
+			scrollStep=- mw->scrpHeight;
+			break;
+			
+		case kControlDownButtonPart:
+			scrollStep = mw->scrpHeight;
+			break;
+		
+		case kControlIndicatorPart:
+			ScrollBarChanged(mw->we, GetControl32BitValue(vscr));
+			scrollStep = 0;
+			break;
+	}
+	
+	if(scrollStep)
+		MWScroll(mw, scrollStep);
 }
 
 pascal void MWPage(MWPtr mw, char up)
@@ -429,32 +383,8 @@ static pascal void TextScrolled(WEReference we)
 
 void MWHitContent(MWPtr mw, EventRecord *e)
 {
-	ControlRef theControl;
-	ControlPartCode pa;
-	ControlActionUPP upp;
-	
 	GlobalToLocal(&e->where);
-	theControl = FindControlUnderMouse(e->where, mw->w, &pa);
-	if(theControl == mw->vscr) //kludge, since the only control I know about is the vscr.
-	{
-		switch(pa)
-		{
-			case kControlPageUpPart:
-			case kControlPageDownPart:
-			case kControlUpButtonPart:
-			case kControlDownButtonPart:
-				upp = NewControlActionUPP(MWVScrollTrack);
-				pa = HandleControlClick(theControl, e->where, e->modifiers, upp);
-				DisposeControlActionUPP(upp);
-				break;
-			
-			case kControlIndicatorPart:
-				MWLiveScroll(mw, e->where);
-				break;
-		}
-	}
-	else
-		MWPaneClick(mw, e);
+	MWPaneClick(mw, e);
 }
 
 #pragma mark -
@@ -732,23 +662,10 @@ pascal void MWReposition(MWPtr mw)
 
 void MWSetDimen(MWPtr win, short left, short top, short width, short height)
 {
-	GrafPtr gp;
-	Rect portRect;
-	
 	if(win)
 	{
 		MoveWindow(win->w, left, top, false);
 		SizeWindow(win->w, width, height, false);
-		GetPort(&gp);
-		SetPortWindowPort(win->w);
-		GetPortBounds(GetWindowPort(win->w), &portRect);
-		EraseRect(&portRect);
-		SetPort(gp);
-		
-		MWPaneRecalculate(win);
-		MWRecalculateRects(win);
-		
-		MWPaneResize(win);
 	}
 }
 
@@ -947,13 +864,12 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 		
 		GetPort(&p0);
 
-		h->w=WCreate(&windowSize, title, kWindowResizableAttribute, (long)h, false);
+		h->w=WCreate(&windowSize, title, kWindowResizableAttribute | kWindowLiveResizeAttribute | kWindowStandardHandlerAttribute, (long)h, false);
 
 		if(!h->w)
 			goto failedWCreate;
 		else
 		{
-			MWInstallEventHandlers(h); // Events.c
 			SetPortWindowPort(h->w);
 			TextFont(fontNum);
 			TextSize(mainPrefs->defaultFontSize);
@@ -971,7 +887,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, we);
 		
 			h->magic=MW_MAGIC;
-			h->vscr=NewControl(h->w, &windowSize, "\p", true, 0, 0, 0, kControlScrollBarProc, 0);
+			h->vscr=NewControl(h->w, &windowSize, "\p", true, 0, 0, 0, kControlScrollBarLiveProc, 0);
 			DeactivateControl(h->vscr);
 				
 			h->winType=winType;
@@ -1033,7 +949,9 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 					h->hpos = 0;
 				}
 
-			MWSetDimen(h, windowSize.left, windowSize.top, windowSize.right-windowSize.left, windowSize.bottom-windowSize.top);
+			MWPaneRecalculate(h);
+			MWRecalculateRects(h);
+			MWPaneResize(h);
 
 				MWNewWidget(h, mwTopicWidget, mwAlignLeft, -1);
 				
@@ -1052,6 +970,8 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			if(h->next)
 				h->next->prev = h;
 			mwl = h;
+
+			MWInstallEventHandlers(h);
 		}
 	}
 	return h;

@@ -327,7 +327,6 @@ INLINE void DoExport(SLServHand servers[])
 	
 	NavReplyRecord		theReply;
 	NavDialogOptions	dialogOptions;
-	NavEventUPP			eventUPP = NewNavEventUPP(NavDialogFilter);
 	OSErr err;
 	AEKeyword key;
 	
@@ -338,9 +337,7 @@ INLINE void DoExport(SLServHand servers[])
 	pstrcpy("\pServerList Export", dialogOptions.savedFileName);
 	pstrcpy("\pShadowIRC", dialogOptions.clientName);
 	
-	err = NavPutFile(0, &theReply, &dialogOptions, eventUPP, 'TEXT', 'SIRC', 0);
-	
-	DisposeNavEventUPP(eventUPP);
+	err = NavPutFile(0, &theReply, &dialogOptions, NULL, 'TEXT', 'SIRC', 0);
 	
 	if(theReply.validRecord && !err)
 	{

@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x02000006
+#define _ShadowIRC_API_Version_ 0x02000007
 
 #include <Carbon/Carbon.h>
 #include <netinet/in.h>
@@ -2391,13 +2391,6 @@ pascal char StandardDialogFilter(DialogPtr d, EventRecord *e, short *item);
 					you should call this first, and process only if it returns false.
 */ 
 
-//pascal void NavDialogFilter(const NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD)
-pascal void NavDialogFilter(const long callBackSelector, Ptr callBackParms, long callBackUD);
-/*	ShadowIRC's standard Navigation Services dialog filter. Call directly from your filter, or as a
-		UPP from a Navigation Services API call.
-		Provides update event support for other windows. Does NOT allow network activity.
-*/
-
 pascal void MWPart(MWPtr mw);
 /*	Closes a message window. Same as hitting cmd-w on a window.
 		Input:	mw - The message window to close
@@ -2549,16 +2542,6 @@ pascal MWPtr NewPluginMWindow(ConstStr255Param title);
 		Notes:	¥ Don't EVER change the 'magic' variable in a MWPtr. If you do, ShadowIRC will not be able
 					to tell that the window is a message window.
 					¥ Don't EVER change the window's refCon, since it contains the MWPtr for the window.
-*/
-
-void MWSetDimen(MWPtr window, short left, short top, short width, short height);
-/*	Sets a message window's size and position.
-		Input:	window - the message window
-					left - left coord
-					top - top coord
-					width - width of window
-					height - height of window
-		Output:	none
 */
 
 pascal void MWSetFontSize(MWPtr window, short font, short size);

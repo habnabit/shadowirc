@@ -112,6 +112,7 @@ static void ULSetWindowProperty(ULI ul)
 	SetWindowProperty(ul->uwin, kUserlistSignature, kUserlistWindow, sizeof(ul), &ul);
 }
 
+/*
 static ULI ULGetWindowProperty(WindowPtr w)
 {
 	ULI ul;
@@ -121,7 +122,7 @@ static ULI ULGetWindowProperty(WindowPtr w)
 	
 	return ul;
 }
-		
+*/		
 
 INLINE ULI ULIFromMW(MWPtr mw)
 {
@@ -1642,7 +1643,7 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			shadowircColors = sidrIN->shadowircColors;
 			
 			l=((pVersionCheckDataPtr)sidrIN->messageData)->version;
-			if(l<0x02000006) //2.0a6
+			if(l<0x02000007) //2.0a7
 			{
 				((pVersionCheckDataPtr)sidrIN->messageData)->version = pVersionShadowIRCTooOld;
 				displayOldVersionMsg();

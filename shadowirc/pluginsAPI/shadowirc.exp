@@ -76,7 +76,6 @@ _WIsFloater
 _WSelect
 _WGetBBox
 _StandardDialogFilter
-_NavDialogFilter
 _MWPart
 _SetTextColor
 _SetBackground
@@ -92,7 +91,6 @@ _DragGetType
 _DragGetPtr
 _DragAddPtr
 _NewPluginMWindow
-_MWSetDimen
 _MWSetFontSize
 _MWDelete
 _MWMessage

@@ -337,7 +337,7 @@ static pascal char ColorFileSelect(FSSpec *out)
 	pstrcpy("\pShadowIRC", dialogOptions.clientName);
 	openList = (NavTypeListHandle)GetResource('open', kOpenColor);
 
-	theErr = NavGetFile(0, &theReply, &dialogOptions, StdNavFilter, 0, 0, openList, 0);
+	theErr = NavGetFile(0, &theReply, &dialogOptions, NULL, 0, 0, openList, 0);
 	
 	if(openList)
 		ReleaseResource((Handle)openList);

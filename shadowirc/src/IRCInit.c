@@ -82,7 +82,6 @@ inline void CheckPreferences(void)
 inline void SetupUPPs(void)
 {
 	StdDlgFilter = NewModalFilterUPP(StandardDialogFilter);
-	StdNavFilter = NewNavEventUPP(NavDialogFilter);
 }
 
 static void AppleHelpInit()

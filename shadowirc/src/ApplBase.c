@@ -59,11 +59,7 @@
 
 static pascal void WindowActivate(WindowPtr window, char activate);
 static pascal void floatingWindowClick(EventRecord *e);
-static pascal void inZoomInOutHandler(const EventRecord *e, short part);
-static pascal void inDragHandler(EventRecord *e);
 static pascal void inContentHandler(EventRecord *e);
-inline void inGoAwayHandler(const EventRecord *e);
-static pascal void inGrowHandler(const EventRecord *e);
 static pascal void doMouseDown(EventRecord *e);
 static void doTCPEvent(CEPtr message);
 static pascal void ApplEvents(EventRecord *e);
@@ -310,42 +306,26 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 	channelPtr ch;
 	pServiceActivateWinData ps;
 	
-	p=MWFromWindow(window);
-	if(p)
-	{
-		MWPaneActivate(p, activate);
-		
-		ch = MWGetChannel(p);
-		
-		EnableMenuCommand(gEditMenu, 'FIND');
-		EnableMenuCommand(gEditMenu, 'FAGN');
-	}
-	else
-	{
-		pluginDlgInfoPtr l;
-		
-		ch=0;
+	pluginDlgInfoPtr l;
+	
+	ch=0;
 
-		DisableMenuCommand(gEditMenu, 'FIND');
-		DisableMenuCommand(gEditMenu, 'FAGN');
-		
-		l= (pluginDlgInfoPtr)GetWRefCon(window);
-		if(l && l->magic==PLUGIN_MAGIC)
-		{
-			pl.window=window;
-			pl.activate=activate;
-			runIndPlugin(l->pluginRef, pUIActivateMessage, &pl);
-		}
+	DisableMenuCommand(gEditMenu, 'FIND');
+	DisableMenuCommand(gEditMenu, 'FAGN');
+	
+	l= (pluginDlgInfoPtr)GetWRefCon(window);
+	if(l && l->magic==PLUGIN_MAGIC)
+	{
+		pl.window=window;
+		pl.activate=activate;
+		runIndPlugin(l->pluginRef, pUIActivateMessage, &pl);
 	}
 	
 	if(!WIsFloater(window)) //don't change the target if it's a floater
 	{
 		if(activate) //activatechannels
 		{
-			if(p && IsWindowActive(p->w))
-				SetTarget(p, &CurrentTarget);
-			else
-				InvalTarget(&CurrentTarget);
+			InvalTarget(&CurrentTarget);
 	
 			UpdateStatusLine();
 			DrawMWinStatus(consoleWin);
@@ -359,21 +339,11 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 	}
 }
 
-pascal void UpdateWindowPosition(WindowPtr win)
-{
-	MWPtr mw;
-	
-	mw=MWFromWindow(win);
-	if(mw)
-		MWReposition(mw);
-}
-
 static pascal void floatingWindowClick(EventRecord *e) //this also takes care of handling the float clicks
 {
 	GrafPtr p;
 	short i;
 	WindowPtr wp;
-	pluginDlgInfoPtr pd;
 	
 	i=FindWindow(e->where, &wp);
 	if(wp==inputLine.w)
@@ -394,18 +364,7 @@ static pascal void floatingWindowClick(EventRecord *e) //this also takes care of
 		return;
 	}
 	else //it's another floater...
-	{
-		if(WIsFloater(wp))
-		{
-			pd=(pluginDlgInfoPtr)GetWRefCon(wp);
-			if(pd && (pd->magic==PLUGIN_MAGIC))
-				return;
-		}
-		else
-		{ //it's not a floater I know of.
-			iwFront=0;
-		}
-	}
+		iwFront=0;
 }
 
 #pragma mark -
@@ -598,48 +557,6 @@ static void InitTimers()
 
 #pragma mark -
 
-static pascal void inZoomInOutHandler(const EventRecord *e, short part)
-{
-	MWPtr p;
-	Rect r;
-	
-	p=MWFromWindow((WindowPtr)e->message);
-	if(p)
-	{
-		if(TrackBox(p->w, e->where, part))
-		{
-			ZoomWindow(p->w, part, 0);
-			WGetBBox(p->w, &r);
-			MWSetDimen(p, r.left, r.top, r.right-r.left, r.bottom-r.top);
-		}
-	}
-}
-
-static pascal void inGrowHandler(const EventRecord *e)
-{
-	MWPtr p;
-	Rect r;
-	long ii;
-	GrafPtr port;
-	
-	GetPort (&port);
-
-	p=MWFromWindow((WindowPtr)e->message);
-	if(p)
-	{
-		SetRect(&r, 125, 60, 32767, 32767);
-		ii=GrowWindow(p->w, e->where, &r);
-		if(ii)
-		{
-			WGetBBox(p->w, &r);
-			MWSetDimen(p, r.left, r.top, ii&0x0000FFFF, ii >> 16);
-			UpdateWindowPosition(p->w);
-		}
-	}
-
-	SetPort(port);
-}
-
 static pascal void inContentHandler(EventRecord *e)
 {
 	MWPtr mw;
@@ -655,41 +572,6 @@ static pascal void inContentHandler(EventRecord *e)
 		MWHitContent(mw, e);
 
 	SetPort(gp);
-}
-
-static pascal void inDragHandler(EventRecord *e)
-{
-	if(IsWindowPathSelectClick((WindowPtr)e->message, e))
-		WindowPathSelect((WindowPtr)e->message, 0, 0);
-	else
-	{
-		Rect WindowDragRect;
-		GetRegionBounds(GetGrayRgn(), &WindowDragRect);
-		DragWindow((WindowPtr)e->message, e->where, &WindowDragRect);
-		UpdateWindowPosition((WindowPtr)e->message);
-	}
-}
-
-inline void inGoAwayHandler(const EventRecord *e)
-{
-	MWPtr p;
-	pluginDlgInfoPtr pl;
-	
-	p=MWFromWindow((WindowPtr)e->message);
-	if(p)
-	{
-		if(TrackGoAway(p->w, e->where))
-			MWPart(p);
-	}
-	else
-	{
-		if(TrackGoAway((WindowPtr)e->message, e->where))
-		{
-			pl=(pluginDlgInfoPtr)GetWRefCon((WindowPtr)e->message);
-			if(pl && pl->magic==PLUGIN_MAGIC)
-				pluginCloseWindow((WindowPtr)e->message, pl);
-		}
-	}
 }
 
 static OSStatus DoModifierKeysChangedEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
@@ -745,19 +627,6 @@ static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef even
 	return noErr;
 }
 
-pascal void doUpdateEvent(EventRecord *e)
-{
-	MWPtr mw=MWFromWindow((WindowPtr)e->message);
-
-	if(mw)
-	{
-		BeginUpdate(mw->w);
-		DrawControls(mw->w);
-		MWPaneUpdate(mw);
-		EndUpdate(mw->w);
-	}
-}
-
 static pascal void doMouseDown(EventRecord *e)
 {
 	short i;
@@ -772,7 +641,7 @@ static pascal void doMouseDown(EventRecord *e)
 			break;
 		
 		default:
-			if((i==inContent || i==inGrow) && (p!=ActiveNonFloatingWindow())) // || i==inDrag
+			if((i==inContent) && (p!=ActiveNonFloatingWindow())) // || i==inDrag
 			{
 				if(!WIsFloater(p))
 				{
@@ -803,23 +672,6 @@ static pascal void doMouseDown(EventRecord *e)
 							iwFront=0;
 							inContentHandler(e);
 						}
-						break;
-					
-					case inGrow:
-						inGrowHandler(e);
-						break;
-					
-					case inGoAway:
-						inGoAwayHandler(e);
-						break;
-					
-					case inDrag:
-						inDragHandler(e);
-						break;
-					
-					case inZoomIn:
-					case inZoomOut:
-						inZoomInOutHandler(e, i);
 						break;
 				}
 			}
@@ -862,10 +714,6 @@ static pascal void ApplEvents(EventRecord *e)
 	switch(e->what)
 	{
 		case nullEvent:
-			break;
-		
-		case updateEvt:
-			doUpdateEvent(e);
 			break;
 		
 		case activateEvt:
