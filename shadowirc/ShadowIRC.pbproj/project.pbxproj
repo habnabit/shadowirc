@@ -66,6 +66,38 @@
 //052
 //053
 //054
+//140
+//141
+//142
+//143
+//144
+		14EEACA8044D95C800A80001 = {
+			children = (
+				14EEACA9044D95C800A80001,
+			);
+			isa = PBXVariantGroup;
+			name = Localizable.strings;
+			path = "";
+			refType = 4;
+		};
+		14EEACA9044D95C800A80001 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = English;
+			path = English.lproj/Localizable.strings;
+			refType = 4;
+		};
+		14EEACAA044D95C800A80001 = {
+			fileRef = 14EEACA8044D95C800A80001;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+//140
+//141
+//142
+//143
+//144
 //190
 //191
 //192
@@ -184,6 +216,7 @@
 				F552BF490211030901A80061,
 				F552BF4F0211030901A80061,
 				F5059DA302A5C0930132A983,
+				14EEACA8044D95C800A80001,
 				F5D4BE900323C8880132A983,
 				F5BA629F030FFFCA0132A983,
 				F5059D9402A3470A0132A983,
@@ -368,6 +401,7 @@
 				F57375F303205FE90132A983,
 				F5A6AF20032111060132A983,
 				F5D4BE910323C8880132A983,
+				14EEACAA044D95C800A80001,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
