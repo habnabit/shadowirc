@@ -983,8 +983,13 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 				case T_Established:
                                         if(FD_ISSET(c->sockfd, rset)) {
                                                 cer->value = TCPCharsAvailable(c->sockfd);
-					if(cer->value > 0)
-						cer->event = C_CharsAvailable;
+                                                if(cer->value > 0) {
+                                                    cer->event = C_CharsAvailable;
+                                                } else {
+                                                    c->status = CS_Closing;
+                                                    cer->event = C_Closed;
+                                                    CloseTCPConnection(&rcp);
+                                                }
                                         }
 					break;
 				case T_Closed:
