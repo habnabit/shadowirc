@@ -835,7 +835,7 @@ static void FindAddressDNR(DNRRecordPtr drp)
 	pthread_cleanup_push((void *) pthread_mutex_unlock, (void *) &dnslock);
 	
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_INET;	// limit to IPv4 until remainder of changes are checked in
+	hints.ai_family = PF_UNSPEC;
 	pthread_mutex_lock(&drp->lock);
 	error = getaddrinfo(str, NULL, &hints, &drp->addr_list); // where will we free the list?
 	free(str);
