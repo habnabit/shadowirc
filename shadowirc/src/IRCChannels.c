@@ -1391,7 +1391,7 @@ pascal MWPtr ChJoin(channelPtr ch)
 		w->inactive=0;
 		
 		//Only need to fix the target if the window already exited.
-		if(CurrentTarget.bad && FrontNonFloater() == w->w)
+		if(CurrentTarget.bad && ActiveNonFloatingWindow() == w->w)
 		{
 			SetTarget(w, &CurrentTarget);
 			UpdateStatusLine();
@@ -1413,7 +1413,7 @@ pascal MWPtr ChJoin(channelPtr ch)
 			if(!ls.len)
 				WSelect(w->w);
 			else
-				WShow(w->w);
+				ShowWindow(w->w);
 		}
 		else
 			WSelect(w->w);
@@ -1425,7 +1425,7 @@ pascal MWPtr ChJoin(channelPtr ch)
 pascal void DoJoinSelWin(MWPtr w)
 {
 	if(MWActive && MWActive->protect)
-		WShow(w->w);
+		ShowWindow(w->w);
 	else if(mainPrefs->dontActivateNewWindowsIfInputlineText)
 	{
 		LongString ls;
@@ -1434,7 +1434,7 @@ pascal void DoJoinSelWin(MWPtr w)
 		if(!ls.len)
 			WSelect(w->w);
 		else
-			WShow(w->w);
+			ShowWindow(w->w);
 	}
 	else
 		WSelect(w->w);
@@ -1492,7 +1492,7 @@ pascal void MWPart(MWPtr mw)
 		switch(mw->winType)
 		{
 			case conWin:
-				WHide(mw->w);
+				HideWindow(mw->w);
 				SendBehind(mw->w, 0);
 				mainPrefs->consoleOpen=0;
 				break;

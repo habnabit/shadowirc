@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -30,14 +30,8 @@ extern WindowActivateProcPtr ActivateWindowProcPtr;
 #define IsDialog(w) (GetWindowKind(w) == dialogKind)
 
 Rect *WGetBBox(WindowPtr w, Rect *r);
-pascal WindowPtr FrontNonFloater(void);
 pascal char WIsFloater(WindowPtr w);
-pascal void WMoveToFront(WindowPtr w);
 pascal void WSelect(WindowPtr w);
-pascal void WDrag(WindowPtr w, Point startPoint, const Rect *boundsRect);
-pascal void WShow(WindowPtr w);
-pascal void WHide(WindowPtr w);
-pascal void WMove(WindowPtr w, short h, short v, char front);
 pascal void EnterModalDialog(void);
 pascal void ExitModalDialog(void);
 

@@ -776,7 +776,7 @@ static pascal void MWTallPosition(Rect *r)
 	WindowPtr wp = consoleWin->w;
 
 	if(!IsWindowVisible(wp))
-		wp = FrontNonFloater();
+		wp = ActiveNonFloatingWindow();
 	
 	if(wp)
 	{
@@ -1031,7 +1031,7 @@ pascal void MWDelete(MWPtr w)
 	MWPtr mw;
 	
 	if(w->w)
-		WHide(w->w);
+		HideWindow(w->w);
 	MWDestroyAllWidgets(w);
 	
 	pd.mw = w;
@@ -1071,7 +1071,7 @@ pascal void MWDelete(MWPtr w)
 	DisposePtr((Ptr)w);
 	if(MWLast == MWActive || MWLast == w)
 		MWLast=0;
-	MWActive=MWFromWindow(FrontNonFloater());
+	MWActive=MWFromWindow(ActiveNonFloatingWindow());
 }
 
 static pascal Style DoAddHunk(Style s, myStScrpHandle sty, int i, int *nsty)

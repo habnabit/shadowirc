@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -24,9 +24,6 @@
 
 extern char inBackground;
 
-static pascal void ShowAllFloaters(void);
-static pascal void HideAllFloaters(void);
-
 WindowActivateProcPtr ActivateWindowProcPtr;
 
 Rect *WGetBBox(WindowPtr w, Rect *rr)
@@ -46,16 +43,6 @@ pascal char WIsFloater(WindowPtr w)
 	return wclass == kFloatingWindowClass;
 }
 
-pascal WindowPtr FrontNonFloater(void)
-{
-	return ActiveNonFloatingWindow();
-}
-
-pascal void WMoveToFront(WindowPtr w)
-{
-	BringToFront(w);
-}
-
 //Not called if has 8.6
 static pascal void WDeactivate(WindowPtr w)
 {
@@ -73,12 +60,12 @@ pascal void EnterModalDialog(void)
 	TEFromScrap();
 	if(!inBackground)
 	{
-		fnf=FrontNonFloater();
+		fnf=ActiveNonFloatingWindow();
 		
 		if(fnf && IsWindowHilited(fnf))
 			WDeactivate(fnf);
 		
-		HideAllFloaters();
+		HideFloatingWindows();
 	}
 }
 
@@ -88,7 +75,7 @@ pascal void ExitModalDialog(void)
 	{
 		WindowPtr fnf;
 		
-		fnf = FrontNonFloater();
+		fnf = ActiveNonFloatingWindow();
 
 		//Directly do WActivate stuff since window is going to hilite itself...		
 		if(fnf)
@@ -97,7 +84,7 @@ pascal void ExitModalDialog(void)
 			ActivateWindowProcPtr(fnf, 1);
 		}
 		
-		ShowAllFloaters();
+		ShowFloatingWindows();
 	}
 	else
 	{
@@ -115,32 +102,12 @@ pascal void WSelect(WindowPtr w)
 	SelectWindow(w);
 }
 
-pascal void WShow(WindowPtr w)
-{
-	ShowWindow(w);
-}
-
-pascal void WHide(WindowPtr w)
-{
-	HideWindow(w);
-}
-
-static pascal void ShowAllFloaters(void)
-{
-	ShowFloatingWindows();
-}
-
-static pascal void HideAllFloaters(void)
-{
-	HideFloatingWindows();
-}
-
 pascal void WSuspend(void) //hide all floaters and deactivate first non-floater
 {
 	WindowPtr fnf;
 	
-	HideAllFloaters();
-	fnf=FrontNonFloater();
+	HideFloatingWindows();
+	fnf=ActiveNonFloatingWindow();
 
 /*	This is expanded here rather than calling WDeactivate() to ensure that it gets called, even though the window
 		may already be deactivated.
@@ -156,8 +123,8 @@ pascal void WResume(void)
 {
 	WindowPtr fnf;
 	
-	ShowAllFloaters();
-	fnf = FrontNonFloater();
+	ShowFloatingWindows();
+	fnf = ActiveNonFloatingWindow();
 	if(fnf)
 	{
 		//This is WActivate() stuff. Moved here so window does get redrawn,
@@ -165,16 +132,6 @@ pascal void WResume(void)
 		HiliteWindow(fnf, 1);
 		ActivateWindowProcPtr(fnf, 1);
 	}
-}
-
-pascal void WDrag(WindowPtr w, Point startPoint, const Rect *boundsRect)
-{
-	DragWindow(w, startPoint, boundsRect);
-}
-
-pascal void WMove(WindowPtr w, short h, short v, char front)
-{
-	MoveWindow(w, h, v, front);
 }
 
 pascal WindowPtr WCreate(const Rect *boundsRect, ConstStr255Param title, short theProc, char goAwayFlag, long refCon, char isFloater)

@@ -101,7 +101,7 @@ void WindowClose(WindowPtr wp)
 
 static void CloseFrontWindow(void)
 {
-	WindowClose(FrontNonFloater());
+	WindowClose(ActiveNonFloatingWindow());
 }
 
 #pragma mark -
@@ -141,7 +141,7 @@ static void DoCycleCommand(char next)
 {
 	MWPtr activeW, mw;
 	
-	if(!FrontNonFloater()) //do nothing if no front window.
+	if(!ActiveNonFloatingWindow()) //do nothing if no front window.
 		return;
 	
 	activeW=MWActive;
@@ -217,7 +217,7 @@ static void DoCascadeWindows(void)
 	WindowPtr w;
 	
 	SetRect(&cornerstone, 5, GetMBarHeight() + 16, 425, 340);
-	w=FrontNonFloater();
+	w=ActiveNonFloatingWindow();
 	
 	if(w)
 		cascade2(w);
@@ -225,7 +225,7 @@ static void DoCascadeWindows(void)
 
 static void DoTileWindows(void)
 {
-	WindowPtr w = FrontNonFloater();
+	WindowPtr w = ActiveNonFloatingWindow();
 	WindowPtr w2=w;
 	int cnt = 0;
 	int height;

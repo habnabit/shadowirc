@@ -644,7 +644,7 @@ static pascal void displayOldVersionMsg(void)
 	
 	LSStrLS("\pThe highlight plugin requires ShadowIRC 1.1 or later.", &ls);
 	if(!WIsVisible((*sidr->consoleWin)->w))
-		WShow((*sidr->consoleWin)->w);
+		ShowWindow((*sidr->consoleWin)->w);
 	SMPrefixIrcleColor(&ls, dsConsole, '2');
 }
 

@@ -382,7 +382,7 @@ static pascal void nPart(linkPtr link, LongString *target, StringPtr from, Strin
 	runPlugins(pServerPARTMessage, &p);
 
 	if(p.isMe)
-		WHide(p.channel->window->w);
+		HideWindow(p.channel->window->w);
 	
 	if(!p.dontDisplay)
 	{

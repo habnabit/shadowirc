@@ -1293,7 +1293,7 @@ static pascal ULI ULINew(WindowPtr w, long type)
 		}
 		
 		if(mainPrefs->userListOpen)
-			WShow(ul->uwin);
+			ShowWindow(ul->uwin);
 		else
 			SendBehind(ul->uwin, 0); //Throw it behind everything else so it doesn't pop up at fg/bg switch if hidden.
 		
@@ -1906,7 +1906,7 @@ INLINE void ULCloseWindow(pUIWindowCloseDataRec *p)
 	
 	if(ul) //then it's the global window
 	{
-		WHide(ul->uwin);
+		HideWindow(ul->uwin);
 		mainPrefs->userListOpen = false;
 	}
 }
@@ -1922,12 +1922,12 @@ INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p)
 				if(WIsVisible(gUserlist->uwin)) //hide it
 				{
 					mainPrefs->userListOpen = false;
-					WHide(gUserlist->uwin);
+					HideWindow(gUserlist->uwin);
 				}
 				else //show it
 				{
 					mainPrefs->userListOpen = true;
-					WShow(gUserlist->uwin);
+					ShowWindow(gUserlist->uwin);
 				}
 
 				CheckItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType), mainPrefs->userListOpen);
@@ -2180,7 +2180,7 @@ static pascal void displayOldVersionMsg(void)
 	
 	LSStrLS("\pThe userlist plugin requires ShadowIRC 1.1 or later.", &ls);
 	if(!WIsVisible((*sidr->consoleWin)->w))
-		WShow((*sidr->consoleWin)->w);
+		ShowWindow((*sidr->consoleWin)->w);
 	SMPrefixIrcleColor(&ls, dsConsole, '2');
 }
 
@@ -2190,7 +2190,7 @@ static pascal void displayMultipleUserlistsMsg(void)
 	
 	LSStrLS("\pYou have more than one userlist plugin installed.", &ls);
 	if(!WIsVisible((*sidr->consoleWin)->w))
-		WShow((*sidr->consoleWin)->w);
+		ShowWindow((*sidr->consoleWin)->w);
 	SMPrefix(&ls, dsConsole);
 }
 

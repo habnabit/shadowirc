@@ -2418,9 +2418,8 @@ pascal void SetInputLine(LongString *ls);
 		for example.)
 		
 		¥ List of Window Manager functions to avoid:
-			NewWindow(), NewDialog() and variants, DisposeWindow() and DisposeDialog(), FrontWindow(),
-			BringToFront(), SelectWindow(), DragWindow(), ShowWindow(), HideWindow(), ShowHide(),
-			MoveWindow()
+			NewWindow(), NewDialog() and variants, DisposeWindow() and DisposeDialog(),
+			SelectWindow(), DragWindow(), ShowHide(),
 		
 		¥ And the exception to the previous rule...
 			When creating a modal dialog, your DLOG resource should have the 'Initially Visible' flag off, and
@@ -2485,61 +2484,15 @@ pascal void* GetPluginWindowOwner(WindowPtr w);
 		Output:	return value: pluginRef of owner, or nil if none.
 */
 
-pascal WindowPtr FrontNonFloater(void);
-/*	Gets the frontmost non-floating window. (Replacment for FrontWindow())
-		Input:	none
-		Output:	WindowPtr to frontmost non-floating window, or nil, if there is none.
-*/
-
 pascal char WIsFloater(WindowPtr w);
 /*	Determines if a window is a floating window or not.
 		Input:	w - WindowPtr of window to test
 		Output:	return value: true if the window floats, false if not
 */
 
-pascal void WMoveToFront(WindowPtr w);
-/*	Moves a window to the "front." (Replacment for BringToFront())
-		Input:	w - WindowPtr of window to move to the front
-		Output:	none
-		Note:	If the window floats, it is brought to the front. If the window doesn't float, it's brought between the
-					windows returned by FrontNonFloater() and LastFloater().
-
-*/
-
 pascal void WSelect(WindowPtr w);
 /*	Brings a window to the front and activates it. (Replacment for SelectWindow())
 		Input:	w - WindowPtr of window to activate
-		Output:	none
-*/
-
-pascal void WDrag(WindowPtr w, Point startPoint, Rect *boundsRect);
-/*	Drags a window around on the screen, and brings it to the front, if necessary. (Replacment for DragWindow()).
-		Input:	w - WindowPtr of window to drag
-					startPoint - where the user clicked
-					boundsRect - bounding rectangle
-		Output:	none
-		Note:	You should never need to call this function. ShadowIRC automatically calls it when the user
-					starts to drag your window.
-*/
-
-pascal void WShow(WindowPtr w);
-/*	Makes a hidden window visible and brings it to the front. (Replacment for ShowWindow()).
-		Input:	w - window to make visible
-		Output:	none
-*/
-
-pascal void WHide(WindowPtr w);
-/*	Makes a visible window hidden. (Replacment for HideWindow()).
-		Input:	w - window to hide
-		Output:	none
-*/
-
-pascal void WMove(WindowPtr w, short h, short v, char front);
-/*	Moves a window around on the screen. (Replacment for MoveWindow().
-		Input:	w - window to move.
-					h - horizontal position, in global coordinates
-					v - vertical position, in global coordinates
-					front - bring the window to the "front"?
 		Output:	none
 */
 

@@ -187,15 +187,15 @@ static pascal void DoFind(char again)
 
 char ToggleConsoleWindow()
 {
-		if(FrontNonFloater() == consoleWin->w && IsWindowVisible(consoleWin->w))
+		if(ActiveNonFloatingWindow() == consoleWin->w && IsWindowVisible(consoleWin->w))
 		{
-			WHide(consoleWin->w);
+			HideWindow(consoleWin->w);
 			return mainPrefs->consoleOpen = 0;
 		}
 		else
 		{
 			if(!IsWindowVisible(consoleWin->w)) //not front and visible
-				WShow(consoleWin->w);
+				ShowWindow(consoleWin->w);
 			WSelect(consoleWin->w);
 			return mainPrefs->consoleOpen = 1;
 		}
@@ -228,7 +228,7 @@ pascal void HitEditMenu(short item)
 	TEHandle te;
 	WEReference we;
 	long s0, s1;
-	WindowPtr w = FrontNonFloater();
+	WindowPtr w = ActiveNonFloatingWindow();
 	
 	if(w && IsDialog(w))
 	{
@@ -630,7 +630,7 @@ pascal void MenuBarClick(const EventRecord *e)
 	}
 	
 	//Update window menu
-	if((w = FrontNonFloater())!=0 && (w=GetNextWindow(w))!=0 && IsWindowVisible(w))
+	if((w = ActiveNonFloatingWindow())!=0 && (w=GetNextWindow(w))!=0 && IsWindowVisible(w))
 	{
 		EnableMenuCommand(gWindowMenu, kCommandPrevWin);
 		EnableMenuCommand(gWindowMenu, kCommandNextWin);

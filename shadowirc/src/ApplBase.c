@@ -423,7 +423,7 @@ inline pascal void checkCursorFocus(EventRecord *e)
 		{
 			if(!mainPrefs->cursorFocusDontActivate) //autoraise
 			{
-				if(FrontNonFloater()!=p)
+				if(ActiveNonFloatingWindow()!=p)
 					WSelect(p);
 			}
 			else //autoraise disabled
@@ -771,7 +771,7 @@ static pascal void inDragHandler(EventRecord *e)
 	{
 		Rect WindowDragRect;
 		GetRegionBounds(GetGrayRgn(), &WindowDragRect);
-		WDrag((WindowPtr)e->message, e->where, &WindowDragRect);
+		DragWindow((WindowPtr)e->message, e->where, &WindowDragRect);
 		UpdateWindowPosition((WindowPtr)e->message);
 	}
 }
@@ -915,7 +915,7 @@ static pascal void doMouseDown(EventRecord *e)
 			break;
 		
 		default:
-			if((i==inContent || i==inGrow) && (p!=FrontNonFloater())) // || i==inDrag
+			if((i==inContent || i==inGrow) && (p!=ActiveNonFloatingWindow())) // || i==inDrag
 			{
 				if(!WIsFloater(p))
 				{

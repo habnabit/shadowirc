@@ -707,7 +707,7 @@ pascal WEReference ILGetWE(void)
 		return inputLine._il;
 	else
 	{
-		MWPtr mw = MWFromWindow(FrontNonFloater());
+		MWPtr mw = MWFromWindow(ActiveNonFloatingWindow());
 		if(mw)
 			return mw->il;
 		else
@@ -730,7 +730,7 @@ static pascal CharsHandle _ILGetHist(MWPtr mw)
 
 pascal CharsHandle ILGetHist(void)
 {
-	return _ILGetHist(MWFromWindow(FrontNonFloater()));
+	return _ILGetHist(MWFromWindow(ActiveNonFloatingWindow()));
 }
 
 static pascal void _ILSetHpos(MWPtr mw, long hp)
@@ -746,7 +746,7 @@ static pascal void _ILSetHpos(MWPtr mw, long hp)
 
 pascal void ILSetHpos(long hp)
 {
-	MWPtr mw = MWFromWindow(FrontNonFloater()); //fix a crash in 68k - compiler bug
+	MWPtr mw = MWFromWindow(ActiveNonFloatingWindow()); //fix a crash in 68k - compiler bug
 	_ILSetHpos(mw, hp);
 }
 
@@ -765,7 +765,7 @@ static pascal long _ILGetHpos(MWPtr mw)
 
 pascal long ILGetHpos(void)
 {
-	return _ILGetHpos(MWFromWindow(FrontNonFloater()));
+	return _ILGetHpos(MWFromWindow(ActiveNonFloatingWindow()));
 }
 
 pascal void SetInputLineCursorSelection(long start, long finish)

@@ -542,7 +542,7 @@ pascal long _UndocumentedAPI(long type, long data)
 			if(data < 5)
 			{
 				if(!IsWindowVisible(consoleWin->w))
-					WShow(consoleWin->w);
+					ShowWindow(consoleWin->w);
 				LSStrLS("\pThe version of mailcheck installed is too old. Please install the most recent version.", &ls);
 				SMPrefixIrcleColor(&ls, dsConsole, '2');
 				return pVersionPluginTooOld;
@@ -550,7 +550,7 @@ pascal long _UndocumentedAPI(long type, long data)
 			else if(data < 4)
 			{
 				if(!IsWindowVisible(consoleWin->w))
-					WShow(consoleWin->w);
+					ShowWindow(consoleWin->w);
 				LSStrLS("\pYou are not using the most recent version of the mailcheck plugin.", &ls);
 				SMPrefixIrcleColor(&ls, dsConsole, '2');
 				return 0;
@@ -563,7 +563,7 @@ pascal long _UndocumentedAPI(long type, long data)
 			if(data < 2)
 			{
 				if(!IsWindowVisible(consoleWin->w))
-					WShow(consoleWin->w);
+					ShowWindow(consoleWin->w);
 				LSStrLS("\pThe version of numusers installed is too old. Please install the most recent version.", &ls);
 				SMPrefixIrcleColor(&ls, dsConsole, '2');
 				return pVersionPluginTooOld;
@@ -585,7 +585,7 @@ pascal long _UndocumentedAPI(long type, long data)
 			if(data < 11)
 			{
 				if(!IsWindowVisible(consoleWin->w))
-					WShow(consoleWin->w);
+					ShowWindow(consoleWin->w);
 				LSStrLS("\pThe Userlist plugin is too old. Please install the most recent version.", &ls);
 				SMPrefixIrcleColor(&ls, dsConsole, '2');
 				return pVersionPluginTooOld;
@@ -593,7 +593,7 @@ pascal long _UndocumentedAPI(long type, long data)
 			else if(data < 9)
 			{
 				if(!IsWindowVisible(consoleWin->w))
-					WShow(consoleWin->w);
+					ShowWindow(consoleWin->w);
 				LSStrLS("\pYou are not using the most recent version of the userlist plugin.", &ls);
 				SMPrefixIrcleColor(&ls, dsConsole, '2');
 				return 0;
@@ -604,7 +604,7 @@ pascal long _UndocumentedAPI(long type, long data)
 		
 		case 'srvl':
 			if(!IsWindowVisible(consoleWin->w))
-				WShow(consoleWin->w);
+				ShowWindow(consoleWin->w);
 			LSStrLS("\pThe ServerList plugin is no longer necessary. Please delete it.", &ls);
 			SMPrefixIrcleColor(&ls, dsConsole, '2');
 			return pVersionPluginTooOld;
@@ -614,7 +614,7 @@ pascal long _UndocumentedAPI(long type, long data)
 			if(data < 7)
 			{
 				if(!IsWindowVisible(consoleWin->w))
-					WShow(consoleWin->w);
+					ShowWindow(consoleWin->w);
 				LSStrLS("\pThe popups plugin is too old. Please install the most recent version.", &ls);
 				SMPrefixIrcleColor(&ls, dsConsole, '2');
 				return pVersionPluginTooOld;
@@ -622,7 +622,7 @@ pascal long _UndocumentedAPI(long type, long data)
 			else if(data < 4)
 			{
 				if(!IsWindowVisible(consoleWin->w))
-					WShow(consoleWin->w);
+					ShowWindow(consoleWin->w);
 				LSStrLS("\pYou are not using the most recent version of the Popups plugin.", &ls);
 				SMPrefixIrcleColor(&ls, dsConsole, '2');
 				return 0;
@@ -633,7 +633,7 @@ pascal long _UndocumentedAPI(long type, long data)
 		
 		default:
 			if(!IsWindowVisible(consoleWin->w))
-				WShow(consoleWin->w);
+				ShowWindow(consoleWin->w);
 			LSConcatStrAndStrAndStr("\pPlugin \"", sidr.yourInfo->pluginName, "\p\" can not run.", &ls);
 			SMPrefixIrcleColor(&ls, dsConsole, '2');
 			for(x=0;x<numMessages;x++)
@@ -673,7 +673,7 @@ static pascal void InitPlugins(void)
 			if(!b)
 			{
 				if(!IsWindowVisible(consoleWin->w))
-					WShow(consoleWin->w);
+					ShowWindow(consoleWin->w);
 			}
 			b=1;
 		}
@@ -685,7 +685,7 @@ static pascal void InitPlugins(void)
 			if(!b)
 			{
 				if(!IsWindowVisible(consoleWin->w))
-					WShow(consoleWin->w);
+					ShowWindow(consoleWin->w);
 			}
 			b=1;
 			
