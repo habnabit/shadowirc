@@ -990,8 +990,9 @@ static ULI ULINew(WindowPtr w, long type)
 		static DataBrowserItemNotificationUPP dbINUPP = NULL;
 		static ControlFontStyleRec controlFontStyleStruc;
 		
-		controlFontStyleStruc.flags = kControlUseSizeMask;
+		controlFontStyleStruc.flags = kControlUseSizeMask | kControlUseFaceMask;
 		controlFontStyleStruc.size = 10;
+		controlFontStyleStruc.style = normal;
 		
 		dbColumn.propertyDesc.propertyID = 'name';
 		dbColumn.propertyDesc.propertyType = kDataBrowserTextType;
