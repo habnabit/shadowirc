@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -191,7 +191,6 @@ resource 'STR#' (257, "Informative Strings", locked, preload)
 		"Channel created on ^0 at ^1",
 		"Topic set by ^0 on ^1 at ^2",
 		"Recent Channels",
-		"Inputline",
 		"(nobody)",
 		"Time Delta: ^0",
 		"^0 set by ^1 on ^2 @ ^3", //^b around set by and on.

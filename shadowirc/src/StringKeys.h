@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -21,6 +21,8 @@
 
 #ifndef __STRINGKEYS_H
 #define __STRINGKEYS_H
+
+#define kInputWindowTitle CFSTR("Inputline")
 
 #define kNoDCCFolderKey CFSTR("NoDCCFolder")
 #define kNoLogFolderKey CFSTR("NoLogFolder")

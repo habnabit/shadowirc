@@ -24,6 +24,7 @@
 #include "WASTE.h"
 
 #include "StringList.h"
+#include "StringKeys.h"
 #include "IRCGlobals.h"
 #include "utils.h"
 #include "AppearanceHelp.h"
@@ -1059,7 +1060,7 @@ void OpenInputLine()
 		Rect sb;
 		char zeroPosition;
 		char offscreen;
-		ConstStringPtr s;
+		CFStringRef inputWindowTitle;
 		Rect wr;
 		Rect statusControlRect;
 		const EventTypeSpec ilSpec[] = {
@@ -1080,9 +1081,12 @@ void OpenInputLine()
 			return;
 		}
 		
-		s = GetIntStringPtr(spInfo, sInputline);
 		// add Live Resize and attach the Standard Handler [smcgovern]
-		inputLine.w= WCreate(&mainPrefs->inputLoc, s, kWindowResizableAttribute | kWindowLiveResizeAttribute | kWindowStandardHandlerAttribute | kWindowCompositingAttribute, 0, true);
+		CreateNewWindow(kFloatingWindowClass, kWindowStandardFloatingAttributes | kWindowResizableAttribute | kWindowLiveResizeAttribute | kWindowStandardHandlerAttribute | kWindowCompositingAttribute, &mainPrefs->inputLoc, &inputLine.w);
+		inputWindowTitle = CFCopyLocalizedString(kInputWindowTitle, NULL);
+		SetWindowTitleWithCFString(inputLine.w, inputWindowTitle);
+		CFRelease(inputWindowTitle);
+		
 		if(inputLine.w)
 		{
 			// Get rid of the close box
@@ -1103,8 +1107,6 @@ void OpenInputLine()
 			inputLine.statusLineHeight = inputLine.statusLinePos + inputLine.fi.descent + 3;
 			line2 = inputLine.statusLineHeight + inputLine.fi.leading + inputLine.fi.ascent;
 			
-			//SetOrigin(-2,-2);
-
 			//Set the inputline position
 			zeroPosition = ((mainPrefs->inputLoc.left == 0) && (mainPrefs->inputLoc.right == 0));
 			offscreen = !RectInRgn(&mainPrefs->inputLoc, GetGrayRgn());

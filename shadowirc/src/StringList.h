@@ -115,7 +115,6 @@ enum InfoStrings {
 	sChannelCreatedTime,
 	sTopicSetBy2,
 	sRecentChannels,
-	sInputline,
 	sNobody,
 	sStatsNTimeDelta,
 	sBanSetBy,
