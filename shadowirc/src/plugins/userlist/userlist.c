@@ -28,8 +28,6 @@
 ShadowIRCDataRecord* sidr;
 prefsPtr mainPrefs;
 RGBColor *shadowircColors = 0;
-short genevaNum = 0;
-int line = 0;
 
 static short prefsPanel;
 
@@ -51,9 +49,6 @@ INLINE ULI ULIFromMW(MWPtr mw);
 static ULI ULIFromChannel(channelPtr ch);
 static ULI ULIFromWindow(WindowPtr w);
 
-static void ULScrollbarLive(ULI ul, const EventRecord *e);
-static void ULScrollbarActionProc(ControlHandle vscr, short part);
-INLINE void ULScrollbarHit(ULI ul, short part, const EventRecord *e);
 INLINE void ULGotNamesList(pServiceULNamesEndData *p);
 INLINE void ULSActivateWin(pServiceActivateWinData *p);
 static char MouseInWindow(ULI ul);
@@ -245,122 +240,6 @@ void DragOneUser(ULI ul, int u, const EventRecord *e)
 }
 
 #pragma mark -
-
-static void ULScroll(ULI ul, long delta)
-{
-	ControlHandle bar = ul->bar;
-	long value = GetControl32BitValue(bar);
-	long max = GetControl32BitMaximum(bar);
-	
-	if(((value<max) && (delta>0)) || ((value>0) && (delta<0)))
-	{
-		SetControl32BitValue(bar, value+delta);
-	}
-}
-
-static void ULScrollbarActionProc(ControlHandle bar, short part)
-{
-	long scrollStep = 0;
-	long actualSize;
-	ULI ul = 0;
-	
-	//-30599 error
-	GetControlProperty(bar, kUserlistSignature, kUserlistSignature, sizeof(ULI), &actualSize, &ul);
-	if(!ul)
-		return;
-	
-	switch(part)
-	{
-		case kControlUpButtonPart:
-			scrollStep = -1;
-			break;
-			
-		case kControlDownButtonPart:
-			scrollStep = 1;
-			break;
-
-		case kControlPageUpPart:
-			scrollStep = -ul->visLines;
-			break;
-		
-		case kControlPageDownPart:
-			scrollStep = ul->visLines;
-			break;
-		
-		case kControlIndicatorPart:
-			break;
-	}
-	
-	if(scrollStep)
-		ULScroll(ul, scrollStep);
-}
-
-static void ULScrollbarLive(ULI ul, const EventRecord *e)
-{
-	IndicatorDragConstraint constraint;
-	Point mouse;
-	long initial, old, cur, max;
-	short range, delta;
-	MouseTrackingResult trackingResult;
-
-	HiliteControl(ul->bar, kControlIndicatorPart);
-
-	*(Point*)&constraint.limitRect = e->where;
-	SendControlMessage(ul->bar, thumbCntl, &constraint);
-	
-	range = constraint.limitRect.bottom - constraint.limitRect.top;
-	
-	initial=old=cur=GetControl32BitValue(ul->bar);
-	max=GetControl32BitMaximum(ul->bar);
-	
-	GetMouse(&mouse);
-	do
-	{
-		if(PtInRect(mouse, &constraint.slopRect))
-		{
-			delta=mouse.v - e->where.v;
-			
-			cur = initial + (float)max * ((float)delta/(float)range);
-			if(cur<0)
-				cur=0;
-			if(cur>max)
-				cur=max;
-		}
-		
-		if(cur != old)
-		{
-			SetControl32BitValue(ul->bar, cur);
-			old=cur;
-		}
-		
-		TrackMouseLocation(NULL, &mouse, &trackingResult);
-	} while(trackingResult != kMouseTrackingMouseReleased);
-
-	HiliteControl(ul->bar, kControlNoPart);
-}
-
-INLINE void ULScrollbarHit(ULI ul, short part, const EventRecord *e)
-{
-	#pragma unused(e)
-	static ControlActionUPP ulScrollbarActionUPP = NULL;
-	
-	if(!ulScrollbarActionUPP)
-		ulScrollbarActionUPP = NewControlActionUPP(ULScrollbarActionProc);
-	
-	switch(part)
-	{
-		case kControlUpButtonPart:
-		case kControlDownButtonPart:
-		case kControlPageUpPart:
-		case kControlPageDownPart:
-			HandleControlClick(ul->bar, e->where, e->modifiers, ulScrollbarActionUPP);
-			break;
-		
-		case kControlIndicatorPart:
-			ULScrollbarLive(ul, e);
-			break;
-	}
-}
 
 INLINE void ULGotNamesList(pServiceULNamesEndData *p)
 {
@@ -878,52 +757,10 @@ static void ULIDestroy(ULI ul)
 				DisposeControl(ul->browser);
 				ul->browser = 0;
 			}
-			
-			if(ul->bar)
-			{
-				DisposeControl(ul->bar);
-				ul->bar = 0;
-			}
 		}
 
 		DisposePtr((Ptr)ul);
 	}
-}
-
-static OSStatus ULDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
-{
-	OSStatus myErr = eventNotHandledErr;
-	Point mouseLoc;
-	EventMouseWheelAxis wheelAxis;
-	long wheelDelta;
-	ULI ul = userData;
-	
-	GetEventParameter(theEvent, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(mouseLoc), NULL, &mouseLoc);
-	GetEventParameter(theEvent, kEventParamMouseWheelAxis, typeMouseWheelAxis, NULL, sizeof(wheelAxis), NULL, &wheelAxis);
-	GetEventParameter(theEvent, kEventParamMouseWheelDelta, typeLongInteger, NULL, sizeof(wheelDelta), NULL, &wheelDelta);
-	
-	if(wheelAxis == kEventMouseWheelAxisY)
-	{
-		// Scroll the vertical scroll bar
-		int maxValue = GetControl32BitMaximum(ul->bar);
-		int numLines;
-		float lineValue;
-		long adjustedDelta;
-		
-		if(ul->ch)
-			numLines = ul->ch->numUsers;
-		else
-			numLines = 0;
-		
-		lineValue = (float)maxValue/(float)numLines;
-		adjustedDelta = (((float)lineValue * (float)wheelDelta) + ((wheelDelta < 0)?(-0.5):(0.5)));
-		
-		ULScroll(ul, -adjustedDelta);
-		
-		myErr = noErr;
-	}
-	
-	return myErr;
 }
 
 static OSStatus UlDoWindowEventHandler(EventHandlerCallRef nextHandler, EventRef event, void *userData)
@@ -943,9 +780,6 @@ static OSStatus UlDoWindowEventHandler(EventHandlerCallRef nextHandler, EventRef
 			
 			switch (eventKind)
 			{
-				case kEventWindowActivated:
-					break;
-				
 				case kEventWindowGetMinimumSize:
 				{
 					Point minSize;
@@ -973,21 +807,15 @@ static OSStatus UlDoWindowEventHandler(EventHandlerCallRef nextHandler, EventRef
 
 static void ULInstallWindowHandlers(ULI ul)
 {
-	static EventHandlerUPP mouseWheelHandler = NULL;
-	const EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
 	static EventHandlerUPP ulWindowHandler = NULL;
 	const EventTypeSpec ulWindowTypes[] = {
-		{kEventClassWindow, kEventWindowActivated},
 		{kEventClassWindow, kEventWindowGetMinimumSize},
 		{kEventClassWindow, kEventWindowBoundsChanged}
 	};
 	
-	if(!mouseWheelHandler)
-		mouseWheelHandler = NewEventHandlerUPP(ULDoMouseWheelEvent);
 	if(!ulWindowHandler)
 		ulWindowHandler = NewEventHandlerUPP(UlDoWindowEventHandler);
 	
-	InstallWindowEventHandler(ul->uwin, mouseWheelHandler, GetEventTypeCount(wheelType), &wheelType, ul, NULL);
 	InstallWindowEventHandler(ul->uwin, ulWindowHandler, GetEventTypeCount(ulWindowTypes), ulWindowTypes, ul, NULL);
 }
 
@@ -1068,7 +896,6 @@ static ULI ULINew(WindowPtr w, long type)
 	ULI ul = (ULI)NewPtrClear(sizeof(UserListInstance));
 	Rect r; //pos for scrollbar
 	GrafPtr gp;
-	FontInfo genevaInfo;
 	MWPtr mw;
 	
 	if(mainPrefs->userlistNickWidth < 10)
@@ -1205,20 +1032,6 @@ static ULI ULINew(WindowPtr w, long type)
 	GetPort(&gp);
 	SetPortWindowPort(ul->uwin);
 
-	if(!line)
-	{
-		GetFNum("\pGeneva", &genevaNum);
-		TextFont(genevaNum);
-		TextSize(9);
-		GetFontInfo(&genevaInfo);
-		line = genevaInfo.ascent + genevaInfo.descent + genevaInfo.leading;
-	}
-	else if(type == ulGlobal)
-	{
-		TextFont(genevaNum);
-		TextSize(9);
-	}	
-	
 	SetPort(gp);
 
 	if(type == ulMessageWindow)
@@ -1413,7 +1226,7 @@ static void SULPaneClick(pMWPaneClickData *p)
 		
 		if((l = FindControl(p->e->where, ul->uwin, &c)) != 0)
 		{
-			ULScrollbarHit(ul, l, p->e);
+			//hit the databrowser
 		}
 		else
 		{
@@ -1471,8 +1284,8 @@ INLINE void SULPaneResize(pMWPaneResizeData *p)
 		else
 			ActivateControl(ul->browser);
 
-		SizeControl(ul->bar, 16, r.bottom - r.top);
-		MoveControl(ul->bar, r.left, r.top);
+		SizeControl(ul->browser, 16, r.bottom - r.top);
+		MoveControl(ul->browser, r.left, r.top);
 	}
 }
 
@@ -1651,11 +1464,14 @@ INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p)
 //This is always going to be used for the global list
 static void ULResizeWin(ULI ul, short height, short wid)
 {
-	MoveControl(ul->browser, 0, 0);
-	SizeControl(ul->browser, wid, height);
-
-	ul->uwinSize.bottom = height;
-	ul->uwinSize.right = wid;
+	if(ul->uwinSize.bottom != height || ul->uwinSize.right != wid) //size changed
+	{
+		MoveControl(ul->browser, 0, 0);
+		SizeControl(ul->browser, wid, height);
+	
+		ul->uwinSize.bottom = height;
+		ul->uwinSize.right = wid;
+	}
 }
 
 INLINE void ULMouse(pUIMouseUpDownData *p)
@@ -1678,9 +1494,9 @@ INLINE void ULMouse(pUIMouseUpDownData *p)
 			GlobalToLocal(&p->e->where);
 			pa = FindControl(p->e->where, ul->uwin, &c);
 			
-			if(c == ul->bar) //it's our scrollbar
+			if(c == ul->browser) //it's our scrollbar
 			{
-				ULScrollbarHit(ul, pa, p->e);
+				//hit the databrowser
 			}
 			
 			SetPort(gp);

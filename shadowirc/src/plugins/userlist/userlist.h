@@ -48,13 +48,9 @@ enum ulType {
 typedef struct UserListInstance {
 	long ulType;
 	WindowPtr uwin;
-	ControlHandle bar;
 	ControlRef browser;
 	Rect uwinSize;
 	channelPtr ch;
-	long visLines;
-	long lastClick;
-	long lastClickTime;
 	
 	MWPtr mw;
 	mwPanePtr pane;
@@ -89,8 +85,6 @@ enum {
 extern ShadowIRCDataRecord* sidr;
 extern prefsPtr mainPrefs;
 extern RGBColor *shadowircColors;
-extern short genevaNum;
-extern int line;
 
 #define WInvalRect(w, r) InvalWindowRect(w, r)
 #define WInvalRgn(w, r) InvalWindowRgn(w, r)
