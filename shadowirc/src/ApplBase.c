@@ -740,8 +740,8 @@ static OSStatus DoModifierKeysChangedEvent(EventHandlerCallRef handlerCallRef, E
 	if(result == noErr)
 	{
 		//Test for changes with the control key.
-		if(modifiers & controlKey != oldModifiers & controlKey)
-			CMSetCursor(modifiers & controlKey == controlKey);
+		if((modifiers & controlKey) != (oldModifiers & controlKey))
+			CMSetCursor((modifiers & controlKey) == controlKey);
 		
 		oldModifiers = modifiers;
 	}
