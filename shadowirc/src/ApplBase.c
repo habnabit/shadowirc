@@ -969,7 +969,7 @@ static void doTCPEvent(CEPtr c)
 	connectionPtr conn;
 	
 	conn=findConnectionSock(c->connection);
-	if(!conn) //dunno how we're suppoed to process this...
+	if(!conn) //dunno how we're supposed to process this...
 		return;
 
 	if(conn->tryingToConnect)
@@ -977,28 +977,10 @@ static void doTCPEvent(CEPtr c)
 		switch(c->event)
 		{
 			case C_Found:
-				if(conn->connectStage == csLookingUp2)
-				{
-					LongString ls;
-					linkPtr link;
-					pServiceCWLinkStateChangeData p;
-				
-					memcpy(&conn->ip2, &c->addr, sizeof(conn->ip2));
-					ConnFindAddress(conn, link->conn->name);
-					
-					LSParamString(&ls, GetIntStringPtr(spInfo, sLookingUpIP), link->conn->name, 0, 0, 0);
-					SMPrefix(&ls, dsConsole);
-
-					p.link = link = conn->link;
-					p.connectStage = conn->connectStage = csLookingUp;
-					runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
-				}
-				else
-				{
-					memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
+				memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
+				if(!conn->socksSecondLookup)
 					connection2(conn);
-				}
-				return; //not sure why, but, we don't want to call the input handler
+				break;
 			
 			case C_Established:
 				memcpy(&conn->ip, &c->addr, sizeof(conn->ip));

@@ -61,9 +61,6 @@ enum connectStage {
 	csSOCKSSendingAuthRequest,	//Attempting authentication with SOCKS server
 	csSOCKSSendingRequest,			//Sending connection request to SOCKS server
 
-	csLookingUp2,						//Secondary IP lookup
-	
-	
 	csFailedToLookup = -1,			//IP lookup failed
 //	csConnectFailed = -2,			//connect failed -- redundant -- removed
 	csFailedToConnect = -3,		//connect failed
@@ -82,16 +79,16 @@ enum lineTermList {
 };
 
 #ifndef _TCP
-typedef pascal void (*ConnInputFuncPtr)(void*, connectionPtr conn);
+typedef void (*ConnInputFuncPtr)(void*, connectionPtr conn);
 #else
-typedef pascal void (*ConnInputFuncPtr)(CEPtr, connectionPtr conn);
+typedef void (*ConnInputFuncPtr)(CEPtr, connectionPtr conn);
 #endif
 
 struct Connection {
 	CONST connectionPtr next;
 	CONST long private_socket;
 	CONST short connType;
-	CONST short realConnType;
+	unsigned short port;
 	
 #ifndef _DCC
 	Ptr dcc;
@@ -106,11 +103,9 @@ struct Connection {
 	 * localip: local IP address (getsockname on sockfd)
          */
 	struct in_addr ip;
-        struct in_addr ip2;
+	struct in_addr ip2;
 	struct in_addr localip;
 	Str255 name;
-	unsigned short port;
-	short connectStage;
 	unsigned long lastData;
 
 	char outgoing;
@@ -128,6 +123,9 @@ struct Connection {
 	short socksPort;
 	CONST short socksType;
 	char socksMethodVersion, socksMethod;
+	char socksSecondLookup;
+	short socksStage;
+	CONST short realConnType;
 };
 
 enum maxLinks {
@@ -181,6 +179,7 @@ struct Link {
 	CONST linkPtr next, prev;
 
 	short outstandingUSERHOST;
+	short connectStage;
 	
 	//End of public API
 	HTPtr serverOptions;

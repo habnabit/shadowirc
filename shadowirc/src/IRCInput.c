@@ -196,10 +196,11 @@ pascal void ProcessLine(LongString* line, char stackup, char action, MWPtr mw)
 	
 	if((line->len>0) && p.action)
 	{
-		s[0]=4;
-		s[1]=CmdChar;
-		*(short*)&s[2] = 'me';
-		s[4]=' ';
+		s[0] = 4;
+		s[1] = CmdChar;
+		s[2] = 'm';
+		s[3] = 'e';
+		s[4] = ' ';
 		LSCopyString(line, 1, 4, s2);
 		if(!pstrcmp(s, s2))
 			LSConcatStrAndLS(s, line, line);
@@ -490,7 +491,6 @@ pascal void Key(EventRecord *e, char dontProcess)
 
 static pascal void SOCKSConnect(connectionPtr conn)
 {
-	pServiceCWLinkStateChangeData p;
 	Str255 send;
 	long nn;
 
@@ -536,37 +536,45 @@ static pascal void SOCKSConnect(connectionPtr conn)
 	
 	ConnPut(&conn, send, nn);
 
-	conn->connectStage=csSOCKSSendingRequest;
+	conn->socksStage = csSOCKSSendingRequest;
 	if(conn->socksType == connIRC)
-	{
-		p.link = conn->link;
-		p.connectStage = conn->connectStage;
-		runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
-	}
+		LinkSetStage(conn->link, conn->socksStage);
 }
 
-pascal void processSOCKS(CEPtr c, connectionPtr conn)
+void processSOCKS(CEPtr c, connectionPtr conn)
 {
-	pServiceCWLinkStateChangeData p;
 	Str255 send;
 	long nn;
 	LongString ls;
 	
 	conn->tryingToConnect = false;
-		
-	if(c->event == C_Established)
+	
+	if(c->event == C_Found)
+	{
+		if(conn->socksSecondLookup)
+		{
+			//Move the ip from ip to ip2
+			memcpy(&conn->ip2, &conn->ip, sizeof(conn->ip2));
+			
+			//Look up the server IP
+			ConnFindAddress(conn, conn->name);
+			
+			LSParamString(&ls, GetIntStringPtr(spInfo, sLookingUpIP), conn->name, 0, 0, 0);
+			SMPrefix(&ls, dsConsole);
+			
+			LinkSetStage(conn->link, csLookingUp);
+			conn->socksSecondLookup = false;
+		}
+	}
+	else if(c->event == C_Established)
 	{
 		if(conn->socksType == connIRC)
 			LinkSuccessfulConnection(conn->link, false);
 
-		conn->connectStage=csSOCKSNegotiatingMethod;
+		conn->socksStage=csSOCKSNegotiatingMethod;
 		
 		if(conn->socksType == connIRC)
-		{
-			p.link = conn->link;
-			p.connectStage = conn->connectStage;
-			runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
-		}
+			LinkSetStage(conn->link, conn->socksStage);
 		
 		if(mainPrefs->firewallType == fwSOCKS5)
 		{
@@ -594,7 +602,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 	}
 	else if(c->event == C_CharsAvailable)
 	{
-		if(conn->connectStage == csSOCKSNegotiatingMethod)
+		if(conn->socksStage == csSOCKSNegotiatingMethod)
 		{
 			//Read two bytes: version, and method
 			nn = c->value; //This had better be >= 2.
@@ -617,27 +625,21 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 				nn+=send[nn]+1;
 				ConnPut(&conn, send, nn);
 
-				conn->connectStage=csSOCKSSendingAuthRequest;
+				conn->socksStage=csSOCKSSendingAuthRequest;
 				if(conn->socksType == connIRC)
-				{
-					p.link = conn->link;
-					p.connectStage = conn->connectStage;
-					runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
-				}
+					LinkSetStage(conn->link, conn->socksStage);
 			}
 			else if(conn->socksMethod == 0xFF)
 			{
 				ConstStringPtr sp = GetIntStringPtr(spSOCKS, 12);
 
-				conn->connectStage=csSOCKSAuthFailed;
+				conn->socksStage=csSOCKSAuthFailed;
 				if(conn->socksType == connIRC)
 				{
 					LSParamString(&ls, GetIntStringPtr(spSOCKS, 9), sp, 0, 0, 0);
 					SMPrefix(&ls, dsConsole);
-
-					p.link = conn->link;
-					p.connectStage = conn->connectStage;
-					runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
+					
+					LinkSetStage(conn->link, conn->socksStage);
 					ServerOK(kServerOKBadSOCKS, conn->link);
 				}
 				else if(conn->socksType == connDCC)
@@ -646,7 +648,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 				}
 			}
 		}
-		else if(conn->connectStage == csSOCKSSendingAuthRequest) //authing for user/host respponse
+		else if(conn->socksStage == csSOCKSSendingAuthRequest) //authing for user/host respponse
 		{
 			nn = c->value; //This had better be >= 2.
 			if(nn < 2)
@@ -661,15 +663,13 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 			{
 				ConstStringPtr sp = GetIntStringPtr(spSOCKS, 11);
 				
-				conn->connectStage=csSOCKSAuthFailed;
+				conn->socksStage = csSOCKSAuthFailed;
 				if(conn->socksType == connIRC)
 				{
 					LSParamString(&ls, GetIntStringPtr(spSOCKS, 9), sp, 0, 0, 0);
 					SMPrefix(&ls, dsConsole);
-
-					p.link = conn->link;
-					p.connectStage = conn->connectStage;
-					runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
+					
+					LinkSetStage(conn->link, conn->socksStage);
 					ServerOK(kServerOKBadSOCKS, conn->link);
 				}
 				else if(conn->socksType == connDCC)
@@ -678,7 +678,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 				}
 			}
 		}
-		else if(conn->connectStage == csSOCKSSendingRequest)
+		else if(conn->socksStage == csSOCKSSendingRequest)
 		{
 			//This is the reply to our connection request
 			nn = c->value; //This had better be >= 2.
@@ -731,14 +731,12 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 					GetIntString(send, spSOCKS, send[1]);
 				}
 
-				conn->connectStage=csSOCKSConnectFailed;
+				conn->socksStage = csSOCKSConnectFailed;
 				if(conn->socksType == connIRC)
 				{
 					LSParamString(&ls, sp, send, 0, 0, 0);
 					SMPrefix(&ls, dsConsole);
-					p.link = conn->link;
-					p.connectStage = conn->connectStage;
-					runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
+					LinkSetStage(conn->link, conn->socksStage);
 					ServerOK(kServerOKBadSOCKS, conn->link);
 				}
 				else if(conn->socksType == connDCC)
@@ -757,7 +755,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 	}
 }
 
-pascal void processIdentd(CEPtr c, connectionPtr conn)
+void processIdentd(CEPtr c, connectionPtr conn)
 {
 	int i;
 	Str255 s;
@@ -842,8 +840,6 @@ static void processServerData(CEPtr c, connectionPtr conn)
 
 void processServer(CEPtr c, connectionPtr conn)
 {
-	pServiceCWLinkStateChangeData p;
-	
 	switch(c->event)
 	{
 		case C_Established:
@@ -851,16 +847,12 @@ void processServer(CEPtr c, connectionPtr conn)
 			break;
 		
 		case C_SearchFailed:
-			p.link = conn->link;
-			p.connectStage = conn->connectStage = csFailedToLookup;
-			runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
+			LinkSetStage(conn->link, csFailedToLookup);
 			ServerOK(c->event, conn->link);
 			break;
 		
 		case C_FailedToOpen:
-			p.link = conn->link;
-			p.connectStage = conn->connectStage = csFailedToConnect;
-			runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
+			LinkSetStage(conn->link, csFailedToConnect);
 			ServerOK(c->event, conn->link);
 			break;
 		
@@ -868,12 +860,15 @@ void processServer(CEPtr c, connectionPtr conn)
 			processServerData(c, conn);
 			break;
 		
+		case C_Found:
+			break;
+		
 		default:
 			ServerOK(c->event, conn->link);
 	}
 }
 
-pascal void processPlugin(CEPtr c, connectionPtr conn)
+void processPlugin(CEPtr c, connectionPtr conn)
 {
 	long nn;
 	size_t abytes;
@@ -913,7 +908,7 @@ pascal void processPlugin(CEPtr c, connectionPtr conn)
 	}
 }
 
-pascal void dnsEvent(CEPtr c, connectionPtr conn)
+void dnsEvent(CEPtr c, connectionPtr conn)
 {
 	Str255 s2;
 	LongString ls;
@@ -986,7 +981,7 @@ pascal void dnsEvent(CEPtr c, connectionPtr conn)
 	deleteConnection(&conn);
 }
 
-pascal void processStale(CEPtr c, connectionPtr conn)
+void processStale(CEPtr c, connectionPtr conn)
 {
 	LongString ls;
 	Str255 s;

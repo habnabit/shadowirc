@@ -1050,7 +1050,7 @@ static pascal void DrawTopicWidget(mwWidgetPtr o, char winActive)
 				DrawString("\p: ");
 				
 				if(link->serverStatus == S_CONN)
-					if(link->conn->connectStage == csOnline && link->CurrentNick[0])
+					if(link->connectStage == csOnline && link->CurrentNick[0])
 					{
 						TextFace(bold);
 						DrawString(link->CurrentNick);

@@ -498,7 +498,7 @@ inline void IWInternalDraw(iwWidgetPtr o)
 
 				default:
 					NumToString(link->serverStatus, &server[5]);
-					server[0]=server[4]+4;
+					server[0]=server[5]+4;
 					*(long*)&server[1]=' Err';
 					server[5]='(';
 			}
@@ -1181,7 +1181,7 @@ static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short mod
 		{
 			AppendMenu(m, "\p-");
 			SetMenuItemText(m, x+4, lp->linkPrefs->linkName);
-			if(lp->serverStatus != S_CONN || !lp->conn || lp->conn->connectStage != csOnline)
+			if(lp->serverStatus != S_CONN || lp->connectStage != csOnline)
 				DisableMenuItem(m, x+4);
 		}
 		

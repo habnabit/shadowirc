@@ -429,9 +429,6 @@ pascal char NumericComm(short comm, StringPtr from, ConstStringPtr target, LongS
 			break;
 		
 		case 1: //2.8 intro
-		{
-			pServiceCWLinkStateChangeData pCWSC;
-			
 			if(!pstrcmp(link->CurrentNick, target))
 			{
 				LSGetIntString(&ls, spError, sServerNickMismatch);
@@ -441,18 +438,15 @@ pascal char NumericComm(short comm, StringPtr from, ConstStringPtr target, LongS
 			
 			pstrcpy(from, link->CurrentServer);
 			SMPrefixLink(link, rest, dsFrontWin);
-			pCWSC.link = link;
-			pCWSC.connectStage = link->conn->connectStage = csOnline;
 			
 			//Clear and create a new hashtable.
 			if(link->serverOptions)
 				HTDestroy(link->serverOptions);
 			link->serverOptions = DefaultServerOptions();
 			
-			runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &pCWSC);
+			LinkSetStage(link, csOnline);
 			UpdateStatusLine();
 			break;
-		}
 		
 		case 5: //map
 			//This is a supports command at connect.

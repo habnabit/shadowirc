@@ -102,6 +102,7 @@ static pascal void InitLink(linkPtr l, linkPrefsPtr lp, int linkNum)
 	l->channelList = 0;
 	
 	l->serverOptions = 0;
+	l->connectStage=csNil;
 	
 	pstrcpy(l->linkPrefs->nick, l->CurrentNick);
 }
@@ -275,7 +276,6 @@ pascal connectionPtr newConnection(short connType)
 		c->name[0]=0;
 		c->port=0;
 		c->tryingToConnect=0;
-		c->connectStage=csNil;
 		c->lastData=now;
 		c->dcc=0;
 		c->pluginRef=0;
@@ -286,7 +286,8 @@ pascal connectionPtr newConnection(short connType)
 		c->socksName[0]=0;
 		c->socksPort=0;
 		c->socksType=connType;
-		c->socksMethodVersion = c->socksMethod = 0;
+		c->socksMethodVersion = c->socksMethod = c->socksStage = 0;
+		c->socksSecondLookup = 0;
 		c->ip2.s_addr = 0;
 		
 		ConnSetInputFunc(c);
@@ -301,7 +302,7 @@ pascal void newIRCConnection(linkPtr link)
 	if(c)
 	{
 		c->outgoing=true;
-		c->connectStage=csStartingToConnect;
+		link->connectStage=csStartingToConnect;
 		c->tryingToConnect=true;
 		c->link=link;
 		link->conn=c;

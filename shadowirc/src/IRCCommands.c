@@ -220,7 +220,7 @@ pascal void DoSignoff(linkPtr link, const LongString *reason)
 		link->gotMOTD=0;
 		link->neverConnected=1;
 		
-		if(link->conn->connectStage == csOnline)
+		if(link->connectStage == csOnline)
 		{
 			LSConcatStrAndLS("\pQUIT :", &ls, &ls);
 			putServer(link, &ls);
@@ -754,7 +754,6 @@ pascal void RegUser(linkPtr link)
 		channelPtr ch, next;
 		LongString ls;
 		linkPrefsPtr lp;
-		pServiceCWLinkStateChangeData p;
 		pServiceUserRegData urp;
 		
 		link->gotMOTD = link->alreadyFinished = link->finishedMOTD=false;
@@ -799,9 +798,7 @@ pascal void RegUser(linkPtr link)
 		link->conn->tryingToConnect=0;
 		link->UserRegistered=1;
 		link->outstandingUSERHOST = 0; //Probabally unnecessary, but it can't hurt.
-		p.link = link;
-		p.connectStage = link->conn->connectStage = csSentRegistration;
-		runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
+		LinkSetStage(link, csSentRegistration);
 	}
 }
 

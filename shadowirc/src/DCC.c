@@ -927,7 +927,6 @@ pascal void DCCOpen(connectionPtr *x)
 		if(cc->connType == connSOCKS)
 		{
 			ConnFindAddress(cc, cc->name);
-			cc->connectStage=csLookingUp;
 			cc->tryingToConnect = true;
 			cc->outgoing = true;
 		}
@@ -1673,7 +1672,7 @@ static void DCCGetLineSend(connectionPtr conn, CEPtr c)
 	}
 }
 
-pascal void dccEvent(CEPtr c, connectionPtr conn)
+void dccEvent(CEPtr c, connectionPtr conn)
 {
 	switch(c->event)
 	{
@@ -1698,7 +1697,6 @@ pascal void dccEvent(CEPtr c, connectionPtr conn)
 			break;
 			
 		case C_Found:
-			memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
 			break;
 	}
 }
