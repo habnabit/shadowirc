@@ -553,16 +553,16 @@ int TCPLocalIP(int sockfd, struct in_addr *ip)
     return (0);
 }
 
-int TCPRemoteIP(int sockfd, struct in_addr *ip)
+int TCPRemoteIP(int sockfd, struct sockaddr_storage *ip)
 {
-    sockaddr_union sau;
+    struct sockaddr_storage ss;
     int len;
     
-    len = sizeof(sockaddr_union);
-    if(getpeername(sockfd, (SA *) &sau.sa, &len) < 0)
+    len = sizeof(ss);
+    if(getpeername(sockfd, (struct sockaddr *) &ss, &len) < 0)
         return (-1);
     
-    memcpy(ip, &sau.sin.sin_addr, sizeof(ip));
+    memcpy(ip, &ss, sizeof(struct sockaddr_storage));
     return (0);
 }
 
