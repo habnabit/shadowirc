@@ -26,6 +26,8 @@
 #include "SmartScrollAPI.h"
 #endif
 
+#define SAppend1(s,ch){(s)[++((s)[0])]=ch;}
+
 CIconHandle gSortForwardIcon, gSortReverseIcon;
 
 inline char pstrgt(Str255 one, Str255 two);
