@@ -471,16 +471,26 @@ static pascal void HitFontsMenu(short item)
 		{
 			if(MWActive)
 			{
+/*
+				OSStatus status;
+				FMFontFamily fontFamily;
+				FMFontStyle style;
+
+				status = GetFontFamilyFromMenuSelection(gFontsMenu, item, &fontFamily, &style);
+				if(!status)
+*/				
 				GetFNum(s, &i);
-				MWSetFontSize(MWActive, i, -1);
-				WEActivate(MWActive->we);
+				{
+					MWSetFontSize(MWActive, i, -1);
+					WEActivate(MWActive->we);
+				}
 			}
 		}
 		else
 		{
-			StringToNum(s, &l);
 			if(MWActive)
 			{
+				StringToNum(s, &l);
 				MWSetFontSize(MWActive, -1, l);
 				WEActivate(MWActive->we);
 			}
@@ -685,7 +695,7 @@ void FontsMenuInit(void)
 		gFontsMenu = mh;
 		fontsBegin=CountMenuItems(mh);
 		gFontSizeOtherItem = fontsBegin - 1;
-		AppendResMenu(mh, 'FONT');
+		CreateStandardFontMenu(mh, fontsBegin, 0, kNilOptions, 0);
 	}
 }
 
