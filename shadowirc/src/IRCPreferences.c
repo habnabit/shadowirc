@@ -39,6 +39,8 @@
 #include "ServerList.h"
 #include "MoreFiles.h"
 #include "MenuCommands.h"
+#include "IRCCFPrefs.h"
+#include "StringKeys.h"
 
 enum PrefsWindowID {
 	kwPrefConn = 1001,
@@ -1142,7 +1144,10 @@ static void HitPreferencesWindow(short windowNum, short item)
 						if((FSpMakeFSRef(&dccFolderFSp, &localRef)) == noErr)
 						{
 							if((DoDirSelRef(&localRef, 9)) == noErr)
+							{
 								FSGetCatalogInfo(&localRef, kFSCatInfoNone, NULL, NULL, &dccFolderFSp, NULL);
+								WriteDirURLRef(kPrefDCCFolder, &localRef);
+							}
 						}
 						break;
 					}
@@ -1252,7 +1257,8 @@ static void HitPreferencesWindow(short windowNum, short item)
 						break;
 					
 					case 6:
-						DoDirSelRef(&logFolderRef, 7);
+						if((DoDirSelRef(&logFolderRef, 7)) == noErr)
+							WriteDirURLRef(kPrefLogFolder, &logFolderRef);
 						break;
 				}
 				break;
