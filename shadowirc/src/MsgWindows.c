@@ -118,26 +118,40 @@ static pascal void ScrollBarChanged(WEReference we, long val);
 
 pascal OSErr FSpGetDirectoryID(FSSpec*, long*, char*); //for MWStartLogging
 
+/*
+	This function returns the frontmost message window.
+*/
 MWPtr GetFrontMW(void)
 {
 	MWPtr m;
 	WindowPtr w;
 	
-	if(MWActive)
-		return MWActive;
-	else
+	w = FrontNonFloatingWindow();
+	while(w)
 	{
-		w = FrontNonFloatingWindow();
-		while(w)
-		{
-			m = MWFromWindow(w);
-			if(m)
-				return m;
-			w = GetNextWindow(w);
-		}
-		
-		return 0;
+		m = MWFromWindow(w);
+		if(m)
+			return m;
+		w = GetNextWindow(w);
 	}
+		
+	return 0;
+}
+
+/*
+	This is the replacment for the MWActive global.
+	If the front window is a message window, it returns that MWPtr.
+	Otherwise, it returns nil.
+*/
+MWPtr GetActiveMW()
+{
+	WindowPtr w;
+
+	w = FrontNonFloatingWindow();
+	if(w)
+		return MWFromWindow(w);
+	else
+		return 0;
 }
 
 pascal char MWValid(MWPtr mw)

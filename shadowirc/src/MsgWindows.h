@@ -186,6 +186,8 @@ enum{
 
 
 MWPtr GetFrontMW(void);
+MWPtr GetActiveMW(void);
+
 pascal char MWValid(MWPtr mw);
 pascal MWPtr NewPluginMWindow(ConstStr255Param title);
 void MWSetDimen(MWPtr win, short left, short top, short width, short height);
