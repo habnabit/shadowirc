@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<string>sicServer</string>
+	<string>sicStandard</string>
+	<string>sicPrivmsg</string>
+	<string>sicCTCP</string>
+	<string>sicOutgoing</string>
+	<string>sicNotice</string>
+	<string>sicWindowBG</string>
+	<string>sicUserChannelOp</string>
+	<string>sicUserVoice</string>
+	<string>sicUserOper</string>
+	<string>sicUserRegular</string>
+	<string>sicStatusLine</string>
+	<string>sicUserIgnored</string>
+	<string>sicNotifyColor</string>
+	<string>sicTimestampColor</string>
+</array>
+</plist>
