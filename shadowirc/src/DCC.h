@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -164,11 +164,9 @@ pascal void DCCSendCookieReply(connectionPtr *x, long cky, LongString *ls);
 
 pascal char DCCGetAFile(FSSpec *f, char *macbinary);
 
-pascal long ulongval(ConstStr255Param s);
 pascal void ulongstr(unsigned long l, StringPtr s);
 pascal ConstStringPtr dccTypToStr(short d);
 pascal ConstStringPtr dccFlagTypToStr(short d);
-pascal void hostToIPStr(long, StringPtr);
 
 pascal short DCCTypeAdd(ConstStringPtr type);
 pascal short DCCTypeFind(ConstStr255Param s);

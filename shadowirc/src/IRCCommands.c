@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -985,8 +985,8 @@ static void _ucRping(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 	SAppend1(s1, ' ');
 	Microseconds(&t);
 	*(unsigned long long*)&t/=1000;
-	ulongstr(t.hi, s2);
-	ulongstr(t.lo, s3);
+	ntohl_str(t.hi, s2);
+	ntohl_str(t.lo, s3);
 	LSStrCat4(s, "\pRPING ", s1, s2, s3);
 }
 
@@ -1330,8 +1330,8 @@ static void _ucCping(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 	
 	Microseconds(&t);
 	*(unsigned long long*)&t/=1000;
-	ulongstr(t.hi, s1);
-	ulongstr(t.lo, s2);
+	ntohl_str(t.hi, s1);
+	ntohl_str(t.lo, s2);
 	LSConcatStrAndStrAndStr("\pPING ", s1, s2, s);
 	i=LSPosChar(' ', rest);
 	if(i)

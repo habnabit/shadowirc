@@ -189,9 +189,9 @@ _HandleCommand
 _SendCommand
 _writeMainPrefs
 _writeAllFiles
-_ulongval
-_ulongstr
-_hostToIPStr
+_str_htonl
+_ntohl_str
+_inet_ntoa_str
 _IPStringToLong
 _DNSLookup
 _doBroadcast

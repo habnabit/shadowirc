@@ -1,6 +1,6 @@
 /*	ShadowIRC Plugins Header File
 		Version 2.0-preliminary
-		© John Bafford 1997-2002. All Rights Reserved.
+		© John Bafford 1997-2003. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
 		
@@ -375,6 +375,8 @@ typedef struct dccCHATData {
 
 typedef struct dccGETData {
 	FSSpec gfile;					//FSSpec to the file
+	CFStringRef fileName;				//CFStringRef of the file name
+	FSRef gfileRef;					//FSRef to the file
 	short gfref;					//The file's reference number
 	long gotten;					//How much of the file we've gotten
 	long getmax;					//File size, or -1 if we don't know.
@@ -3276,22 +3278,22 @@ pascal void writeAllFiles(void);
 		Output:	none
 */
 
-pascal long ulongval(ConstStr255Param s);
+u_int32_t str_htonl(StringPtr string);
 /*	Turns a 10-digit string into a unsigned longint.
-		Input:	s - string
+		Input:	string - Pascal (lengthed) string
 		Output:	return value: (unsigned) long.
 */
 
-pascal void ulongstr(long l, Str255 s);
+void ntohl_str(u_int32_t net32, StringPtr string);
 /*	Turns an (unsigned) long into a character string. Use NumToString() for signed values.
-		Input:	l - (unsigned) long.
-		Output:	s - string
+		Input:	net32 - (unsigned) long.
+		Output:	string - Pascal (lengthed) string
 */
 
-pascal void hostToIPStr(long l, Str255 s);
+void inet_ntoa_str(struct in_addr addr, StringPtr string);
 /*	Changes an IP into xxx.xxx.xxx.xxx format.
-		Input:	l - longint representing an IP
-		Output:	s - string representation of l
+		Input:	addr - longint representing an IP
+		Output:	string - string representation of addr
 */
 
 pascal long IPStringToLong(ConstStr255Param s);

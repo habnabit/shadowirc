@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -2079,22 +2079,6 @@ pascal void DCCSendCookieReply(connectionPtr *x, long cky, LongString *ls)
 		DCCClose(x, false);
 }
 
-pascal long ulongval(ConstStr255Param s)
-{
-	long l=0;
-	int i=0,j;
-
-	while(++i<=s[0])
-	{
-		j=s[i]-48;
-		if((j<0)||(j>9))
-			break;
-		
-		l= (10*l)+j;
-	};
-	return l;
-}
-
 static void str10neg(StringPtr s)
 {
 	unsigned char y[]="\p4294967296";
@@ -2144,38 +2128,6 @@ pascal void ulongstr(unsigned long l, StringPtr s)
 		s[0]=0;
 	//else
 	//bad
-}
-
-typedef union charsLong {
-	char chars[4];
-	long l;
-} charsLong;
-
-pascal void hostToIPStr(long l, Str255 s)
-{
-	int i1, i2, i3, i4;
-	charsLong c;
-	Str255 s2;
-	
-	c.l = l;
-	i1= c.chars[0];
-	i2= c.chars[1];
-	i3= c.chars[2];
-	i4= c.chars[3];
-
-	NumToString(i1,s);
-	SAppend1(s, '.');
-	
-	NumToString(i2, s2);
-	pstrcat(s, s2, s);
-	SAppend1(s, '.');
-	
-	NumToString(i3, s2);
-	pstrcat(s, s2, s);
-	SAppend1(s, '.');
-	
-	NumToString(i4, s2);
-	pstrcat(s, s2, s);
 }
 
 pascal ConstStringPtr dccTypToStr(short d)
