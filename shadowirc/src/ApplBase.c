@@ -57,6 +57,7 @@
 static void doTCPEvent(CEPtr message);
 static void ApplExit(void);
 
+static void AsyncSoundCleanup(EventLoopTimerRef timer, void* data);
 static void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord);
 
 typedef struct aspData {
