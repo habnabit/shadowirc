@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -240,7 +240,7 @@ static void CreateIdentdConn(linkPtr link)
 			LSGetIntString(&ls, spError, sOpeningIdentd);
 			SMPrefixLink(link, &ls, 1);
 			
-			identConn->ip = conn->ip;
+			memcpy(identConn->sas, conn->sas, sizeof(struct sockaddr_storage));
 			identConn->port = 113;
 			identConn->link=link;
 			if(mainPrefs->firewallType == fwSOCKS4A || mainPrefs->firewallType == fwSOCKS4)
@@ -257,10 +257,12 @@ static void CreateIdentdConn(linkPtr link)
 void DisplayLookupResult(connectionPtr conn)
 {
 	LongString ls;
-	Str255 s;
+	char hbuf[NI_MAXHOST];
+	Str255 pstr;
 
-	inet_ntoa_str(conn->ip, s);
-	LSParamString(&ls, GetIntStringPtr(spInfo, sIPForIs), conn->name, s, 0, 0);
+	getnameinfo((struct sockaddr *)conn->sas, conn->sas->ss_len, hbuf, sizeof(hbuf), NULL, 0, NI_NUMERICHOST);
+	CopyCStringToPascal(hbuf, pstr);
+	LSParamString(&ls, GetIntStringPtr(spInfo, sIPForIs), conn->name, pstr, 0, 0);
 	SMPrefix(&ls, dsConsole);
 }
 

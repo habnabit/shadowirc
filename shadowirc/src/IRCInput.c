@@ -563,16 +563,19 @@ static void SOCKSConnect(connectionPtr conn)
 
 void processSOCKS(CEPtr c, connectionPtr conn)
 {
+	/*
+	 * SOCKS firewalling does not yet support IPv6
+	 */
 	Str255 send;
 	long nn;
 	LongString ls;
 	
 	if(c->event == C_Found)
 	{
-		if(conn->socks.secondLookup)
+		if(conn->socks.secondLookup && (conn->sas->ss_family == AF_INET))
 		{
 			//Move the ip from ip to ip2
-			memcpy(&conn->socks.ip, &conn->ip, sizeof(conn->socks.ip));
+			memcpy(&conn->socks.ip, &((struct sockaddr_in *)conn->sas)->sin_addr, sizeof(conn->socks.ip));
 			
 			//Look up the server IP
 			ConnFindAddress(conn, conn->name);

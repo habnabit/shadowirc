@@ -104,12 +104,11 @@ struct Connection {
 	void* refCon;
 	linkPtr link;
 	/*
-         * ip: store ip address
-         * ip2: used w/ storing SOCKS proxy IP address
-	 * localip: local IP address (getsockname on sockfd)
-         */
-	struct in_addr ip;
-	struct in_addr localip;
+	 * sas: store IP address
+	 * localsas: local IP address (getsockname on sockfd)
+	 */
+	struct sockaddr_storage *sas;
+	struct sockaddr_storage *localsas;
 	Str255 name;
 	unsigned long lastData;
 

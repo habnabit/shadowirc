@@ -608,7 +608,7 @@ static void doTCPEvent(CEPtr c)
 	switch(c->event)
 	{
 		case C_Found:
-			memcpy(&conn->ip, &((struct sockaddr_in *)c->sas)->sin_addr, sizeof(conn->ip));
+			memcpy(conn->sas, c->sas, sizeof(struct sockaddr_storage));
 			DisplayLookupResult(conn);
                         /*
                          * The socket connect() can fail, even when non-blocking
@@ -621,7 +621,7 @@ static void doTCPEvent(CEPtr c)
 			break;
 		
 		case C_Established:
-			memcpy(&conn->ip, &((struct sockaddr_in *)c->sas)->sin_addr, sizeof(conn->ip));
+			memcpy(conn->sas, c->sas, sizeof(struct sockaddr_storage));
 			break;
 	}
 	

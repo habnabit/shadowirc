@@ -183,6 +183,8 @@ pascal void deleteConnection(connectionPtr *c)
 	cc->next = 0;
 	cc->connType = connNIL;
 	cc->InputFunc = 0;
+	DisposePtr((Ptr)cc->sas);
+	DisposePtr((Ptr)cc->localsas);
 	DisposePtr((Ptr)cc);
 	*c=0;
 }
@@ -270,8 +272,8 @@ pascal connectionPtr newConnection(short connType)
 		}
 		else
 			c->connType=connType;
-		c->ip.s_addr=0;
-		c->localip.s_addr=0;
+		c->sas = (struct sockaddr_storage *)NewPtrClear(sizeof(struct sockaddr_storage));
+		c->localsas = (struct sockaddr_storage *)NewPtrClear(sizeof(struct sockaddr_storage));
 		c->name[0]=0;
 		c->port=0;
 		c->lastData=now;
@@ -282,6 +284,9 @@ pascal connectionPtr newConnection(short connType)
 		c->closeTime = 0;
 		c->realConnType = 0;
 		
+		/*
+		 * SOCKS firewalling does not yet support IPv6
+		 */
 		c->socks.name[0]=0;
 		c->socks.port=0;
 		c->socks.type=connType;
@@ -462,14 +467,7 @@ pascal void ConnClose(connectionPtr conn)
 
 char ConnNewActive(connectionPtr c)
 {
-	struct sockaddr_in sin;
-	
-	sin.sin_len = sizeof(struct sockaddr_in);
-	sin.sin_family = PF_INET;
-	sin.sin_port = 0;
-	memcpy(&sin.sin_addr, &c->ip, sizeof(struct in_addr));
-	
-	return NewActiveConnection(&c->private_socket, (struct sockaddr *)&sin, c->port)==0;
+	return NewActiveConnection(&c->private_socket, (struct sockaddr *)c->sas, c->port)==0;
 }
 
 char ConnNewListen(connectionPtr c, int af, int backlog)

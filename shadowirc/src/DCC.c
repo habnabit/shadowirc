@@ -90,6 +90,8 @@ static void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr255Param
 
 static void DCCNMRequest(connectionPtr x, char overwriteFile);
 
+#pragma mark -
+
 char IsDCCName(ConstStringPtr s)
 {
 	if((s[0]!=0)&&(s[1]=='='))
@@ -330,12 +332,9 @@ pascal char DCCCreate(linkPtr link, short typ, ConstStr255Param fr, connectionPt
 		return 0;
 	else
 	{
-		struct sockaddr_in sin;
-	
 		*c=newConnection(connDCC);
 		(*c)->link=link;
-		ConnGetLocalIP(link->conn, (struct sockaddr *)&sin);
-		memcpy(&(*c)->localip, &sin.sin_addr, sizeof(struct in_addr));
+		ConnGetLocalIP(link->conn, (struct sockaddr *)(*c)->localsas);
 		d=(*c)->dcc=(dccPtr)NewPtr(sizeof(dccRec));
 		pstrcpy(fr, d->dccUserName);
 		d->dccType=typ;
@@ -507,7 +506,7 @@ pascal char DCCGetAFile(FSSpec *f, char *macbinary)
 	NavReplyRecord		theReply;
 	NavDialogOptions	dialogOptions;
 	OSErr theErr;
-    NavEventUPP eventUPP = NewNavEventUPP(DCCSendFileNavHook);
+	NavEventUPP eventUPP = NewNavEventUPP(DCCSendFileNavHook);
 		
 	theErr = NavGetDefaultDialogOptions(&dialogOptions);
 	dialogOptions.preferenceKey = kNavGetFile;
@@ -850,12 +849,15 @@ pascal void DCCOpen(connectionPtr *x)
 	{
 		if(ConnNewListen(cc, AF_UNSPEC, 10))
 		{
+			char hbuf[NI_MAXHOST];
+			
 			cc->port=ConnGetLocalPort(cc);
                         /*
                          * DCCCreate sets cc->localip to local IP address
                          * based off of connected sockfd
                          */
-			ntohl_str(cc->localip.s_addr, ipa);
+  			getnameinfo((struct sockaddr *)cc->localsas, cc->localsas->ss_len, hbuf, sizeof(hbuf), NULL, 0, NI_NUMERICHOST);
+  			CopyCStringToPascal(hbuf, ipa);
 			ulongstr(cc->port, pn);
 			args[0]=0;
 			
@@ -909,7 +911,10 @@ pascal void DCCOpen(connectionPtr *x)
 	}
 	else if(d->dccFlags==offered)
 	{
-		inet_ntoa_str(cc->ip, des);
+		char hbuf[NI_MAXHOST];
+		
+		getnameinfo((struct sockaddr *)cc->sas, cc->sas->ss_len, hbuf, sizeof(hbuf), NULL, 0, NI_NUMERICHOST);
+		CopyCStringToPascal(hbuf, des);
 		NumToString(cc->port, args);
 		ConnSetup(cc, des, cc->port);
 		if(cc->connType == connSOCKS)
@@ -1683,6 +1688,33 @@ void dccEvent(CEPtr c, connectionPtr conn)
 
 #pragma mark -
 
+/*
+ * NextArgIP() - IPv6-safe version of NextArg()
+ *				(does not remove colons)
+ */
+static void NextArgIP(StringPtr from, StringPtr arg)
+{
+	short i = pos(' ',from);
+	if(!i)
+	{
+		if(arg)
+			pstrcpy(from,arg);
+		from[0]=0;
+	}
+	else
+	{
+		if(arg)
+			myCopy(from,1,i-1, arg);
+		while(i<from[0])
+		{
+			if(from[i+1]!=' ')
+				break;
+			i++;
+		}
+		pdelete(from,1,i);
+	}
+}
+
 static void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, StringPtr s, long revNum)
 {
 	LongString ls;
@@ -1716,17 +1748,35 @@ static void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param u
 	
 	if(revNum != -1)
 	{
-		NextArg(s, 0); //IP
+		NextArgIP(s, 0); //IP
 		NextArg(s, 0); //port
-		x->ip.s_addr = x->port = 0;
+		BlockZero(x->sas, sizeof(struct sockaddr_storage));
+		x->port = 0;
 		d->refcon = (void*)revNum;
 		d->dccFlags = closed;
 		d->reverse = true;
 	}
 	else
 	{
-		NextArg(s, c); //IP
-		x->ip.s_addr = str_htonl(c);
+		char cstr[256];
+		
+		NextArgIP(s, c); //IP
+		CopyPascalStringToC(c, cstr);
+		if (strchr(cstr, ':')) {
+			struct sockaddr_in6 *sin6;
+			
+			sin6 = (struct sockaddr_in6 *)x->sas;
+			sin6->sin6_family = PF_INET6;
+			sin6->sin6_len = sizeof(struct sockaddr_in6);
+			inet_pton(AF_INET6, cstr, (struct sockaddr *)&sin6->sin6_addr);
+		} else {
+			struct sockaddr_in *sin;
+			
+			sin = (struct sockaddr_in *)x->sas;
+			sin->sin_family = PF_INET;
+			sin->sin_len = sizeof(struct sockaddr_in);
+			sin->sin_addr.s_addr = str_htonl(c);
+		}
 		NextArg(s, c); //port
 		StringToNum(c, &l);
 		x->port=l;
@@ -1741,8 +1791,10 @@ static void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param u
 	else
 	{
 		Str255 st2;
+		char hbuf[NI_MAXHOST];
 		
-		inet_ntoa_str(x->ip, c);
+		getnameinfo((struct sockaddr *)x->sas, x->sas->ss_len, hbuf, sizeof(hbuf), NULL, 0, NI_NUMERICHOST);
+		CopyCStringToPascal(hbuf, c);
 		NumToString(x->port, st);
 		pstrcat(c, "\p:", st2);
 		pstrcat(st2, st, st2);
@@ -1788,17 +1840,35 @@ static void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param ua
 	pstrcpy(uah, x->name);
 	if(revNum != -1)
 	{
-		NextArg(s, 0); //IP
+		NextArgIP(s, 0); //IP
 		NextArg(s, 0); //port
-		x->ip.s_addr = x->port = 0;
+		BlockZero(x->sas, sizeof(struct sockaddr_storage));
+		x->port = 0;
 		d->refcon = (void*)revNum;
 		d->dccFlags = closed;
 		d->reverse = true;
 	}
 	else
 	{
-		NextArg(s, c); //IP
-		x->ip.s_addr = str_htonl(c);
+		char cstr[256];
+		
+		NextArgIP(s, c); //IP
+		CopyPascalStringToC(c, cstr);
+		if (strchr(cstr, ':')) {
+			struct sockaddr_in6 *sin6;
+			
+			sin6 = (struct sockaddr_in6 *)x->sas;
+			sin6->sin6_family = PF_INET6;
+			sin6->sin6_len = sizeof(struct sockaddr_in6);
+			inet_pton(AF_INET6, cstr, (struct sockaddr *)&sin6->sin6_addr);
+		} else {
+			struct sockaddr_in *sin;
+			
+			sin = (struct sockaddr_in *)x->sas;
+			sin->sin_family = PF_INET;
+			sin->sin_len = sizeof(struct sockaddr_in);
+			sin->sin_addr.s_addr = str_htonl(c);
+		}
 		NextArg(s, c); //port
 		StringToNum(c, &l);
 		x->port=l;
@@ -1840,9 +1910,12 @@ static void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param ua
 	}
 	else
 	{
-		inet_ntoa_str(x->ip, c);
+		char hbuf[NI_MAXHOST];
+		
+		getnameinfo((struct sockaddr *)x->sas, x->sas->ss_len, hbuf, sizeof(hbuf), NULL, 0, NI_NUMERICHOST);
+		CopyCStringToPascal(hbuf, c);
 		NumToString(x->port, st);
-		LSConcatStrAndStrAndStr(c, "\p:", st, &ls);
+		LSConcatStrAndStrAndStr(c, "\p port ", st, &ls);
 		LSCopyString(&ls, 1, ls.len, c);
 		LSParamString(&ls, GetIntStringPtr(spDCC, sDCCRequest), dccTypeStr, fr, des, c);
 	}
@@ -1949,9 +2022,17 @@ static void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr255Param
 					x = DCCFindRefcon((void*)l);
 					if(x)
 					{
+						int af;
+						char cstr[256];
+						
 						NextArg(s, 0); //name
-						NextArg(s, c); //IP
-						x->ip.s_addr = str_htonl(c);
+						NextArgIP(s, c); //IP
+						CopyPascalStringToC(c, cstr);
+						if (strchr(cstr, ':'))
+								af = PF_INET6;
+						else
+								af = PF_INET;
+						inet_pton(af, cstr, (struct sockaddr *)x->sas);
 						NextArg(s, c); //port
 						StringToNum(c, &l);
 						x->port=l;

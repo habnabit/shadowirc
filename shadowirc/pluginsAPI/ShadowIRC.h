@@ -455,7 +455,7 @@ struct Connection {
 	void* refCon;							//Reference constant.
 	const linkPtr link;						//The link for this connection, or nil.
 	
-	struct in_addr ip, localip;
+	struct sockaddr_storage *sas, *localsas; //IP stored as a socket address
 	Str255 name;							//name of connection
 	long lastData;							//The time the last data came in.
 
