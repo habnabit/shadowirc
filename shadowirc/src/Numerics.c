@@ -63,7 +63,8 @@ inline void n353names(LongString *rest, linkPtr link);
 inline void n433nickInUse(linkPtr link, LongString *rest);
 
 /*
-	Unet options:
+	005 Server options
+	http://www.irc.org/tech_docs/005.html
 	
 	Used now:
 		TOPICLEN=160
@@ -81,10 +82,18 @@ inline void n433nickInUse(linkPtr link, LongString *rest);
 		CHANMODES=b,k,l,imnpst
 		CHARSET=rfc1459
 		NETWORK=Undernet
+		CASEMAPPING=ascii
 	
 	Dalnet:
 		WATCH=128 - serverside notify
 		SAFELIST - does /list in chunks
+	
+	Notes:
+		CHANMODES=A,B,C,D
+			a = mode adds/removes nick/address to a list. (always has param)
+			b = mode changes a setting. (always has param)
+			c = mode changes a setting. (has param only when set)
+			d = mode changes a setting. (never has param)
 */
 
 static HTPtr DefaultServerOptions(void)
