@@ -66,6 +66,8 @@ target CurrentTarget = {0, 0, 0, 0, 1, 0, 0};
 static MWPtr hel=0;
 static short curHelpItem = 0;
 
+static CIconHandle giCMWidgetIcon[4], giHelpWidgetIcon[4], giLinkWidgetIcon[4];
+
 inline pascal void linkWinAdd(MWPtr win, int i);
 inline pascal int linkWinNull(linkPtr link);
 inline pascal void linkWinDel(MWPtr win);
@@ -107,6 +109,45 @@ inline pascal void linkWinDel(MWPtr win)
 }
 
 #pragma mark -
+
+//Stick the init here since it's only used here.
+
+enum iconIDs {
+	kIconWidgetUp = 0,
+	kIconWidgetDisabled = 1,
+	kIconWidgetDown = 2,
+	kIconWidgetDownDisabled = 3,
+	
+	kiCMWidgetUp = 128,
+	kiCMWidgetDisabled = 129,
+	kiCMWidgetDown = 130,
+	
+	kiHelpWidgetUp = 132,
+	kiHelpWidgetDisabled = 133,
+	kiHelpWidgetDown = 134,
+
+	kiLinkWidgetUp = 136,
+	kiLinkWidgetDisabled = 137,
+	kiLinkWidgetDown = 138
+};
+
+pascal void GetIcons(void)
+{
+	giCMWidgetIcon[kIconWidgetUp] = GetCIcon(kiCMWidgetUp);
+	giCMWidgetIcon[kIconWidgetDownDisabled] = giCMWidgetIcon[kIconWidgetDisabled] = GetCIcon(kiCMWidgetDisabled);
+	giCMWidgetIcon[kIconWidgetDown] = GetCIcon(kiCMWidgetDown);
+
+	giHelpWidgetIcon[kIconWidgetUp] = GetCIcon(kiHelpWidgetUp);
+	giHelpWidgetIcon[kIconWidgetDownDisabled] = giHelpWidgetIcon[kIconWidgetDisabled] = GetCIcon(kiHelpWidgetDisabled);
+	giHelpWidgetIcon[kIconWidgetDown] = GetCIcon(kiHelpWidgetDown);
+
+	giLinkWidgetIcon[kIconWidgetUp] = GetCIcon(kiLinkWidgetUp);
+	giLinkWidgetIcon[kIconWidgetDownDisabled] = giLinkWidgetIcon[kIconWidgetDisabled] = GetCIcon(kiLinkWidgetDisabled);
+	giLinkWidgetIcon[kIconWidgetDown] = GetCIcon(kiLinkWidgetDown);
+}
+
+#pragma mark -
+
 pascal void InvalTarget(targetPtr targ)
 {
 	targ->type=targInvalid;

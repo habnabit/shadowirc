@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -51,13 +51,13 @@
 #include "CalcCRC.h"
 #include "IRCPreferences.h"
 #include "MenuCommands.h"
+#include "IRCChannels.h"
 
 #pragma internal on
 inline void AppleMenuURLInit(void);
 inline void CheckPreferences(void);
 pascal void ToolboxInit(void);
 pascal void ApplicationInit(void);
-inline void GetIcons(void);
 inline void SetupUPPs(void);
 
 pascal void ApplInit();
@@ -97,21 +97,6 @@ inline void AppleMenuURLInit(void)
 			SetMenuItemText(m, y, GetIntStringPtr(spAppleURL, x));
 		}
 	}
-}
-
-inline void GetIcons(void)
-{
-	giCMWidgetIcon[kIconWidgetUp] = GetCIcon(kiCMWidgetUp);
-	giCMWidgetIcon[kIconWidgetDownDisabled] = giCMWidgetIcon[kIconWidgetDisabled] = GetCIcon(kiCMWidgetDisabled);
-	giCMWidgetIcon[kIconWidgetDown] = GetCIcon(kiCMWidgetDown);
-
-	giHelpWidgetIcon[kIconWidgetUp] = GetCIcon(kiHelpWidgetUp);
-	giHelpWidgetIcon[kIconWidgetDownDisabled] = giHelpWidgetIcon[kIconWidgetDisabled] = GetCIcon(kiHelpWidgetDisabled);
-	giHelpWidgetIcon[kIconWidgetDown] = GetCIcon(kiHelpWidgetDown);
-
-	giLinkWidgetIcon[kIconWidgetUp] = GetCIcon(kiLinkWidgetUp);
-	giLinkWidgetIcon[kIconWidgetDownDisabled] = giLinkWidgetIcon[kIconWidgetDisabled] = GetCIcon(kiLinkWidgetDisabled);
-	giLinkWidgetIcon[kIconWidgetDown] = GetCIcon(kiLinkWidgetDown);
 }
 
 static pascal void AboutDlgVersion(DialogPtr d, short i);

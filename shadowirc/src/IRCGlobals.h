@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -42,27 +42,6 @@ typedef char Table[256], *TableChars;
 enum stdgrey {
 	kStandardGrey = 57097
 };
-
-enum iconIDs {
-	kIconWidgetUp = 0,
-	kIconWidgetDisabled = 1,
-	kIconWidgetDown = 2,
-	kIconWidgetDownDisabled = 3,
-	
-	kiCMWidgetUp = 128,
-	kiCMWidgetDisabled = 129,
-	kiCMWidgetDown = 130,
-	
-	kiHelpWidgetUp = 132,
-	kiHelpWidgetDisabled = 133,
-	kiHelpWidgetDown = 134,
-
-	kiLinkWidgetUp = 136,
-	kiLinkWidgetDisabled = 137,
-	kiLinkWidgetDown = 138
-};
-
-extern CIconHandle giCMWidgetIcon[4], giHelpWidgetIcon[4], giLinkWidgetIcon[4];
 
 enum {
 	S_CONN,
@@ -293,7 +272,7 @@ extern unsigned long now, launchTime;
 enum {readTimeout = 20};
 extern short fontsBegin;
 
-extern Str63 CL_VERSION, cdt, expDate, shadowIRCDefaultSignoff;
+extern Str63 CL_VERSION, cdt, shadowIRCDefaultSignoff;
 extern char debugOn;
 extern char QuitRequest;
 extern char allowConnections;

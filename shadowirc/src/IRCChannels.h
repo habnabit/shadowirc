@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -81,6 +81,8 @@ pascal void ChPart(MWPtr w);
 pascal void DoJoinSelWin(MWPtr w);
 pascal void MWStatusClick(MWPtr mw, Point p);
 #endif
+
+pascal void GetIcons(void);
 
 pascal MWPtr ChJoin(channelPtr ch);
 pascal MWPtr DoJoinQuery(ConstStr255Param ch, linkPtr link);
