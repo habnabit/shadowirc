@@ -212,7 +212,7 @@ pascal char MWSetChannel(MWPtr mw, struct Channel* ch);
 pascal char MWSetDCC(MWPtr mw, connectionPtr dcc, Str255 name);
 pascal void MWSetNameQuery(MWPtr mw, ConstStr255Param from, linkPtr link);
 
-extern MWPtr MWActive, consoleWin;
+extern MWPtr consoleWin;
 extern Rect cornerstone;
 
 enum {

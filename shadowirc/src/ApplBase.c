@@ -258,11 +258,6 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 	p=MWFromWindow(window);
 	if(p)
 	{
-		if(activate)
-			MWActive=p;
-		else
-			MWActive=0;
-		
 		MWPaneActivate(p, activate);
 		
 		ch = MWGetChannel(p);
@@ -272,7 +267,6 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 		pluginDlgInfoPtr l;
 		
 		ch=0;
-		MWActive=0;
 		
 		l= (pluginDlgInfoPtr)GetWRefCon(window);
 		if(l && l->magic==PLUGIN_MAGIC)
@@ -852,7 +846,7 @@ static pascal void doMouseDown(EventRecord *e)
 				if(!WIsFloater(p))
 				{
 					WSelect(p);
-					MWActive = mw = MWFromWindow(p);
+					mw = MWFromWindow(p);
 				}
 				
 				if(!CMClick(p, e))

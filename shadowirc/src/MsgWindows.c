@@ -46,7 +46,7 @@
 
 MWPtr mwl = 0;
 
-MWPtr consoleWin=0, MWActive=0;
+MWPtr consoleWin=0;
 Rect cornerstone;
 
 enum colorRamp {
@@ -435,7 +435,6 @@ void MWHitContent(MWPtr mw, EventRecord *e)
 	short pa;
 	ControlActionUPP upp;
 	
-	MWActive = mw;
 	GlobalToLocal(&e->where);
 	pa=FindControl(e->where, mw->w, &c);
 	if(c == mw->vscr) //kludge, since the only control I know about is the vscr.
@@ -1161,8 +1160,6 @@ pascal void MWDelete(MWPtr w)
 	w->magic = 0; //clear magic so we aren't screwed by stray message window pointers
 	w->winType = invalWin;
 	DisposePtr((Ptr)w);
-	
-	MWActive=MWFromWindow(ActiveNonFloatingWindow());
 }
 
 static pascal Style DoAddHunk(Style s, myStScrpHandle sty, int i, int *nsty)
@@ -1650,7 +1647,7 @@ pascal void InitMsgWindows(void)
 
 	SetRect(&cornerstone, 5, GetMBarHeight() + 16, 425, 340);
 	
-	MWActive = consoleWin=MWNew(GetIntStringPtr(spTopic, sConsole), conWin, 0, 0);
+	consoleWin=MWNew(GetIntStringPtr(spTopic, sConsole), conWin, 0, 0);
 	MWNewWidget(consoleWin, mwLinkWidget, mwForceLeft, 17);
 	if(mainPrefs->consoleOpen)
 		WSelect(consoleWin->w);
