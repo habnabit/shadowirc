@@ -356,7 +356,7 @@ static pascal void floatingWindowClick(EventRecord *e) //this also takes care of
 			if(e->where.v>inputLine.statusLineHeight)
 				WEClick(e->where, e->modifiers, e->when, ILGetWE());
 			else
-				StatusLineClick(e->where, e->modifiers, e->when);
+				StatusLineClick(e->where, e->modifiers);
 			SetPort(p);
 		}
 		

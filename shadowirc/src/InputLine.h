@@ -120,7 +120,7 @@ pascal void ILAddHistory(MWPtr mw, LongString *line);
 #endif
 
 void OpenInputLine(void);
-pascal void StatusLineClick(Point where, short modifiers, long when);
+void StatusLineClick(Point where, short modifiers);
 
 #ifdef _WASTE_
 pascal char ILWEIsInput(WEReference we);

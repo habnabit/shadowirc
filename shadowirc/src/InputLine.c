@@ -1292,9 +1292,8 @@ static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short mod
 	}
 }
 
-pascal void StatusLineClick(Point where, short modifiers, long when)
+void StatusLineClick(Point where, short modifiers)
 {
-#pragma unused(when)
 	iwWidgetPtr o;
 	pIWClickData pp;
 	
