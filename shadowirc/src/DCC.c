@@ -420,13 +420,8 @@ static pascal void DCCSendFileNavHook(NavEventCallbackMessage callBackSelector, 
 		case kNavCBEvent:
 			switch (callBackParms->eventData.eventDataParms.event->what)
 			{
-				case nullEvent:
-					//doNetworkCheck();
-					break;
-					
 				case updateEvt:
 					doUpdateEvent(callBackParms->eventData.eventDataParms.event);
-					//doNetworkCheck();
 					break;
 				
 				case mouseDown:

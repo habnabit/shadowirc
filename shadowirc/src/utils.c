@@ -749,15 +749,11 @@ pascal unsigned char StandardDialogFilter(DialogPtr d, EventRecord *e, short *it
 		if((DialogPtr)e->message != d)
 		{
 			doUpdateEvent(e);
-			doNetworkCheck();
-			doNetworkCheck();
 			return true;
 		}
 	}
 	else if(e->what == nullEvent)
 	{
-		doNetworkCheck();
-		doNetworkCheck();
 		*item=0;
 	}
 	else if(e->what == mouseDown)

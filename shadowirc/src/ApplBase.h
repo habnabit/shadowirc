@@ -35,7 +35,6 @@ pascal void ApplInit(void);
 pascal char doQuit(LongString *reason);
 
 pascal void doUpdateEvent(EventRecord *e);
-pascal void doNetworkCheck(void);
 
 pascal void UpdateWindowPosition(WindowPtr win);
 

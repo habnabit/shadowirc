@@ -986,13 +986,6 @@ static pascal void ApplEvents(EventRecord *e)
 	}
 }
 
-pascal void doNetworkCheck(void)
-{
-	connectionEventRecord connEvt;
-	if(GetConnectionEvent(&connEvt))
-		doTCPEvent(&connEvt);
-}
-
 pascal void ApplRun(void)
 {
 	EventRecord e;
