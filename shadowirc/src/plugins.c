@@ -743,7 +743,6 @@ static int LoadPluginFromBundle(CFBundleRef pluginBundle, CFStringRef pluginName
 				if(err == noErr)
 					thisPlug->resFileRefNum = refNum;
 			}
-			CFRelease(resFile);
 		}
 
 		if(resourceURLs != NULL)
