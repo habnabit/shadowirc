@@ -74,8 +74,6 @@ pascal void LineMsg(const LongString *ls);
 
 pascal long ShadowIRCVersion(StringPtr);
 
-FSSpec pluginPrefsFSSpec;
-
 hmiListHand hmiList;
 
 static plugsPtr firstPlugin, lastPlugin;

@@ -1089,7 +1089,6 @@ typedef struct wMenuServicesRec {
 
 extern wMenuServicesHand wMenuServices;
 
-extern FSSpec pluginPrefsFSSpec;
 extern hmiListHand hmiList;
 extern ShadowIRCDataRecord sidr;
 
