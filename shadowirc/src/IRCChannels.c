@@ -274,10 +274,11 @@ static pascal void RollCSMouseCall(short l, char mc, char cl, Rect *cr, Point p,
 	*b=TrackCSMouse(p, cr, cl, mc);
 	if(*b)
 	{
+		LSAppend1(*ls, ' ');
 		if(mc)
-			LSAppend2(*ls, ' -')
+			LSAppend1(*ls, '-')
 		else
-			LSAppend2(*ls, ' +');
+			LSAppend1(*ls, '+');
 		LSAppend1(*ls, cl + 0x20);
 	}
 }

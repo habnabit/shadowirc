@@ -486,7 +486,8 @@ inline void IWInternalDraw(iwWidgetPtr o)
 					{
 						pstrcpy(link->CurrentServer, &server[2]);
 						server[0]=server[2]+2;
-						*(short*)&server[1]=' (';
+						server[1] = ' ';
+						server[2] = '(';
 					}
 					else
 						server[0]=0;
