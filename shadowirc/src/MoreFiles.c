@@ -98,32 +98,6 @@ pascal	OSErr	FSpGetDirectoryID(const FSSpec *spec,
 /*****************************************************************************/
 
 #pragma mark -
-#pragma mark ¥ FSpCompat
-
-pascal	OSErr	FSMakeFSSpecCompat(short vRefNum,
-								   long dirID,
-								   ConstStr255Param fileName,
-								   FSSpec *spec)
-{
-	OSErr	result;
-	
-	/* Let the file system create the FSSpec if it can since it does the job */
-	/* much more efficiently than I can. */
-	result = FSMakeFSSpec(vRefNum, dirID, fileName, spec);
-
-	/* Fix a bug in Macintosh PC Exchange's MakeFSSpec code where 0 is */
-	/* returned in the parID field when making an FSSpec to the volume's */
-	/* root directory by passing a full pathname in MakeFSSpec's */
-	/* fileName parameter. Fixed in Mac OS 8.1 */
-	if ( (result == noErr) && (spec->parID == 0) )
-		spec->parID = fsRtParID;
-	
-	return ( result );
-}
-
-/*****************************************************************************/
-
-#pragma mark -
 #pragma mark ¥ FullPath
 
 pascal	OSErr	FSpGetFullPath(const FSSpec *spec,
@@ -145,7 +119,7 @@ pascal	OSErr	FSpGetFullPath(const FSSpec *spec,
 	/* work around Nav Services "bug" (it returns invalid FSSpecs with empty names) */
 	if ( spec->name[0] == 0 )
 	{
-		result = FSMakeFSSpecCompat(spec->vRefNum, spec->parID, spec->name, &tempSpec);
+		result = FSMakeFSSpec(spec->vRefNum, spec->parID, spec->name, &tempSpec);
 	}
 	else
 	{

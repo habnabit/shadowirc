@@ -19,11 +19,6 @@ pascal	OSErr	FSpGetDirectoryID(const FSSpec *spec,
 								  long *theDirID,
 								  Boolean *isDirectory);
 
-pascal	OSErr	FSMakeFSSpecCompat(short vRefNum,
-								   long dirID,
-								   ConstStr255Param fileName,
-								   FSSpec *spec);
-
 pascal	OSErr	FSpGetFullPath(const FSSpec *spec,
 							   short *fullPathLength,
 							   Handle *fullPath);
