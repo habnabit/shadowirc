@@ -266,6 +266,4 @@ extern char hasAquaMenuMgr;
 extern MenuHandle menuConnectionList, menuSignoffConnectionList, menuSelectConnectionList;
 
 extern ModalFilterUPP StdDlgFilter;
-
-extern ProcessSerialNumber gPSN;
 #endif

@@ -241,8 +241,6 @@ static void ToolboxInit(void)
 {
 	gApplResFork = CurResFile();
 	
-	GetCurrentProcess(&gPSN);
-
 	Gestalts();
 	
 	RegisterAppearanceClient();

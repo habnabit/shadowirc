@@ -49,5 +49,3 @@ MenuHandle menuConnectionList, menuSignoffConnectionList, menuSelectConnectionLi
 int wLastServiceItem = wFirstServiceItem - 1;
 
 ModalFilterUPP StdDlgFilter = 0;
-
-ProcessSerialNumber gPSN;
