@@ -1182,9 +1182,8 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, we);
 			WESetInfo(weTranslucencyThreshold, &translucencyTreshold, we);
 		
-			h->magic=MW_MAGIC;
-			h->vscr=NewControl(h->w, &windowSize, "\p", true, 0, 0, 0, kControlScrollBarLiveProc, 0);
-			DeactivateControl(h->vscr);
+			h->magic = MW_MAGIC;
+			h->winType = winType;
 			
 			if(!caction)
 			{
@@ -1192,10 +1191,9 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 				mouseWheelHandler = NewEventHandlerUPP(MWDoMouseWheelEvent);
 			}
 			
+			CreateScrollBarControl(h->w, &windowSize, 0, 0, 0, 0, true, caction, &h->vscr);
 			SetControlProperty(h->vscr, kApplicationSignature, MW_MAGIC, sizeof(MWPtr), &h);
 			SetControlAction(h->vscr, caction);
-			
-			h->winType=winType;
 			
 			//Create the style here. This way, we don't need to continually regenerate this
 			//on every call to MWMessage() for this window.

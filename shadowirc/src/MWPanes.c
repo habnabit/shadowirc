@@ -111,7 +111,6 @@ static void DrawInputPane(mwPanePtr o)
 	char ia;
 	RGBColor oldFront, oldBack;
 	RgnHandle rgn1, rgn2;
-	//WEReference il = IADGetWE(mw->inputData);
 	
 	r = o->drawArea;
 	r.bottom = r.top + 5;
@@ -150,20 +149,8 @@ static void DrawInputPane(mwPanePtr o)
 		RGBForeColor(&VDkGrey);
 	
 	FrameRect(&r);
-	RGBForeColor(&oldFront);
 	
-/*
-	if(ia)
-	{
-		WEActivate(il);
-		WEUpdate(0, il);
-	}
-	else
-	{
-		WEUpdate(0, il);
-		WEDeactivate(il);
-	}
-*/
+	RGBForeColor(&oldFront);
 	RGBBackColor(&oldBack);
 }
 
