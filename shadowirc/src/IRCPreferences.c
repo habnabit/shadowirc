@@ -19,6 +19,10 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+/*	ChangeLog
+		2000-10-16	JB	Various code cleanup.
+*/
+
 #include <Sound.h>
 #include <Appearance.h>
 #include <Navigation.h>
@@ -106,13 +110,13 @@ static PreferencesMenuItemListHand pmlList;
 
 pascal short PMLAdd(ConstStr63Param name)
 {
-	int i;
-	PreferencesMenuItemPtr pp;
-	
 	if(name[0])
 	{
-		i=(**pmlList).num++;
-		SetHandleSize((Handle)pmlList, sizeof(long)+((**pmlList).num*sizeof(PreferencesMenuItemRec)));
+		int i;
+		PreferencesMenuItemPtr pp;
+		
+		i = (**pmlList).num++;
+		SetHandleSize((Handle)pmlList, sizeof(long)+((i+1)*sizeof(PreferencesMenuItemRec)));
 		pp = &(**pmlList).list[i];
 		
 		pp->dlgID = 0;
@@ -145,7 +149,7 @@ pascal void InitPrefs(void)
 {
 	Handle h = Get1Resource('STR#', 129);
 	
-	pmlList = (PreferencesMenuItemListHand)NewHandleClear(0);
+	pmlList = (PreferencesMenuItemListHand)NewHandleClear(sizeof(long));
 	
 	if(h)
 	{
@@ -482,7 +486,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 	short x, y;
 	ControlHandle item;
 	Str255 s;
-	prefsPtr mp=mainPrefs;
+	prefsPtr mp = mainPrefs;
 	MenuHandle mh;
 	linkPrefsPtr lp;
 	StringHandle sth;
@@ -767,7 +771,7 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 	switch(pp->dlgID)
 	{
 		case 1001:
-			lp=&linkPrefsArray[connListNum];
+			lp = &linkPrefsArray[connListNum];
 			GetText(PrefsDlg, 4, s);
 			if(s[0]>31)
 				s[0]=31;
@@ -830,7 +834,7 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			break;
 		
 		case 1011:
-			lp=&linkPrefsArray[connListNum];
+			lp = &linkPrefsArray[connListNum];
 			GetText(PrefsDlg, 4, lp->signoffMessage);
 			GetText(PrefsDlg, 5, lp->fingerMessage);
 			GetText(PrefsDlg, 6, lp->userinfoMessage);
@@ -888,7 +892,6 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 		
 		case 1012:
 			mp->autoQuery=getCheckBox(PrefsDlg, 4);
-			b=0;
 			b = getCheckBox(PrefsDlg, 6);
 			if(!b)
 				b = 2 * getCheckBox(PrefsDlg, 7);
@@ -904,7 +907,6 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			break;
 		
 		case 1002:
-			b=0;
 			b = getCheckBox(PrefsDlg, 6);
 			if(!b)
 				b = 2 * getCheckBox(PrefsDlg, 7);
@@ -994,7 +996,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 	ControlHandle hnd;
 	Rect box;
 	RGBColor rgb;
-	PreferencesMenuItemPtr pp= &(**pmlList).list[windowNum];
+	PreferencesMenuItemPtr pp = &(**pmlList).list[windowNum];
 
 	if(pp->pluginRef)
 	{
@@ -1387,15 +1389,12 @@ pascal unsigned char PrefsDialogFilter(DialogPtr d, EventRecord *e, short *item)
 	if(!ok)
 	{
 		if(e->what == updateEvt) //our window
-		{
 			RedrawPreferencesWindow(d);
-			return false; //we aren't completely processing this!
-		}
+		
+		return false; //we aren't completely processing this!
 	}
 	else
 		return true;
-	
-	return false;
 }
 
 static pascal char SetupCancel(void)
