@@ -2896,7 +2896,7 @@ pascal OSErr ConnGetData(connectionPtr conn, Ptr data, short len);
 		Output:	return value: MacTCP error
 */
 
-pascal unsigned short ConnGetLocalPort(connectionPtr conn);
+unsigned short ConnGetLocalPort(connectionPtr conn);
 /*	Gets the local port for a connection.
 		Input:	conn - the connection.
 		Output:	return value: the local port.
