@@ -44,7 +44,6 @@
 #include "plugins.h"
 #include "IRCInput.h"
 #include "CMenus.h"
-#include "OffscreenDrawing.h"
 #include "TextWindows.h"
 #include "ApplBase.h"
 #include "TextManip.h"
@@ -1166,7 +1165,6 @@ pascal void DrawMWinStatus(MWPtr mw)
 	mwPanePtr p;
 	mwWidgetPtr o;
 	pMWWidgetUpdateData pp;
-	Ptr offscreen;
 	RgnHandle clip;
 	char b;
 	int themeTextColor;
@@ -1200,8 +1198,6 @@ restart:
 		r.bottom++;
 	}
 	
-	StartDrawingOffscreen(&offscreen, &r, false);
-
 	if(b)
 		r.bottom++;
 	r.right++;
@@ -1252,7 +1248,6 @@ restart:
 		if(mw->drawingStatus>1)
 		{
 			mw->drawingStatus = 1;
-			AbortDrawingOffscreen(offscreen);
 			SetClip(clip);
 			DisposeRgn(clip);
 			goto restart;
@@ -1261,8 +1256,6 @@ restart:
 
 	SetClip(clip);
 	DisposeRgn(clip);
-
-	EndDrawingOffscreen(offscreen);
 
 	RGBForeColor(&black);
 	if(!mw->protect)

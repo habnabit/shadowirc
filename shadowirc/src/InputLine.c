@@ -26,7 +26,6 @@
 #include "StringList.h"
 #include "IRCGlobals.h"
 #include "utils.h"
-#include "OffscreenDrawing.h"
 #include "AppearanceHelp.h"
 #include "Floaters.h"
 #include "MsgWindows.h"
@@ -919,7 +918,6 @@ pascal void UpdateStatusLine(void)
 	Rect r;
 	iwWidgetPtr o;
 	pIWUpdateData pp;
-	Ptr offscreen;
 	
 	if(noFloatingInput)
 		return;
@@ -950,7 +948,6 @@ restart:
 	r.top = -2;
 	r.bottom = inputLine.statusLineHeight;
 	
-	StartDrawingOffscreen(&offscreen, &r, false);
 	r.top = r.left = -3;
 	r.right ++;
 	DrawThemePlacard(&r, kThemeStateActive);
@@ -973,13 +970,10 @@ restart:
 		if(reentrant>1)
 		{
 			reentrant=1;
-			AbortDrawingOffscreen(offscreen);
 			goto restart;
 		}
 	}
 
-	EndDrawingOffscreen(offscreen);
-	
 	SetPort(p0);
 	reentrant = 0;
 }

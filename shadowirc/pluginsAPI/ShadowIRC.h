@@ -2719,45 +2719,6 @@ pascal char DragAddPtr(DragReference drag, ItemReference item, long type, void* 
 */
 
 
-#pragma mark ¥ Offscreen Utilities
-/*	------------------------------------------------------------------------------------------
-		Offscreen Utilities
-
-		These functions aid in using offscreen graphics. Proper calling sequence is:
-		
-		Ptr p;
-		
-		StartDrawingOffscreen(&p, bounds, copyDest);
-		...draw stuff...
-		EndDrawingOffscreen(p);
-		------------------------------------------------------------------------------------------
-*/
-
-pascal char StartDrawingOffscreen(Ptr *data, RectPtr bounds, Boolean copyDest);
-/*	Creates a new offscreen drawing area.
-		Input:	bounds - Rect in current graphics port to draw in
-					copyDest - true if you want to blit to the screen while you're drawing to the GWorld. Usually false.
-		Output:	data - data needed by End and Abort.
-					return value: true = GWorld allocation successful; false = not enough memory to create GWorld; drawing to screen instead.
-		Notes:	¥ Once you issue a StartDrawingOffscreen() call, all drawing will be made to the GWorld until you change
-						the graphics port or you call End/AbortDrawingOffscreen()
-					¥	If there is not enough RAM to generate a GWorld of the requested size, you will draw to the screen, rather
-						than to the GWorld.
-*/
-
-pascal void EndDrawingOffscreen(Ptr data);
-/*	Ends an offscreen drawing session and blits to the screen.
-		Input:	data - the data pointer StartDrawingOffscreen() gave you.
-		Output:	none
-*/
-
-pascal void AbortDrawingOffscreen(Ptr data);
-/*	Aborts an offscreen drawing session and DOES NOT blit to the screen.
-		Input:	data - the data pointer StartDrawingOffscreen() gave you.
-		Output:	none
-*/
-
-
 #pragma mark ¥ Message Windows
 /*	------------------------------------------------------------------------------------------
 		Message Window Functions
