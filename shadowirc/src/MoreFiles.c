@@ -21,14 +21,9 @@
 	This file is a condensed version of MoreFiles 1.5, including only the functionality that ShadowIRC requires.
 */
 
-#include "MoreFiles.h"
+#include <Carbon/Carbon.h>
 
-#if UNIVERSAL_INTERFACES_VERSION < 0x0331
-	enum 
-	{
-		kioFlAttribDirMask			= 0x10
-	};
-#endif
+#include "MoreFiles.h"
 
 pascal	OSErr GetCatInfoNoName(short vRefNum,
 							   long dirID,

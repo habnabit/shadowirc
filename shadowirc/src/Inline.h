@@ -19,8 +19,6 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Carbon/Carbon.h>
-
 #define linkfor(list, init) for((list) = (init); (list); (list)=(list)->next)
 
 //inline void pstrcpy(ConstStringPtr f, StringPtr dest) {BlockMoveData(f, dest, f[0]+1);}

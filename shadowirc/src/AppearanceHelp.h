@@ -22,8 +22,6 @@
 #ifndef _AppearanceHelp_
 #define _AppearanceHelp_
 
-#include <Carbon/Carbon.h>
-
 enum {
 	cWhite = -1,
 	cBlack = 0,
