@@ -50,8 +50,7 @@ enum iwDefaultObjects {
 	iwShadowIRCObject = 'SIRC',
 	iwPluginObject = 'PLUG',
 	
-	iwStatusLine = 'stat',
-	iwMemory = 'memd'
+	iwStatusLine = 'stat'
 };
 
 typedef struct iwStatusObjectRec {

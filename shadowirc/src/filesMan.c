@@ -637,7 +637,7 @@ static pascal void CreateNewPrefsMain(void)
 	pstrcpy("\p*** ", mp->serverMessagePrefix);
 	ZeroRect(mp->consoleLoc);
 	ZeroRect(mp->inputLoc);
-	mp->inputLineMemoryDisplay=0;
+mp->unusedIW=0;
 	mp->consoleOpen=true;
 	mp->userListOpen=0;
 	ZeroRect(mp->userListRect);

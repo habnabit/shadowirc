@@ -350,9 +350,6 @@ pascal void OpenInputLine()
 			}
 
 			//Allocate default Inputline objects
-		#if !TARGET_CARBON
-			inputLine.memory=IWNewWidget(iwMemory, iwRight, StringWidth("\pMemory: 00000000"));
-		#endif
 			inputLine.status=IWNewWidget(iwStatusLine, iwLeft, -1);
 			
 			//Now, create the data pointer for the status object
@@ -596,30 +593,6 @@ inline void IWInternalDraw(iwWidgetPtr o)
 			}
 			break;
 		}
-			
-#if !TARGET_CARBON
-		case iwMemory:
-		{
-			long fm;
-			
-			MoveTo(o->drawArea.left, inputLine.statusLinePos);//o->drawArea.top);
-			DrawString("\pMemory: ");
-			fm=FreeMem();
-			switch(mainPrefs->inputLineMemoryDisplay)
-			{
-				case kILMDBytes:
-					NumToString(fm, s);
-					break;
-				
-				case kILMDKBytes:
-					NumToString(fm/1024, s);
-					SAppend1(s, 'k');
-					break;
-			}
-			DrawString(s);
-			break;
-		}
-#endif
 	}
 }
 
@@ -1261,14 +1234,6 @@ pascal void StatusLineClick(Point where, short modifiers, long when)
 			{
 				if(o->type == iwStatusLine)
 					IWStatusLineWidgetClick(o, where, modifiers);
-#if !TARGET_CARBON
-				else if(o->type == iwMemory)
-				{
-					if(++mainPrefs->inputLineMemoryDisplay>kILMDmax)
-						mainPrefs->inputLineMemoryDisplay=0;
-					UpdateStatusLine();
-				}
-#endif
 			}
 			else
 			{

@@ -107,7 +107,7 @@ typedef struct prefsRec {
 	Str255 serverMessagePrefix;	//Prefix for server messages
 	Rect consoleLoc;
 	Rect inputLoc;							//Position and size of inputline.
-	short inputLineMemoryDisplay;
+short unusedIW;
 	char consoleOpen;						//Is console window open?
 	char userListOpen;
 	Rect userListRect;
