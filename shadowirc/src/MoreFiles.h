@@ -17,8 +17,4 @@ pascal	OSErr	FSpGetDirectoryID(const FSSpec *spec,
 								  long *theDirID,
 								  Boolean *isDirectory);
 
-pascal	OSErr	FSpGetFullPath(const FSSpec *spec,
-							   short *fullPathLength,
-							   Handle *fullPath);
-
 #endif
