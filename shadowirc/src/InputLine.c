@@ -278,7 +278,7 @@ pascal char ILWEIsInput(WEReference we)
 		return false;
 }
 
-pascal void OpenInputLine()
+void OpenInputLine()
 {
 	if(!inputLine.w)
 	{
@@ -305,13 +305,13 @@ pascal void OpenInputLine()
 		inputLine.w= WCreate(&mainPrefs->inputLoc, s, kWindowFloatGrowProc, 0, 0, true);
 		if(inputLine.w)
 		{
-            // Get rid of the close box
-            ChangeWindowAttributes(inputLine.w, NULL, kWindowCloseBoxAttribute);
-            
+			// Get rid of the close box
+			ChangeWindowAttributes(inputLine.w, NULL, kWindowCloseBoxAttribute);
+			
 			GetPort(&p0);
 			SetPortWindowPort(inputLine.w);
 			SetOrigin(-2,-2);
-			GetFNum(mainPrefs->defaultFontName, &inputLine.fontnum);
+			inputLine.fontnum = FMGetFontFamilyFromName(mainPrefs->defaultFontName);
 			TextFont(inputLine.fontnum);
 			TextSize(mainPrefs->defaultFontSize);
 			inputLine.fontsize=mainPrefs->defaultFontSize;

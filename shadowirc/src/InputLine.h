@@ -119,7 +119,7 @@ extern inputLineRec inputLine;
 pascal void ILAddHistory(MWPtr mw, LongString *line);
 #endif
 
-pascal void OpenInputLine(void);
+void OpenInputLine(void);
 pascal void StatusLineClick(Point where, short modifiers, long when);
 pascal void IWGrow(const EventRecord *e);
 
