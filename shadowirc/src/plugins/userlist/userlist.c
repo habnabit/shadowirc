@@ -1002,7 +1002,6 @@ static ULI ULINew(WindowPtr w, long type)
 		dbColumn.headerBtnDesc.btnFontStyle.size = 9;
 		dbColumn.headerBtnDesc.btnFontStyle.font = kControlFontSmallSystemFont;
 		dbColumn.headerBtnDesc.btnContentInfo.contentType = kControlContentTextOnly;
-//kControlFontSmallSystemFont with kControlFontSystemFont
 		
 		AddDataBrowserListViewColumn(ul->browser, &dbColumn, ULONG_MAX);
 
@@ -1046,6 +1045,8 @@ static ULI ULINew(WindowPtr w, long type)
 		
 		SetDataBrowserSelectionFlags(ul->browser, kDataBrowserDragSelect | kDataBrowserCmdTogglesSelection);
 		SetControlProperty(ul->browser, kUserlistSignature, kUserlistSignature, sizeof(ULI), &ul);
+		SetDataBrowserTableViewRowHeight(ul->browser, 13);
+		SetDataBrowserTableViewHiliteStyle(ul->browser, kDataBrowserTableViewFillHilite);
 	}
 	
 	GetPort(&gp);
