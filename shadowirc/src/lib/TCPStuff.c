@@ -265,7 +265,8 @@ static int fd_remove (int fd)
 }
 
 /*
- * Socket supporting functions from W. Richard Stevens
+ * Socket supporting functions
+ * writen() and readn() from Richard Stevens
  */
  
 /*
