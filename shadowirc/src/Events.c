@@ -442,6 +442,14 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 		case 'WCAS':
 			DoCascadeWindows();
 			return noErr;
+		
+		case kCommandWindowService:
+			HitWindowPluginServiceMenu(hiCommand.menu.menuItemIndex);
+			return noErr;
+		
+		case kCommandWindowSelect:
+			HitWindowSelectWindowMenu(hiCommand.menu.menuItemIndex);
+			return noErr;
 			
 		case 'WTIL':
 			DoTileWindows();

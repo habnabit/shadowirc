@@ -123,6 +123,9 @@ pascal short WMSListAdd(FourCharCode serviceType, ConstStr255Param name)
 	(**wMenuServices).service[x].pluginRef = sidr.yourInfo;
 	(**wMenuServices).service[x].key = serviceType;
 	InsertMenuItem(gWindowMenu, name, wLastServiceItem++);
+	
+	SetMenuItemCommandID(gWindowMenu, wLastServiceItem, kCommandWindowService);
+	
 	return wLastServiceItem;
 }
 

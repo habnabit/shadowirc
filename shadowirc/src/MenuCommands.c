@@ -369,9 +369,8 @@ pascal void HitEditMenu(short item)
 	}
 }
 
-pascal void HitWindowMenu(const short item)
+int HitWindowPluginServiceMenu(const short item)
 {
-	//check for service items
 	if(wMenuServices && item <= wLastServiceItem)
 	{
 		pServiceWindowMenuData dp;
@@ -380,22 +379,29 @@ pascal void HitWindowMenu(const short item)
 		dp.key = service->key;
 		dp.menuItem = item;
 		runIndPlugin(service->pluginRef, pServiceWindowMenu, &dp);
+		
+		return 1;
+	}
+	
+	return 0;
+}
+
+int HitWindowSelectWindowMenu(const short item)
+{
+	if(item<windowsStart2)
+	{
+		//NOW Menus menu selection workaround
+		//What should this be normally?
+		if(item-windowsStart <= wmItems.channelsLength)
+			WSelect((**wmItems.channels).mw[item-windowsStart-1]->w);
 	}
 	else
 	{
-		if(item<windowsStart2)
-		{
-			//NOW Menus menu selection workaround
-			//What should this be normally?
-			if(item-windowsStart <= wmItems.channelsLength)
-				WSelect((**wmItems.channels).mw[item-windowsStart-1]->w);
-		}
-		else
-		{
-			if(item-windowsStart2 <= wmItems.restLength)
-				WSelect((**wmItems.rest).mw[item-windowsStart2-1]->w);
-		}
-	}	
+		if(item-windowsStart2 <= wmItems.restLength)
+			WSelect((**wmItems.rest).mw[item-windowsStart2-1]->w);
+	}
+	
+	return 1;
 }
 
 static pascal void HitFontsMenu(short item)
@@ -516,7 +522,7 @@ pascal void MenuSignoffConnectionList(short item)
 
 #pragma mark -
 
-pascal void DoMenuEvent(long menuitem, const EventRecord *e)
+static void DoMenuEvent(long menuitem, const EventRecord *e)
 {
 	int menuNum, itemNum;
 	
@@ -529,9 +535,6 @@ pascal void DoMenuEvent(long menuitem, const EventRecord *e)
 		{
 			case EditMenu:
 				HitEditMenu(itemNum);
-				break;
-			case windowMenu:
-				HitWindowMenu(itemNum);
 				break;
 			case fontsMenu:
 				HitFontsMenu(itemNum);

@@ -106,6 +106,7 @@ pascal void wmAdd(MWPtr mw)
 	MenuHandle mh=gWindowMenu;
 	char b=0;
 	Str255 s;
+	int item;
 	
 	if(mw->winType==chanWin)
 	{
@@ -121,9 +122,11 @@ pascal void wmAdd(MWPtr mw)
 			SetHandleSize((Handle)wmItems.channels, ++wmItems.channelsLength * sizeof(MWPtr));
 			(**wmItems.channels).mw[wmItems.channelsLength-1] = mw;
 			
-			InsertMenuItem(mh, "\p-", windowsStart+wmItems.channelsLength-1);
+			item = windowsStart+wmItems.channelsLength;
+			InsertMenuItem(mh, "\p-", item - 1);
 			GetWTitle(mw->w, s);
-			SetMenuItemText(mh, windowsStart+wmItems.channelsLength, s);
+			SetMenuItemText(mh, item, s);
+			SetMenuItemCommandID(gWindowMenu, item, kCommandWindowSelect);
 		}
 	}
 	else
@@ -143,9 +146,12 @@ pascal void wmAdd(MWPtr mw)
 			if(wmItems.restLength == 1) //first extra item, add separator
 				AppendMenu(mh, "\p-");
 			
+			item = windowsStart2+wmItems.restLength;
+			
 			AppendMenu(mh, "\p-");
 			GetWTitle(mw->w, s);
-			SetMenuItemText(mh, windowsStart2+wmItems.restLength, s);
+			SetMenuItemText(mh, item, s);
+			SetMenuItemCommandID(gWindowMenu, item, kCommandWindowSelect);
 		}
 	}
 }

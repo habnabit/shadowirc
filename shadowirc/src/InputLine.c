@@ -1131,9 +1131,9 @@ static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short mod
 				if(i==1) //console
 					ToggleConsoleWindow();
 				else if(i<dashPoint) //channel window
-					HitWindowMenu(i - 2 + windowsStart);
+					HitWindowSelectWindowMenu(i - 2 + windowsStart);
 				else //other window
-					HitWindowMenu(windowsStart2+i-dashPoint);
+					HitWindowSelectWindowMenu(windowsStart2+i-dashPoint);
 				break;
 			
 			case 100: //recent channels

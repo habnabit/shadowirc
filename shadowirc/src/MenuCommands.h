@@ -22,7 +22,10 @@
 enum menuCommands
 {
 	kCommandPrevWin = 'PWIN',
-	kCommandNextWin = 'NWIN'
+	kCommandNextWin = 'NWIN',
+	
+	kCommandWindowService = 'WINS',
+	kCommandWindowSelect = 'WINP'
 };
 
 extern MenuHandle gAppleMenu, gFileMenu, gShortcutsMenu, gWindowMenu, gHelpMenu;
@@ -32,10 +35,12 @@ void HitSelectConnectionMenu(short item);
 
 pascal void MenuConnectionList(short item);
 pascal void MenuSignoffConnectionList(short item);
-pascal void HitWindowMenu(short item);
+
+int HitWindowPluginServiceMenu(const short item);
+int HitWindowSelectWindowMenu(const short item);
+
 pascal void HitEditMenu(short item);
 
-pascal void DoMenuEvent(long menuitem, const EventRecord *e);
 pascal void MenuBarClick(const EventRecord *e);
 
 pascal void MenuInit(void);

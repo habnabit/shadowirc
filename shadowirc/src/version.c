@@ -20,7 +20,7 @@
 */
 
 const unsigned char CL_VERSION[] = "\p2.0a4";
-#define SIVersion 0x02000003
+#define SIVersion 0x02000004
 
 #include "IRCGlobals.h"
 #include "utils.h"
