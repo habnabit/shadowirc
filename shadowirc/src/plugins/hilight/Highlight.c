@@ -1,3 +1,30 @@
+/*
+	ShadowIRC - A Mac OS IRC Client
+	Copyright (C) 1996-2000 John Bafford
+	dshadow@shadowirc.com
+	http://www.shadowirc.com
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/
+
+/*	ChangeLog
+	2000-09-16	JB	Merged in CJB's (Chris Behm) modifications.
+									Strict Matching
+									Auto-hilight current nick
+*/
+
 #include <Sound.h>
 #include "ShadowIRC.h"
 
@@ -13,13 +40,17 @@ typedef struct strN
 
 typedef struct WordPref
 {
-	Str31 word;
+	Str63 word;	//Size should to match length of nick
+	char matchStrict;
 } WordPref, *WordPrefPtr;
 
 typedef struct GPrefs
 {
+	long version;
+	
 	char boldToken, boldNick;
-	short reserved;
+	char autoHilightCurNick;
+	char reserved;
 } GPrefs;
 
 typedef struct Prefs
@@ -32,7 +63,7 @@ typedef struct Prefs
 
 
 // Prototypes
-static WordPrefPtr SearchLS(LongString *text);
+static WordPrefPtr SearchLS(LongString *text, ConstStr63Param curNick);
 static void HandleChanMsg(pServerPRIVMSGDataRec *p);
 static void PrefsWindowSet(pPWSetWindowDataPtr p);
 static void PrefsWindowGet(pPWGetWindowDataPtr p);
@@ -44,6 +75,10 @@ static void ReadPrefs(void);
 // Constants
 #define kPrefsFileName "\pHighlight Preferences"
 #define preferencesDitl 4242
+
+#define kCurrentVersion			0x01010001	//aa bb cc dd (major, minor, debug, prefs)
+#define kPrefVersionMask			0x000000FF
+#define kCurrentPrefsVersion	(kCurrentVersion & kPrefVersionMask)
 
 // Prefs Struct
 /*
@@ -71,6 +106,8 @@ enum
 	iBoldNick,
 	iSelectSnd,
 	iSoundCheck,
+	iNickHilight,
+	iStrictMatch,
 	iColorPopup
 };
 
@@ -138,7 +175,7 @@ static char DoSearch(LongString *text, WordPrefPtr wp)
 	{
 		LSCopyString(text, i, x, string);
 		
-		if(pstrcasecmp(wp->word, string) && ValidPosition(text, i, i + x - 1))
+		if(pstrcasecmp(wp->word, string) && (!wp->matchStrict || ValidPosition(text, i, i + x - 1)))
 		{
 //if(wp->boldToken)
 			if((**prefs).prefs.boldToken)
@@ -155,8 +192,9 @@ static char DoSearch(LongString *text, WordPrefPtr wp)
 }
 
 // Search for our nick
-static WordPrefPtr SearchLS(LongString *text)
+static WordPrefPtr SearchLS(LongString *text, ConstStr63Param curNick)
 {
+	static WordPref CurrentNick = {"\p", 0};
 	PrefsPtr pp = *prefs;
 	int num = pp->numWords;
 	int x;
@@ -164,6 +202,13 @@ static WordPrefPtr SearchLS(LongString *text)
 	for(x=0; x < num; x++)
 		if(DoSearch(text, &pp->p[x]))
 			return &pp->p[x];
+	
+	if(pp->prefs.autoHilightCurNick)
+	{
+		pstrcpy(curNick, CurrentNick.word);
+		if(DoSearch(text, &CurrentNick))
+			return &CurrentNick;
+	}
 	
 	return false;
 }
@@ -175,7 +220,7 @@ static void HandleChanMsg(pServerPRIVMSGDataRec *p)
 	
 	if(p->targChan == true)
 	{
-		wp = SearchLS(p->message);
+		wp = SearchLS(p->message, p->link->CurrentNick);
 		if(wp)
 		{
 //if(wp->boldNick)
@@ -215,7 +260,7 @@ static void HandleCTCPMsg(pCTCPDataPtr p)
 		LongString ls;
 		
 		LSStrLS(p->rest, &ls);
-		wp = SearchLS(&ls);
+		wp = SearchLS(&ls, p->link->CurrentNick);
 		
 		if(wp)
 		{
@@ -234,9 +279,11 @@ static void PrefsWindowSet(pPWSetWindowDataPtr p)
 		setCheckBox(p->PrefsDlg, iBoldText, (**prefs).prefs.boldToken);
 		setCheckBox(p->PrefsDlg, iBoldNick, (**prefs).prefs.boldNick);
 		//setCheckBox(p->PrefsDlg, iSoundCheck, (*prefs)->playSnd);
+		setCheckBox(p->PrefsDlg, iNickHilight, (**prefs).prefs.autoHilightCurNick);
 		
 		setButtonEnable(p->PrefsDlg, iAddButton, false);
 		setButtonEnable(p->PrefsDlg, iRemoveButton, (**aliasList).dataBounds.bottom >= 1);
+		setButtonEnable(p->PrefsDlg, iStrictMatch, false);
 		// SetDialogItemValue(p->PrefsDlg, iColorPopup, (*prefs)->color + 1);
 	}
 }
@@ -248,6 +295,7 @@ static void PrefsWindowGet(pPWGetWindowDataPtr p)
 	{
 		(**prefs).prefs.boldToken = getCheckBox(p->PrefsDlg, iBoldText);
 		(**prefs).prefs.boldNick = getCheckBox(p->PrefsDlg, iBoldNick);
+		(**prefs).prefs.autoHilightCurNick = getCheckBox(p->PrefsDlg, iNickHilight);
 		//(**prefs).prefs.playSnd = getCheckBox(p->PrefsDlg, iSoundCheck);
 		// (*prefs)->color = GetDialogItemValue(p->PrefsDlg, iColorPopup) - 1;
 	}
@@ -282,6 +330,16 @@ static int PFindWord(ConstStr255Param st)
 	return -1;
 }
 
+static char DoWordMatchOnWord(ConstStr255Param inWord)
+{
+	int w = PFindWord(inWord);
+	
+	if(w != -1)
+		return (**prefs).p[w].matchStrict;
+	else
+		return false;
+}
+
 static char AddWord(ConstStr255Param st)
 {
 	int w = PFindWord(st);
@@ -298,6 +356,7 @@ static char AddWord(ConstStr255Param st)
 		pstrcpy(st, p->word);
 	//	p->boldToken = 
 	//	p->boldNick = 1;
+		p->matchStrict = true;
 		return true;
 	}
 	else
@@ -344,7 +403,26 @@ static void PrefWinHit(pPWItemHitDataPtr p)
 		switch (p->itemNum)
 		{
 			case iAliasList:
+			{
+				Cell cell;
+				short offset, dataLen;
+				
+				cell.h = cell.v = 0;
+				if(LGetSelect(true, &cell, aliasList))
+				{
+					LGetCellDataLocation(&offset, &dataLen, cell, aliasList);
+					LGetCell(&st[1], &dataLen, cell, aliasList);
+					st[0] = (SInt8)dataLen;
+					setButtonEnable(p->PrefsDlg, iStrictMatch, true);
+					setCheckBox(p->PrefsDlg, iStrictMatch, DoWordMatchOnWord(st));
+				}
+				else
+				{
+					setCheckBox(p->PrefsDlg, iStrictMatch, false);
+					setButtonEnable(p->PrefsDlg, iStrictMatch, false);
+				}
 				break;
+			}
 			
 			case iAddButton:
 			GetText(p->PrefsDlg, iAliasEdit, st);
@@ -361,7 +439,7 @@ static void PrefWinHit(pPWItemHitDataPtr p)
 				Cell cell;
 				short offset, dataLen;
 				
-				SetPt(&cell, 0, 0);
+				cell.h = cell.v = 0;
 				if(LGetSelect(true, &cell, aliasList))
 				{
 					LGetCellDataLocation(&offset, &dataLen, cell, aliasList);
@@ -389,10 +467,31 @@ static void PrefWinHit(pPWItemHitDataPtr p)
 			
 			case iBoldText:
 			case iBoldNick:
+			case iNickHilight:
 //			case iSoundCheck:
 				setCheckBox(p->PrefsDlg, p->itemNum, !getCheckBox(p->PrefsDlg, p->itemNum));
 				break;
 			
+			case iStrictMatch:
+			{
+				Cell cell;
+				short offset, dataLen;
+				
+				setCheckBox(p->PrefsDlg, p->itemNum, !getCheckBox(p->PrefsDlg, p->itemNum));
+				cell.h = cell.v = 0;
+				if(LGetSelect(true, &cell, aliasList))
+				{
+					int w;
+					LGetCellDataLocation(&offset, &dataLen, cell, aliasList);
+					LGetCell(&st[1], &dataLen, cell, aliasList);
+					st[0] = (SInt8)dataLen;
+					w = PFindWord(st);
+					if(w != -1)
+						(**prefs).p[w].matchStrict = getCheckBox(p->PrefsDlg, p->itemNum);
+				}
+				break;
+			}
+
 /*
 			case iSelectSnd:
 			{
@@ -478,6 +577,9 @@ static void WritePrefs(void)
 		SetEOF(refNum, siz);
 		SetFPos(refNum, fsFromStart, 0);
 		HLock((Handle)prefs);
+		
+		(**prefs).prefs.version = kCurrentVersion;
+		
 		FSWrite(refNum, &siz, *prefs);
 		HUnlock((Handle)prefs);
 		PFClose(refNum);
@@ -490,6 +592,7 @@ static void ReadPrefs(void)
 	short refNum;
 	OSErr err;
 	long siz;
+	char ok;
 	
 	if(PFExists(kPrefsFileName))
 	{	
@@ -498,14 +601,26 @@ static void ReadPrefs(void)
 		{
 			err = GetEOF(refNum, &siz);
 			
-			prefs = (PrefsHand)NewHandle(siz);
-			HLock((Handle)prefs);
-			FSRead(refNum, &siz, *prefs);
-			HUnlock((Handle)prefs);
-			PFClose(refNum);
-			
-			return;
+			if(siz >= sizeof(long) + sizeof(GPrefs)) //valid size
+			{
+				prefs = (PrefsHand)NewHandle(siz);
+				HLock((Handle)prefs);
+				FSRead(refNum, &siz, *prefs);
+				HUnlock((Handle)prefs);
+				PFClose(refNum);
+
+				if((**prefs).prefs.version & kPrefVersionMask != kCurrentPrefsVersion) //version bad
+				{
+					DisposeHandle((Handle)prefs);
+					ok = false;
+				}
+				else
+					ok = true;
+			}
 		}
+		
+		if(ok)
+			return;
 	}
 
 	prefs = (PrefsHand)NewHandleClear(sizeof(GPrefs) + sizeof(long));
