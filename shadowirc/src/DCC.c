@@ -1338,7 +1338,7 @@ pascal void DCCConnOpened(connectionPtr *cn)
 
 #pragma mark -
 
-static pascal void DCCGetLineChat(connectionPtr conn, CEPtr c)
+static void DCCGetLineChat(connectionPtr conn, CEPtr c)
 {
 	int i;
 	long nn;
@@ -1447,7 +1447,7 @@ static pascal void DCCGetLineChat(connectionPtr conn, CEPtr c)
 	}
 }
 
-static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c)
+static void DCCGetLineGet(connectionPtr conn, CEPtr c)
 {
 	long nn = 0;
 	short pt;
@@ -1626,7 +1626,7 @@ static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c)
 	};
 }
 
-static pascal void DCCGetLineSend(connectionPtr conn, CEPtr c)
+static void DCCGetLineSend(connectionPtr conn, CEPtr c)
 {
 	long nn = 0;
         long ack;
