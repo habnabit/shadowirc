@@ -36,7 +36,6 @@ pascal void EnterModalDialog(void);
 pascal void ExitModalDialog(void);
 
 
-pascal void WResume(void);
 pascal WindowPtr WCreate(const Rect *boundsRect, ConstStr255Param title, short theProc, char goAwayFlag, long refCon, char isFloater);
 
 #endif

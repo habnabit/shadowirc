@@ -85,32 +85,12 @@ pascal void ExitModalDialog(void)
 		
 		ShowFloatingWindows();
 	}
-	else
-	{
-		WResume();
-		inBackground=false;
-	}
 }
 
 pascal void WSelect(WindowPtr w)
 {
 	ShowWindow(w);
 	SelectWindow(w);
-}
-
-pascal void WResume(void)
-{
-	WindowPtr fnf;
-	
-	ShowFloatingWindows();
-	fnf = ActiveNonFloatingWindow();
-	if(fnf)
-	{
-		//This is WActivate() stuff. Moved here so window does get redrawn,
-		//even though WActivate() prevents the window from being updated...
-		HiliteWindow(fnf, 1);
-		ActivateWindowProcPtr(fnf, 1);
-	}
 }
 
 pascal WindowPtr WCreate(const Rect *boundsRect, ConstStr255Param title, short theProc, char goAwayFlag, long refCon, char isFloater)
