@@ -307,6 +307,39 @@ static int fd_remove (int fd)
  */
  
 /*
+ * set_nblk
+ * Set O_NONBLOCK flag on sockfd
+ */
+static int set_nblk(int sockfd)
+{
+    int flags;
+    /*
+     * Set O_NONBLOCK flag
+     */
+    if((flags = fcntl(sockfd, F_GETFL, 0)) < 0)
+        return (-1);
+    if((fcntl(sockfd, F_SETFL, flags | O_NONBLOCK)) < 0)
+        return (-1);
+                
+}
+
+/*
+ * set_blk
+ * Remove O_NONBLOCK flag from sockfd
+ */
+static int set_blk(int sockfd)
+{
+    int flags;
+    if((flags = fcntl(sockfd, F_GETFL, 0)) == -1)
+        return (-1);
+    /*
+     * Remove O_NONBLOCK flag
+     */
+    if(fcntl(sockfd, F_SETFL, flags & ~O_NONBLOCK) < 0)
+        return (-1);
+}
+    
+/*
  * readn macro
  * Use MSG_WAITALL flag to cause read() to block until all requested bytes are read
  * Can still return fewer than requested bytes if a signal is caught,
@@ -342,6 +375,15 @@ ssize_t writen(int fd, const void *vptr, size_t n)
 		ptr += nwritten;
 	}
 	return (n);
+}
+
+static int nblk_accept(int sockfd, struct sockaddr *addr, int *addrlen)
+{
+        int retval;
+        set_nblk(sockfd);
+        retval = accept(sockfd, addr, addrlen);
+        set_blk(sockfd);
+        return retval;
 }
 
 #pragma mark -
@@ -1083,10 +1125,34 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
                                                 cer->event = C_Established;
                                                 break;
                                         }
-                                        /*
-                                         * Fall through to timeout
-                                         */
+                                        if(TickCount() > c->timeout)
+					{
+						CloseTCPConnection(rcp);
+						cer->event = C_FailedToOpen;
+						cer->timedout = true;
+					}
+					break;
 				case T_Listening:
+                                        /*
+                                         * If a connection is ready to be accepted, call non-blocking
+                                         * accept(). Replace old connection sockfd with new fd.
+                                         * This means that only ONE connection can be made on a listen
+                                         * socket
+                                         */
+                                        if(FD_ISSET(c->sockfd, rset) || FD_ISSET(c->sockfd, wset)) {
+                                                struct sockaddr_in clientaddr;
+                                                int len, newfd;
+
+                                                len = sizeof(clientaddr);
+                                                newfd = nblk_accept(c->sockfd, (SA *) &clientaddr, &len);
+                                                fd_remove(c->sockfd);
+                                                c->sockfd = newfd;
+                                                fd_add(c->sockfd);
+                                                c->state = T_Established;
+                                                c->status = CS_Established;
+                                                cer->event = C_Established;
+                                                break;
+                                        }
 					if(TickCount() > c->timeout)
 					{
 						CloseTCPConnection(rcp);
