@@ -26,10 +26,10 @@ const unsigned char CL_VERSION[] = "\p2.0a2";
 #include "utils.h"
 #include "Inline.h"
 
-pascal long ShadowIRCVersion(StringPtr str);
-pascal long ShadowIRCVersion2(StringPtr v, StringPtr date);
-pascal long ShadowIRCVersion(StringPtr str){if(str)pstrcpy(CL_VERSION, str);return SIVersion;}
-pascal long ShadowIRCVersion2(StringPtr v, StringPtr date){if(v) pstrcpy(CL_VERSION,v); if(date) pstrcpy(cdt,date);return SIVersion;}
+long ShadowIRCVersion(StringPtr str);
+long ShadowIRCVersion2(StringPtr v, StringPtr date);
+long ShadowIRCVersion(StringPtr str){if(str)pstrcpy(CL_VERSION, str);return SIVersion;}
+long ShadowIRCVersion2(StringPtr v, StringPtr date){if(v) pstrcpy(CL_VERSION,v); if(date) pstrcpy(cdt,date);return SIVersion;}
 
 void setVers(void);
 void setVers(void)

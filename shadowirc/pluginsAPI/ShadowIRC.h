@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x02000001
+#define _ShadowIRC_API_Version_ 0x02000002
 
 #include <Carbon/Carbon.h>
 
@@ -3384,7 +3384,7 @@ pascal void MBNewMessage(linkPtr link, ConstStr255Param nick);
 		------------------------------------------------------------------------------------------
 */
 
-pascal long ShadowIRCVersion(StringPtr versionString);
+long ShadowIRCVersion(StringPtr versionString);
 /*	Returns the version of ShadowIRC being used.
 		Input:	versionString - a pointer to where you want a copy of the string representation of ShadowIRC's
 					version, or nil, if you don't want a copy.
@@ -3394,7 +3394,7 @@ pascal long ShadowIRCVersion(StringPtr versionString);
 					checking, larger numbers are always newer versions.
 */
 
-pascal long ShadowIRCVersion2(StringPtr version, StringPtr date);
+long ShadowIRCVersion2(StringPtr version, StringPtr date);
 /*	Returns version information.
 		Input:	version - pointer to a string, or nil
 					date - pointer to a string, or nil
