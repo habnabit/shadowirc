@@ -57,7 +57,6 @@
 #include "Events.h"
 #include "ApplBase.h"
 
-static pascal void WindowActivate(WindowPtr window, char activate);
 static pascal void floatingWindowClick(EventRecord *e);
 static pascal void inContentHandler(EventRecord *e);
 static pascal void doMouseDown(EventRecord *e);
@@ -299,46 +298,6 @@ CantInstallDialogHandler:
 	return QuitRequest;
 }
 
-static pascal void WindowActivate(WindowPtr window, char activate)
-{
-	MWPtr p;
-	pUIActivateData pl;
-	channelPtr ch;
-	pServiceActivateWinData ps;
-	
-	pluginDlgInfoPtr l;
-	
-	ch=0;
-
-	DisableMenuCommand(gEditMenu, 'FIND');
-	DisableMenuCommand(gEditMenu, 'FAGN');
-	
-	l= (pluginDlgInfoPtr)GetWRefCon(window);
-	if(l && l->magic==PLUGIN_MAGIC)
-	{
-		pl.window=window;
-		pl.activate=activate;
-		runIndPlugin(l->pluginRef, pUIActivateMessage, &pl);
-	}
-	
-	if(!WIsFloater(window)) //don't change the target if it's a floater
-	{
-		if(activate) //activatechannels
-		{
-			InvalTarget(&CurrentTarget);
-	
-			UpdateStatusLine();
-			DrawMWinStatus(consoleWin);
-		}
-		
-		ps.ch = ch;
-		ps.activate=activate;
-		ps.w = window;
-		ps.mw = p;
-		runService(pServiceActivateWin, &ps);
-	}
-}
-
 static pascal void floatingWindowClick(EventRecord *e) //this also takes care of handling the float clicks
 {
 	GrafPtr p;
@@ -574,6 +533,60 @@ static pascal void inContentHandler(EventRecord *e)
 	SetPort(gp);
 }
 
+static OSStatus EventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
+{
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	switch(eventClass)
+	{
+		case kEventClassWindow:
+		{
+			WindowRef win;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeWindowRef, NULL, sizeof(WindowRef), NULL, &win);
+			switch(eventKind)
+			{
+				case kEventWindowActivated:
+				case kEventWindowDeactivated:
+				{
+					pServiceActivateWinData ps;
+					MWPtr mw = MWFromWindow(win);
+					char activate = eventKind == kEventWindowActivated;
+					
+					if(!WIsFloater(win))
+					{
+						if(activate)
+						{
+							if(!mw) //if it's not a message window, then it's an invalid target
+							{
+								InvalTarget(&CurrentTarget);
+								UpdateStatusLine();
+								DrawMWinStatus(consoleWin);
+							}
+						}
+						
+						ps.activate = activate;
+						ps.w = win;
+						ps.mw = mw;
+						
+						runService(pServiceActivateWin, &ps);
+					}
+					
+					result = noErr;
+					break;
+				}
+			}
+			break;
+		}
+	}
+	
+	return result;
+}
+
 static OSStatus DoModifierKeysChangedEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
 {
 	UInt32 modifiers;
@@ -713,13 +726,6 @@ static pascal void ApplEvents(EventRecord *e)
 {
 	switch(e->what)
 	{
-		case nullEvent:
-			break;
-		
-		case activateEvt:
-			WindowActivate((WindowPtr)e->message, e->modifiers & 1);
-			break;
-		
 		case kHighLevelEvent:
 			AEProcessAppleEvent(e);
 			break;
@@ -759,9 +765,17 @@ static void MyIAEH(long class, long type, EventHandlerProcPtr handlerFunc)
 
 static void InitLocalEventHandlers()
 {
+	EventTypeSpec events[] = 
+	{
+		{kEventClassWindow, kEventWindowActivated},
+		{kEventClassWindow, kEventWindowDeactivated},
+	};
+	
 	MyIAEH(kEventClassApplication, kEventAppActivated, DoResumeEvent);
 	MyIAEH(kEventClassApplication, kEventAppDeactivated, DoSuspendEvent);
 	MyIAEH(kEventClassKeyboard, kEventRawKeyModifiersChanged, DoModifierKeysChangedEvent);
+	
+	InstallApplicationEventHandler(NewEventHandlerUPP(EventHandler), GetEventTypeCount(events), events, NULL, NULL);
 }
 
 void ApplInit(void)

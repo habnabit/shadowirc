@@ -48,7 +48,7 @@ INLINE ULI ULIFromMW(MWPtr mw);
 static ULI ULIFromChannel(channelPtr ch);
 
 INLINE void ULGotNamesList(pServiceULNamesEndData *p);
-INLINE void ULSActivateWin(pServiceActivateWinData *p);
+static void ULSActivateWin(pServiceActivateWinData *p);
 static char MouseInWindow(ULI ul);
 
 static void ULDragTrack(pUIDragTrackData *p);
@@ -227,10 +227,15 @@ INLINE void ULGotNamesList(pServiceULNamesEndData *p)
 		ListGenerate(ul, p->channel);
 }
 
-INLINE void ULSActivateWin(pServiceActivateWinData *p)
+static void ULSActivateWin(pServiceActivateWinData *p)
 {
 	static WindowPtr lastActivate = 0;
-	ULI ul = ULIFromChannel(p->ch);
+	channelPtr ch = 0;
+	ULI ul = 0;
+	
+	if(p->mw)
+		ch = MWGetChannel(p->mw);
+	ul = ULIFromChannel(ch);
 	
 	if(p->activate)
 	{
@@ -241,9 +246,9 @@ INLINE void ULSActivateWin(pServiceActivateWinData *p)
 		
 		if(globalUserlist)
 		{
-			if(p->ch && p->ch->active) //valid channel
+			if(ch && ch->active) //valid channel
 			{
-				ListGenerate(ul, p->ch);
+				ListGenerate(ul, ch);
 				ListSetWTitle(ul);
 			}
 			else if(ul)

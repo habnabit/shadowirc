@@ -100,7 +100,6 @@ enum messagesList
 	pUIWindowCloseMessage			=51,		//User attempted to close one of your windows.
 	pMWWindowMoveMessage			=52,		//User moved one of your message windows.
 	pUIMWGotTextMessage				=54,		//User typed text to one of your plugin's message windows
-	pUIActivateMessage					=55,		//A window has become active or deactive.
 	pUIMWInfoRefresh						=252,	//ShadowIRC is refreshing your Message Window's status bar. Tell it what you want it to do.
 
 //Drag and Drop
@@ -1545,13 +1544,6 @@ typedef struct pPWClosedData {
 	char canceled;		//True if prefs changes were canceled.
 } pPWClosedData, *pPWClosedDataPtr;
 
-/*	pUIActivateData
-*/
-typedef struct pUIActivateData {
-	WindowPtr window;	//The window being activated or deactivated
-	char activate;			//True if being activated, false if being deactivated.
-} pUIActivateData, *pUIActivateDataPtr;
-
 /*	pUIMWInfoRefreshData
 */
 typedef struct pUIMWInfoRefreshData {
@@ -1591,14 +1583,12 @@ typedef struct pAsyncSoundCompletionData {
 } pAsyncSoundCompletionData, *pAsyncSoundCompletionDataPtr;
 
 /*	pServiceActivateWinData
-		NOTE: You will sometimes get thhis message twice in a row for the same window.
+		NOTE: You will sometimes get this message twice in a row for the same window.
 */
 typedef struct pServiceActivateWinData {
-	channelPtr ch;			//Channel that was activated. Nil if the window wasn't a channel
-	char activate;			//True if activated, false if deactivated
-	char padding[3];
 	WindowPtr w;			//The window that was activated/deactivated.
-	MWPtr mw;				//If the window is a message window, the MWPtr. Nil otherwise.
+	MWPtr mw;				//The MW for the window.
+	char activate;			//True if activated, false if deactivated
 } pServiceActivateWinData, *pServiceActivateWinDataPtr;
 
 /*	pServiceWindowMenuData

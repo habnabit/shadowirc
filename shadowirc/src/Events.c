@@ -126,28 +126,18 @@ static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef even
 				case kEventWindowActivated:
 				case kEventWindowDeactivated:
 				{
-					channelPtr ch;
-					pServiceActivateWinData ps;
 					char activate = eventKind == kEventWindowActivated;
 					
 					MWPaneActivate(mw, activate);
-					ch = MWGetChannel(mw);
-					
-					EnableMenuCommand(gEditMenu, 'FIND');
-					EnableMenuCommand(gEditMenu, 'FAGN');
 					
 					if(activate)
 					{
+						EnableMenuCommand(gEditMenu, 'FIND');
+						EnableMenuCommand(gEditMenu, 'FAGN');
 						SetTarget(mw, &CurrentTarget);
 						UpdateStatusLine();
 						DrawMWinStatus(consoleWin);
 					}
-					
-					ps.ch = ch;
-					ps.activate = activate;
-					ps.w = mw->w;
-					ps.mw = mw;
-					runService(pServiceActivateWin, &ps);
 					break;
 				}
 					

@@ -22,8 +22,6 @@
 #include "userlist.h"
 #include "ULList.h"
 
-#define SAppend1(s,ch){(s)[++((s)[0])]=ch;}
-
 char pstrgt(Str255 one, Str255 two)
 {
 	int i;
