@@ -4,7 +4,8 @@
 	Re-written for MacOS X by:
 			Landon Fuller <landonf@fullers.org>
 			Chris Campbell <chris_campbell@mac.com>
-	Copyright (C) 2002 Landon Fuller, Chris Campbell, John Bafford
+			Sean McGovern <smcgovern@users.sourceforge.net>
+	Copyright (C) 2003 Sean McGovern, Landon Fuller, Chris Campbell, John Bafford
 	http://www.shadowirc.com
 
 	This program is free software; you can redistribute it and/or
@@ -639,9 +640,6 @@ TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short rem
 
 TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog)
 {
-        if((*sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-                return (T_Failed);
-                
         /*
          * Special case (low) ident port
          */
