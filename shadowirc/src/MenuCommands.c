@@ -43,6 +43,7 @@
 
 MenuHandle gAppleMenu, gFileMenu, gEditMenu, gShortcutsMenu, gWindowMenu;
 static MenuHandle gFontsMenu;
+static short fontsBegin;
 
 static void FontsMenuInit(void);
 static void ApplicationURLMenuInit(void);

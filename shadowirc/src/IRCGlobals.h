@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -249,7 +249,6 @@ extern FSRef logFolderRef;
 extern short gApplResFork;
 
 extern unsigned long now, launchTime;
-extern short fontsBegin;
 
 extern const unsigned char CL_VERSION[];
 extern Str63 cdt, shadowIRCDefaultSignoff;
