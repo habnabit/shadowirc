@@ -44,6 +44,7 @@
 #include "ApplBase.h"
 #include "TextManip.h"
 #include "WindowList.h"
+#include "InetConfig.h"
 
 pascal long ShadowIRCVersion(StringPtr str);
 
@@ -1266,9 +1267,15 @@ pascal void DCCConnOpened(connectionPtr *cn)
 		case dccGET:
 		{
 			dccGETDataPtr dd = (dccGETDataPtr)d->dccData;
+			CFStringRef fileName;
+			ICMapEntry mapEntry;
 
 			d->timeOpened = now;
-			err = CreateUniqueFile(&dd->gfile, 'SIRC', 'BINA');
+			
+			fileName = CFStringCreateWithPascalString(NULL, dd->gfile.name, kCFStringEncodingMacRoman);
+			err = MapFileTypeCreator(fileName, &mapEntry);
+			CFRelease(fileName);
+			err = CreateUniqueFile(&dd->gfile, mapEntry.fileCreator, mapEntry.fileType);
 			
 /*
 			if(err == dupFNErr) //file already exists. Allow them to reselect where to save it. If they don't allow, kill file.
