@@ -48,8 +48,7 @@ MenuHandle gAppleMenu, gFileMenu, gEditMenu, gShortcutsMenu, gWindowMenu;
 static MenuHandle gFontsMenu;
 static short gFontSizeOtherItem;
 
-static pascal void DoFind2(void);
-static pascal void DoFind(char again);
+static void DoFind2(MWPtr mw);
 
 static pascal void HitFontsMenu(short item);
 
@@ -106,12 +105,11 @@ static struct FindInformation {
 	char reverse;
 } find = {"\p", 0, 1};
 
-static pascal void DoFind2(void)
+static void DoFind2(MWPtr mw)
 {
 	Handle t;
 	long s0, s1;
 	long found;
-	MWPtr mw = GetActiveMW();
 	
 	if(find.searchFor[0] && mw)
 	{
@@ -142,13 +140,13 @@ static pascal void DoFind2(void)
 	}
 }
 
-static pascal void DoFind(char again)
+void DoFind(MWPtr mw, char again)
 {
 	DialogPtr d;
 	short i;
 	
 	if(again && find.searchFor[0])
-		DoFind2();
+		DoFind2(mw);
 	else //throw a dialog
 	{
 		d=GetNewDialog(135, 0, (WindowPtr)-1);
@@ -176,7 +174,7 @@ static pascal void DoFind(char again)
 		FinishModalDialog();
 		
 		if(i==1)
-			DoFind2();
+			DoFind2(mw);
 	}
 }
 
@@ -217,6 +215,7 @@ void HitAppleURLMenu(short item)
 	}
 }
 
+			
 pascal void HitEditMenu(short item)
 {
 	char mwFront, otherFront;
@@ -357,13 +356,6 @@ pascal void HitEditMenu(short item)
 					TESetSelect(0, 32767, te);
 				else if(we)
 					WESetSelection(0, 0x7FFFFFF, we);
-				break;
-			
-			case 9:	
-				DoFind(false);
-				break;
-			case 10:
-				DoFind(true);
 				break;
 		}
 	}

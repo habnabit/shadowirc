@@ -261,12 +261,18 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 		MWPaneActivate(p, activate);
 		
 		ch = MWGetChannel(p);
+		
+		EnableMenuCommand(gEditMenu, 'FIND');
+		EnableMenuCommand(gEditMenu, 'FAGN');
 	}
 	else
 	{
 		pluginDlgInfoPtr l;
 		
 		ch=0;
+
+		DisableMenuCommand(gEditMenu, 'FIND');
+		DisableMenuCommand(gEditMenu, 'FAGN');
 		
 		l= (pluginDlgInfoPtr)GetWRefCon(window);
 		if(l && l->magic==PLUGIN_MAGIC)

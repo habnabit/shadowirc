@@ -22,7 +22,7 @@
 #include <Carbon/Carbon.h>
 #include "MsgWindows.h"
 
-void MWInstallMouseWheelHandlers(MWPtr mw);
+void MWInstallEventHandlers(MWPtr mw);
 void InitEventHandlers();
 
 

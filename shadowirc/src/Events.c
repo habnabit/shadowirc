@@ -80,15 +80,42 @@ static OSStatus MWDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef th
 	return myErr;
 }
 
-void MWInstallMouseWheelHandlers(MWPtr mw)
+static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
 {
-	static EventHandlerUPP mouseWheelHandler = 0;
-	EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
+	OSStatus myErr = eventNotHandledErr;
+	HICommand hiCommand;
+	MWPtr mw = (MWPtr)userData;
+	
+	GetEventParameter(theEvent, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
+	
+	switch(hiCommand.commandID)
+	{
+		case 'FIND':
+			DoFind(mw, false);
+			return noErr;
+
+		case 'FAGN':
+			DoFind(mw, true);
+			return noErr;
+	}
+	
+	return myErr;
+}
+
+void MWInstallEventHandlers(MWPtr mw)
+{
+	static EventHandlerUPP mouseWheelHandler = NULL;
+	static EventHandlerUPP uiCommandHandler = NULL;
+	const EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
+	const EventTypeSpec commandType = {kEventClassCommand, kEventProcessCommand};
 	
 	if(!mouseWheelHandler)
 		mouseWheelHandler = NewEventHandlerUPP(MWDoMouseWheelEvent);
+	if(!uiCommandHandler)
+		uiCommandHandler = NewEventHandlerUPP(MWUICommandHandler);
 	
 	InstallWindowEventHandler(mw->w, mouseWheelHandler, 1, &wheelType, mw, NULL);
+	InstallWindowEventHandler(mw->w, uiCommandHandler, 1, &commandType, mw, NULL);
 }
 
 #pragma mark -
@@ -425,18 +452,16 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 			HitSelectConnectionMenu(hiCommand.menu.menuItemIndex);
 			return noErr;
 		
-                //Edit Menu
-                case kHICommandUndo:
-                case kHICommandCut:
-                case kHICommandCopy:
-                case kHICommandPaste:
-                case kHICommandClear:
-                case kHICommandSelectAll:
-                case 'FIND':                
-                case 'FAGN':
-                        HitEditMenu(hiCommand.menu.menuItemIndex);
-                        return noErr;
-                
+		//Edit Menu
+		case kHICommandUndo:
+		case kHICommandCut:
+		case kHICommandCopy:
+		case kHICommandPaste:
+		case kHICommandClear:
+		case kHICommandSelectAll:
+			HitEditMenu(hiCommand.menu.menuItemIndex);
+			return noErr;
+		
 		//Command Menu
 		case 'COMD':
 			HitCommandsMenu(hiCommand.menu.menuItemIndex);
@@ -491,10 +516,7 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 
 void InitEventHandlers()
 {
-	EventTypeSpec commandType;
-	
-	commandType.eventClass = kEventClassCommand;
-	commandType.eventKind  = kEventProcessCommand;
+	const EventTypeSpec commandType = {kEventClassCommand, kEventProcessCommand};
 	
 	InstallApplicationEventHandler(NewEventHandlerUPP(DoCommandEvent), 1, &commandType, NULL, NULL);
 }

@@ -28,7 +28,9 @@ enum menuCommands
 	kCommandWindowSelect = 'WINP'
 };
 
-extern MenuHandle gAppleMenu, gFileMenu, gShortcutsMenu, gWindowMenu, gHelpMenu;
+extern MenuHandle gAppleMenu, gEditMenu, gFileMenu, gShortcutsMenu, gWindowMenu, gHelpMenu;
+
+void DoFind(MWPtr mw, char again);
 
 void HitAppleURLMenu(short item);
 void HitSelectConnectionMenu(short item);

@@ -1005,7 +1005,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			goto failedWCreate;
 		else
 		{
-			MWInstallMouseWheelHandlers(h); // Events.c
+			MWInstallEventHandlers(h); // Events.c
 			SetPortWindowPort(h->w);
 			TextFont(fontNum);
 			TextSize(mainPrefs->defaultFontSize);
