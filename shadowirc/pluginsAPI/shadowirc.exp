@@ -61,11 +61,7 @@ _ProcessLine
 _ProcessInputHunk
 _LockInput
 _UnlockInput
-_IWNewWidget
-_IWDeleteWidget
-_IWRecalculateRects
-_IWPopUpMenu
-_IWOverride
+_GetInputWindowData
 _ILGetInputDataFromMW
 _IADGetText
 _IADSetText

@@ -1,5 +1,5 @@
 /*	ShadowIRC Plugins Header File
-		Version 2.0a12-preliminary
+		Version 2.0a13-preliminary
 		й John Bafford 1997-2004. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x0200000C
+#define _ShadowIRC_API_Version_ 0x0200000D
 
 #include <Carbon/Carbon.h>
 #include <netinet/in.h>
@@ -687,21 +687,19 @@ enum statuslineFlags {
 */
 typedef struct inputAreaData inputAreaData, *inputAreaDataPtr;
 
-typedef struct inputLineRec {
+/*
+	InputWindowData: The input window's data structure
+*/
+typedef struct InputWindowData {
 	const WindowPtr window;				//The inputwindow. If nil, it means there's no global floating inputline.
 	const inputAreaDataPtr inputData; //Input data
-	const FontInfo fi;							//The status line font.
-	const short fontnum;						//The status line font number
-	const short fontsize;						//The status line font size
+	const ControlRef statusControl;				//Status line control
 	
-	const iwWidgetPtr widgetList;		//Status line widget list
-	const Ptr reserved2;
-
 	const short statusLinePos;
 	const short statusLineHeight;		//The height of the status line
 	
-	char statuslineFlags;						//umodeFlags
-} inputLineRec, *inputLinePtr;
+	long statuslineFlags;						//umodeFlags
+} InputWindowData, *InputWindowDataPtr;
 
 
 #pragma mark еее Drag and Drop
@@ -966,14 +964,12 @@ typedef struct ShadowIRCDataRecord {
 	const long *const lastKeyTime;				//The time the user last input any text to the inputline. (GetDateTime())
 
 	targetPtr CurrentTarget;						//The active target
-	inputLinePtr inputLine;							//Pointer to the inputline data.
-
+	
 	const MWPtr *const consoleWin;			//A pointer to the console.
 	const MWPtr *const mwList;				//A pointer to the message window list.
 	
 	const Ptr internetConfig;						//The Internet Config component. Nil if IC is not installed. Typecast to internetConfigurationComponent.
 } ShadowIRCDataRecord;
-
 
 enum pVersionCheckMessageReply {
 	pVersionShadowIRCTooOld = -1, 	//Pass this if you have determined that this version of ShadowIRC is too old.
@@ -2220,42 +2216,17 @@ pascal void UnlockInput(void);
 		Inputline Functions
 
 		These functions handle various inputline related tasks.
+		
+		NOTE: As of ShadowIRC 2.0a13, the functionality for adding items to the statusline
+		was removed. If this functionality is desired, send an email discussing your needs.
 		------------------------------------------------------------------------------------------
 */
 
-pascal iwWidgetPtr IWNewWidget(long type, short align, short width);
-/*	Creates a new inputline widget, adds it to the list, and calls IWRecalculateRects().
-		Input:	type - a value of your choosing
-					align - see enum iwAlign
-					width - number of pixels to request
-		Output:	return value: the inputline widget you created
-*/
-
-pascal char IWDeleteWidget(iwWidgetPtr widget);
-/*	Deletes an inputline widget
-		Input:	widget - widget to delete
-		Output:	true if the widget was deleted, false if not.
-*/
-
-pascal void IWRecalculateRects(void);
-/*	Recalculates the displayArea of each inputline widget based on the inputline width and givenWidth in each inputline widget.
+InputWindowDataPtr GetInputWindowData(void);
+/*
+	Gets the InputWindowDataPtr for the inputline window, if there is a global inputline.
 		Input:	none
-		Output:	none
-*/
-
-pascal long IWPopUpMenu(Point pt, MenuHandle m, long curItem);
-/*	Handles popup menus on the inputline.
-		Input:	pt - top left corner of the menu
-					m - the menu to display
-					curItem - item number to select
-		Output:	return value: high two bytes- menu ID. low two bytes- item number
-*/
-
-pascal short IWOverride(long type, iwWidgetPtr *widget);
-/*	Allows you to override a ShadowIRC inputline widget.
-		Input:	type - type of widget to override
-		Output:	widget - if IWOverride() successful, the widget you overrode. If not, nil.
-					return value: error condition. See enum iwOverrideErrors
+		Output:	return value: the InputWindowDataPtr, or NULL if there is no global inputline.
 */
 
 inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw);
@@ -2293,7 +2264,7 @@ void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish);
 					finish - The end of the selection.
 */
 
-pascal void UpdateStatusLine(void);
+void UpdateStatusLine(void);
 /*	Updates the status line
 		Input:	none
 		Output:	none

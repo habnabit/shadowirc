@@ -717,6 +717,7 @@ static char CMMW(MWPtr mw, Point where, char optCM)
 	return true;
 }
 
+/*
 static char CMIW(Point where)
 {
 	cmmwData d;
@@ -760,7 +761,6 @@ static char CMIW(Point where)
 	
 	switch(outMenuID)
 	{
-/*
 		case 201: //Inputline
 			if(outMenuItem > 0)
 			{
@@ -812,7 +812,7 @@ static char CMIW(Point where)
 				}
 				break;
 			}
-*/
+		
 		default: //plugin popup
 			if(outMenuID > 0)
 				CMSubmenu(&d, outMenuID, outMenuItem);
@@ -823,6 +823,7 @@ static char CMIW(Point where)
 	CMILDispose(&d);
 	return 1;
 }
+*/
 
 static char CMPlugin(WindowPtr w, Point where)
 {
@@ -876,8 +877,10 @@ pascal char DetermineCM(WindowPtr w, Point where, char optCM)
 	
 	if(mw)
 		ret = CMMW(mw, where, optCM);
+/*
 	else if(w==inputLine.w)
 		ret = CMIW(where);
+*/
 	else
 		ret = CMPlugin(w, where);
 	

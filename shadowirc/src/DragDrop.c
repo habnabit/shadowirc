@@ -660,10 +660,12 @@ static OSErr PreDrag(DragReference drag, WEReference we)
 		//¥¥Fix for channel, dcc windows
 		GetWTitle(mw->w, title);
 	}
+/*
 	else if((WindowPtr)mw == inputLine.w)
 	{
 		GetWTitle((WindowPtr)mw, title);
 	}
+*/
 	else
 		return paramErr;
 	

@@ -47,13 +47,23 @@
 #include "IRCInput.h"
 #include "InputControl.h"
 
-inputLineRec inputLine;
-
+static InputWindowData inputLine;
 char noFloatingInput = 0;
 
-inline void IWInternalDraw(iwWidgetPtr o);
+#pragma mark -
+#pragma mark Status Control
 
-pascal void IWRecalculateRects(void)
+typedef struct ILCSData {
+	InputWindowDataPtr inputLine;
+	ControlRef theControl;
+	EventHandlerRef controlEvents;
+	Rect bounds;
+
+	iwWidgetPtr objectList;
+	iwWidgetPtr status;
+} ILCSData, *ILCSDataPtr;
+
+static void IWRecalculateRects(ILCSDataPtr ilcsd)
 {
 	short lRight, rLeft;
 	short t;
@@ -63,24 +73,24 @@ pascal void IWRecalculateRects(void)
 	if(noFloatingInput)
 		return;
 	
-	GetPortBounds(GetWindowPort(inputLine.w), &wp);
+	wp = ilcsd->bounds;
 	
 	lRight = 0;
 	rLeft = wp.right - 2;
 	
 	//Go to the end of the object list.
-	o = inputLine.objectList;
+	o = ilcsd->objectList;
 	while(o->next)
-		o=o->next;
+		o = o->next;
 	
 	//o now contains the last object in the list. this will be all of the right-aligned objects.
 	//Scan through and stop when we hit the first left aligned object and give everything the space it wants.
-	while(o && o->align==iwRight)
+	while(o && o->align == iwRight)
 	{
 		t=rLeft - 1;
 		rLeft -= o->askedWidth + 1;
 		
-		SetRect(&o->drawArea, rLeft, 0, t, inputLine.statusLineHeight-2);
+		SetRect(&o->drawArea, rLeft, wp.top, t, wp.bottom);
 		o->givenWidth = t - rLeft + 1;
 		o=o->prev;
 	}
@@ -88,7 +98,7 @@ pascal void IWRecalculateRects(void)
 	//Now that that's dealt with, we start giving everything the space it wants until we can't go any further.
 	//That means that unless someone does somethign really stupid, the only thing we're gonna truncate is the
 	//status line, which we can identify as having a creator/type of SIRC/stat.
-	o=inputLine.objectList;
+	o = ilcsd->objectList;
 	while(o && o->align==iwLeft)
 	{
 		t = lRight +1;
@@ -98,66 +108,19 @@ pascal void IWRecalculateRects(void)
 			lRight += o->askedWidth;
 		if(lRight > rLeft) //Houston, we have a problem
 		{
-			if(o->creator==iwShadowIRCObject && o->type == iwStatusLine)
+			if(o->creator == iwShadowIRCObject && o->type == iwStatusLine)
 				lRight = rLeft - 2;
 			else // it's a plugin. Give 'em 16 pixels.
 				lRight = t + 15;
 		}
-		SetRect(&o->drawArea, t, 0, lRight, inputLine.statusLineHeight-2);
+		SetRect(&o->drawArea, t, wp.top, lRight, wp.bottom);
 		
 		o->givenWidth = lRight - t;
 		o=o->next;
 	}
 }
 
-pascal short IWOverride(long type, iwWidgetPtr *object)
-{
-	iwWidgetPtr o;
-	
-	if(noFloatingInput)
-		return iwOverrideNotFound;
-
-	*object=0;
-	linkfor(o, inputLine.objectList)
-		if(o->type==type)
-		{
-			if(o->creator!=iwShadowIRCObject)
-				return iwOverridePluginObject;
-			else
-			{
-				if(!o->pluginRef)
-				{
-					*object=o;
-					o->pluginRef = sidr.yourInfo;
-					return iwOverrideNoErr;
-				}
-				else
-					return iwOverrideAlready;
-			}
-		}
-	
-	return iwOverrideNotFound;
-}
-
-pascal char IWDeleteWidget(iwWidgetPtr o)
-{
-	if(o && (!sidr.yourInfo || sidr.yourInfo == o->pluginRef))
-	{
-		if(o->prev)
-			o->prev->next = o->next;
-		if(o->next)
-			o->next->prev = o->prev;
-		
-		DisposePtr((Ptr)o);
-		IWRecalculateRects();
-		
-		return 1;
-	}
-	else
-		return 0;
-}
-
-pascal iwWidgetPtr IWNewWidget(long type, short align, short width)
+static iwWidgetPtr IWNewWidget(ILCSDataPtr ilcsd, long type, short align, short width)
 {
 	iwWidgetPtr p;
 	iwWidgetPtr prev;
@@ -168,14 +131,14 @@ pascal iwWidgetPtr IWNewWidget(long type, short align, short width)
 
 	o = (iwWidgetPtr)NewPtr(sizeof(iwWidgetRec));
 	
-	p = inputLine.objectList;
+	p = ilcsd->objectList;
 	prev=0;
 	if(align==iwLeft) //then tack it onto the begining.
 	{
 		o->next=p;
 		if(p)
 			p->prev=o;
-		inputLine.objectList=o;
+		ilcsd->objectList = o;
 	}
 	else if(align==iwRight) //then tack it on before the first right object
 	{
@@ -189,9 +152,9 @@ pascal iwWidgetPtr IWNewWidget(long type, short align, short width)
 		}
 
 		if(prev)
-			prev->next=o;
+			prev->next = o;
 		else
-			inputLine.objectList=o;
+			ilcsd->objectList = o;
 		o->next=p;
 		o->prev=prev;
 		if(p)
@@ -213,303 +176,12 @@ pascal iwWidgetPtr IWNewWidget(long type, short align, short width)
 	}
 	o->align=align;
 
-	IWRecalculateRects();
+	IWRecalculateRects(ilcsd);
+	
 	return o;
 }
 
-static void IWGrow(WindowRef window, Rect r)
-{
-	Rect textRect;
-	
-	mainPrefs->inputLoc = r;
-	
-	textRect.top = inputLine.statusLineHeight;
-	textRect.left = -2;
-	textRect.bottom = r.bottom - r.top;
-	textRect.right = r.right - r.left - 14;
-	IADSetFieldBounds(inputLine.inputData, textRect);
-	
-	GetPortBounds(GetWindowPort(window), &r);
-	InvalWindowRect(window, &r);
-	IWRecalculateRects();
-}
-
-#pragma mark -
-
-static void IWClick(WindowRef ilWindow, EventRef event)
-{
-	Point where;
-	UInt32 modifiers;
-	GrafPtr gp;
-	
-	GetPort(&gp);
-	SetPortWindowPort(ilWindow);
-	
-	GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &where);
-	GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(modifiers), NULL, &modifiers);
-	
-	GlobalToLocal(&where);
-	if(where.v <= inputLine.statusLineHeight)
-		StatusLineClick(where, modifiers);
-	
-	SetPort(gp);
-}
-
-static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
-{
-#pragma unused(handlerCallRef, userData)
-	OSStatus result = eventNotHandledErr;
-	UInt32 eventClass, eventKind;
-	HICommand hiCommand;
-	
-	eventClass = GetEventClass(event);
-	eventKind = GetEventKind(event);
-	
-	switch(eventClass)
-	{
-		case kEventClassWindow:
-		{
-			WindowRef ilWindow;
-			GetEventParameter(event, kEventParamDirectObject, typeWindowRef, NULL, sizeof(WindowRef), NULL, &ilWindow);
-			switch (eventKind)
-			{
-				//For now, we do nothing as it is consistent with what we used to do. This will need to be fixed, however...
-				case kEventWindowActivated:
-				case kEventWindowShown:
-					IADActivate(inputLine.inputData, true);
-					result = noErr;
-					break;
-					
-				case kEventWindowDeactivated:
-				case kEventWindowHidden:
-					IADActivate(inputLine.inputData, false);
-					result = noErr;
-					break;
-				
-				case kEventWindowDrawContent:
-				{
-					Rect tempRect;
-					
-					EraseRect(GetWindowPortBounds(ilWindow, &tempRect));
-					
-					UpdateStatusLine();
-					break;
-				}
-				case kEventWindowHandleContentClick:
-					if(!CMClick(ilWindow, event))
-						IWClick(ilWindow, event);
-					
-					iwFront = 1;
-					result = noErr;
-					break;
-				
-				case kEventWindowGetMinimumSize:
-				{
-					const Point minSize = {32, 200};
-					
-					SetEventParameter(event, kEventParamDimensions, typeQDPoint, sizeof(Point), &minSize);
-					result = noErr;
-					break;
-				}
-				case kEventWindowBoundsChanged:
-				{
-					Rect growRect;
-					
-					GetEventParameter(event, kEventParamCurrentBounds, typeQDRectangle, NULL, sizeof(Rect), NULL, &growRect);
-					IWGrow(ilWindow, growRect);
-					result = noErr;
-					break;
-				}
-			}
-			break;
-		}
-		
-		case kEventClassCommand:
-		{
-			GetEventParameter(event, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
-			
-			switch(eventKind)
-			{
-				case kEventCommandUpdateStatus:
-					switch(hiCommand.commandID)
-					{
-						case kHICommandCut:
-						case kHICommandCopy:
-						case kHICommandPaste:
-						case kHICommandClear:
-						case kHICommandSelectAll:
-							break;
-					}
-					break;
-			}
-			break;
-		}
-	}
-
-	return result;
-}
-
-static OSErr IWDragTrackingHandler(DragTrackingMessage message, WindowPtr window, void* refCon, DragReference drag)
-{
-#pragma unused(refCon)
-	return IADFieldTrackDrag(inputLine.inputData, message, window, drag);
-}
-
-static OSErr IWDragReceiveHandler(WindowPtr window, void* refCon, DragReference drag)
-{
-#pragma unused(refCon)
-	return IADFieldReceiveDrag(inputLine.inputData, window, drag);
-}
-
-void OpenInputLine()
-{
-	if(!inputLine.w)
-	{
-		Rect textRect;
-		GrafPtr p0;
-		short line2;
-		Rect sb;
-		iwStatusObjectPtr iws;
-		char zeroPosition;
-		char offscreen;
-		ConstStringPtr s;
-		Rect wr;
-		const EventTypeSpec ilSpec[] = {
-			{kEventClassWindow, kEventWindowDrawContent},
-			{kEventClassWindow, kEventWindowHandleContentClick},
-			{kEventClassWindow, kEventWindowGetMinimumSize},
-			{kEventClassWindow, kEventWindowBoundsChanged},
-			{kEventClassWindow, kEventWindowActivated},
-			{kEventClassWindow, kEventWindowDeactivated},
-			{kEventClassWindow, kEventWindowShown},
-			{kEventClassWindow, kEventWindowHidden},
-		};
-		static EventHandlerUPP ilUPP = NULL;
-		static DragTrackingHandlerUPP iwTrackingHandlerUPP = nil;
-		static DragReceiveHandlerUPP iwReceiveHandlerUPP = nil;
-
-		if(mainPrefs->nonGlobalInput)
-		{
-			noFloatingInput = 1;
-			return;
-		}
-		
-		s = GetIntStringPtr(spInfo, sInputline);
-		// add Live Resize and attach the Standard Handler [smcgovern]
-		inputLine.w= WCreate(&mainPrefs->inputLoc, s, kWindowResizableAttribute | kWindowLiveResizeAttribute | kWindowStandardHandlerAttribute, 0, true);
-		if(inputLine.w)
-		{
-			// Get rid of the close box
-			ChangeWindowAttributes(inputLine.w, NULL, kWindowCloseBoxAttribute);
-			
-			GetPort(&p0);
-			SetPortWindowPort(inputLine.w);
-			SetOrigin(-2,-2);
-			inputLine.fontnum = FMGetFontFamilyFromName(mainPrefs->defaultFontName);
-			TextFont(inputLine.fontnum);
-			TextSize(mainPrefs->defaultFontSize);
-			inputLine.fontsize=mainPrefs->defaultFontSize;
-			GetFontInfo(&inputLine.fi);
-			inputLine.statusLinePos=inputLine.fi.ascent+inputLine.fi.leading;
-			
-			inputLine.statusLineHeight=inputLine.statusLinePos+inputLine.fi.descent+3;
-			line2=inputLine.statusLineHeight + inputLine.fi.leading + inputLine.fi.ascent;
-
-			//Set the inputline position
-			zeroPosition=((mainPrefs->inputLoc.left==0)&&(mainPrefs->inputLoc.right==0));
-			offscreen=!RectInRgn(&mainPrefs->inputLoc, GetGrayRgn());
-			if(zeroPosition || offscreen)
-			{
-				short h,v;
-				
-				GetAvailableWindowPositioningBounds(GetGDevice(), &sb);
-				if(zeroPosition)
-				{
-					h=80* inputLine.fi.widMax+16;
-					v=line2 + inputLine.fi.descent + inputLine.fi.leading+10;
-				}
-				else
-				{
-					h=mainPrefs->inputLoc.right - mainPrefs->inputLoc.left;
-					v=mainPrefs->inputLoc.bottom - mainPrefs->inputLoc.top;
-				}
-				SizeWindow(inputLine.w, h, v, 1);
-				GetPortBounds(GetWindowPort(inputLine.w), &wr);
-				MoveWindow(inputLine.w, (sb.right-sb.left-wr.right+2)/2 -1, sb.bottom - wr.bottom-5, false);
-				WGetBBox(inputLine.w, &mainPrefs->inputLoc);
-				mainPrefs->inputLoc.right=mainPrefs->inputLoc.left+h;
-				mainPrefs->inputLoc.bottom=mainPrefs->inputLoc.top+v;
-			}
-
-			//Add Drag Handlers
-			if(!iwTrackingHandlerUPP)
-			{
-				iwTrackingHandlerUPP = NewDragTrackingHandlerUPP(IWDragTrackingHandler);
-				iwReceiveHandlerUPP = NewDragReceiveHandlerUPP(IWDragReceiveHandler);
-			}
-			InstallTrackingHandler(iwTrackingHandlerUPP, inputLine.w, inputLine.w);
-			InstallReceiveHandler(iwReceiveHandlerUPP, inputLine.w, inputLine.w);
-			
-			//Allocate default Inputline objects
-			inputLine.status=IWNewWidget(iwStatusLine, iwLeft, -1);
-			
-			//Now, create the data pointer for the status object
-			inputLine.status->data = (long)NewPtr(sizeof(iwStatusObjectRec));
-			iws = (iwStatusObjectPtr)inputLine.status->data;
-			iws->awayWidth=StringWidth("\p (Away)");
-			iws->istalkingwithWidth=StringWidth("\p is talking with ");
-			iws->onWidth=StringWidth("\pon ");
-			iws->closeParenWid = CharWidth('(');
-			
-/*
-			WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, twe);
-*/
-			
-			textRect.top = inputLine.statusLineHeight;
-			textRect.left = -2;
-			textRect.right = (mainPrefs->inputLoc.right - mainPrefs->inputLoc.left)-14; //local coord
-			textRect.bottom = (mainPrefs->inputLoc.bottom - mainPrefs->inputLoc.top); //local coord
-			
-			inputLine.inputData = IADNew(inputLine.w, textRect, NewKey);
-			
-			SetPort(p0);
-			WSelect(inputLine.w);
-			
-			SetUserFocusWindow(inputLine.w);
-			
-			iws->maxLineWid=(CharWidth('n') * (22+22+32+1)) + iws->awayWidth + iws->istalkingwithWidth + iws->onWidth;
-			
-			inputLine.statuslineFlags = kUmodeFlagsOn + kUmodeFlagsPlus + kBoldedPopups;
-			
-			// assign Event Handler to the window [smcgovern]
-			if(!ilUPP)
-				ilUPP = NewEventHandlerUPP(InputLineWindowEventHandler);
-	
-			InstallWindowEventHandler(inputLine.w, ilUPP, GetEventTypeCount(ilSpec), ilSpec, NULL, NULL);
-		}
-	}
-}
-
-#pragma mark -
-
-pascal long IWPopUpMenu(Point p, MenuHandle m, long curItem)
-{
-	long newItem;
-
-	if(noFloatingInput)
-		return 0;
-
-	LocalToGlobal(&p);
-
-	SetMenuFont(m, inputLine.fontnum, inputLine.fontsize);
-
-	InsertMenu(m, -1);
-	newItem=PopUpMenuSelect(m, p.v, p.h, curItem);
-	
-	return newItem;
-}
-
-inline void IWInternalDraw(iwWidgetPtr o)
+static void IWInternalDraw(ILCSDataPtr ilcsd, iwWidgetPtr o)
 {
 	Str255 s;
 	switch(o->type)
@@ -521,7 +193,7 @@ inline void IWInternalDraw(iwWidgetPtr o)
 			channelPtr ch;
 			iwStatusObjectPtr stats = (iwStatusObjectPtr)o->data;
 			short strwid, curPos, maxPos = o->drawArea.right;
-			char boldedPopups = (inputLine.statuslineFlags & kBoldedPopups) == kBoldedPopups;
+			char boldedPopups = (ilcsd->inputLine->statuslineFlags & kBoldedPopups) == kBoldedPopups;
 			
 			link = CurrentTarget.link;
 			if(link==0)
@@ -620,7 +292,7 @@ inline void IWInternalDraw(iwWidgetPtr o)
 			}
 			
 			//Draw status text
-			MoveTo(o->drawArea.left, inputLine.statusLinePos);//o->drawArea.top);
+			MoveTo(o->drawArea.left, ilcsd->inputLine->statusLinePos); //o->drawArea.top);
 			if(boldedPopups)
 				TextFace(bold);
 			else
@@ -632,12 +304,12 @@ inline void IWInternalDraw(iwWidgetPtr o)
 			if(boldedPopups)
 				TextFace(0);
 			
-			if((inputLine.statuslineFlags & kUmodeFlagsOn) && link && link->yourUmodes)
+			if((ilcsd->inputLine->statuslineFlags & kUmodeFlagsOn) && link && link->yourUmodes)
 			{
 				int x;
 				
 				pstrcpy("\p [", s);
-				if(inputLine.statuslineFlags & kUmodeFlagsPlus)
+				if(ilcsd->inputLine->statuslineFlags & kUmodeFlagsPlus)
 					SAppend1(s, '+');
 				
 				for(x=1;x<=link->yourUmodes[0];x++)
@@ -707,67 +379,18 @@ inline void IWInternalDraw(iwWidgetPtr o)
 	}
 }
 
-#pragma mark -
-
-inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw)
+void UpdateStatusLine(void)
 {
-	if(!noFloatingInput)
-		return inputLine.inputData;
-	else if(mw)
-		return mw->inputData;
-	else //no mw specified; try the current window and see if that works
-	{
-		mw = MWFromWindow(ActiveNonFloatingWindow());
-		if(mw)
-			return mw->inputData;
-		else
-			return 0;
-	}
+	if(noFloatingInput)
+		return;
+	
+	if(!IsWindowVisible(inputLine.w))
+		return;
+	
+	HIViewSetNeedsDisplay(inputLine.statusControl, true);
 }
 
-
-#pragma mark -
-
-void IWLock(void)
-{
-	if(!noFloatingInput && !inputLine.lock)
-	{
-/*
-		inputLine.lock = 1;
-		
-		IADSetTextPtr(inputLine,inputData, NULL, 0);
-		WEFeatureFlag(weFReadOnly, weBitSet, inputLine.inputData->il);
-		UpdateStatusLine();
-*/
-	}
-}
-
-void IWUnlock(void)
-{
-	if(!noFloatingInput && inputLine.lock)
-	{
-/*
-		Rect r;
-		GrafPtr p0;
-
-		GetPort(&p0);
-
-		SetPortWindowPort(inputLine.w);
-		WGetBBox(inputLine.w, &r);
-		GlobalToLocal((Point*)&r.bottom);
-
-		r.left = -2;
-		r.top = inputLine.statusLineHeight;
-		RGBBackColor(&white);
-		EraseRect(&r);
-		inputLine.lock = 0;
-		SetPort(p0);
-		WEFeatureFlag(weFReadOnly, weBitClear, inputLine.inputData->il);
-*/
-	}
-}
-
-pascal void UpdateStatusLine(void)
+static void _UpdateStatusLine(ILCSDataPtr ilcsd)
 {
 	static int reentrant = 0;
 	GrafPtr p0;
@@ -775,22 +398,16 @@ pascal void UpdateStatusLine(void)
 	iwWidgetPtr o;
 	pIWUpdateData pp;
 	
-	if(noFloatingInput)
-		return;
-	
-	if(!IsWindowVisible(inputLine.w))
-		return;
-	
 	if(++reentrant > 1)
 		return;
 	
 	GetPort(&p0);
 	
-	SetPortWindowPort(inputLine.w);
+	SetPortWindowPort(ilcsd->inputLine->w);
 restart:
-	WGetBBox(inputLine.w, &r);
-	GlobalToLocal((Point*)&r.bottom);
-
+	r = ilcsd->bounds;
+	
+/*
 	r.left = -2;
 	
 	if(inputLine.lock)
@@ -806,36 +423,50 @@ restart:
 	
 	r.top = r.left = -3;
 	r.right ++;
+*/
 	DrawThemePlacard(&r, kThemeStateActive);
 	
 	RGBBackColor(&white);
 	RGBForeColor(&shadowircColors[sicStatusLine]);
 	
-	linkfor(o, inputLine.objectList)
+	linkfor(o, ilcsd->objectList)
 	{
 		TextFace(0);
-		MoveTo(o->drawArea.left, inputLine.statusLinePos);
-		if(o->creator==iwShadowIRCObject && !o->pluginRef)
-			IWInternalDraw(o);
+		MoveTo(o->drawArea.left, ilcsd->bounds.bottom);
+		if(o->creator == iwShadowIRCObject && !o->pluginRef)
+			IWInternalDraw(ilcsd, o);
 		else
 		{
 			pp.widget=o;
 			runIndPlugin(o->pluginRef, pIWUpdateMessage, &pp);
 		}
 		
-		if(reentrant>1)
+		if(reentrant > 1)
 		{
-			reentrant=1;
+			reentrant = 1;
 			goto restart;
 		}
 	}
-
+	
 	SetPort(p0);
 	reentrant = 0;
 }
 
-static void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers);
-static void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers)
+static long IWPopUpMenu(ILCSDataPtr ilcsd, Point p, MenuHandle m, long curItem)
+{
+	long newItem;
+
+	LocalToGlobal(&p);
+
+	SetMenuFont(m, ilcsd->inputLine->fontnum, ilcsd->inputLine->fontsize);
+
+	InsertMenu(m, -1);
+	newItem = PopUpMenuSelect(m, p.v, p.h, curItem);
+	
+	return newItem;
+}
+
+static void IWStatusLineWidgetClick(ILCSDataPtr ilcsd, iwWidgetPtr o, Point where, short modifiers)
 {
 	char sk=(modifiers&shiftKey)==shiftKey;
 	iwStatusObjectPtr stats = (iwStatusObjectPtr)o->data;
@@ -865,14 +496,14 @@ static void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers)
 		p.v=0;
 		p.h=stats->nickStart;
 		ni=CountMenuItems(m);
-		newItem=IWPopUpMenu(p, m, ni);
+		newItem=IWPopUpMenu(ilcsd, p, m, ni);
 		i=newItem&0xFF;
 		if(i>1) //Don't change nick, because the current one is the top one in the list...
 		{
 			if(i==ni)
 			{
 				LSStrLS("\p/nick ", &ls);
-				IADSetText(inputLine.inputData, &ls);
+				IADSetText(ilcsd->inputLine->inputData, &ls);
 			}
 			else if(i==ni-1)
 			{
@@ -976,10 +607,10 @@ static void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers)
 		if(!sk)
 		{
 			InsertMenu(rcm, -1);
-			newItem=IWPopUpMenu(p, m, curItem);
+			newItem = IWPopUpMenu(ilcsd, p, m, curItem);
 		}
 		else
-			newItem=IWPopUpMenu(p, rcm, CountMenuItems(rcm)-2);
+			newItem = IWPopUpMenu(ilcsd, p, rcm, CountMenuItems(rcm)-2);
 
 		i = *(((short*)&newItem)+1);
 		switch(*(short*)&newItem)
@@ -1041,7 +672,7 @@ static void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers)
 		ConnectionMenuHilites();
 		p.v=0;
 		p.h=stats->servStart;
-		newItem = IWPopUpMenu(p, m, 4 + CurrentTarget.link->linkNum);
+		newItem = IWPopUpMenu(ilcsd, p, m, 4 + CurrentTarget.link->linkNum);
 		i= *(((short*)&newItem)+1);
 		
 		switch(*(short*)&newItem)
@@ -1074,26 +705,541 @@ static void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers)
 	}
 }
 
-void StatusLineClick(Point where, short modifiers)
+static void StatusLineClick(ILCSDataPtr ilcsd, Point where, short modifiers)
 {
 	iwWidgetPtr o;
 	pIWClickData pp;
 	
-	linkfor(o, inputLine.objectList)
+	linkfor(o, ilcsd->objectList)
 		if(PtInRect(where, &o->drawArea))
 		{
-			if(o->creator==iwShadowIRCObject && !o->pluginRef)
+			if(o->creator == iwShadowIRCObject && !o->pluginRef)
 			{
 				if(o->type == iwStatusLine)
-					IWStatusLineWidgetClick(o, where, modifiers);
+					IWStatusLineWidgetClick(ilcsd, o, where, modifiers);
 			}
 			else
 			{
-				pp.widget=o;
-				pp.where=where;
+				pp.widget = o;
+				pp.where = where;
 				runIndPlugin(o->pluginRef, pIWClickMessage, &pp);
 			}
 			
 			break;
 		}
  }
+
+static const EventTypeSpec ilcsControlEvents[] = {
+	{ kEventClassControl, kEventControlDraw },
+	{ kEventClassControl, kEventControlBoundsChanged },
+	{ kEventClassControl, kEventControlDispose },
+	{ kEventClassControl, kEventControlHitTest },
+	{ kEventClassControl, kEventControlActivate },
+	{ kEventClassControl, kEventControlDeactivate },
+	{ kEventClassControl, kEventControlTrack },
+};
+
+static OSStatus ILCSControlEventHandler(EventHandlerCallRef myHandler, EventRef event, void* userData)
+{
+#pragma unused(myHandler)
+	ILCSDataPtr ilcsd = (ILCSDataPtr)userData;
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	OSStatus err;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	switch(eventClass)
+	{
+		case kEventClassControl:
+		{
+			switch(eventKind)
+			{
+				case kEventControlTrack:
+				{
+					Point where;
+					UInt32 modifiers;
+					
+					GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &where);
+					GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(modifiers), NULL, &modifiers);
+					
+					StatusLineClick(ilcsd, where, modifiers);
+					result = noErr;
+					break;
+				}
+				case kEventControlDispose:
+					free(ilcsd);
+					break;
+				
+				case kEventControlDraw:
+					_UpdateStatusLine(ilcsd);
+					result = noErr;
+					break;
+				
+				case kEventControlBoundsChanged:
+				{
+					GetEventParameter(event, kEventParamCurrentBounds, typeQDRectangle, NULL, sizeof(Rect), NULL, &ilcsd->bounds);
+					
+					IWRecalculateRects(ilcsd);
+					result = noErr;
+					break;
+				}
+				
+				case kEventControlHitTest:
+				{
+					//We only have one part, so we just check if they clicked in the bounds
+					ControlPartCode thePart;
+					Point where;
+					
+					err = GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(where), NULL, &where);
+					if(!err)
+					{
+						if(PtInRect(where, &ilcsd->bounds))
+							thePart = 1;
+						else
+							thePart = 0;
+						
+						err = SetEventParameter( event, kEventParamControlPart, typeControlPartCode, sizeof(thePart), &thePart);
+					}
+					
+					result = err;
+					break;
+				}
+				
+				case kEventControlClick:
+				case kEventControlActivate:
+				case kEventControlDeactivate:
+					result = noErr;
+					break;
+			}
+			break;
+		}
+	}
+	
+	return result;
+}
+
+static OSStatus ILSCAttachToExistingControl(ControlRef theControl, InputWindowDataPtr inputLine)
+{
+	static EventHandlerUPP ilcsEventHandlerUPP = NULL;
+	ILCSDataPtr ilcsd;
+	UInt32 outCommandID;
+	OSStatus err;
+	iwStatusObjectPtr iws;
+	
+	ilcsd = calloc(1, sizeof(ILCSData));
+	ilcsd->inputLine = inputLine;
+	ilcsd->theControl = theControl;
+	GetControlBounds(theControl, &ilcsd->bounds);
+	
+	//Allocate default Inputline objects
+	ilcsd->status = IWNewWidget(ilcsd, iwStatusLine, iwLeft, -1);
+	
+	//Now, create the data pointer for the status object
+	ilcsd->status->data = (long)NewPtr(sizeof(iwStatusObjectRec));
+	iws = (iwStatusObjectPtr)ilcsd->status->data;
+	iws->awayWidth = StringWidth("\p (Away)");
+	iws->istalkingwithWidth = StringWidth("\p is talking with ");
+	iws->onWidth = StringWidth("\pon ");
+	iws->closeParenWid = CharWidth('(');
+	iws->maxLineWid = (CharWidth('n') * (22+22+32+1)) + iws->awayWidth + iws->istalkingwithWidth + iws->onWidth;
+	
+	/* set our control's command id.  we don't actually use it, but it must
+	be non-zero for our control to be sent command events.  only set it
+	if it has not already been set.  */
+	err = GetControlCommandID(theControl, &outCommandID);
+	if(err == noErr)
+	{
+		if(outCommandID == 0)
+			err = SetControlCommandID(theControl, 1);
+	}
+	
+	if(!ilcsEventHandlerUPP)
+		ilcsEventHandlerUPP = NewEventHandlerUPP(ILCSControlEventHandler);
+	
+	InstallEventHandler(GetControlEventTarget(theControl), ilcsEventHandlerUPP, GetEventTypeCount(ilcsControlEvents), ilcsControlEvents, ilcsd, &ilcsd->controlEvents);
+	
+	return noErr;
+}
+
+static OSStatus CreateInputLineStatusControl(WindowRef theWindow, InputWindowDataPtr inputLine, Rect *bounds, ControlRef *theControl)
+{
+	UInt32 featureSet;
+	OSStatus err;
+	ControlRef newControl;
+	
+	featureSet = kControlSupportsEmbedding | kControlWantsActivate | kControlHasSpecialBackground;
+	
+	err = CreateUserPaneControl(theWindow, bounds, featureSet, &newControl);
+	if(!err)
+	{
+		err = ILSCAttachToExistingControl(newControl, inputLine);
+		if(!err)
+			*theControl = newControl;
+		else
+			DisposeControl(newControl);
+	}
+	
+	return err;
+}
+
+
+
+#pragma mark -
+
+/*
+pascal short IWOverride(long type, iwWidgetPtr *object)
+{
+	iwWidgetPtr o;
+	
+	if(noFloatingInput)
+		return iwOverrideNotFound;
+
+	*object=0;
+	linkfor(o, inputLine.objectList)
+		if(o->type==type)
+		{
+			if(o->creator!=iwShadowIRCObject)
+				return iwOverridePluginObject;
+			else
+			{
+				if(!o->pluginRef)
+				{
+					*object=o;
+					o->pluginRef = sidr.yourInfo;
+					return iwOverrideNoErr;
+				}
+				else
+					return iwOverrideAlready;
+			}
+		}
+	
+	return iwOverrideNotFound;
+}
+
+pascal char IWDeleteWidget(iwWidgetPtr o)
+{
+	if(o && (!sidr.yourInfo || sidr.yourInfo == o->pluginRef))
+	{
+		if(o->prev)
+			o->prev->next = o->next;
+		if(o->next)
+			o->next->prev = o->prev;
+		
+		DisposePtr((Ptr)o);
+		IWRecalculateRects();
+		
+		return 1;
+	}
+	else
+		return 0;
+}
+*/
+
+#pragma mark -
+
+static void IWGrow(WindowRef window, Rect r)
+{
+	Rect textRect;
+	
+	mainPrefs->inputLoc = r;
+	
+	textRect.top = inputLine.statusLineHeight;
+	textRect.left = 0;
+	textRect.bottom = r.bottom - r.top;
+	textRect.right = r.right - r.left - 10;
+	IADSetFieldBounds(inputLine.inputData, textRect);
+	
+	textRect.bottom = textRect.top;
+	textRect.top = 0;
+	textRect.right =  r.right - r.left;
+	SetControlBounds(inputLine.statusControl, &textRect);
+	
+	GetPortBounds(GetWindowPort(window), &r);
+	InvalWindowRect(window, &r);
+}
+
+static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
+{
+#pragma unused(handlerCallRef, userData)
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	HICommand hiCommand;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	switch(eventClass)
+	{
+		case kEventClassWindow:
+		{
+			WindowRef ilWindow;
+			GetEventParameter(event, kEventParamDirectObject, typeWindowRef, NULL, sizeof(WindowRef), NULL, &ilWindow);
+			switch (eventKind)
+			{
+				//For now, we do nothing as it is consistent with what we used to do. This will need to be fixed, however...
+				case kEventWindowActivated:
+				case kEventWindowShown:
+					IADActivate(inputLine.inputData, true);
+					result = noErr;
+					break;
+					
+				case kEventWindowDeactivated:
+				case kEventWindowHidden:
+					IADActivate(inputLine.inputData, false);
+					result = noErr;
+					break;
+				
+				case kEventWindowGetMinimumSize:
+				{
+					const Point minSize = {32, 200};
+					
+					SetEventParameter(event, kEventParamDimensions, typeQDPoint, sizeof(Point), &minSize);
+					result = noErr;
+					break;
+				}
+				case kEventWindowBoundsChanged:
+				{
+					Rect growRect;
+					
+					GetEventParameter(event, kEventParamCurrentBounds, typeQDRectangle, NULL, sizeof(Rect), NULL, &growRect);
+					IWGrow(ilWindow, growRect);
+					result = noErr;
+					break;
+				}
+			}
+			break;
+		}
+		
+		case kEventClassCommand:
+		{
+			GetEventParameter(event, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
+			
+			switch(eventKind)
+			{
+				case kEventCommandUpdateStatus:
+					switch(hiCommand.commandID)
+					{
+						case kHICommandCut:
+						case kHICommandCopy:
+						case kHICommandPaste:
+						case kHICommandClear:
+						case kHICommandSelectAll:
+							break;
+					}
+					break;
+			}
+			break;
+		}
+	}
+
+	return result;
+}
+
+static OSErr IWDragTrackingHandler(DragTrackingMessage message, WindowPtr window, void* refCon, DragReference drag)
+{
+#pragma unused(refCon)
+	return IADFieldTrackDrag(inputLine.inputData, message, window, drag);
+}
+
+static OSErr IWDragReceiveHandler(WindowPtr window, void* refCon, DragReference drag)
+{
+#pragma unused(refCon)
+	return IADFieldReceiveDrag(inputLine.inputData, window, drag);
+}
+
+void OpenInputLine()
+{
+	if(!inputLine.w)
+	{
+		Rect textRect;
+		GrafPtr p0;
+		short line2;
+		Rect sb;
+		char zeroPosition;
+		char offscreen;
+		ConstStringPtr s;
+		Rect wr;
+		Rect statusControlRect;
+		const EventTypeSpec ilSpec[] = {
+			{kEventClassWindow, kEventWindowGetMinimumSize},
+			{kEventClassWindow, kEventWindowBoundsChanged},
+			{kEventClassWindow, kEventWindowActivated},
+			{kEventClassWindow, kEventWindowDeactivated},
+			{kEventClassWindow, kEventWindowShown},
+			{kEventClassWindow, kEventWindowHidden},
+		};
+		static EventHandlerUPP ilUPP = NULL;
+		static DragTrackingHandlerUPP iwTrackingHandlerUPP = nil;
+		static DragReceiveHandlerUPP iwReceiveHandlerUPP = nil;
+
+		if(mainPrefs->nonGlobalInput)
+		{
+			noFloatingInput = 1;
+			return;
+		}
+		
+		s = GetIntStringPtr(spInfo, sInputline);
+		// add Live Resize and attach the Standard Handler [smcgovern]
+		inputLine.w= WCreate(&mainPrefs->inputLoc, s, kWindowResizableAttribute | kWindowLiveResizeAttribute | kWindowStandardHandlerAttribute | kWindowCompositingAttribute, 0, true);
+		if(inputLine.w)
+		{
+			// Get rid of the close box
+			ChangeWindowAttributes(inputLine.w, NULL, kWindowCloseBoxAttribute);
+			
+			GetPort(&p0);
+			SetPortWindowPort(inputLine.w);
+			
+			//Determine the height of the status control
+			inputLine.fontnum = FMGetFontFamilyFromName(mainPrefs->defaultFontName);
+			inputLine.fontsize = mainPrefs->defaultFontSize;
+			
+			TextFont(inputLine.fontnum);
+			TextSize(inputLine.fontsize);
+			GetFontInfo(&inputLine.fi);
+			
+			inputLine.statusLinePos = inputLine.fi.ascent + inputLine.fi.leading + 2;
+			inputLine.statusLineHeight = inputLine.statusLinePos + inputLine.fi.descent + 3;
+			line2 = inputLine.statusLineHeight + inputLine.fi.leading + inputLine.fi.ascent;
+			
+			//SetOrigin(-2,-2);
+
+			//Set the inputline position
+			zeroPosition = ((mainPrefs->inputLoc.left == 0) && (mainPrefs->inputLoc.right == 0));
+			offscreen = !RectInRgn(&mainPrefs->inputLoc, GetGrayRgn());
+			if(zeroPosition || offscreen)
+			{
+				short h,v;
+				
+				GetAvailableWindowPositioningBounds(GetGDevice(), &sb);
+				if(zeroPosition)
+				{
+					h = 80* inputLine.fi.widMax + 16;
+					v = line2 + inputLine.fi.descent + inputLine.fi.leading + 10;
+				}
+				else
+				{
+					h = mainPrefs->inputLoc.right - mainPrefs->inputLoc.left;
+					v = mainPrefs->inputLoc.bottom - mainPrefs->inputLoc.top;
+				}
+				
+				SizeWindow(inputLine.w, h, v, 1);
+				GetPortBounds(GetWindowPort(inputLine.w), &wr);
+				MoveWindow(inputLine.w, (sb.right-sb.left-wr.right+2)/2 -1, sb.bottom - wr.bottom-5, false);
+				WGetBBox(inputLine.w, &mainPrefs->inputLoc);
+				
+				mainPrefs->inputLoc.right = mainPrefs->inputLoc.left + h;
+				mainPrefs->inputLoc.bottom = mainPrefs->inputLoc.top + v;
+			}
+
+			//Add Drag Handlers
+			if(!iwTrackingHandlerUPP)
+			{
+				iwTrackingHandlerUPP = NewDragTrackingHandlerUPP(IWDragTrackingHandler);
+				iwReceiveHandlerUPP = NewDragReceiveHandlerUPP(IWDragReceiveHandler);
+			}
+			InstallTrackingHandler(iwTrackingHandlerUPP, inputLine.w, inputLine.w);
+			InstallReceiveHandler(iwReceiveHandlerUPP, inputLine.w, inputLine.w);
+			
+			inputLine.statuslineFlags = kUmodeFlagsOn | kUmodeFlagsPlus | kBoldedPopups;
+			
+/*
+			WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, twe);
+*/
+			
+			textRect.top = inputLine.statusLineHeight;
+			textRect.left = -2;
+			textRect.right = (mainPrefs->inputLoc.right - mainPrefs->inputLoc.left) - 10; //local coord
+			textRect.bottom = (mainPrefs->inputLoc.bottom - mainPrefs->inputLoc.top); //local coord
+			
+			inputLine.inputData = IADNew(inputLine.w, textRect, NewKey);
+			
+			statusControlRect.top = 0;
+			statusControlRect.left = 0;
+			statusControlRect.bottom = inputLine.statusLineHeight;
+			statusControlRect.right = mainPrefs->inputLoc.right - mainPrefs->inputLoc.left;
+			CreateInputLineStatusControl(inputLine.w, &inputLine, &statusControlRect, &inputLine.statusControl);
+			
+			WSelect(inputLine.w);
+			
+			SetUserFocusWindow(inputLine.w);
+			
+			// assign Event Handler to the window [smcgovern]
+			if(!ilUPP)
+				ilUPP = NewEventHandlerUPP(InputLineWindowEventHandler);
+	
+			InstallWindowEventHandler(inputLine.w, ilUPP, GetEventTypeCount(ilSpec), ilSpec, NULL, NULL);
+
+			SetPort(p0);
+		}
+	}
+}
+
+#pragma mark -
+
+InputWindowDataPtr GetInputWindowData(void)
+{
+	if(noFloatingInput)
+		return NULL;
+	else
+		return &inputLine;
+}
+
+inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw)
+{
+	if(!noFloatingInput)
+		return inputLine.inputData;
+	else if(mw)
+		return mw->inputData;
+	else //no mw specified; try the current window and see if that works
+	{
+		mw = MWFromWindow(ActiveNonFloatingWindow());
+		if(mw)
+			return mw->inputData;
+		else
+			return 0;
+	}
+}
+
+
+#pragma mark -
+
+void IWLock(void)
+{
+	if(!noFloatingInput && !inputLine.lock)
+	{
+/*
+		inputLine.lock = 1;
+		
+		IADSetTextPtr(inputLine,inputData, NULL, 0);
+		WEFeatureFlag(weFReadOnly, weBitSet, inputLine.inputData->il);
+		UpdateStatusLine();
+*/
+	}
+}
+
+void IWUnlock(void)
+{
+	if(!noFloatingInput && inputLine.lock)
+	{
+/*
+		Rect r;
+		GrafPtr p0;
+
+		GetPort(&p0);
+
+		SetPortWindowPort(inputLine.w);
+		WGetBBox(inputLine.w, &r);
+		GlobalToLocal((Point*)&r.bottom);
+
+		r.left = -2;
+		r.top = inputLine.statusLineHeight;
+		RGBBackColor(&white);
+		EraseRect(&r);
+		inputLine.lock = 0;
+		SetPort(p0);
+		WEFeatureFlag(weFReadOnly, weBitClear, inputLine.inputData->il);
+*/
+	}
+}

@@ -24,7 +24,7 @@
 	<key>CFBundleExecutable</key>
 	<string>ShadowIRC</string>
 	<key>CFBundleGetInfoString</key>
-	<string>2.0a12, Â© 1996-2004 John Bafford</string>
+	<string>2.0a13, © 1996-2004 John Bafford</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>ShadowIRC Help</string>
 	<key>CFBundleHelpBookName</key>

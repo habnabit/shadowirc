@@ -278,11 +278,6 @@ typedef struct ShadowIRCDataRecord {
 #else
 	targetPtr CurrentTarget;						//The active target
 #endif
-#ifndef _InputLine_
-	Ptr inputLine;
-#else
-	inputLinePtr inputLine;					 		//Pointer to the inputline data.
-#endif
 
 #ifndef _MsgWindows_
 	Ptr *consoleWin;

@@ -30,10 +30,6 @@
 #define CONST
 #endif
 
-enum {
-	kInputField = 'INPT'
-};
-
 enum iwAlign {
 	iwLeft=0,
 	iwRight=1
@@ -80,50 +76,39 @@ struct iwWidgetRec {
 	CONST struct plugsRec* pluginRef;
 };
 
-enum {
-	kILMDBytes, kILMDKBytes,
-	kILMDmax=1
-};
-
 enum statuslineFlags {
 	kUmodeFlagsOn = 1 << 0,
 	kUmodeFlagsPlus = 1 << 1,
 	kBoldedPopups = 1 << 2
 };
 
-typedef struct inputLineRec {
+typedef struct InputWindowData {
 	CONST WindowPtr w;
 	CONST inputAreaDataPtr inputData;
-	CONST FontInfo fi;
-	CONST short fontnum, fontsize;
+	CONST ControlRef statusControl;
 	
-	CONST iwWidgetPtr objectList;
-	CONST iwWidgetPtr status;
-
 	CONST short statusLinePos, statusLineHeight;
 	
-	char statuslineFlags;
+	long statuslineFlags;
+	
+	//END OF PLUGINS API
+	
+	CONST FontInfo fi;
+	CONST short fontnum, fontsize;
 	CONST char lock;
-} inputLineRec, *inputLinePtr;
+} InputWindowData, *InputWindowDataPtr;
 
-extern inputLineRec inputLine;
 extern char noFloatingInput;
 
 #undef CONST
 
-
-void OpenInputLine(void);
-void StatusLineClick(Point where, short modifiers);
-
 void IWLock(void);
 void IWUnlock(void);
 
-pascal iwWidgetPtr IWNewWidget(long type, short align, short width);
-pascal void IWRecalculateRects(void);
-pascal void UpdateStatusLine(void);
-pascal long IWPopUpMenu(Point p, MenuHandle m, long curItem);
-pascal char IWDeleteWidget(iwWidgetPtr o);
-pascal short IWOverride(long type, iwWidgetPtr *object);
+void OpenInputLine(void);
+InputWindowDataPtr GetInputWindowData(void);
+
+void UpdateStatusLine(void);
 
 inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw);
 
