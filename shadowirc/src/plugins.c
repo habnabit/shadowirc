@@ -836,7 +836,7 @@ static void ProcessApplicationPlugins()
 	mainBundle = CFBundleGetMainBundle();
 
 	// Get a list of URLs for all the bundles in the Plugins directory
-	pluginURLs = CFBundleCopyResourceURLsOfType(mainBundle, CFSTR("bundle"), CFSTR("Plugins"));
+	pluginURLs = CFBundleCopyResourceURLsOfType(mainBundle, CFSTR("bundle"), CFSTR("../PlugIns"));
 	if(pluginURLs != NULL)
 	{
 		int pluginCount = CFArrayGetCount(pluginURLs);

@@ -104,6 +104,7 @@
 //194
 		195DF8C9FE9D4F0611CA2CBB = {
 			children = (
+				F50FA70E0358BD880132A983,
 				0249A665FF388DC511CA2CEA,
 			);
 			isa = PBXGroup;
@@ -140,7 +141,6 @@
 				F510A8AB021CB6B10132A983,
 				20286C2AFDCF999611CA2CEA,
 				20286C2CFDCF999611CA2CEA,
-				F5B0C91E0358F6820132A983,
 				20286C32FDCF999611CA2CEA,
 				F552BFD60211060D01A80061,
 				195DF8C9FE9D4F0611CA2CBB,
@@ -248,6 +248,7 @@
 				20286C38FDCF999611CA2CEA,
 				20286C3BFDCF999611CA2CEA,
 				04313892FE3035C9C02AAC07,
+				F5BE65840359094B0132A983,
 			);
 			buildSettings = {
 				EXPORTED_SYMBOLS_FILE = pluginsAPI/shadowirc.exp;
@@ -399,7 +400,6 @@
 				F57375F303205FE90132A983,
 				F5A6AF20032111060132A983,
 				F5D4BE910323C8880132A983,
-				F5B0C91F0358F6B40132A983,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2357,21 +2357,6 @@
 			settings = {
 			};
 		};
-		F5B0C91E0358F6820132A983 = {
-			children = (
-				F50FA70E0358BD880132A983,
-			);
-			isa = PBXGroup;
-			name = Plugins;
-			path = "";
-			refType = 4;
-		};
-		F5B0C91F0358F6B40132A983 = {
-			fileRef = F50FA70E0358BD880132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F5B0C9200358F9DE0132A983 = {
 			isa = PBXTargetDependency;
 			target = F50FA70D0358BD880132A983;
@@ -2443,6 +2428,22 @@
 		};
 		F5BB5DA4021AA73C01A82AF3 = {
 			fileRef = F5DB41480213AAFA01A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5BE65840359094B0132A983 = {
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F5BE65870359099E0132A983,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5BE65870359099E0132A983 = {
+			fileRef = F50FA70E0358BD880132A983;
 			isa = PBXBuildFile;
 			settings = {
 			};
