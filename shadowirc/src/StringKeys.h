@@ -24,6 +24,7 @@
 
 #define kNoDCCFolderKey CFSTR("NoDCCFolder")
 #define kNoLogFolderKey CFSTR("NoLogFolder")
+#define kUsingICFolderKey CFSTR("UsingICFolder")
 
 #define kDirSelKey CFSTR("DirSelMessage")
 
