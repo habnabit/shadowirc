@@ -1044,11 +1044,11 @@ static ULI ULINew(WindowPtr w, long type)
 		SetDataBrowserTableViewNamedColumnWidth(ul->browser, 'host', ul->uwinSize.right - ul->nickListWidth);
 		
 		SetDataBrowserSelectionFlags(ul->browser, kDataBrowserDragSelect | kDataBrowserCmdTogglesSelection);
-		//SetDataBrowserTableViewRowHeight(ul->browser, 10);
 		SetDataBrowserTableViewHiliteStyle(ul->browser, kDataBrowserTableViewFillHilite);
 		
 		SetControlFontStyle(ul->browser, &controlFontStyleStruc);
 		SetControlProperty(ul->browser, kUserlistSignature, kUserlistSignature, sizeof(ULI), &ul);
+		SetDataBrowserTableViewRowHeight(ul->browser, 12);
 	}
 	
 	GetPort(&gp);
