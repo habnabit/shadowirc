@@ -282,7 +282,7 @@ static int set_nblk(int sockfd)
         return (-1);
     if((fcntl(sockfd, F_SETFL, flags | O_NONBLOCK)) < 0)
         return (-1);
-                
+    return (0);
 }
 
 /*
@@ -299,6 +299,7 @@ static int set_blk(int sockfd)
      */
     if(fcntl(sockfd, F_SETFL, flags & ~O_NONBLOCK) < 0)
         return (-1);
+    return (0);
 }
     
 /*
