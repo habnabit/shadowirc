@@ -2013,12 +2013,6 @@ pascal char ExistsService(FourCharCode serviceType);
 		Output:	return value: 1 if the service was registered, 0 if not.
 */
 
-pascal short HMIAdd(ConstStr63Param name);
-/*	Adds an item to the help menu
-		Input:	name - string to add
-		Output:	return value: reference number.
-*/
-
 pascal short WMSGetMenuItemNum(long key);
 /*	Returns the item number for a menu item in the Windows menu.
 		Input:	key - a unique value
