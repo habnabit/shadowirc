@@ -24,8 +24,6 @@
 
 #include <Carbon/Carbon.h>
 
-#define IsDialog(w) (GetWindowKind(w) == dialogKind)
-
 Rect *WGetBBox(WindowPtr w, Rect *r);
 pascal char WIsFloater(WindowPtr w);
 pascal void WSelect(WindowPtr w);

@@ -348,32 +348,9 @@ void HitAppleURLMenu(short item)
 pascal void HitEditMenu(short item)
 {
 	char mwFront, otherFront;
-	TEHandle te;
 	WEReference we;
 	long s0, s1;
-	WindowPtr w = ActiveNonFloatingWindow();
 	MWPtr activeMW;
-	
-	if(w && IsDialog(w))
-	{
-		DialogPtr d = GetDialogFromWindow(w);
-		
-		if(item == 3)
-			DialogCut(d);
-		else if(item == 4)
-			DialogCopy(d);
-		else if(item==5)
-			DialogPaste(d);
-		else if(item==6) //clear
-			DialogDelete(d);
-		else if(item==7) //select all
-		{
-			te = GetDialogTextEditHandle(d);
-			if(te)
-				SelectDialogItemText(d, GetDialogKeyboardFocusItem(d), 0, 32766);
-		}
-		return;
-	}
 	
 	activeMW = GetActiveMW();
 	if(activeMW)
@@ -387,7 +364,6 @@ pascal void HitEditMenu(short item)
 		otherFront = !iwFront;
 	}
 
-	te=0;
 	we=0;
 	if(iwFront)
 		we=ILGetWE();
@@ -398,7 +374,7 @@ pascal void HitEditMenu(short item)
 		return; //don't know what to do.
 	}
 	
-	if(te || we)
+	if(we)
 	{
 		switch(item)
 		{
@@ -413,15 +389,10 @@ pascal void HitEditMenu(short item)
 			case 3: //cut
 				if(iwFront)
 					WECut(ILGetWE());
-				else if(otherFront)
-					TECut(te);
 				break;
 			
 			case 4: //copy
-				if(otherFront)
-					TECopy(te);
-				else
-					WECopy(we);
+				WECopy(we);
 				break;
 			
 			case 5: //paste
@@ -435,31 +406,21 @@ pascal void HitEditMenu(short item)
 						processPaste(activeMW, false);
 					}
 				}
-				else if(otherFront)
-					TEPaste(te);
 				break;
 			
 			case 6: //clear
-				if(otherFront)
-					TEDelete(te);
-				else
+				WEGetSelection(&s0, &s1, we);
+				if(s0==s1)
 				{
-					WEGetSelection(&s0, &s1, we);
-					if(s0==s1)
-					{
-						WEDeactivate(we);
-						WESetSelection(0, 0x7FFFFF, we);
-					}
-					WEDelete(we);
-					WEActivate(we);
+					WEDeactivate(we);
+					WESetSelection(0, 0x7FFFFF, we);
 				}
+				WEDelete(we);
+				WEActivate(we);
 				break;
 			
 			case 7: //select all
-				if(te)
-					TESetSelect(0, 32767, te);
-				else if(we)
-					WESetSelection(0, 0x7FFFFFF, we);
+				WESetSelection(0, 0x7FFFFFF, we);
 				break;
 		}
 	}
