@@ -675,7 +675,6 @@ pascal void MenuBarClick(const EventRecord *e)
 	MenuHandle m;
 	int x, y;
 	long l;
-	WindowPtr w;
 	MWPtr mw = GetActiveMW();
 	
 	//Update file menu
