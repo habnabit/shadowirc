@@ -1,21 +1,5 @@
 #include <Carbon/Carbon.r>
 
-resource 'ALRT' (129, "TCPERR") {
-	{56, 74, 158, 465},
-	129,
-	{	/* array: 4 elements */
-		/* [1] */
-		OK, visible, sound1,
-		/* [2] */
-		OK, visible, sound1,
-		/* [3] */
-		OK, visible, sound1,
-		/* [4] */
-		OK, visible, sound1
-	},
-	alertPositionMainScreen
-};
-
 resource 'ALRT' (130) {
 	{54, 40, 156, 431},
 	130,
@@ -596,30 +580,6 @@ resource 'DITL' (-300) {
 		Button {
 			enabled,
 			""
-		}
-	}
-};
-
-resource 'DITL' (129) {
-	{	/* array DITLarray: 3 elements */
-		/* [1] */
-		{77, 163, 97, 228},
-		Button {
-			enabled,
-			"Continue"
-		},
-		/* [2] */
-		{2, 4, 34, 36},
-		Icon {
-			disabled,
-			0
-		},
-		/* [3] */
-		{3, 39, 70, 388},
-		StaticText {
-			disabled,
-			"MacTCP error: Could not open TCP driver."
-			" (id=^0)."
 		}
 	}
 };
@@ -3183,15 +3143,6 @@ resource 'aete' (0) {
 		},
 		{	/* array Enumerations: 0 elements */
 		}
-	}
-};
-
-resource 'alrx' (129) {
-	versionZero {
-		13,
-		0,
-		kUseThemeWindow,
-		""
 	}
 };
 
