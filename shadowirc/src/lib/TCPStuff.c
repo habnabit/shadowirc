@@ -743,7 +743,7 @@ static void FindAddressDNR(DNRRecordPtr drp)
          * pop pthread_mutex_unlock off the cleanup stack and execute it
          * this unlocks our lock mutex lock
          */
-        pthread_cleanup_pop(1)
+        pthread_cleanup_pop(1);
 }
 
 /*
