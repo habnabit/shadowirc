@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -57,7 +57,6 @@ static pascal void CMMWMake(cmmwData *d);
 static pascal void CMDoPopup(cmmwData *d, short item);
 static pascal void MyWEFindWord(long offset, long *selStart, long *selEnd, WEReference we);
 
-static pascal char MyIsShowCMClick(const EventRecord *e);
 inline OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBalloonAvailable, UInt32 inHelpType, ConstStr255Param inHelpItemString, const AEDesc* inSelection, UInt32* outUserSelectionType, SInt16* outMenuID, UInt16* outMenuItem);
 
 static pascal char CMMW(MWPtr mw, Point where, char optCM);
@@ -94,11 +93,6 @@ pascal void CMSetCursor(void)
 	}
 }
 
-static pascal char MyIsShowCMClick(const EventRecord *e)
-{
-	return IsShowContextualMenuClick(e);
-}
-
 inline OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBalloonAvailable, UInt32 inHelpType, ConstStr255Param inHelpItemString, const AEDesc* inSelection, UInt32* outUserSelectionType, SInt16* outMenuID, UInt16* outMenuItem)
 {
 	gCMCursorOn = 0;
@@ -108,7 +102,7 @@ inline OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBal
 
 pascal char CMClick(WindowPtr w, const EventRecord *e)
 {
-	char stdCM = MyIsShowCMClick(e);
+	char stdCM = IsShowContextualMenuClick(e);
 	char optCM = 0;
 	
 	if(!stdCM&& ((e->modifiers & (optionKey | shiftKey | controlKey | cmdKey)) == optionKey))
