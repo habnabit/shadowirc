@@ -61,6 +61,8 @@
 #include "TextManip.h"
 #include "CalcCRC.h"
 #include "CommandsMenu.h"
+#include "MsgBuffer.h"
+#include "IRCNotify.h"
 
 #pragma internal on
 static pascal void DoAbout(void);
@@ -1345,6 +1347,210 @@ static pascal void MenuAppleURL(short item)
 
 #pragma mark -
 
+inline pascal void checkCursorFocus(EventRecord *e)
+{
+	static Point prevLoc = {0,0};
+	MWPtr mw;
+	WindowPtr p;
+	
+	//If we're doing cursor focus, the command key isn't down, and the mouse has moved
+	if(mainPrefs->cursorFocus &&!(e->modifiers & cmdKey) && (*(long*)&prevLoc != *(long*)&e->where))
+	{
+		prevLoc = e->where;
+		
+		FindWindow(e->where, &p);
+		if(p && !WIsFloater(p))
+		{
+			if(!mainPrefs->cursorFocusDontActivate) //autoraise
+			{
+				if(FrontNonFloater()!=p)
+					WSelect(p);
+			}
+			else //autoraise disabled
+			{
+				if(p==consoleWin->w)
+				{
+					if(!CurrentTarget.bad)
+					{
+						InvalTarget(&CurrentTarget);
+						UpdateStatusLine();
+					}
+				}
+				else if((mw=MWFromWindow(p)) != nil)
+				{
+					if(mw != CurrentTarget.mw)
+					{
+						SetTarget(mw, &CurrentTarget);
+						UpdateStatusLine();
+					}
+				}
+			}
+		}
+	}
+}
+
+inline void checkConnections(void)
+{
+	connectionPtr conn, conn2;
+	LongString ls;
+	
+	conn=fConn;
+	while(conn)
+	{
+		conn2=conn->next;
+		if(conn->connType == connSTALE && now >= conn->closeTime)
+			processStale(0, conn);
+		else if(conn->connType == connIRC && !conn->tryingToConnect)
+		{
+			//Test and kill stale irc connections
+			if(conn->link && conn->link->conn != conn) //stale connection!
+			{
+				LSConcatStrAndStr("\pStale connection deleted for link \"", conn->link->linkPrefs->linkName, &ls);
+				SMPrefixIrcleColor(&ls, dsConsole, '2');
+				deleteConnection(&conn);
+			}
+			else if(conn->lastData<(now-300))
+			{
+				LSConcatStrAndStr("\pPING ", conn->link->CurrentNick, &ls);
+				conn->lastData+=60;
+				ConnPutLS(&conn, &ls);
+			}
+		}
+		conn=conn2;
+	}
+}
+
+static void ProcessUserHostsOutgoing(linkPtr link, LongString *ts)
+{
+	LSConcatStrAndLS("\pUSERHOST", ts, ts);
+	SendCommand(link, ts);
+	link->outstandingUSERHOST++;
+	ts->len=0;
+}
+
+#define processUHOutgoing {if((++i)==5) { i=0;\
+	ProcessUserHostsOutgoing(link, &ts);\
+	if((++ii) == 5) return;}}
+
+#define AddUserHostRequest \
+{ \
+	u->lastUHUpdate=-1; \
+	LSAppend1(ts, ' '); \
+	LSConcatLSAndStr(&ts, u->nick, &ts); \
+	processUHOutgoing; \
+}
+
+inline void ProcessUserHosts(linkPtr link)
+{
+	LongString ts;
+	int i, ii;
+	UserListPtr u;
+	channelPtr ch;
+	
+	ts.len=0;
+	i = ii = 0;
+	if(link->needUserHosts)
+	{
+		linkfor(ch, link->channelList)
+			linkfor(u, ch->userlist)
+				if(!u->userhost[0] && (u->lastUHUpdate!=-1))
+					AddUserHostRequest;
+
+		link->needUserHosts=0;
+	}
+	else
+	{
+		//Ok, we're here. That means we've gotten ALL the userhost information from people who
+		//previously existed. That means we have to scan through, find userhosts updated more than five minutes ago,
+		//and update.
+		
+		linkfor(ch, link->channelList)
+			linkfor(u, ch->userlist)
+				if((!u->userhost[0] || (now-u->lastUHUpdate>300)) && (u->lastUHUpdate!=-1)) //5 minute update time
+					AddUserHostRequest;
+	}
+	
+	if(i>0)
+		ProcessUserHostsOutgoing(link, &ts);
+}
+
+static pascal void RetryConnections(void)
+{
+	linkPtr curLink;
+	
+	linkfor(curLink, firstLink)
+		if(curLink->serverStatus==S_OFFLINE && !curLink->neverConnected)
+		{
+			if(curLink->waitingToRetry)
+			{
+				if(now >= curLink->lastConnAttempt + curLink->linkPrefs->retryDelay)
+				{
+					OpenConnection(curLink);
+					curLink->connectionAttempts++;
+					if(curLink->linkPrefs->maxConnAtt && curLink->connectionAttempts >= curLink->linkPrefs->maxConnAtt)
+						curLink->neverConnected = true; //to prevent reconnects
+				}
+
+			}
+			else if(curLink->linkPrefs->reconnect)
+				curLink->waitingToRetry = true;
+		}
+}
+
+static pascal void IdleTasks(EventRecord *e)
+{
+	static unsigned long userhostsTimer, minuteTimer, periodicTasksTimer;
+	linkPtr curLink;
+	
+	if(gSoundIsFinished)
+		AsyncSoundCheck();
+	
+	//Stuff we need to do periodically when we're in the foreground
+	if(!inBackground)
+	{
+		if(MWActive && MWActive->winType == textWin && !iwFront)
+			WEIdle(0, MWActive->we);
+		else
+			if(!inputLine.lock)
+				WEIdle(0, ILGetWE());
+
+		checkCursorFocus(e); //perhaps this should be in a mouse moved event?
+		CMSetCursor();
+	}
+	
+	RetryConnections();
+	
+	
+	//Periodic tasks
+	if(now-periodicTasksTimer>5)
+	{
+		periodicTasksTimer=now;
+		CheckMem();
+		checkConnections();
+		
+		if(now-userhostsTimer>20)
+		{
+			userhostsTimer = now;
+			linkfor(curLink, firstLink)
+				if(curLink->serverStatus==S_CONN)
+					ProcessUserHosts(curLink);
+		}
+		
+		if(now-minuteTimer>60)
+		{
+			minuteTimer = now;
+			MBIdle();
+			RunNotify();
+		}
+		
+		UpdateStatusLine();
+	}
+	
+	idlePlugins(e);
+}
+
+#pragma mark -
+
 static pascal void inZoomInOutHandler(const EventRecord *e, short part)
 {
 	MWPtr p;
@@ -1958,48 +2164,6 @@ static pascal char doDialogEvent(EventRecord *e)
 		return (e->what == updateEvt) || (e->what !=0);
 }
 
-inline pascal void checkCursorFocus(EventRecord *e)
-{
-	static Point prevLoc = {0,0};
-	MWPtr mw;
-	WindowPtr p;
-	
-	//If we're doing cursor focus, the command key isn't down, and the mouse has moved
-	if(mainPrefs->cursorFocus &&!(e->modifiers & cmdKey) && (*(long*)&prevLoc != *(long*)&e->where))
-	{
-		prevLoc = e->where;
-		
-		FindWindow(e->where, &p);
-		if(p && !WIsFloater(p))
-		{
-			if(!mainPrefs->cursorFocusDontActivate) //autoraise
-			{
-				if(FrontNonFloater()!=p)
-					WSelect(p);
-			}
-			else //autoraise disabled
-			{
-				if(p==consoleWin->w)
-				{
-					if(!CurrentTarget.bad)
-					{
-						InvalTarget(&CurrentTarget);
-						UpdateStatusLine();
-					}
-				}
-				else if((mw=MWFromWindow(p)) != nil)
-				{
-					if(mw != CurrentTarget.mw)
-					{
-						SetTarget(mw, &CurrentTarget);
-						UpdateStatusLine();
-					}
-				}
-			}
-		}
-	}
-}
-
 static pascal void ApplEvents(EventRecord *e)
 {
 	long l;
@@ -2034,22 +2198,7 @@ static pascal void ApplEvents(EventRecord *e)
 	switch(e->what)
 	{
 		case nullEvent:
-			if(gSoundIsFinished)
-				AsyncSoundCheck();
-
-			if(!inBackground)
-			{
-				if(MWActive && MWActive->winType == textWin && !iwFront)
-					WEIdle(0, MWActive->we);
-				else
-					if(!inputLine.lock)
-						WEIdle(0, ILGetWE());
-
-				checkCursorFocus(e);
-				CMSetCursor();
-			}
-			idlePlugins(e);
-			CheckMem();
+			IdleTasks(e);
 			break;
 		
 		case updateEvt:
@@ -2101,6 +2250,7 @@ pascal void ApplRun(void)
 	int x;
 
 	WaitNextEvent(-1, &e, 1, mouseRgn);
+	GetDateTime(&now);
 	if(e.what==nullEvent)
 	{
 		x=-8;
