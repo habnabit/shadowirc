@@ -65,7 +65,7 @@ enum connectStage {
 	
 	
 	csFailedToLookup = -1,			//IP lookup failed
-	csConnectFailed = -2,			//connect failed
+//	csConnectFailed = -2,			//connect failed -- redundant -- removed
 	csFailedToConnect = -3,		//connect failed
 	csSOCKSAuthFailed = -4,		//SOCKS authentication failed
 	csSOCKSConnectFailed = -5	//SOCKS connection failed

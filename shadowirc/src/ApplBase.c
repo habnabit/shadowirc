@@ -68,7 +68,7 @@ inline void inGoAwayHandler(const EventRecord *e);
 static pascal void inGrowHandler(const EventRecord *e);
 static pascal void doMouseUp(EventRecord *e);
 static pascal void doMouseDown(EventRecord *e);
-static pascal void doTCPEvent(CEPtr message);
+static void doTCPEvent(CEPtr message);
 static pascal void ApplEvents(EventRecord *e);
 static pascal char doDialogEvent(EventRecord *e);
 static pascal void ApplExit(void);
@@ -964,102 +964,49 @@ static pascal void doMouseDown(EventRecord *e)
 	}
 }
 
-static pascal char processOutgoingConnectionEvent(CEPtr c, connectionPtr conn)
+static void doTCPEvent(CEPtr c)
 {
+	connectionPtr conn;
+	
+	conn=findConnectionSock(c->connection);
+	if(!conn) //dunno how we're suppoed to process this...
+		return;
+
 	if(conn->tryingToConnect)
 	{
-		LongString ls;
-		pServiceCWLinkStateChangeData p;
-		linkPtr link;
-		p.link = link = conn->link;
-
-		if(conn->connectStage == csLookingUp || conn->connectStage == csLookingUp2)
+		switch(c->event)
 		{
-			if(c->event == C_Found)
-			{
+			case C_Found:
 				if(conn->connectStage == csLookingUp2)
 				{
-                    memcpy(&conn->ip2, &c->addr, sizeof(conn->ip2));
+					LongString ls;
+					linkPtr link;
+					pServiceCWLinkStateChangeData p;
+				
+					memcpy(&conn->ip2, &c->addr, sizeof(conn->ip2));
 					ConnFindAddress(conn, link->conn->name);
 					
 					LSParamString(&ls, GetIntStringPtr(spInfo, sLookingUpIP), link->conn->name, 0, 0, 0);
 					SMPrefix(&ls, dsConsole);
 
+					p.link = link = conn->link;
 					p.connectStage = conn->connectStage = csLookingUp;
 					runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
 				}
 				else
 				{
-                    memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
+					memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
 					connection2(conn);
 				}
-			}
-			else
-			{
-				if(conn->socksType == connIRC)
-				{
-					p.connectStage = conn->connectStage = csFailedToLookup;
-					runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
-					ServerOK(c->event, link);
-				}
-				else if(conn->socksType == connDCC)
-				{
-					DCCFailed(&conn, "\p");
-				}
-			}
-			return true;
-		}
-		if(conn->connectStage == csOpeningConnection)
-		{
-			if(c->event == C_Established)
-			{
-                memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
-				
-				if(conn->connType == connSOCKS || conn->connType == connIRC)
-				{
-					if(conn->connType == connIRC || conn->socksType == connIRC)
-					{
-						if(c->value == -1)
-							LinkFailedConnection(link);
-						else
-						{
-							LinkSuccessfulConnection(link, conn->connType == connIRC);
-							if(conn->connType == connSOCKS)
-								conn->InputFunc(c, conn);
-						}
-					}
-					else if(conn->socksType == connDCC)
-						conn->InputFunc(c, conn);
-				}
-			}
-			else
-			{
-				if(conn->socksType == connIRC)
-				{
-					p.connectStage = conn->connectStage=csConnectFailed;
-					runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
-					ServerOK(c->event, link);
-				}
-				else if(conn->socksType == connDCC)
-				{
-					DCCFailed(&conn, "\p");
-				}
-			}
-			return true;
+				return; //not sure why, but, we don't want to call the input handler
+			
+			case C_Established:
+				memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
+				break;
 		}
 	}
 	
-	return false;
-}
-
-static pascal void doTCPEvent(CEPtr c)
-{
-	connectionPtr conn;
-	
-	conn=findConnectionSock(c->connection);
-	if(conn)
-		if(!processOutgoingConnectionEvent(c, conn))
-			conn->InputFunc(c, conn);
+	conn->InputFunc(c, conn);
 }
 
 static pascal char doDialogEvent(EventRecord *e)

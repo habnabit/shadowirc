@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -556,6 +556,9 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 		
 	if(c->event == C_Established)
 	{
+		if(conn->socksType == connIRC)
+			LinkSuccessfulConnection(conn->link, false);
+
 		conn->connectStage=csSOCKSNegotiatingMethod;
 		
 		if(conn->socksType == connIRC)
@@ -790,57 +793,84 @@ pascal void processIdentd(CEPtr c, connectionPtr conn)
 	}
 }
 
-pascal void processServer(CEPtr c, connectionPtr conn)
+static void processServerData(CEPtr c, connectionPtr conn)
 {
 	LongString ls;
 	long nn, i;
 	size_t abytes = c->value;
 	linkPtr link = conn->link;
 	char cr;
-	
-	if(c->event==C_CharsAvailable)
+	int count = -8;
+
+	conn->lastData=now;
+	do
 	{
-		int count = -8;
-
-		conn->lastData=now;
-		do
+		//read to LF
+		nn = ConnGetUntil(conn, (Ptr)&ls.data[1], '\n', MIN(maxLSlen-1, abytes));
+		
+		abytes -= nn;
+		cr = 0;
+		//kill CR/LF at end
+		while(nn>0 && (ls.data[nn]=='\n' || ls.data[nn]=='\r'))
 		{
-			//read to LF
-			nn = ConnGetUntil(conn, (Ptr)&ls.data[1], '\n', MIN(maxLSlen-1, abytes));
-			
-			abytes -= nn;
-			cr = 0;
-			//kill CR/LF at end
-			while(nn>0 && (ls.data[nn]=='\n' || ls.data[nn]=='\r'))
-			{
-				cr = 1;
-				nn--;
-			}
+			cr = 1;
+			nn--;
+		}
 
-			if(nn>0)
-			{
-				ls.len=nn;
-				for(i=1;i<=nn;i++)
-					ls.data[i]=ISODecode[ls.data[i]];
+		if(nn>0)
+		{
+			ls.len=nn;
+			for(i=1;i<=nn;i++)
+				ls.data[i]=ISODecode[ls.data[i]];
 
-				LSConcatLSAndLS(&link->firstHalfOfIncoming, &ls, &link->firstHalfOfIncoming);
-			}
-			
-			if(cr)
-			{
-				ServerCommands(&link->firstHalfOfIncoming, link);
-				link->firstHalfOfIncoming.len=0;
-			}
-                /*
-                 * abytes > nn is fuzzy math, but a reasonable way
-                 * to decide when to stop.
-                 * If the number of available bytes is less than the size of the last server message
-                 * then stop here.
-                 */
-		} while(++count && abytes > nn);
+			LSConcatLSAndLS(&link->firstHalfOfIncoming, &ls, &link->firstHalfOfIncoming);
+		}
+		
+		if(cr)
+		{
+			ServerCommands(&link->firstHalfOfIncoming, link);
+			link->firstHalfOfIncoming.len=0;
+		}
+		/*
+			* abytes > nn is fuzzy math, but a reasonable way
+			* to decide when to stop.
+			* If the number of available bytes is less than the size of the last server message
+			* then stop here.
+			*/
+	} while(++count && abytes > nn);
+}
+
+void processServer(CEPtr c, connectionPtr conn)
+{
+	pServiceCWLinkStateChangeData p;
+	
+	switch(c->event)
+	{
+		case C_Established:
+			LinkSuccessfulConnection(conn->link, true);
+			break;
+		
+		case C_SearchFailed:
+			p.link = conn->link;
+			p.connectStage = conn->connectStage = csFailedToLookup;
+			runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
+			ServerOK(c->event, conn->link);
+			break;
+		
+		case C_FailedToOpen:
+			p.link = conn->link;
+			p.connectStage = conn->connectStage = csFailedToConnect;
+			runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
+			ServerOK(c->event, conn->link);
+			break;
+		
+		case C_CharsAvailable:
+			processServerData(c, conn);
+			break;
+		
+		default:
+			ServerOK(c->event, conn->link);
 	}
-	else
-		ServerOK(c->event, link);
 }
 
 pascal void processPlugin(CEPtr c, connectionPtr conn)

@@ -220,16 +220,6 @@ pascal void LinkSuccessfulConnection(linkPtr link, char reg)
 		RegUser(link);
 }
 
-pascal void LinkFailedConnection(linkPtr link)
-{
-	pServiceCWLinkStateChangeData p;
-	
-	p.link = link;
-	p.connectStage = link->conn->connectStage=csFailedToConnect;
-	runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
-	ServerOK(C_FailedToOpen, link);
-}
-
 static pascal void CreateIdentdConn(connectionPtr conn)
 {
 	if(mainPrefs->firewallType != fwSOCKS5) //Why?

@@ -38,7 +38,6 @@ pascal char ValidPrefs(linkPtr link);
 pascal void ServerOK(short status, linkPtr link);
 pascal void connection2(connectionPtr conn);
 pascal void LinkSuccessfulConnection(linkPtr link, char reg);
-pascal void LinkFailedConnection(linkPtr link);
 #endif
 
 #endif
