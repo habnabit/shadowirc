@@ -3,13 +3,13 @@
 resource 'DITL' (1541, purgeable) {
 	{	/* array DITLarray: 3 elements */
 		/* [1] */
-		{35, 15, 50, 215},
+		{35, 15, 50, 240},
 		CheckBox {
 			enabled,
 			"Display userlist in channel windows"
 		},
 		/* [2] */
-		{50, 25, 65, 225},
+		{55, 25, 70, 250},
 		CheckBox {
 			enabled,
 			"Display on right side of window"
