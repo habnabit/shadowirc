@@ -56,7 +56,7 @@ void ReadShortCutDataCFPrefs(Str255 shortcutData[])
 {
 	int x;
 	CFStringRef shortcutString;
-	CFMutableArrayRef shortcutsArray;
+	CFPropertyListRef shortcutsArray;
 	
 	shortcutsArray = CFPreferencesCopyAppValue(kShortcutArrayKey, kCFPreferencesCurrentApplication);
 	
