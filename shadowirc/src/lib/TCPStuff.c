@@ -154,6 +154,30 @@ int GetConnectionSocket(long cp);
 
 #pragma mark -
 
+#ifndef BUFLEN
+    #define BUFLEN 256
+#endif
+
+void inet_ntop_str(struct sockaddr *addr, StringPtr string)
+{
+    char cstr[BUFLEN];
+    
+    switch(addr->sa_family)
+    {
+	    case AF_INET6:
+		    inet_ntop(addr->sa_family, &((struct sockaddr_in6 *)addr)->sin6_addr, cstr, BUFLEN);
+		    break;
+	    case AF_INET:
+		    inet_ntop(addr->sa_family, &((struct sockaddr_in *)addr)->sin_addr, cstr, BUFLEN);
+		    break;
+	    default:
+		    memset(addr, 0, sizeof(struct sockaddr));
+		    break;
+    }
+
+    CopyCStringToPascal(cstr, string);
+}
+
 /*
  * inet_ntoa_str
  * Converts an in_addr struct to presentation format
@@ -553,7 +577,7 @@ int TCPLocalIP(int sockfd, struct in_addr *ip)
     return (0);
 }
 
-int TCPRemoteIP(int sockfd, struct sockaddr_storage *ip)
+int TCPRemoteIP(int sockfd, struct sockaddr *ip)
 {
     struct sockaddr_storage ss;
     int len;
