@@ -275,10 +275,11 @@ pascal void connection2(connectionPtr conn)
 
 		if(ConnNewActive(conn)) //this makes the connection to the (socks) server
 		{
-			CreateIdentdConn(conn);
-			
 			if(conn->socksType == connIRC)
+			{
+				CreateIdentdConn(conn);
 				LinkSetStage(link, csOpeningConnection);
+			}
 		}
 		else
 		{
