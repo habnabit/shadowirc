@@ -631,7 +631,9 @@ TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog)
 
 	    if (asprintf(&portstr, "%d", htons(localport)) == -1)
 		    return (T_Failed);
-	    getaddrinfo(NULL, portstr, &hints, &res);
+
+	    if (getaddrinfo(NULL, portstr, &hints, &res) != 0)
+		    return (T_Failed);
 
 	    res_saved = res;
 	    free(portstr);

@@ -47,7 +47,7 @@ ssize_t write_fd(int fd, void *ptr, size_t nbytes, int sendfd) {
 }
 
 int main(int argc, char **argv) {
-	int n, sockfd;
+	int sockfd;
 	struct addrinfo hints, *res;
 	
 	memset(&hints, 0, sizeof(struct addrinfo));
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 	hints.ai_family = PF_INET6;
 	hints.ai_socktype = SOCK_STREAM;
 	
-	if ((n = getaddrinfo(NULL, "ident", &hints, &res)) == -1)
+	if (getaddrinfo(NULL, "ident", &hints, &res) != 0)
 		return 1;
 	
 	if ((sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
