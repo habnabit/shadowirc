@@ -37,22 +37,6 @@ resource 'open' (301, purgeable)
 	}
 };
 
-resource 'kind' (1000, purgeable)
-{
-	'SIRC',
-	0,
-	{
-		'apnm', "ShadowIRC",
-		
-		'TEXT', "ShadowIRC text file",
-		'COLR', "ShadowIRC color set",
-		'pref', "ShadowIRC preference file",
-		'PLUG', "ShadowIRC 68k plugin",
-		'shlb', "ShadowIRC PPC plugin",
-		'PPLG', "ShadowIRC plugin"
-	}
-};
-
 resource 'scsz' (0)
 {
 	launchToGetTerminology,
