@@ -429,7 +429,7 @@ pascal void ChTopicWindow(channelPtr ch)
 	TopicWindowSet(d, ch);
 	SetupModalDialog(d, 2, 2);
 	b=0;
-	df = NewModalFilterProc(TopicWidgetDialogFilter);
+	df = NewModalFilterUPP(TopicWidgetDialogFilter);
 	do {
 		ModalDialog(df, &i);
 		

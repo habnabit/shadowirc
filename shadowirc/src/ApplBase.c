@@ -883,7 +883,7 @@ static pascal void inContentHandler(EventRecord *e)
 					else// if(pa == kControlPageDownPart)
 						sScrollStep=(pageSize-p->scrpHeight);
 
-					upp = NewControlActionProc(MWVScrollTrack);
+					upp = NewControlActionUPP(MWVScrollTrack);
 					pa=TrackControl(c, e->where, upp);
 					DisposeControlActionUPP(upp);
 					break;

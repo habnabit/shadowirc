@@ -561,7 +561,7 @@ pascal OSErr _WEDrag ( Point mouseLoc, EventModifiers modifiers, UInt32 clickTim
 	// we need supply a data send callback
 	if ( _weFlavorSender == nil )
 	{
-		_weFlavorSender = NewDragSendDataProc ( ( DragSendDataProcPtr ) _WESendFlavor ) ;
+		_weFlavorSender = NewDragSendDataUPP ( ( DragSendDataProcPtr ) _WESendFlavor ) ;
 	}
 
 	if ( ( err = SetDragSendProc ( drag, _weFlavorSender, 0 ) ) != noErr )

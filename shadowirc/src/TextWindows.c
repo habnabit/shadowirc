@@ -343,7 +343,7 @@ pascal char TWClose(MWPtr mw, char lowMem)
 		else
 			GetWTitle(mw->w, s);
 		ParamText(s, "\p", "\p", "\p");
-		df = NewModalFilterProc(TWSaveWindowDialogFilter);
+		df = NewModalFilterUPP(TWSaveWindowDialogFilter);
 		SetupModalDialog(d, 1, 2);
 		i=0;
 		do

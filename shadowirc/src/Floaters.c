@@ -26,7 +26,6 @@
 #include "IRCGlobals.h"
 
 extern char inBackground;
-extern char hasAppearance;
 
 static pascal WindowPtr LastFloater(void);
 static pascal void WActivate(WindowPtr w);

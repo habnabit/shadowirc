@@ -1488,7 +1488,7 @@ pascal void OpenPreferencesWindow(short panelID)
 	ControlHandle ch;
 	MenuHandle mh;
 	GrafPtr gp;
-	ModalFilterUPP df = NewModalFilterProc(PrefsDialogFilter);
+	ModalFilterUPP df = NewModalFilterUPP(PrefsDialogFilter);
 	short rf = CurResFile();
 	char cancelPrefs = 0;
 	pPWClosedData pd;

@@ -59,7 +59,7 @@ pascal void Notify(char mark, Handle icon, Handle sound, ConstStr255Param s)
 	n->nmSound = sound;
 	n->nmStr = NewPString(s);
 	if(!nmResponseProc)
-		nmResponseProc = NewNMProc(NotifyReply);	
+		nmResponseProc = NewNMUPP(NotifyReply);	
 	n->nmResp = nmResponseProc;
 	n->nmRefCon = 0;
 	NMInstall(n);

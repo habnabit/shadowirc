@@ -641,10 +641,10 @@ pascal OSErr WEInstallTSMHandlers(void)
 	// the first time we're called, create routine descriptors for our Apple event handlers
 	if (_weUpdateActiveInputAreaHandler == nil)
 	{
-		_weUpdateActiveInputAreaHandler = NewAEEventHandlerProc((AEEventHandlerProcPtr) _WEHandleUpdateActiveInputArea);
-		_wePositionToOffsetHandler = NewAEEventHandlerProc((AEEventHandlerProcPtr) _WEHandlePositionToOffset);
-		_weOffsetToPositionHandler = NewAEEventHandlerProc((AEEventHandlerProcPtr) _WEHandleOffsetToPosition);
-		_weGetTextHandler = NewAEEventHandlerProc((AEEventHandlerProcPtr) _WEHandleGetText);
+		_weUpdateActiveInputAreaHandler = NewAEEventHandlerUPP((AEEventHandlerProcPtr) _WEHandleUpdateActiveInputArea);
+		_wePositionToOffsetHandler = NewAEEventHandlerUPP((AEEventHandlerProcPtr) _WEHandlePositionToOffset);
+		_weOffsetToPositionHandler = NewAEEventHandlerUPP((AEEventHandlerProcPtr) _WEHandleOffsetToPosition);
+		_weGetTextHandler = NewAEEventHandlerUPP((AEEventHandlerProcPtr) _WEHandleGetText);
 	}
 
 	// install Apple Event handlers to be used by Text Service components

@@ -329,7 +329,7 @@ INLINE void DoExport(SLServHand servers[])
 	{
 		NavReplyRecord		theReply;
 		NavDialogOptions	dialogOptions;
-		NavEventUPP			eventUPP = NewNavEventProc(NavDialogFilter);
+		NavEventUPP			eventUPP = NewNavEventUPP(NavDialogFilter);
 		OSErr err;
 		AEKeyword key;
 		
@@ -625,7 +625,7 @@ pascal void DoServerSelect(ServerListServiceData *p)
 	short curServ;
 	char save = 0;
 	SLServHand *servers = 0;
-	ModalFilterUPP df = NewModalFilterProc(ServerDialogFilter);
+	ModalFilterUPP df = NewModalFilterUPP(ServerDialogFilter);
 	short rf = CurResFile();
 	DrawingState ts;
 	WindowPtr w;

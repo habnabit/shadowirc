@@ -21,7 +21,6 @@
 
 #define linkfor(list, init) for((list) = (init); (list); (list)=(list)->next)
 
-#pragma a6frames off
 #pragma macsbug off
 #pragma traceback off
 #pragma dont_inline off
@@ -66,7 +65,6 @@ inline char inupc(char c)
 
 #define pstrcmpX(str, l, l2) (*(long*)str == (((long)l << 24L) + l2))
 
-#pragma a6frames reset
 #pragma macsbug reset
 #pragma traceback reset
 #pragma dont_inline reset
