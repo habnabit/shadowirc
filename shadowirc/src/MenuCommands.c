@@ -418,10 +418,7 @@ pascal void HitEditMenu(short item)
 				break;
 			
 			case 7: //select all
-				if(!iwFront)
-				{
-					WESetSelection(0, 0x7FFFFFF, we);
-				}
+				WESetSelection(0, 0x7FFFFFF, we);
 				break;
 		}
 	}
