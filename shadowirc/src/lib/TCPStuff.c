@@ -46,7 +46,6 @@
 #include <pthread.h>
 
 #include "TCPStuff.h"
-#include "connections.h"
 #include "TCP.h"
 
 #include "inline.h"
