@@ -22,8 +22,6 @@
 #ifndef _CommandsMenu
 #define _CommandsMenu
 
-#pragma internal on
 pascal void HitCommandsMenu(short item, short modifiers);
-#pragma internal reset
 
 #endif

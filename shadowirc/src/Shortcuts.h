@@ -22,18 +22,11 @@
 #ifndef _Shortcuts_
 #define _Shortcuts_
 
-#pragma lib_export on
-#pragma export on
 pascal void ProcessShortcutText(LongString *ls, short *cursorPos, short *endPos);
-#pragma export off
-#pragma lib_export off
 
-
-#pragma internal on
 pascal void getShortcutsDlg(void);
 pascal void ShortcutsMenuUpdate(void);
 
 pascal void ShortcutsMenu(short item);
 
-#pragma internal reset
 #endif

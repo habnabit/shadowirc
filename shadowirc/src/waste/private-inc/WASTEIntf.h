@@ -13,101 +13,7 @@
 
 //	Toolbox #includes
 
-#ifndef __CONDITIONALMACROS__
-#include <ConditionalMacros.h>
-#endif
-
-#ifndef UNIVERSAL_INTERFACES_VERSION
-#error "You need Universal Headers version 2.1 or newer to compile WASTE"
-#endif
-
-#ifndef __TYPES__
-#include <Types.h>
-#endif
-
-#ifndef __MIXEDMODE__
-#include <MixedMode.h>
-#endif
-
-#ifndef __CODEFRAGMENTS__
-#include <CodeFragments.h>
-#endif
-
-#ifndef __ERRORS__
-#include <Errors.h>
-#endif
-
-#ifndef __GESTALT__
-#include <Gestalt.h>
-#endif
-
-#ifndef __MEMORY__
-#include <Memory.h>
-#endif
-
-#ifndef __FONTS__
-#include <Fonts.h>
-#endif
-
-#ifndef __QUICKDRAWTEXT__
-#include <QuickdrawText.h>
-#endif
-
-#ifndef __QUICKDRAW__
-#include <Quickdraw.h>
-#endif
-
-#ifndef __QDOFFSCREEN__
-#include <QDOffscreen.h>
-#endif
-
-#ifndef __PALETTES__
-#include <Palettes.h>
-#endif
-
-#ifndef __TEXTEDIT__
-#include <TextEdit.h>
-#endif
-
-#ifndef __SCRAP__
-#include <Scrap.h>
-#endif
-
-#ifndef __SCRIPT__
-#include <Script.h>
-#endif
-
-#ifndef __TOOLUTILS__
-#include <ToolUtils.h>
-#endif
-
-#ifndef __TEXTUTILS__
-#include <TextUtils.h>
-#endif
-
-#ifndef __LOWMEM__
-#include <LowMem.h>
-#endif
-
-#ifndef __APPLEEVENTS__
-#include <AppleEvents.h>
-#endif
-
-#ifndef __AEREGISTRY__
-#include <AERegistry.h>
-#endif
-
-#ifndef __DRAG__
-#include <Drag.h>
-#endif
-
-#ifndef __TEXTSERVICES__
-#include <TextServices.h>
-#endif
-
-#ifndef __FIXMATH__
-#include <FixMath.h>
-#endif
+#include <Carbon/Carbon.h>
 
 //	ANSI #includes
 
@@ -557,16 +463,6 @@ enum
 	kDefaultObjectWidth = 32,	// default width for new objects
 	kAutoOrderingSize = 32		// size of stack-based format array used by _WESegmentLoop
 };
-
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #if PRAGMA_STRUCT_ALIGN
-  #pragma options align=mac68k
-  #endif
-#else
-  #if PRAGMA_ALIGN_SUPPORTED
-  #pragma options align=mac68k
-  #endif
-#endif
 
 typedef UInt16 WEStyleMode;
 typedef SInt8 WEAlignment;
@@ -1339,16 +1235,6 @@ struct FormatOrderData
 	WEHandle hWE;
 };
 
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #if PRAGMA_STRUCT_ALIGN
-  #pragma options align=reset
-  #endif
-#else
-  #if PRAGMA_ALIGN_SUPPORTED
-  #pragma options align=reset
-  #endif
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1552,7 +1438,9 @@ pascal OSErr _WESmartSetFont(WEStyleMode mode, const WETextStyle *ts, WEHandle h
 pascal OSErr _WEHiliteRangeArray(TextRangeArrayHandle hTray, WEHandle hWE);
 
 //	WELineLayout.c (private)
+/* CPC - Not defined
 INLINE pascal void _WERemoveLine(SInt32 lineIndex, WEPtr pWE); // Motorola 12-Nov-97
+*/
 pascal OSErr _WEInsertLine(SInt32 lineIndex, const WELineRec *pLine, WEPtr pWE);
 pascal void _WEBumpOrigin(SInt32 lineIndex, SInt32 deltaOrigin, WEPtr pWE);
 pascal SInt32 _WEFindLineBreak(SInt32 lineStart, WEHandle hWE);
@@ -1619,7 +1507,9 @@ pascal OSErr _WEAppendObject(Handle hSoup, const WERunInfo *info, SInt32 offset)
 pascal OSErr _WEPutScrapHandle(FlavorType dataFlavor, Handle dataHandle);
 
 //	WESelecting.c (private)
+/* CPC - Not defined
 INLINE pascal void _WEClearHiliteBit(void); // Motorola 9-Jun-97
+*/
 pascal SInt16 _WEGetContext(SInt32 offset, SInt32 *contextStart, SInt32 *contextEnd,
 						WEHandle hWE);
 pascal SInt16 _WEGetRestrictedContext(SInt32 offset, SInt32 *contextStart, SInt32 *contextEnd,

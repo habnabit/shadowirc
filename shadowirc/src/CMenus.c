@@ -41,84 +41,11 @@
 #include "IRCInput.h"
 #include "MenuCommands.h"
 
-typedef enum menuCommand {
-	mcNull,
-	mcCloseWindow,
-	mcCopy,
-	mcCopyIL,
-	mcClear,
-	mcLog,
-	mcSaveText,
-	mcConnect,
-	mcTextSave,
-	mcTextSaveAs,
-	mcPlugin,
-	mcSubmenu,
-	
-	mcILCut,
-	mcILCopy,
-	mcILPaste,
-	mcILClear
-} menuCommand;
-
-typedef struct CMItem {
-	MenuHandle m;
-	long key;
-	plugsPtr pluginRef;
-	short mid;
-	short command;
-} CMItem;
-
-typedef struct CMItemList {
-	long numItems;
-	CMItem list[1];
-} CMItemList, *CMItemListP, **CMItemListH;
-
-enum cmType {
-	cmMW = 'cmmw',
-	cmInputline = 'cmil',
-	cmPlugin = 'cmpl'
-};
-
-typedef struct cmmwData {
-	long type;
-	
-	WindowPtr window;
-	MWPtr mw;
-	mwPanePtr pane;
-
-	Point where;
-	
-	long s0, s1;
-	char noSelection;
-	char oneWord;
-short unused;
-	Str255 theWord;
-	
-	long id;
-	short menuID;
-	short popupsMenuID;
-	
-	MenuHandle m;
-	MenuHandle colorMenu;
-	CMItemListH items;
-} cmmwData, *cmmwDataPtr;
-
-static Byte gCMCursor[] = {
-				0x00, 0x00, 0x40, 0x00, 0x60, 0x00, 0x70, 0x00, 0x78, 0x00,
-				0x7C, 0x00, 0x7E, 0x00, 0x7F, 0x7E, 0x7F, 0xFE, 0x7C, 0x42,
-				0x6C, 0x7E, 0x46, 0x42, 0x06, 0x7E, 0x03, 0x42, 0x03, 0x7E,
-				0x00, 0x00, 0xC0, 0x00, 0xE0, 0x00, 0xF0, 0x00, 0xF8, 0x00,
-				0xFC, 0x00, 0xFE, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-				0xFF, 0xFF, 0xFF, 0xFF, 0xEF, 0xFF, 0xCF, 0xFF, 0x87, 0xFF,
-				0x07, 0xFF, 0x03, 0xFF, 0x00, 0x01, 0x00, 0x01};
-
 static char gCMCursorOn = 0;
 
 #define kControlKey1					0x3B
 #define kControlKey2					0x3E
 
-#pragma internal on
 static pascal void _CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key, short *id, MenuHandle *m);
 static pascal void CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key);
 inline void CMILDelete(cmmwData *d, short item);
@@ -158,47 +85,25 @@ pascal void CMSetCursor(void)
 	if(!gCMCursorOn && ctrlDown)
 	{
 		gCMCursorOn = 1;
-		if(hasAppearance11)
-			SetThemeCursor(kThemeContextualMenuArrowCursor);
-		else
-			SetCursor((CursPtr)gCMCursor);
+		SetThemeCursor(kThemeContextualMenuArrowCursor);
 	}
 	else if(gCMCursorOn && !ctrlDown)
 	{
 		gCMCursorOn = 0;
-		if(hasAppearance11)
-			SetThemeCursor(kThemeArrowCursor);
-#if !TARGET_CARBON
-		else
-			SetCursor(&qd.arrow);
-#endif
+		SetThemeCursor(kThemeArrowCursor);
 	}
 }
 
 static pascal char MyIsShowCMClick(const EventRecord *e)
 {
-	if(hasCM)
-		return IsShowContextualMenuClick(e);
-	else
-		return ((e->what==mouseDown) && (e->modifiers&controlKey));
+	return IsShowContextualMenuClick(e);
 }
 
 inline OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBalloonAvailable, UInt32 inHelpType, ConstStr255Param inHelpItemString, const AEDesc* inSelection, UInt32* outUserSelectionType, SInt16* outMenuID, UInt16* outMenuItem)
 {
 	gCMCursorOn = 0;
 	
-	if(hasCM)
-		return ContextualMenuSelect(inMenuRef, inGlobalLocation, inBalloonAvailable, inHelpType, inHelpItemString, inSelection, (unsigned long*)outUserSelectionType, outMenuID, outMenuItem);
-	else
-	{
-		long out;
-		
-		out=PopUpMenuSelect(inMenuRef, inGlobalLocation.v, inGlobalLocation.h, 0);
-		outUserSelectionType=0;
-		*outMenuID=*(short*)&out;
-		*outMenuItem=out&0x0000FFFF;
-		return 0;
-	}
+	return ContextualMenuSelect(inMenuRef, inGlobalLocation, inBalloonAvailable, inHelpType, inHelpItemString, inSelection, (unsigned long*)outUserSelectionType, outMenuID, outMenuItem);
 }
 
 pascal char CMClick(WindowPtr w, const EventRecord *e)
@@ -222,7 +127,6 @@ pascal char CMClick(WindowPtr w, const EventRecord *e)
 
 #pragma mark -
 
-#pragma internal reset
 pascal void CMAdd(cmmwData *d, ConstStr255Param item, long key)
 {
 	_CMILAdd(d, item, mcPlugin, key, 0, 0);
@@ -251,8 +155,6 @@ pascal void CMSetCheckmark(cmmwData *d, long key, char checked)
 			}
 	}
 }
-
-#pragma internal on
 
 static pascal int CMCountItems(cmmwData *d)
 {
@@ -816,10 +718,12 @@ static pascal char CMMW(MWPtr mw, Point where, char optCM)
 			
 		case 203: //color styles
 			if(outMenuItem > 0)
+			{
 				if(outMenuItem == 1)
 					mw->colorMethod = cmNone;
 				else
 					mw->colorMethod = outMenuItem - 2;
+			}
 			break;
 		
 		default: //plugin popup
@@ -1005,9 +909,6 @@ pascal char DetermineCM(WindowPtr w, Point where, char optCM)
 		ret = CMIW(where);
 	else
 		ret = CMPlugin(w, where);
-	
-	if(!hasCM)
-		CMSetCursor();
 	
 	return ret;
 }

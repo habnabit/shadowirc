@@ -22,12 +22,8 @@
 #ifndef _MyMemory_
 #define _MyMemory_
 
-#pragma internal on
-
-pascal void MZero(void* p, long size);
-pascal void MFill(void* p, long size, short val);
-pascal void MFillLong(void* p, long size, long val);
-
-#pragma internal reset
+void MZero(void* p, long size);
+void MFill(void* p, long size, short val);
+void MFillLong(void* p, long size, long val);
 
 #endif

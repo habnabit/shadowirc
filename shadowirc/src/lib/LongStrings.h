@@ -22,11 +22,7 @@
 #ifndef _LongStrings
 #define maxLSlen 600
 
-#if TARGET_CARBON
-#ifndef __MACTYPES__
-#include <MacTypes.h>
-#endif
-#endif
+#include <Carbon/Carbon.h>
 
 typedef struct LongString
 {
@@ -40,9 +36,6 @@ extern "C" {
 #endif
 
 pascal void LSDupe(const LongString * const l1, LongString *l2);
-
-#pragma lib_export on
-#pragma export on
 
 pascal char LSCmp(const LongString *ls1, const LongString *ls2);
 pascal char LSCaseCmp(const LongString *ls1, const LongString *ls2);
@@ -74,15 +67,11 @@ pascal void LSGetIndString(LongString *ls, short id, short num);
 pascal OSErr LSParamString(LongString *ls, ConstStr255Param str, ConstStr255Param r0, ConstStr255Param r1, ConstStr255Param r2, ConstStr255Param r3);
 pascal OSErr LSParamLS(LongString *ls, ConstStr255Param r0, ConstStr255Param r1, ConstStr255Param r2, ConstStr255Param r3);
 
-#pragma export off
-#pragma lib_export off
-
 #ifdef __cplusplus
 }
 #endif
 
 
-#pragma internal on
 pascal void LSNextArgIRC(LongString *ls, StringPtr arg);
 pascal void LSStrCat4(LongString *out, ConstStr255Param s1, ConstStr255Param s2, ConstStr255Param s3, ConstStr255Param s4);
 pascal void LSConcatStrAndStrAndLS(ConstStr255Param s1, ConstStr255Param s2, const LongString *ls, LongString *out);
@@ -93,8 +82,6 @@ pascal void LSConcatStrAndStrAndLS(ConstStr255Param s1, ConstStr255Param s2, con
 #define LSAppend4(ls,lo){(ls).len+=4;*(long*)&(ls).data[(ls).len-3]=lo;}
 
 #define LSMakeStr(ls) {if((ls).len>=255) (ls).data[0]=255; else (ls).data[0]=(ls).len;}
-
-#pragma internal reset
 
 #define _LongStrings
 #endif

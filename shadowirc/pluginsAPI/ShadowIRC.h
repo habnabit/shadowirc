@@ -1,6 +1,6 @@
 /*	ShadowIRC Plugins Header File
-		Version 1.2d1
-		й John Bafford 1997-2001. All Rights Reserved.
+		Version 2.0
+		й John Bafford 1997-2002. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
 		
@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x01020001
+#define _ShadowIRC_API_Version_ 0x02000001
 
 #pragma mark еее ShadowIRC Message Definitions
 /*	------------------------------------------------------------------------------------------
@@ -2424,119 +2424,6 @@ pascal void GetInputLine(LongString *line);
 pascal void SetInputLine(LongString *ls);
 /*	Sets the text in the input line.
 		Input:	ls - LongString for inputline.
-		Output:	none
-*/
-
-
-#pragma mark е Smart Scroll
-/*	------------------------------------------------------------------------------------------
-		Smart Scroll Interfaces
-		
-		Use these functions to make your scrollbars Smart Scroll-aware. You ONLY need to do this for
-		non-Message Windows your plugin creates. If Smart Scroll is not installed, these functions do nothing.
-		You don't have to check for Smart Scroll.
-		
-		To use SmartScroll on with PPC plugins, you must include the SmartScrollAPI PPC.lib library, because
-		ShadowIRC can't export those functions. 68k plugins can still use these functions without the
-		library.
-		------------------------------------------------------------------------------------------
-*/
-
-#if !__POWERPC__
-
-pascal void SetSmartScrollInfo(ControlRef theScrollBar, long amountVisible , long amountTotal);
-/*	Sets the Smart Scroll information for a scrollbar.
-		Input:	theScrollBar - the scrollbar
-					amountVisible - number of whatevers visible in the window
-					amountTotal - total number of whatevers in the window
-		Output:	none
-*/
-
-pascal void SetSmartScrollProp(ControlRef theScrollBar, Fract proportion);
-/*	Sets the Smart Scroll information for a scrollbar.
-		Input:	theScrollBar - the scrollbar
-					proportion - a fraction representing the amount visible divided by the amount total.
-		Output:	none
-*/
-
-pascal Fract GetSmartScrollProp(ControlRef theScrollBar);
-/*	Gets the last set Smart Scroll information for a scrollbar.
-		Input:	theScrollBar - the scrollbar
-		Output:	return value: fraction representing the amount visible divided by the amount total.
-*/
-#endif
-
-#pragma mark е Long Controls
-/*	------------------------------------------------------------------------------------------
-		Long Control Interfaces
-		
-		These functions are intended to aid development of scrollbars whose values may exceed the maximum
-		imposed by the Control Manager, but may be used with any control. Provides long values for the control's
-		value, minimum, and maximum. The control, of course, still has access to it's minimum, maximum, and
-		value, as do you, but these are here if you need larger numbers.
-		
-		Notes:	е Do not modify the control's refCon, since this is where the information is stored.
-					е Make sure you call LCAttach() before attempting to use these functions.
-					е Make sure you call LCDetach() on the control before you DisposeControl() it.
-					е If Appearance Manager 1.1 is present, it is preferable that you use the 32-bit control
-						accessors.
-		------------------------------------------------------------------------------------------
-*/
-
-OSErr LCAttach(ControlRef inControl);
-/*	Attaches a LongControl reference to the control.
-		Input:	inControl - the control
-		Output:	return value: an error
-*/
-
-void LCDetach(ControlRef inControl);
-/*	Detaches and disposes of a LongControl reference.
-		Input:	inControl - the control
-		Output:	none
-*/
-
-void LCSetValue(ControlRef inControl, SInt32 inValue);
-/*	Sets the long value of the control
-		Input:	inControl - the control
-					inValue - the value
-		Output:	none
-*/
-
-void LCSetMin(ControlRef inControl, SInt32 inValue);
-/*	Sets the long minimum of the control.
-		Input:	inControl - the control
-					inValue - the minimum
-		Output:	none
-*/
-
-void LCSetMax(ControlRef inControl, SInt32 inValue);
-/*	Sets the long maximum of the control.
-		Input:	inControl - the control
-					inValue - the maximum
-		Output:	none
-*/
-
-SInt32 LCGetValue(ControlRef inControl);
-/*	Gets the long value of the control.
-		Input:	inControl - the control
-		Output:	return value: the long value
-*/
-
-SInt32 LCGetMin(ControlRef inControl);
-/*	Gets the long minimum of the control.
-		Input:	inControl - the control
-		Output:	return value: the long minimum
-*/
-
-SInt32 LCGetMax(ControlRef inControl);
-/*	Gets the long maximum of the control.
-		Input:	inControl - the control
-		Output:	return value: the long maximum
-*/
-
-void LCSynch(ControlRef inControl);
-/*
-		Input:	inControl - the control
 		Output:	none
 */
 

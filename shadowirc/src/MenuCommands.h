@@ -19,8 +19,6 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#pragma internal on
-
 extern UserItemUPP AboutDlgVersionFilter;
 extern MenuHandle gAppleMenu, gFileMenu, gShortcutsMenu, gWindowMenu;
 
@@ -34,10 +32,4 @@ pascal void MenuBarClick(const EventRecord *e);
 
 pascal void MenuInit(void);
 
-#pragma internal reset
-
-#pragma lib_export on
-#pragma export on
 pascal void WindowClose(WindowPtr wp);
-#pragma export reset
-#pragma lib_export reset

@@ -38,8 +38,6 @@ struct notifyRec {
 	CONST char ISON;						//True if we're doing this for an /ison
 };
 
-#pragma lib_export on
-#pragma export on
 pascal void DoNotify(linkPtr link, LongString *parse);
 pascal void RunNotify(void);
 
@@ -47,15 +45,10 @@ pascal void ListNotify(linkPtr link);
 pascal notifyPtr findNotify(linkPtr link, ConstStr255Param nick);
 pascal void deleteNotify(linkPtr link, ConstStr255Param nick);
 pascal notifyPtr addNotify(linkPtr link, ConstStr63Param nick, char ison);
-#pragma export off
-#pragma lib_export off
 
-
-#pragma internal on
 pascal void killISONs(linkPtr link);
 pascal void ProcessISON(linkPtr link, LongString *rest);
 pascal void HandleISON(linkPtr link, LongString *rest);
-#pragma internal reset
 
 #undef CONST
 

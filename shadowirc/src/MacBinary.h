@@ -56,8 +56,6 @@ typedef struct MBIIHeader {
 	short processorID;
 } MBIIHeader, *MBIIHeaderPtr;
 
-#pragma internal on
 pascal short ValidateMBHeader(MBIIHeaderPtr header, char handle2plus);
 pascal void CatInfo2MBHeader(CInfoPBRec *pb, MBIIHeaderPtr header);
-#pragma internal reset
 #endif

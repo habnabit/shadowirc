@@ -20,7 +20,7 @@
 */
 
 #define __INPUTLINE__
-#include <Appearance.h>
+#include <Carbon/Carbon.h>
 #include "WASTE.h"
 
 #include "StringList.h"
@@ -49,7 +49,6 @@ inputLineRec inputLine;
 
 char noFloatingInput = 0;
 
-#pragma internal on
 inline void IWInternalDraw(iwWidgetPtr o);
 
 static pascal char _ILInsertLine(WEReference il, LongString *ls, char select);
@@ -58,7 +57,6 @@ static pascal char _ILGetLine(WEReference il, LongString *ls);
 static pascal long _ILGetHpos(MWPtr mw);
 static pascal CharsHandle _ILGetHist(MWPtr mw);
 static pascal void _ILSetHpos(MWPtr mw, long hp);
-#pragma internal reset
 
 pascal void IWRecalculateRects(void)
 {
@@ -241,7 +239,7 @@ pascal void IWGrow(const EventRecord *e)
 	ii=GrowWindow(inputLine.w, e->where, &r);
 	if(ii)
 	{
-		r=WGetBBox(inputLine.w);
+		WGetBBox(inputLine.w, &r);
 		r.right=r.left+(ii&0x0000FFFF);
 		r.bottom=r.top+*(short*)&ii;
 		
@@ -264,7 +262,8 @@ pascal void IWGrow(const EventRecord *e)
 		WESetDestRect(&lr, il);
 		WESetViewRect(&lr, il);
 		WECalText(il);
-		InvalWindowRect(inputLine.w, GetPortBounds(GetWindowPort(inputLine.w), 0));
+		GetPortBounds(GetWindowPort(inputLine.w), &r);
+		InvalWindowRect(inputLine.w, &r);
 		SetPort(gp);
 		IWRecalculateRects();
 	}
@@ -307,6 +306,9 @@ pascal void OpenInputLine()
 		inputLine.w= WCreate(&mainPrefs->inputLoc, s, kWindowFloatGrowProc, 0, 0, true);
 		if(inputLine.w)
 		{
+            // Get rid of the close box
+            ChangeWindowAttributes(inputLine.w, NULL, kWindowCloseBoxAttribute);
+            
 			GetPort(&p0);
 			SetPortWindowPort(inputLine.w);
 			SetOrigin(-2,-2);
@@ -325,12 +327,10 @@ pascal void OpenInputLine()
 			offscreen=!RectInRgn(&mainPrefs->inputLoc, GetGrayRgn());
 			if(zeroPosition || offscreen)
 			{
+				BitMap screenBits;
 				short h,v;
-#if TARGET_CARBON
-				sb = GetQDGlobalsScreenBits(0)->bounds;
-#else
-				sb=qd.screenBits.bounds;
-#endif
+				GetQDGlobalsScreenBits(&screenBits);
+				sb = screenBits.bounds;
 				if(zeroPosition)
 				{
 					h=80* inputLine.fi.widMax+16;
@@ -344,7 +344,7 @@ pascal void OpenInputLine()
 				SizeWindow(inputLine.w, h, v, 1);
 				GetPortBounds(GetWindowPort(inputLine.w), &wr);
 				MoveWindow(inputLine.w, (sb.right-sb.left-wr.right+2)/2 -1, sb.bottom - wr.bottom-5, false);
-				mainPrefs->inputLoc=WGetBBox(inputLine.w);
+                WGetBBox(inputLine.w, &mainPrefs->inputLoc);
 				mainPrefs->inputLoc.right=mainPrefs->inputLoc.left+h;
 				mainPrefs->inputLoc.bottom=mainPrefs->inputLoc.top+v;
 			}
@@ -388,61 +388,20 @@ pascal void OpenInputLine()
 pascal long IWPopUpMenu(Point p, MenuHandle m, long curItem)
 {
 	long newItem;
-#if !TARGET_CARBON
-	short saveSysFont,saveSysSize;
-	GrafPtr gp, wmp;
-	short saveWMFont, saveWMSize;
-#endif
 
 	if(noFloatingInput)
 		return 0;
 
 	LocalToGlobal(&p);
 
-#if !TARGET_CARBON
-	if(!hasAppearance11)
-	{
-		GetPort(&gp);
-		GetWMgrPort(&wmp);
-		SetPort(wmp);
-		// Preflight LowMem 
-		saveSysFont = LMGetSysFontFam();
-		saveSysSize = LMGetSysFontSize();
-		LMSetSysFontFam(inputLine.fontnum);
-		LMSetSysFontSize(inputLine.fontsize);
-		LMSetLastSPExtra(-1);
-		saveWMFont=wmp->txFont;
-		saveWMSize=wmp->txSize;
-		TextFont(inputLine.fontnum);
-		TextSize(inputLine.fontsize);
-		CalcMenuSize(m);
-	}
-	else
-#endif
-	{
-		SetMenuFont(m, inputLine.fontnum, inputLine.fontsize);
-	}
+	SetMenuFont(m, inputLine.fontnum, inputLine.fontsize);
 
 	InsertMenu(m, -1);
 	newItem=PopUpMenuSelect(m, p.v, p.h, curItem);
 	
-#if !TARGET_CARBON
-	if(!hasAppearance11)
-	{
-		// restore system font 
-		LMSetSysFontFam(saveSysFont);
-		LMSetSysFontSize(saveSysSize);
-		LMSetLastSPExtra(-1);
-		TextFont(saveWMFont);
-		TextSize(saveWMSize);
-		SetPort(gp);
-	}
-#endif
-	
 	return newItem;
 }
 
-#pragma internal on
 inline void IWInternalDraw(iwWidgetPtr o)
 {
 	Str255 s;
@@ -455,7 +414,7 @@ inline void IWInternalDraw(iwWidgetPtr o)
 			channelPtr ch;
 			iwStatusObjectPtr stats = (iwStatusObjectPtr)o->data;
 			short strwid, curPos, maxPos = o->drawArea.right;
-			char boldedPopups = inputLine.statuslineFlags & kBoldedPopups == kBoldedPopups;
+			char boldedPopups = (inputLine.statuslineFlags & kBoldedPopups) == kBoldedPopups;
 			
 			link = CurrentTarget.link;
 			if(link==0)
@@ -663,8 +622,6 @@ inline void IWInternalDraw(iwWidgetPtr o)
 #endif
 	}
 }
-
-#pragma internal reset
 
 #pragma mark -
 
@@ -968,7 +925,7 @@ pascal void IWUnlock()
 		GetPort(&p0);
 
 		SetPortWindowPort(inputLine.w);
-		r=WGetBBox(inputLine.w);
+		WGetBBox(inputLine.w, &r);
 		GlobalToLocal((Point*)&r.bottom);
 
 		r.left = -2;
@@ -983,7 +940,7 @@ pascal void IWUnlock()
 
 pascal void UpdateStatusLine(void)
 {
-	static reentrant = 0;
+	static int reentrant = 0;
 	GrafPtr p0;
 	Rect r;
 	iwWidgetPtr o;
@@ -1003,7 +960,7 @@ pascal void UpdateStatusLine(void)
 	
 	SetPortWindowPort(inputLine.w);
 restart:
-	r=WGetBBox(inputLine.w);
+	WGetBBox(inputLine.w, &r);
 	GlobalToLocal((Point*)&r.bottom);
 
 	r.left = -2;
@@ -1053,7 +1010,6 @@ restart:
 	reentrant = 0;
 }
 
-#pragma internal on
 static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers);
 static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers)
 {

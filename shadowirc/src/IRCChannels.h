@@ -50,9 +50,6 @@ struct target {
 
 extern target CurrentTarget;
 
-#pragma lib_export on
-#pragma export on
-
 pascal void DoModeLWindow(channelPtr ch, LongString *ls);
 pascal void DoModeKWindow(channelPtr ch, LongString *ls);
 
@@ -71,11 +68,6 @@ pascal void DrawMWinStatus(MWPtr mw);
 #ifdef _MsgWindows_
 pascal void MWPart(MWPtr mw);
 
-#pragma export off
-#pragma lib_export off
-
-#pragma internal on
-
 pascal void SetTarget(MWPtr w, targetPtr targ);
 pascal void ChPart(MWPtr w);
 pascal void DoJoinSelWin(MWPtr w);
@@ -91,6 +83,5 @@ pascal void InvalTarget(targetPtr targ);
 
 pascal void CloseHelp(void);
 pascal void ShowHelp(short helpID);
-#pragma internal reset
 
 #endif

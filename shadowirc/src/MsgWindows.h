@@ -26,10 +26,7 @@
 #include "MasterTypes.h"
 #endif
 
-#if TARGET_CARBON
-#include <QuickDraw.h>
-#include <Controls.h>
-#endif
+#include <Carbon/Carbon.h>
 
 #define MW_MAGIC 'MWIN'
 
@@ -187,8 +184,6 @@ enum{
 	C_SIColor=8
 };
 
-#pragma lib_export on
-#pragma export on
 pascal char MWValid(MWPtr mw);
 pascal MWPtr NewPluginMWindow(ConstStr255Param title);
 pascal void MWSetDimen(MWPtr win, short left, short top, short width, short height);
@@ -204,11 +199,8 @@ pascal void MWMessage(MWPtr, const LongString *ls);
 #endif
 
 pascal MWPtr MWFromWindow(WindowPtr w);
-#pragma export off
-#pragma lib_export off
 
 pascal void MWVScrollTrack(ControlHandle vscr, short part);
-#pragma internal on
 
 extern MWPtr mwl;
 
@@ -247,7 +239,6 @@ pascal void MWStopLogging(MWPtr mw);
 pascal void MWStartLogging(MWPtr w);
 
 pascal void MWReposition(MWPtr win);
-#pragma internal off
 
 #undef CONST
 #endif

@@ -25,13 +25,10 @@
 #include "MsgBuffer.h"
 #include "Inline.h"
 
-#pragma internal on
 messageBufferPtr messagebuffers[10];
 messageBufferRec mblist[10];
 int mbnum;
 char mbInput = false;
-
-#pragma internal reset
 
 pascal messageBufferPtr MBFindNick(linkPtr link, ConstStr255Param nick)
 {
@@ -102,7 +99,6 @@ pascal void MBIdle(void)
 			}
 }
 
-#pragma internal on
 pascal void MBInit(void)
 {
 	int x;

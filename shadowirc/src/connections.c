@@ -163,7 +163,7 @@ pascal void deleteConnection(connectionPtr *c)
 	{
 		//If it's a DNS connection, we don't zap it.
 		if(cc->connType != connDNSIP && cc->connType != connDNSNAME)
-			AbortConnection(cc->private_socket);
+			ConnClose(cc);
 		cc->private_socket = 0;
 	}
 	
@@ -235,8 +235,8 @@ static pascal void ConnSetInputFunc(connectionPtr conn)
 		case connDCC:
 			conn->InputFunc = dccEvent;
 			break;
-		case connDNSIP:
 		case connDNSNAME:
+		case connDNSIP:
 			conn->InputFunc = dnsEvent;
 			break;
 		case connPLUGIN:
@@ -271,7 +271,7 @@ pascal connectionPtr newConnection(short connType)
 		}
 		else
 			c->connType=connType;
-		c->ip=0;
+		c->ip.s_addr=0;
 		c->name[0]=0;
 		c->port=0;
 		c->tryingToConnect=0;
@@ -288,7 +288,7 @@ pascal connectionPtr newConnection(short connType)
 		c->socksPort=0;
 		c->socksType=connType;
 		c->socksMethodVersion = c->socksMethod = 0;
-		c->ip2 = 0;
+		c->ip2.s_addr = 0;
 		
 		ConnSetInputFunc(c);
 	}
@@ -309,30 +309,15 @@ pascal void newIRCConnection(linkPtr link)
 	}
 }
 
-pascal connectionPtr ConnNewDNSIP(ConstStr255Param name)
+pascal connectionPtr ConnNewDNS(ConstStr255Param name, short type)
 {
-	connectionPtr c = newConnection(connDNSIP);
+	connectionPtr c = newConnection(type);
 	
 	if(c)
 	{
 		pstrcpy(name, c->name);
 		c->outgoing = 1;
 		FindAddress(&c->private_socket, c->name);
-	}
-	
-	return c;
-}
-
-pascal connectionPtr ConnNewDNSName(ConstStr255Param ip)
-{
-	connectionPtr c = newConnection(connDNSNAME);
-	
-	if(c)
-	{
-		pstrcpy(ip, c->name);
-		c->outgoing = 1;
-		c->ip = IPStringToLong(ip);
-		FindName(&c->private_socket, c->ip);
 	}
 	
 	return c;
@@ -350,7 +335,7 @@ pascal char IsLinkValid(linkPtr link)
 	return 0;
 }
 
-#pragma internal on
+
 
 pascal char ConnStartNetworking()
 {
@@ -468,7 +453,7 @@ pascal void ConnDeSOCKS(connectionPtr conn)
 	conn->connType = conn->socksType;
 	ConnSetInputFunc(conn);
 }
-#pragma internal reset
+
 #pragma mark -
 
 pascal connectionPtr pluginNewConnection(char textOrBinary)
@@ -479,15 +464,6 @@ pascal connectionPtr pluginNewConnection(char textOrBinary)
 	return c;
 }
 
-pascal void ConnAbort(connectionPtr conn)
-{
-	if(conn->private_socket)
-	{
-		AbortConnection(conn->private_socket);
-		conn->private_socket=0;
-	}
-}
-
 pascal void ConnClose(connectionPtr conn)
 {
 	if(conn->private_socket)
@@ -496,43 +472,39 @@ pascal void ConnClose(connectionPtr conn)
 
 pascal char ConnNewActive(connectionPtr c)
 {
-	return NewActiveConnection(&c->private_socket, 8192, 0, c->ip, c->port)==0;
+	return NewActiveConnection(&c->private_socket, c->ip, c->port)==0;
 }
 
-pascal char ConnNewPassive(connectionPtr c)
+pascal char ConnNewListen(connectionPtr c, int backlog)
 {
-	return NewPassiveConnection(&c->private_socket, 8192, c->port, c->ip, 0)==0;
+	return NewListenConnection(&c->private_socket, c->port, backlog)==0;
 }
 
 pascal char ConnNewPassiveBlankListener(connectionPtr c)
 {
-	return NewPassiveConnection(&c->private_socket, 8192, 0, 0, 0)==0;
+        /* XXX figure this shit out */
+	//return NewPassiveConnection(&c->private_socket, 8192, NULL, NULL, NULL)==0;
 }
 
-pascal OSErr ConnGetData(connectionPtr conn, Ptr d, short len)
+size_t ConnGetData(connectionPtr conn, Ptr d, size_t len)
 {
-	return TCPReceiveChars(GetConnectionTCPC(conn->private_socket), d, len);
+	return TCPReceiveChars(GetConnectionSocket(conn->private_socket), d, len);
 }
 
 
-pascal OSErr ConnGetUpTo(connectionPtr conn, char term, long timeout, Ptr readPtr, long readSize, long *readPos, char *gotterm)
+size_t ConnGetUntil(connectionPtr conn, Ptr d, char c, size_t len)
 {
-	return TCPReceiveUpTo(GetConnectionTCPC(conn->private_socket), term, timeout, readPtr, readSize, readPos, gotterm);
-}
-
-pascal long ConnCharsAvail(connectionPtr conn)
-{
-	return TCPCharsAvailable(GetConnectionTCPC(conn->private_socket));
+        return TCPReceiveUntil(GetConnectionSocket(conn->private_socket), d, c, len);
 }
 
 pascal unsigned short ConnGetLocalPort(connectionPtr conn)
 {
-	return TCPLocalPort(GetConnectionTCPC(conn->private_socket));
+	return TCPLocalPort(GetConnectionSocket(conn->private_socket));
 }
 
 pascal OSErr ConnSend(connectionPtr conn, const void* writePtr, short writeCount, char push)
 {
-	return TCPSendAsync(GetConnectionTCPC(conn->private_socket), writePtr, writeCount, push);
+	return TCPSendAsync(conn, writePtr, writeCount, push);
 }
 
 pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host)

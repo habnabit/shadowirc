@@ -21,11 +21,7 @@
 	Note: This code based on code by Peter N. Lewis.
 */
 
-#if TARGET_CARBON
-#include <Memory.h>
-#include <Resources.h>
-#include <Errors.h>
-#endif
+#include <Carbon/Carbon.h>
 
 #include "CalcCRC.h"
 

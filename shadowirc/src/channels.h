@@ -87,8 +87,8 @@ typedef struct Channel {
 
 extern long userNum;
 
-#pragma lib_export on
-#pragma export on
+extern char IsChannel(ConstStringPtr s);
+
 pascal bansP ChFindBan(channelPtr ch, ConstStr255Param n, char exceptionList);
 pascal bansP ChMatchBan(channelPtr ch, ConstStr255Param n, char exceptionList);
 pascal char ChGetBan(channelPtr ch, ConstStr255Param from, bansP *f, char exceptionList);
@@ -103,15 +103,10 @@ pascal UserListPtr ULFindUserName(channelPtr channel, ConstStr255Param nick);
 pascal char IsChannelValid(channelPtr c);
 pascal char IsUserValid(UserListPtr u);
 
-#pragma export off
-#pragma lib_export off
-
-#pragma internal on
 pascal UserListPtr ChFindUser(ConstStr255Param user);
 pascal void ChClear(channelPtr ch);
 pascal void ChDestroy(channelPtr ch);
 pascal channelPtr ChCreate(ConstStr255Param name, linkPtr link);
-#pragma internal reset
 
 #undef CONST
 #endif

@@ -22,17 +22,20 @@
 #ifndef _TCPStuff_
 #define _TCPStuff_
 
+#include <Carbon/Carbon.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include "MasterTypes.h" // connectionPtr
+
 typedef struct TCPConnection *TCPConnectionPtr;
 
-#pragma internal on
+OSErr IPGetMyIPAddr(unsigned long*);
 
-pascal OSErr IPGetMyIPAddr(unsigned long*);
+OSErr TCPSendAsync(connectionPtr conn, const void* writePtr, short writeCount, char push);
 
-pascal OSErr TCPSendAsync(TCPConnectionPtr conn, const void* writePtr, short writeCount, char push);
+short TCPLocalPort(TCPConnectionPtr conn);
+long TCPRemoteIP(TCPConnectionPtr conn);
 
-pascal long TCPCharsAvailable(TCPConnectionPtr conn);
-pascal short TCPLocalPort(TCPConnectionPtr conn);
-pascal long TCPRemoteIP(TCPConnectionPtr conn);
-
-#pragma internal reset
 #endif

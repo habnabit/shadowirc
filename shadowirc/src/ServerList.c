@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -19,7 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Navigation.h>
+#include <Carbon/Carbon.h>
 
 #include "IRCGlobals.h"
 #include "Utils.h"
@@ -183,7 +183,7 @@ pascal void SetOneServer(ListHandle servs, short curNet, short curServ, SLServHa
 
 pascal void fillServsList(ListHandle servs, short curNet, SLServHand servers[])
 {
-	SLNetworkPtr n = &netsR->nets[curNet];
+	//SLNetworkPtr n = &netsR->nets[curNet];
 	SLServHand sH = servers[curNet];
 	SLServPtr s;
 	int x;
@@ -325,72 +325,48 @@ INLINE void DoExport(SLServHand servers[])
 	FSSpec fs;
 	short refNum;
 	
-	if(hasNav)
+	NavReplyRecord		theReply;
+	NavDialogOptions	dialogOptions;
+	NavEventUPP			eventUPP = NewNavEventUPP(NavDialogFilter);
+	OSErr err;
+	AEKeyword key;
+	
+	NavGetDefaultDialogOptions(&dialogOptions);
+	dialogOptions.preferenceKey = kNavPutFile;
+	dialogOptions.dialogOptionFlags |= kNavNoTypePopup;
+	
+	pstrcpy("\pServerList Export", dialogOptions.savedFileName);
+	pstrcpy("\pShadowIRC", dialogOptions.clientName);
+	
+	err = NavPutFile(0, &theReply, &dialogOptions, eventUPP, 'TEXT', 'SIRC', 0);
+	
+	DisposeNavEventUPP(eventUPP);
+	
+	if(theReply.validRecord && !err)
 	{
-		NavReplyRecord		theReply;
-		NavDialogOptions	dialogOptions;
-		NavEventUPP			eventUPP = NewNavEventUPP(NavDialogFilter);
-		OSErr err;
-		AEKeyword key;
+		AEDesc resultDesc;	
+		resultDesc.dataHandle = 0L;
 		
-		NavGetDefaultDialogOptions(&dialogOptions);
-		dialogOptions.preferenceKey = kNavPutFile;
-		dialogOptions.dialogOptionFlags |= kNavNoTypePopup;
-		
-		pstrcpy("\pServerList Export", dialogOptions.savedFileName);
-		pstrcpy("\pShadowIRC", dialogOptions.clientName);
-		
-		err = NavPutFile(0, &theReply, &dialogOptions, eventUPP, 'TEXT', 'SIRC', 0);
-		
-		DisposeNavEventUPP(eventUPP);
-		
-		if(theReply.validRecord && !err)
+		// retrieve the returned selection:
+		if((err = AEGetNthDesc(&(theReply.selection),1,typeFSS, &key,&resultDesc)) == noErr)
 		{
-			AEDesc resultDesc;	
-			resultDesc.dataHandle = 0L;
-			
-			// retrieve the returned selection:
-			if((err = AEGetNthDesc(&(theReply.selection),1,typeFSS, &key,&resultDesc)) == noErr)
-			{
-				AEGetDescData(&resultDesc, &fs, sizeof(FSSpec));
+			AEGetDescData(&resultDesc, &fs, sizeof(FSSpec));
 
-				if(theReply.replacing)
-				{
-					if(FSpDelete(&fs)) //error
-					{
-						return;
-					}
-				}
-					
-				AEDisposeDesc(&resultDesc);
-			}
-
-			NavDisposeReply(&theReply);
-		}
-		else
-			return;
-	}
-#if !TARGET_CARBON
-	else
-	{
-		StandardFileReply sf;
-		StandardPutFile("\p", "\pServerList Export", &sf);
-		fs = sf.sfFile;
-		
-		if(sf.sfGood)
-		{
-			if(sf.sfReplacing)
+			if(theReply.replacing)
 			{
-				if(FSpDelete(&sf.sfFile)) //error
+				if(FSpDelete(&fs)) //error
 				{
 					return;
 				}
 			}
+				
+			AEDisposeDesc(&resultDesc);
 		}
-		else
-			return;
+
+		NavDisposeReply(&theReply);
 	}
-#endif
+	else
+		return;
 		
 	if(!FSpCreate(&fs, 'SIRC', 'TEXT', 0))
 	{

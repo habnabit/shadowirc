@@ -22,8 +22,6 @@
 #ifndef _textwindows_
 #define _textwindows_
 
-#pragma internal on
-
 pascal void TWStatusClick(mwWidgetPtr o, Point p);
 pascal void TWStatus(mwWidgetPtr o, char winActive);
 pascal MWPtr TWSelect(void);
@@ -32,7 +30,5 @@ pascal MWPtr NewTextWin(void);
 pascal char TWClose(MWPtr mw, char lowMem);
 pascal char TWCloseAll(void);
 pascal void TWSave(MWPtr mw, char saveas);
-
-#pragma internal reset
 
 #endif

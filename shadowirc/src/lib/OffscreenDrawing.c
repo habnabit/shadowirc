@@ -19,9 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#if TARGET_CARBON
-#include <QDOffscreen.h>
-#endif
+#include <Carbon/Carbon.h>
 
 #include "AppearanceHelp.h"
 #include "OffscreenDrawing.h"
@@ -73,9 +71,12 @@ pascal char StartDrawingOffscreen(Ptr *returnData, RectPtr bounds, Boolean copyD
 	err = NewGWorld(&data->offscreenWorld, 0, &globalRect, nil, nil, useTempMem);
 	if(err == noErr)
 	{
+		Rect portRect;
+		
 		GetForeColor(&oldFore);
 		GetBackColor(&oldBack);
-		data->oldOrigin = *(Point*)GetPortBounds(data->oldPort, 0);
+		GetPortBounds(data->oldPort, &portRect);
+		SetPt(&data->oldOrigin, portRect.left, portRect.top);
 		SetGWorld(data->offscreenWorld, nil);
 		SetOrigin(bounds->left, bounds->top);
 		RGBForeColor(&oldFore);
@@ -120,6 +121,7 @@ pascal void EndDrawingOffscreen(Ptr dataIn)
 	PixMapHandle	pm;
 	RGBColor oldFore, oldBack;
 	BufferDataPtr data = (BufferDataPtr)dataIn;
+	Rect portRect;
 	
 	if(data->offscreenWorld == nil)
 		return;
@@ -133,7 +135,8 @@ pascal void EndDrawingOffscreen(Ptr dataIn)
 	RGBBackColor(&white);
 
 	pm = GetGWorldPixMap(data->offscreenWorld);
-	CopyBits((BitMap*)*pm, (BitMap*)*GetPortPixMap(data->oldPort), GetPortBounds(data->offscreenWorld, 0), &data->bounds, srcCopy, NULL);
+	GetPortBounds(data->offscreenWorld, &portRect);
+	CopyBits((BitMap*)*pm, (BitMap*)*GetPortPixMap(data->oldPort), &portRect, &data->bounds, srcCopy, NULL);
 
 	RGBForeColor(&oldFore);
 	RGBBackColor(&oldBack);

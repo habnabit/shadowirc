@@ -19,8 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <AEDataModel.h>
-#include <Navigation.h>
+#include <Carbon/Carbon.h>
 
 #include "WASTE.h"
 #include "LongStrings.h"
@@ -35,7 +34,6 @@
 #include "IRCChannels.h"
 #include "IRCInput.h"
 
-#pragma internal on
 static long untitledNum = -1;
 
 static pascal MWPtr TWCreate(ConstStr255Param name);
@@ -85,8 +83,7 @@ static pascal MWPtr TWCreate(ConstStr255Param name)
 		iwFront=0;
 		WEFeatureFlag(weFUndo, weBitSet, mw->we);
 		
-		if(hasWM11)
-			SetWindowProxyCreatorAndType(mw->w, 'SIRC', 'TEXT', kOnSystemDisk);
+		SetWindowProxyCreatorAndType(mw->w, 'SIRC', 'TEXT', kOnSystemDisk);
 	}
 	
 	return mw;
@@ -173,11 +170,8 @@ pascal MWPtr TWOpen(const FSSpec *f)
 						WESetSelection(0, 0, mw->we);
 						WESelView(mw->we);
 						
-						if(hasWM11)
-						{
-							SetWindowProxyFSSpec(mw->w, f);
-							SetWindowModified(mw->w, false);
-						}
+						SetWindowProxyFSSpec(mw->w, f);
+						SetWindowModified(mw->w, false);
 						WSelect(mw->w);
 					}
 				}
@@ -233,75 +227,61 @@ pascal MWPtr TWSelect(void)
 {
 	MWPtr retval = 0;
 	
-	if(hasNav)
+	AEKeyword key;
+	NavReplyRecord		theReply;
+	NavDialogOptions	dialogOptions;
+	OSErr				theErr;
+	long				count;
+	FSSpec	finalFSSpec;	
+	AEDesc 	resultDesc;
+	FInfo	fileInfo;
+	long index;
+	NavTypeListHandle	openList;
+
+	theErr = NavGetDefaultDialogOptions(&dialogOptions);
+	dialogOptions.preferenceKey = kNavGetFile;
+	dialogOptions.dialogOptionFlags = kNNoTypePopup;
+	
+	pstrcpy("\pShadowIRC", dialogOptions.clientName);
+	openList = (NavTypeListHandle)GetResource('open', kOpenText);
+
+	theErr = NavGetFile(0, &theReply, &dialogOptions, StdNavFilter, 0, 0, openList, 0);
+	
+	if (openList != NULL)
+		ReleaseResource((Handle)openList);
+
+	if(theReply.validRecord && !theErr)
 	{
-		AEKeyword key;
-		NavReplyRecord		theReply;
-		NavDialogOptions	dialogOptions;
-		OSErr				theErr;
-		long				count;
-		FSSpec	finalFSSpec;	
-		AEDesc 	resultDesc;
-		FInfo	fileInfo;
-		long index;
-		NavTypeListHandle	openList;
-
-		theErr = NavGetDefaultDialogOptions(&dialogOptions);
-		dialogOptions.preferenceKey = kNavGetFile;
-		dialogOptions.dialogOptionFlags = kNNoTypePopup;
-		
-		pstrcpy("\pShadowIRC", dialogOptions.clientName);
-		openList = (NavTypeListHandle)GetResource('open', kOpenText);
-
-		theErr = NavGetFile(0, &theReply, &dialogOptions, StdNavFilter, 0, 0, openList, 0);
-		
-		if (openList != NULL)
-			ReleaseResource((Handle)openList);
-
-		if(theReply.validRecord && !theErr)
-		{
-			// we are ready to open the document(s), grab information about each file for opening:
-			count = 0;
-			theErr = AECountItems(&(theReply.selection),&count);
-			for (index=1;index<=count;index++)
-				{
-				resultDesc.dataHandle = 0L;
-				if ((theErr = AEGetNthDesc(&(theReply.selection),index,typeFSS, &key,&resultDesc)) == noErr)
-				{
-					AEGetDescData(&resultDesc, &finalFSSpec, sizeof(FSSpec));
-				
-					// decide if the doc we are opening is a 'PICT' or 'TEXT':
-					if ((theErr = FSpGetFInfo(&finalFSSpec,&fileInfo)) == noErr)
-						{
-						if (fileInfo.fdType == 'TEXT')
-							retval = TWOpen(&finalFSSpec);
-						else
-								{
-								// error:
-								// if we got this far, the document is a type we can't open and
-								// (most likely) built-in translation was turned off.
-								// You can alert the user that this returned selection or file spec
-								// needs translation.
-								}
-						}
-					theErr = AEDisposeDesc(&resultDesc);
+		// we are ready to open the document(s), grab information about each file for opening:
+		count = 0;
+		theErr = AECountItems(&(theReply.selection),&count);
+		for (index=1;index<=count;index++)
+			{
+			resultDesc.dataHandle = 0L;
+			if ((theErr = AEGetNthDesc(&(theReply.selection),index,typeFSS, &key,&resultDesc)) == noErr)
+			{
+				AEGetDescData(&resultDesc, &finalFSSpec, sizeof(FSSpec));
+			
+				// decide if the doc we are opening is a 'PICT' or 'TEXT':
+				if ((theErr = FSpGetFInfo(&finalFSSpec,&fileInfo)) == noErr)
+					{
+					if (fileInfo.fdType == 'TEXT')
+						retval = TWOpen(&finalFSSpec);
+					else
+							{
+							// error:
+							// if we got this far, the document is a type we can't open and
+							// (most likely) built-in translation was turned off.
+							// You can alert the user that this returned selection or file spec
+							// needs translation.
+							}
 					}
+				theErr = AEDisposeDesc(&resultDesc);
 				}
-		}
-		theErr = NavDisposeReply(&theReply);	// clean up after ourselves	
+			}
 	}
-#if !TARGET_CARBON
-	else
-	{
-		StandardFileReply sf;
-		OSType tt='TEXT';
-
-		StandardGetFile(0, 1, &tt, &sf);
-
-		if(sf.sfGood)
-			retval = TWOpen(&sf.sfFile);
-	}
-#endif
+	theErr = NavDisposeReply(&theReply);	// clean up after ourselves	
+	
 	return retval;
 }
 
@@ -447,11 +427,8 @@ pascal void TWSave(MWPtr mw, char saveas)
 		FSWrite(ref, &textlen, *text);
 		HSetState(text, hstate);
 		
-		if(hasWM11)
-		{
-			SetWindowProxyFSSpec(mw->w, &f);
-			SetWindowModified(mw->w, false);
-		}
+		SetWindowProxyFSSpec(mw->w, &f);
+		SetWindowModified(mw->w, false);
 
 		if(saveas)
 		{

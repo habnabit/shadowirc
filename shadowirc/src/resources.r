@@ -19,8 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include "Types.r"
-#include "AEUserTermTypes.r"
+#include <Carbon/Carbon.r>
 
 resource 'open' (300, purgeable)
 {

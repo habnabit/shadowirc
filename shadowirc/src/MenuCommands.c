@@ -47,7 +47,6 @@
 
 MenuHandle gAppleMenu, gEditMenu, gShortcutsMenu, gWindowMenu;
 static MenuHandle gFileMenu, gFontsMenu;
-static short applMItems;
 static short gFontSizeOtherItem;
 
 UserItemUPP AboutDlgVersionFilter;
@@ -66,11 +65,7 @@ static pascal void MenuAppleURL(short item);
 static pascal void HitFileMenu(int item);
 static pascal void CloseFrontWindow(void);
 
-inline void FontsMenuInit(void);
-
-#pragma internal on
-
-#pragma dont_inline off
+void FontsMenuInit(void);
 
 static pascal char _strncmp(const char *s1, const char *s2, unsigned long len)
 {
@@ -130,8 +125,6 @@ static pascal long FindText(Handle t, long start, Str255 searchFor, char caseSen
 
 	return -1;
 }
-
-#pragma dont_inline reset
 
 static struct FindInformation {
 	Str255 searchFor;
@@ -337,39 +330,24 @@ static pascal void DoTileWindows(void)
 	if(w)
 	{
 		RgnHandle cr, sr;
-		RectPtr crr, srr;
+		Rect crr, srr;
 		
-		if(hasAppearance11)
-		{
-			cr = NewRgn();
-			sr = NewRgn();
+		cr = NewRgn();
+		sr = NewRgn();
 			
-			GetWindowRegion(w, kWindowContentRgn, cr);
-			GetWindowRegion(w, kWindowStructureRgn, sr);
-			crr = GetRegionBounds(cr, 0);
-			srr = GetRegionBounds(sr, 0);
-		}
-#if !TARGET_CARBON
-		else
-		{
-			WindowPeek wp = (WindowPeek)w;
+		GetWindowRegion(w, kWindowContentRgn, cr);
+		GetWindowRegion(w, kWindowStructureRgn, sr);
+		GetRegionBounds(cr, &crr);
+		GetRegionBounds(sr, &srr);
 
-			crr = &(**wp->contRgn).rgnBBox;
-			srr = &(**wp->strucRgn).rgnBBox;
-		}
-#endif
+		windowTopHeight = crr.top - srr.top;
+		windowBotHeight = srr.bottom - crr.bottom;
 
-		windowTopHeight = crr->top - srr->top;
-		windowBotHeight = srr->bottom - crr->bottom;
+		windowLeftWid = crr.left - srr.left;
+		windowRightWid = srr.right - crr.right;
 
-		windowLeftWid = crr->left - srr->left;
-		windowRightWid = srr->right - crr->right;
-
-		if(hasAppearance11)
-		{
-			DisposeRgn(cr);
-			DisposeRgn(sr);
-		}
+		DisposeRgn(cr);
+		DisposeRgn(sr);
 	}
 	
 	while(w)
@@ -385,12 +363,11 @@ static pascal void DoTileWindows(void)
 		short totHeight;
 		Rect r;
 		short mbarHeight = GetMBarHeight();
+		BitMap screenBits;
 		Rect sb;
-#if TARGET_CARBON
-		sb = GetQDGlobalsScreenBits(0)->bounds;
-#else
-		sb=qd.screenBits.bounds;
-#endif
+		
+		GetQDGlobalsScreenBits(&screenBits);
+		sb = screenBits.bounds;
 
 		SetRect(&sb, -sb.left, -sb.top + mbarHeight + windowTopHeight, sb.right - sb.left, sb.bottom - sb.top - 35);
 		totHeight = sb.bottom - sb.top;
@@ -860,16 +837,6 @@ pascal void DoMenuEvent(long menuitem, const EventRecord *e)
 			case appleMenu:
 				if(itemNum==1)
 					DoAbout();
-			#if !TARGET_CARBON
-				else
-					if(itemNum>applMItems)
-					{
-						Str255 s;
-						
-						GetMenuItemText(gAppleMenu, itemNum, s);
-						OpenDeskAcc(s);
-					}
-			#endif
 				break;
 			
 			case FileMenu:
@@ -914,8 +881,8 @@ pascal void DoMenuEvent(long menuitem, const EventRecord *e)
 
 pascal void MenuBarClick(const EventRecord *e)
 {
-	static previousFontCheck = 0;
-	static previousSizeCheck = 0;
+	static int previousFontCheck = 0;
+	static int previousSizeCheck = 0;
 	Str255 s, s2;
 	MenuHandle m;
 	int x, y;
@@ -992,7 +959,7 @@ pascal void MenuBarClick(const EventRecord *e)
 #pragma mark -
 
 
-inline void FontsMenuInit(void)
+void FontsMenuInit(void)
 {
 	if(mainPrefs->noFontsMenu)
 	{
@@ -1012,17 +979,36 @@ inline void FontsMenuInit(void)
 pascal void MenuInit(void)
 {
 	MenuHandle m;
-	
-	SetMenuBar(GetNewMBar(menuBar));
+	IBNibRef mainNibRef;
+
+	if((CreateNibReference(CFSTR("main"), &mainNibRef) == noErr) && (SetMenuBarFromNib(mainNibRef, CFSTR("MenuBar")) == noErr))
+	{
+		DisposeNibReference(mainNibRef);
+	}
+	else
+	{
+		fprintf(stderr, "Could not create menu bar.\n");
+		fflush(stderr);
+		ExitToShell();
+	}
+
 	gAppleMenu = m = GetMenuHandle(appleMenu);
-	applMItems=CountMenuItems(m);
-#if !TARGET_CARBON
-	AppendResMenu(m, 'DRVR');
-#endif
-	
 	gEditMenu = GetMenuHandle(EditMenu);
 	gFileMenu = GetMenuHandle(FileMenu);
 	FontsMenuInit();
 	gShortcutsMenu = GetMenuHandle(shortcutsMenu);
 	gWindowMenu = GetMenuHandle(windowMenu);
+
+	if(hasAquaMenuMgr)
+	{
+		// Enable the Application menu Preferences... item
+		EnableMenuCommand(NULL, kHICommandPreferences);
+
+		// Delete the Edit menu Preferences... item
+		DeleteMenuItem(gEditMenu, 12); // Preferences... item
+		DeleteMenuItem(gEditMenu, 11); // Separator above Preferences item
+
+		// Delete the Quit item from File since it's under the Application menu
+		DeleteMenuItem(gFileMenu, 9); // Quit menu item
+	}
 }

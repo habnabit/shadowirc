@@ -22,15 +22,11 @@
 #ifndef _ApplBase_
 #define _ApplBase_
 
-#if TARGET_CARBON
-#include <Dialogs.h>
-#endif
+#include <Carbon/Carbon.h>
 
 #ifndef _LongStrings
 #include "LongStrings.h"
 #endif
-
-#pragma internal on
 
 extern WindowPtr ContextWindow;
 
@@ -46,12 +42,6 @@ pascal void doNetworkCheck(void);
 
 pascal void UpdateWindowPosition(WindowPtr win);
 
-#pragma internal reset
-
-#pragma lib_export on
-#pragma export on
 pascal OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel);
-#pragma export reset
-#pragma lib_export reset
 
 #endif

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -24,12 +24,10 @@
 #include <TextUtils.h>
 #endif
 
-#include "LongStrings.h"
 #include <stdarg.h>
 
-#pragma dont_inline off
-
-#pragma optimization_level 4
+#include "LongStrings.h"
+#include "inline.h"
 
 pascal void LSDupe(const LongString * const l1, LongString *l2)
 {
@@ -209,6 +207,7 @@ asm pascal char LSCmp(register const LongString *ls1, register const LongString 
 }
 #endif
 
+/*
 inline char inupc(char c);
 inline char inupc(char c)
 {
@@ -216,6 +215,7 @@ inline char inupc(char c)
 		c-=32;
 	return c;
 }
+*/
 
 #if !__POWERPC__
 pascal char LSCaseCmp(const LongString *ls1, const LongString *ls2)
@@ -781,7 +781,7 @@ void LSStrCat(short n,LongString *out,...)
 	StringPtr cur;
 	Ptr dest;
 	
-	va_start(args,n);
+	va_start(args,out);
 	
 	if(n<1)
 	{
@@ -790,7 +790,6 @@ void LSStrCat(short n,LongString *out,...)
 	}
 	
 	len=0;
-	va_arg(args, StringPtr);
 	for(;n;n--)
 	{
 		cur=va_arg(args, StringPtr);

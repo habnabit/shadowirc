@@ -23,11 +23,8 @@
 
 #include "MyMemory.h"
 
-#pragma internal on
-#pragma optimization_level 4
-
-#if !__POWERPC__
-pascal void MZero(void* p, long size)
+//#if !__POWERPC__
+void MZero(void* p, long size)
 {
 	if(p && size>0)
 	{
@@ -35,6 +32,7 @@ pascal void MZero(void* p, long size)
 			*(((char*)p)++) = 0;
 	}
 }
+/*
 #else
 asm pascal void MZero(register void* p, register long size)
 {
@@ -66,8 +64,9 @@ asm pascal void MZero(register void* p, register long size)
 	blr								//return
 }
 #endif
+*/
 
-pascal void MFill(void* p, long size, short val)
+void MFill(void* p, long size, short val)
 {
 	if(p && size>0)
 	{
@@ -76,7 +75,7 @@ pascal void MFill(void* p, long size, short val)
 	}
 }
 
-pascal void MFillLong(void* p, long size, long val)
+void MFillLong(void* p, long size, long val)
 {
 	if(p)
 	{

@@ -22,9 +22,7 @@
 #ifndef _Floaters_
 #define _Floaters_
 
-#ifndef __MACWINDOWS__
-#include <MacWindows.h>
-#endif
+#include <Carbon/Carbon.h>
 
 typedef pascal void (*WindowActivateProcPtr)(WindowPtr window, char activate);
 extern WindowActivateProcPtr ActivateWindowProcPtr;
@@ -33,22 +31,7 @@ extern WindowActivateProcPtr ActivateWindowProcPtr;
 #define IsActive(w) IsWindowHilited(w)
 #define IsDialog(w) (GetWindowKind(w) == dialogKind)
 
-#if TARGET_CARBON
-inline Rect WGetBBox(WindowPtr w)
-{
-	RgnHandle r = NewRgn();
-	Rect rr;
-	GetWindowRegion(w, kWindowContentRgn, r);
-	GetRegionBounds(r, &rr);
-	DisposeRgn(r);
-	return rr;
-}
-#else
-#define WGetBBox(w) ((**(((WindowPeek)w)->contRgn)).rgnBBox)
-#endif
-
-#pragma lib_export on
-#pragma export on
+Rect *WGetBBox(WindowPtr w, Rect *r);
 pascal WindowPtr FrontNonFloater(void);
 pascal char WIsFloater(WindowPtr w);
 pascal void WMoveToFront(WindowPtr w);
@@ -59,13 +42,10 @@ pascal void WHide(WindowPtr w);
 pascal void WMove(WindowPtr w, short h, short v, char front);
 pascal void EnterModalDialog(void);
 pascal void ExitModalDialog(void);
-#pragma export off
-#pragma lib_export off
 
 
-#pragma internal on
 pascal void WSuspend(void);
 pascal void WResume(void);
 pascal WindowPtr WCreate(const Rect *boundsRect, ConstStr255Param title, short theProc, char goAwayFlag, long refCon, char isFloater);
-#pragma internal reset
+
 #endif

@@ -21,23 +21,18 @@
 
 #include "InetConfig.h"
 
-ComponentInstance internetConfig;
+ICInstance internetConfig;
 
 pascal void StartupIC(void)
 {
-	if(ICCStart(&internetConfig, 'SIRC'))
+	if(ICStart(&internetConfig, 'SIRC'))
 		internetConfig = 0;
-	else //setup prefs
-	{
-		if(ICCFindConfigFile(internetConfig, 0, 0))
-			internetConfig = 0;
-	}
 }
 
 pascal void StopIC(void)
 {
 	if(internetConfig)
-		ICCStop(internetConfig);
+		ICStop(internetConfig);
 }
 
 pascal OSErr OpenURL(Str255 url)
@@ -46,7 +41,7 @@ pascal OSErr OpenURL(Str255 url)
 	{
 		long selStart = 0;
 		long endSel = url[0];
-		return ICCLaunchURL(internetConfig, "\p", (char*)&url[1], url[0], &selStart, &endSel);
+		return ICLaunchURL(internetConfig, "\p", (char*)&url[1], url[0], &selStart, &endSel);
 	}
 	else
 		return -1;

@@ -22,14 +22,7 @@
 #ifndef _IRCGlobals
 #define _IRCGlobals
 
-#if TARGET_CARBON
-#include <Types.h>
-#include <Icons.h>
-#include <Menus.h>
-#include <Dialogs.h>
-#endif
-
-#pragma internal on
+#include <Carbon/Carbon.h>
 
 typedef char Table[256], *TableChars;
 
@@ -234,8 +227,8 @@ enum menuList {
 };
 
 enum {
-	wConsoleItem = 1,
-	wFirstServiceItem = 2
+	wConsoleItem = 7,
+	wFirstServiceItem = 8
 };
 
 extern int wLastServiceItem;
@@ -276,12 +269,9 @@ extern char inBackground;
 
 extern TableChars ISOEncode, ISODecode;
 
-extern char hasCM;
-extern char hasSpeech;
+extern char hasAquaMenuMgr;
 
 extern char gTalkCityPlug;
-
-extern char has85, has86, hasNav, hasAppearance11, hasWM11, hasFloatingWindows;
 
 extern MenuHandle menuConnectionList, menuSignoffConnectionList;
 extern MenuHandle menuHelpWidget, helpMenu;
@@ -290,5 +280,4 @@ extern short defaultHelpItems, normHelpMenuItems;
 extern ModalFilterUPP StdDlgFilter;
 
 extern ProcessSerialNumber gPSN;
-#pragma internal reset
 #endif

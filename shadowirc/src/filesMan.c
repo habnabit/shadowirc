@@ -19,8 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Navigation.h>
-#include <Sound.h>
+#include <Carbon/Carbon.h>
 
 #include "MyMemory.h"
 #include "StringList.h"
@@ -50,7 +49,6 @@ enum aliases {
 short mainRefNum = 0, mainResNum = 0;
 static FSSpec mainPrefsLoc;
 
-#pragma internal on
 typedef struct fileListRec {
 	struct fileListRec *next, *prev;
 	short fref;
@@ -62,10 +60,6 @@ static fileListPtr fileList = 0;
 
 static pascal fileListPtr FileFind(short fref);
 
-static pascal char FolderFileFilter(CInfoPBPtr pb, Ptr data);
-static pascal void SetButtonTitle(Handle b, Str255 name, const Rect *r);
-static pascal short DirSelDlgHook(short item, DialogPtr d, Ptr data);
-
 static pascal void ReadInPrefs(void);
 static pascal void CreateNewPrefsMain(void);
 static pascal void CreateNewPrefsLinks(void);
@@ -74,7 +68,6 @@ static pascal void AllocateNewPrefs(void);
 
 static pascal void WriteAlias(const FSSpec *fs, short id);
 static pascal void ReadAlias(FSSpec *fs, short id);
-#pragma internal reset
 
 static pascal fileListPtr FileFind(short fref)
 {
@@ -232,127 +225,6 @@ pascal short CreateUniqueFile(FSSpec *file, OSType creator, OSType type)
 
 #pragma mark -
 
-static pascal char FolderFileFilter(CInfoPBPtr pb, Ptr data)
-{
-	#pragma unused(data)
-	return !((pb->dirInfo.ioFlAttrib & 16)==16); //return true if a file (remove from list)
-}
-
-#if !TARGET_CARBON
-Str255 gPrevSelName;
-char gDirSelectionFlag;
-
-static pascal void SetButtonTitle(Handle b, Str255 name, const Rect *r)
-{
-	short res, wid;
-	Str255 s;
-	
-	pstrcpy(name, gPrevSelName);
-	wid= (r->right - r->left) - (StringWidth("\pSelect \"\" "));
-	res=TruncString(wid, name, smTruncMiddle);
-	pstrcpy("\pSelect \"", s);
-	pstrcat(s, name, s);
-	SAppend1(s, '"');
-	SetControlTitle((ControlHandle)b, s);
-	ValidRect(r);
-}
-
-enum {kGetDirBtn=10};
-
-inline short GetSFCurDir(void) {return -*(short*)398;}
-
-static pascal short DirSelDlgHook(short item, DialogPtr d, Ptr data)
-{
-	short myType;
-	Handle myHandle;
-	Rect myRect;
-	Str255 myName;
-	CInfoPBRec myPB;
-	StandardFileReply *mySFRPtr;
-	short retval=item;
-	
-	if(GetWRefCon((WindowPtr)d) != (long)sfMainDialogRefCon)
-		return retval;
-	
-	myName[0]=0;
-	GetDialogItem(d, kGetDirBtn, &myType, &myHandle, &myRect);
-	if(item==sfHookFirstCall)
-	{
-		myPB.dirInfo.ioCompletion=0;
-		myPB.dirInfo.ioNamePtr=myName;
-		myPB.dirInfo.ioVRefNum=LMGetSFSaveDisk();
-		myPB.dirInfo.ioFDirIndex=-1;
-		myPB.hFileInfo.ioDirID=GetSFCurDir();
-		
-		PBGetCatInfo(&myPB, false);
-		SetButtonTitle(myHandle, myName, &myRect);
-	}
-	else
-	{
-		mySFRPtr=(StandardFileReply*)data;
-		//Track name of folder
-		if(mySFRPtr->sfIsFolder || mySFRPtr->sfIsVolume)
-			pstrcpy(mySFRPtr->sfFile.name, myName);
-		else
-		{
-			myPB.dirInfo.ioCompletion=0;
-			myPB.dirInfo.ioNamePtr=myName;
-			myPB.dirInfo.ioVRefNum=mySFRPtr->sfFile.vRefNum;
-			myPB.dirInfo.ioFDirIndex=-1;
-			myPB.hFileInfo.ioDirID=mySFRPtr->sfFile.parID;
-		}
-		if(!pstrcmp(myName, gPrevSelName))
-			SetButtonTitle(myHandle, myName, &myRect);
-		
-		if(item==kGetDirBtn)
-			return sfItemCancelButton;
-		else if(item==sfItemCancelButton)
-		{
-			gDirSelectionFlag=0;
-		}
-	}
-	
-	return retval;
-}
-
-enum {rGetDirectoryDLOG = -300};
-pascal char DoGetDirectory(StandardFileReply *out);
-pascal char DoGetDirectory(StandardFileReply *out)
-{
-	Point p;
-	short numTypes;
-	SFTypeList types;
-	Str255 name;
-	char ret;
-	
-	FileFilterYDUPP fileFilter=NewFileFilterYDProc(&FolderFileFilter);
-	DlgHookYDUPP dialogHook=NewDlgHookYDProc(&DirSelDlgHook);
-	
-	gPrevSelName[0]=0;
-	gDirSelectionFlag=1;
-	numTypes=-1;
-	p.h=p.v=-1;
-	
-	CustomGetFile(fileFilter, numTypes, types,out, rGetDirectoryDLOG, p, dialogHook, 0, 0, 0, (Ptr)out);
-	pstrcpy(out->sfFile.name, name);
-	if(gDirSelectionFlag && out->sfIsVolume)
-		SAppend1(name, ':');
-	
-	if(gDirSelectionFlag && out->sfIsVolume)
-		pstrcpy(name, out->sfFile.name);
-	else if(gDirSelectionFlag)
-		pstrcpy(gPrevSelName, out->sfFile.name);
-	
-	ret=gDirSelectionFlag;
-	gDirSelectionFlag=0;
-	
-	DisposeRoutineDescriptor(fileFilter);
-	DisposeRoutineDescriptor(dialogHook);
-	
-	return ret;
-}
-#endif
-
 pascal void CleanFolderFSp(FSSpec *fss)
 {
 	CInfoPBRec pb;
@@ -370,63 +242,36 @@ pascal void CleanFolderFSp(FSSpec *fss)
 
 pascal char DirectorySelectButton(FSSpec *fss)
 {
-	if(hasNav)
+	NavReplyRecord theReply;
+	NavDialogOptions dialogOptions;
+	OSErr theErr = noErr;
+	char b = 0;
+	AEKeyword key;
+	
+	theErr = NavGetDefaultDialogOptions(&dialogOptions);
+	dialogOptions.preferenceKey = kNavGetFolder;
+	
+	GetIntString(dialogOptions.message, spFile, sPleaseChooseAFolder);
+	
+	theErr = NavChooseFolder(NULL, &theReply, &dialogOptions, StdNavFilter, NULL, 0);
+
+	if ((theReply.validRecord)&&(theErr == noErr))
 	{
-		NavReplyRecord theReply;
-		NavDialogOptions dialogOptions;
-		OSErr theErr = noErr;
-		char b = 0;
-		AEKeyword key;
-		
-		theErr = NavGetDefaultDialogOptions(&dialogOptions);
-		dialogOptions.preferenceKey = kNavGetFolder;
-		
-		GetIntString(dialogOptions.message, spFile, sPleaseChooseAFolder);
-		
-		theErr = NavChooseFolder(NULL, &theReply, &dialogOptions, StdNavFilter, NULL, 0);
+		// grab the target FSSpec from the AEDesc:	
+		AEDesc 	resultDesc;
 
-#if !TARGET_CARBON
-		if(theErr == memFullErr)
-			goto standardfileFallback;
-#endif		
-		if ((theReply.validRecord)&&(theErr == noErr))
+		if((theErr = AEGetNthDesc(&(theReply.selection),1,typeFSS, &key,&resultDesc)) == noErr)
 		{
-			// grab the target FSSpec from the AEDesc:	
-			AEDesc 	resultDesc;
-
-			if((theErr = AEGetNthDesc(&(theReply.selection),1,typeFSS, &key,&resultDesc)) == noErr)
-			{
-				AEGetDescData(&resultDesc, fss, sizeof(FSSpec));
-				CleanFolderFSp(fss);
-				b = 1;
-			}
-
-			AEDisposeDesc(&resultDesc);
-			theErr = NavDisposeReply(&theReply);
+			AEGetDescData(&resultDesc, fss, sizeof(FSSpec));
+			CleanFolderFSp(fss);
+			b = 1;
 		}
-		
-		return b;
+
+		AEDisposeDesc(&resultDesc);
+		theErr = NavDisposeReply(&theReply);
 	}
-	else
-#if TARGET_CARBON
-		return false;
-#else
-	{
-		StandardFileReply sf;
-standardfileFallback:
-		if(DoGetDirectory(&sf))
-		{
-			*fss=sf.sfFile;
-			if(sf.sfIsFolder) //user clicked on a folder and clicked select, so we need to clean that up
-				CleanFolderFSp(fss);
-			else //user selected a folder from the select button at bottom
-				fss->name[0]=0;
-			return true;
-		}
-		else
-			return false;
-	}
-#endif
+	
+	return b;
 }
 
 #pragma mark -
@@ -435,71 +280,35 @@ pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileNam
 {
 	char ret = kNoErr;
 
-	if(hasNav)
+	NavReplyRecord		theReply;
+	NavDialogOptions	dialogOptions;
+	OSErr err;
+
+	NavGetDefaultDialogOptions(&dialogOptions);
+	dialogOptions.preferenceKey = kNavPutFile;
+	dialogOptions.dialogOptionFlags = navFlags;
+
+	if(message)
+		pstrcpy(message, dialogOptions.message);
+	if(fileName)
+		pstrcpy(fileName, dialogOptions.savedFileName);
+	pstrcpy("\pShadowIRC", dialogOptions.clientName);
+	
+	err = NavPutFile(0, &theReply, &dialogOptions, StdNavFilter, type, creator, 0);
+
+	if(theReply.validRecord && !err)
 	{
-		NavReplyRecord		theReply;
-		NavDialogOptions	dialogOptions;
-		OSErr err;
-
-		NavGetDefaultDialogOptions(&dialogOptions);
-		dialogOptions.preferenceKey = kNavPutFile;
-		dialogOptions.dialogOptionFlags = navFlags;
-
-		if(message)
-			pstrcpy(message, dialogOptions.message);
-		if(fileName)
-			pstrcpy(fileName, dialogOptions.savedFileName);
-		pstrcpy("\pShadowIRC", dialogOptions.clientName);
+		AEDesc resultDesc;	
+		AEKeyword key;
 		
-		err = NavPutFile(0, &theReply, &dialogOptions, StdNavFilter, type, creator, 0);
-
-#if !TARGET_CARBON
-		if(err == memFullErr) //fall back to standard file
-			goto standardFileFallback;
-#endif
+		resultDesc.dataHandle = 0L;
 		
-		if(theReply.validRecord && !err)
+		// retrieve the returned selection:
+		if((err = AEGetNthDesc(&(theReply.selection),1,typeFSS, &key,&resultDesc)) == noErr)
 		{
-			AEDesc resultDesc;	
-			AEKeyword key;
-			
-			resultDesc.dataHandle = 0L;
-			
-			// retrieve the returned selection:
-			if((err = AEGetNthDesc(&(theReply.selection),1,typeFSS, &key,&resultDesc)) == noErr)
-			{
-				AEGetDescData(&resultDesc, f, sizeof(FSSpec));
+			AEGetDescData(&resultDesc, f, sizeof(FSSpec));
 
-				if(theReply.replacing)
-					if(allowReplace)
-					{
-						if(FSpDelete(f)) //display error!
-							ret = kCantReplace;
-						else
-							ret = kFileReplaced;
-					}
-					else
-						ret = kNoReplace;
-					
-				AEDisposeDesc(&resultDesc);
-			}
-
-			NavDisposeReply(&theReply);
-		}
-		else
-			ret = kUserCanceled;
-	}
-#if !TARGET_CARBON
-	else
-	{
-		StandardFileReply sf;
-standardFileFallback:
-		StandardPutFile(message, fileName, &sf);
-		
-		if(sf.sfGood)
-		{
-			*f = sf.sfFile;
-			if(sf.sfReplacing)
+			if(theReply.replacing)
 			{
 				if(allowReplace)
 				{
@@ -511,12 +320,15 @@ standardFileFallback:
 				else
 					ret = kNoReplace;
 			}
+				
+			AEDisposeDesc(&resultDesc);
 		}
-		else
-			ret = kUserCanceled;
-	}
-#endif
 
+		NavDisposeReply(&theReply);
+	}
+	else
+		ret = kUserCanceled;
+	
 	return ret;
 }
 
@@ -609,7 +421,6 @@ pascal OSErr PFDelete(ConstStr255Param name)
 }
 
 #pragma mark -
-#pragma internal on
 
 enum PrefsData {
 	kShadowIRC10PreferencesVersion = 1,
@@ -1041,7 +852,7 @@ pascal char readMainPrefs(void)
 	FSSpec ShadowIRCFolder;
 	long ShadowIRCFolderDirID, PreferencesFolderDirID;
 	
-	err = FindFolder(kOnSystemDisk, 'pref', false, &vref, &PreferencesFolderDirID);
+	err = FindFolder(kOnSystemDisk, kPreferencesFolderType, kDontCreateFolder, &vref, &PreferencesFolderDirID);
 	err = FSMakeFSSpec(vref, PreferencesFolderDirID, GetIntStringPtr(spFiles, sPreferencesFolder), &ShadowIRCFolder);
 
 	if(err) //this means that there's no preferences folder

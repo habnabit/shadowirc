@@ -26,6 +26,10 @@
 #ifndef _Plugins
 #define _Plugins
 
+#ifndef _TCP
+#include "TCP.h"
+#endif
+
 #define PLUGIN_MAGIC 'PLUG'
 
 enum servicesList {
@@ -225,6 +229,7 @@ enum messagesList
 	pIPCReplyMessage					=301		//Your plugin is being called by an IPC service
 };
 
+struct ShadowIRCDataRecord;
 
 /* plugsPtr
 */
@@ -286,14 +291,6 @@ typedef struct ShadowIRCDataRecord {
 	char *inBackground;								//True if ShadowIRC is in the background, false if it's in the foreground.
 	long *lastInput;										//The time the user last hit return in the inputline, in seconds
 	long *lastKey;										//The time the user last input any text to the inputline, in seconds
-char reserved3;
-	char hasCM;											//True if System-Wide Contextual Menu support exists. (OS 8 and later)
-char reserved;
-	char shasWM11;									//True if Window Manager 1.1 present
-	char hasDrag;										//True if the Drag Manager is pesent.
-char reserved2;
-	char shasNav;										//True if Navigation Services are present
-	char shasAppearance11;						//True if Appearance 1.1 is present.
 	
 #ifndef _IRCChannels
 	Ptr CurrentTarget;
@@ -947,7 +944,7 @@ typedef struct pHelpMenuData {
 */
 typedef struct pDNSLookupData {
 	long refCon;					//The number you passed to DNSLookup()
-	long ip;
+	struct in_addr ip;
 	StringPtr search;
 	StringPtr reply;
 	char nameToIP;
@@ -1146,8 +1143,6 @@ typedef struct IPCListRec {
 	long data;
 } IPCListRec, *IPCPtr;
 
-#pragma internal on
-
 typedef struct hmItem {
 	plugsPtr pluginRef;
 	Str63 name;
@@ -1190,10 +1185,7 @@ pascal void pluginHitDialog(DialogPtr win, pluginDlgInfoPtr p, short i);
 
 pascal long FindService(FourCharCode serviceType);
 pascal void SoundService(long sound, long data);
-#pragma internal off
 
-#pragma lib_export on
-#pragma export on
 pascal short WMSGetMenuItemNum(FourCharCode serviceType);
 
 pascal short HMIAdd(ConstStr63Param name);
@@ -1212,7 +1204,5 @@ pascal char IPCExists(FourCharCode IPCType, long *version, long *data);
 pascal short IPCSend(FourCharCode IPCType, long message, long data, long *result);
 pascal char IPCReply(plugsPtr client, FourCharCode IPCType, long message, long data, long *result);
 pascal short WMSListAdd(FourCharCode serviceType, ConstStr255Param name);
-#pragma export off
-#pragma lib_export off
 
 #endif

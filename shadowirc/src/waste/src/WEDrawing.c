@@ -292,7 +292,7 @@ pascal void _WESegmentLoop(SInt32 firstLine, SInt32 lastLine, WESegmentLoopProcP
 	// create a routine descriptor for GetSegmentDirection, if we haven't already
 	if (directionProc == nil)
 	{
-		directionProc = NewStyleRunDirectionProc((StyleRunDirectionProcPtr) &GetSegmentDirection);
+		directionProc = NewStyleRunDirectionUPP((StyleRunDirectionProcPtr) &GetSegmentDirection);
 	}
 
 	// is right-to-left the dominant line direction?

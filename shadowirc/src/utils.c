@@ -19,9 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Appearance.h>
-#include <Navigation.h>
-#include <ControlDefinitions.h>
+#include <Carbon/Carbon.h>
 
 #include "stringlist.h"
 #include "Inline.h"
@@ -30,12 +28,14 @@
 #include "utils.h"
 #include "ApplBase.h"
 
-#pragma internal on
+
+/* CPC - Not defined
 static pascal void FlashDialogItem(DialogPtr theDialog, short item);
+*/
 static char matchFrom(ConstStr255Param s, ConstStr255Param mask, int i,  int j);
 static pascal void DisableMenus(short except);
 static pascal void EnableMenus(void);
-#pragma internal reset
+
 
 pascal void SecsToHMS(long l, LongString *ls)
 {
@@ -199,11 +199,13 @@ pascal void selectOneCell(ListHandle l, Cell c)
 	char moreCellsInList;
 	
 	if(getFirstSelectedCell(l, &nextSelectedCell))
+	{
 		while(LGetSelect(1, &nextSelectedCell, l))
 			if((nextSelectedCell.h != c.h) || (nextSelectedCell.v != c.v))
 				LSetSelect(0, nextSelectedCell, l);
 			else
 				moreCellsInList= LNextCell(1, 1, &nextSelectedCell, l);
+	}
 	
 	LSetSelect(1, c, l);
 }
@@ -330,7 +332,7 @@ pascal void makeMask(StringPtr uah, StringPtr mask)
 }
 
 #pragma mark -
-#pragma dont_inline off
+
 
 pascal void pstrcpymax(ConstStringPtr src, StringPtr dest, char max)
 {
@@ -553,11 +555,6 @@ asm pascal char pstrcmp(register ConstStr255Param s1, register ConstStr255Param 
 }
 #endif
 
-#pragma dont_inline off
-#pragma internal on
-
-#pragma internal reset
-
 #if !__POWERPC__
 pascal char pstrcasecmp(ConstStr255Param s1, ConstStr255Param s2)
 {
@@ -666,7 +663,6 @@ asm pascal char pstrcasecmp2(register ConstStr255Param s1, register ConstStr255P
 	blr
 }
 #endif
-#pragma dont_inline reset
 
 pascal OSErr ParamString(StringPtr str, ConstStr255Param r0, ConstStr255Param r1, ConstStr255Param r2, ConstStr255Param r3)
 {
@@ -733,6 +729,7 @@ pascal void NavDialogFilter(const long callBackSelector, NavCBRecPtr cbp, void* 
 	}
 }
 
+/*
 static pascal void FlashDialogItem(DialogPtr theDialog, short item)
 {
 	ControlHandle	control;
@@ -750,6 +747,7 @@ static pascal void FlashDialogItem(DialogPtr theDialog, short item)
 		HiliteControl(control, 0);
 	}
 }
+*/
 
 typedef struct MBAR {
 	short num;
@@ -801,12 +799,7 @@ pascal void SetupModalDialog(DialogPtr d, short ok, short cancel)
 pascal void FinishModalDialog(void)
 {
 	ExitModalDialog();
-	if(hasAppearance11)
-		SetThemeCursor(kThemeArrowCursor);
-#if !TARGET_CARBON
-	else
-		SetCursor(&qd.arrow);
-#endif
+	SetThemeCursor(kThemeArrowCursor);
 	EnableMenus();
 }
 
@@ -1136,8 +1129,6 @@ asm pascal unsigned short pos(register short c, register ConstStr255Param s)
 }
 #endif
 
-#pragma dont_inline off
-
 /*
 char MaskMatchC(const char* s, const char* mask)
 {
@@ -1206,7 +1197,6 @@ static char matchFrom(ConstStr255Param s, ConstStr255Param mask, int i,  int j)
 		j++;
 	}while(1);
 }
-#pragma dont_inline reset
 
 pascal char maskMatch(ConstStr255Param s, ConstStr255Param mask)
 {
@@ -1215,11 +1205,7 @@ pascal char maskMatch(ConstStr255Param s, ConstStr255Param mask)
 
 pascal MenuHandle GetControlMenu(ControlHandle c)
 {
-#if TARGET_CARBON
-	return GetControlPopupMenuHandle(c);
-#else
-	return (**(PopupPrivateDataHandle)GetControlDataHandle(c)).mHandle;
-#endif
+return GetControlPopupMenuHandle(c);
 }
 
 pascal void ulong64val(ConstStr255Param s, unsigned long long *out)
@@ -1274,51 +1260,6 @@ pascal void LSGetIntString(LongString *ls, STRnPtr list, short elt)
 {
 	GetIntString(ls->data, list, elt);
 	ls->len = ls->data[0];
-}
-
-pascal SInt32 MySendControlMessage(ControlHandle inControl, SInt16 inMessage, SInt32 inParam)
-{
-	GrafPtr savePort ;
-	Handle cdef ;
-	SInt32 result ;
-	SInt8 saveState ;
-	
-	GetPort(&savePort);
-	SetPortWindowPort(GetControlOwner(inControl));
-#if TARGET_CARBON
-//	result = InvokeControlDefUPP(GetControlVariant(inControl), inControl, inMessage, inParam, X);
-	result = 0;
-#else
-	
-	//	get a handle to the control definition procedure
-	cdef = ( * inControl ) -> contrlDefProc ;
-
-	//	make sure the CDEF is loaded
-	if ( * cdef == nil )
-	{
-		LoadResource ( cdef ) ;
-		if ( * cdef == nil )
-		{
-			return 0 ;		//	emergency exit (couldn't load CDEF)
-		}
-	}
-
-	//	lock it down
-	saveState = HGetState ( cdef ) ;
-	HLock ( cdef ) ;
-
-	//	call the CDEF
-	result = CallControlDefProc ( ( ControlDefUPP ) StripAddress ( * cdef ),
-				GetControlVariant ( inControl ), inControl, inMessage, inParam ) ;
-
-	//	unlock the CDEF
-	HSetState ( cdef, saveState ) ;
-
-#endif
-
-	SetPort(savePort);
-	
-	return result ;
 }
 
 pascal OSErr CopyResource(ResType type, short id, short source, short dest)
@@ -1446,9 +1387,13 @@ pascal StringPtr NewPString(const unsigned char *pstr)
 	return str;
 }
 
-#if !TARGET_CARBON
-pascal void GetQD(QDGlobals* *qdg)
+void * safe_malloc (size_t size)
 {
-	*qdg = &qd;
+        void *result;
+        result = malloc(size);
+        if (result == NULL) {
+                /* XXX landonf: fatal() */
+                exit(-1);
+        }
+        return (result);
 }
-#endif

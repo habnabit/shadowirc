@@ -77,8 +77,6 @@ pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileNam
 extern NavEventUPP StdNavFilter;
 #endif
 
-#pragma lib_export on
-#pragma export on
 pascal OSErr PFOpen(ConstStr255Param name, char resFork, short *refNum, FSSpec *fss);
 pascal char PFExists(ConstStr255Param name);
 pascal OSErr PFCreate(ConstStr255Param name, FourCharCode type, FourCharCode creator, char resFork);
@@ -95,10 +93,6 @@ pascal void CleanFolderFSp(FSSpec *fss);
 
 pascal void FileAdd(short fref, char res);
 pascal OSErr FileClose(short fref);
-#pragma export off
-#pragma lib_export off
-
-#pragma internal on
 pascal short CreateUniqueFile(FSSpec *file, OSType creator, OSType type);
 pascal char ValidFSSpec(const FSSpec *f);
 pascal OSErr FindAppSpec(FSSpec *appSpec);
@@ -106,5 +100,4 @@ pascal OSErr FindAppSpec(FSSpec *appSpec);
 pascal void OpenPrefs(void);
 pascal void ClosePrefs(void);
 extern short mainRefNum, mainResNum;
-#pragma internal reset
 #endif

@@ -44,12 +44,10 @@ typedef struct {
 
 extern wmItemsData wmItems;
 
-#pragma internal on
 pascal void wmItemsInit(void);
 pascal void wmChange(MWPtr mw, ConstStr255Param newName);
 pascal void wmAdd(MWPtr mw);
 pascal void wmDelete(MWPtr mw);
-#pragma internal reset
 
 #pragma mark -
 
@@ -58,13 +56,7 @@ pascal MWPtr MWFindDCC(ConstStr255Param s, linkPtr link);
 pascal MWPtr MWFindChannel(channelPtr ch);
 
 
-#pragma lib_export on
-#pragma export on
-
 pascal MWPtr findWLName(ConstStr255Param s, linkPtr link);
-
-#pragma export off
-#pragma lib_export off
 
 #undef CONST
 

@@ -25,10 +25,7 @@
 		2000-10-16	JB	Various code cleanup.
 */
 
-#include <Sound.h>
-#include <Appearance.h>
-#include <Navigation.h>
-#include <ControlDefinitions.h>
+#include <Carbon/Carbon.h>
 
 #include "WASTE.h"
 #include "StringList.h"
@@ -69,7 +66,6 @@ static DialogPtr PrefsDlg;
 static ListHandle connPrefsList = 0;
 static short connPrefsRowNum = 0;
 
-#pragma internal on
 static pascal short dccsiztomenu(void);
 static pascal long dccmenutosiz(short num);
 
@@ -124,7 +120,6 @@ typedef struct PreferencesMenuItemList {
 
 static PreferencesMenuItemListHand pmlList;
 
-#pragma internal reset
 
 pascal short PMLAdd(ConstStr63Param name)
 {
@@ -318,7 +313,7 @@ pascal void SetColorsPanel(void)
 
 	for(x=0;x<numSIColors; x++)
 	{
-		GetDialogItem(PrefsDlg, 4+x, &itemType, &(Handle)item, &box);
+		GetDialogItem(PrefsDlg, x+4, &itemType, (Handle*)&item, &box);
 		rgbc=(RGBColorHdl)GetControlDataHandle(item);
 		**rgbc = shadowircColors[x];
 		Draw1Control(item);
@@ -327,78 +322,57 @@ pascal void SetColorsPanel(void)
 
 static pascal char ColorFileSelect(FSSpec *out)
 {
-	if(hasNav)
+	char retVal;
+	OSErr theErr;
+	long count;
+	NavReplyRecord theReply;
+	NavDialogOptions dialogOptions;
+	AEDesc 	resultDesc;
+	FInfo	fileInfo;
+	long index;
+	NavTypeListHandle openList;
+	AEKeyword key;
+
+	theErr = NavGetDefaultDialogOptions(&dialogOptions);
+	dialogOptions.preferenceKey = kNavGetFile;
+	dialogOptions.dialogOptionFlags = kNOneFileNoTypePopup;
+	GetIntString(dialogOptions.message, spFile, sSelectColorFileGetLoc);
+	
+	pstrcpy("\pShadowIRC", dialogOptions.clientName);
+	openList = (NavTypeListHandle)GetResource('open', kOpenColor);
+
+	theErr = NavGetFile(0, &theReply, &dialogOptions, StdNavFilter, 0, 0, openList, 0);
+	
+	if(openList)
+		ReleaseResource((Handle)openList);
+	
+	retVal = 0;
+	if(theReply.validRecord && !theErr)
 	{
-		char retVal;
-		OSErr theErr;
-		long count;
-		NavReplyRecord theReply;
-		NavDialogOptions dialogOptions;
-		AEDesc 	resultDesc;
-		FInfo	fileInfo;
-		long index;
-		NavTypeListHandle openList;
-		AEKeyword key;
-
-		theErr = NavGetDefaultDialogOptions(&dialogOptions);
-		dialogOptions.preferenceKey = kNavGetFile;
-		dialogOptions.dialogOptionFlags = kNOneFileNoTypePopup;
-		GetIntString(dialogOptions.message, spFile, sSelectColorFileGetLoc);
-		
-		pstrcpy("\pShadowIRC", dialogOptions.clientName);
-		openList = (NavTypeListHandle)GetResource('open', kOpenColor);
-
-		theErr = NavGetFile(0, &theReply, &dialogOptions, StdNavFilter, 0, 0, openList, 0);
-		
-		if(openList)
-			ReleaseResource((Handle)openList);
-		
-		retVal = 0;
-		if(theReply.validRecord && !theErr)
+		// we are ready to open the document(s), grab information about each file for opening:
+		count = 0;
+		theErr = AECountItems(&(theReply.selection),&count);
+		for (index=1;index<=count;index++)
 		{
-			// we are ready to open the document(s), grab information about each file for opening:
-			count = 0;
-			theErr = AECountItems(&(theReply.selection),&count);
-			for (index=1;index<=count;index++)
+			resultDesc.dataHandle = 0L;
+			
+			theErr = AEGetNthDesc(&(theReply.selection),index,typeFSS, &key, &resultDesc);
+			if(theErr == noErr)
 			{
-				resultDesc.dataHandle = 0L;
+				AEGetDescData(&resultDesc, out, sizeof(FSSpec));
 				
-				theErr = AEGetNthDesc(&(theReply.selection),index,typeFSS, &key, &resultDesc);
+				theErr = FSpGetFInfo(out,&fileInfo);
 				if(theErr == noErr)
-				{
-					AEGetDescData(&resultDesc, out, sizeof(FSSpec));
-					
-					theErr = FSpGetFInfo(out,&fileInfo);
-					if(theErr == noErr)
-						if (fileInfo.fdType == 'COLR')
-							retVal = true;
-					
-					theErr = AEDisposeDesc(&resultDesc);
-				}
+					if (fileInfo.fdType == 'COLR')
+						retVal = true;
+				
+				theErr = AEDisposeDesc(&resultDesc);
 			}
 		}
-		theErr = NavDisposeReply(&theReply);	// clean up after ourselves	
-
-		return retVal;
 	}
-	else
-#if TARGET_CARBON
-		return 0;
-#else
-	{
-		StandardFileReply sf;
-		OSType tt='COLR';
+	theErr = NavDisposeReply(&theReply);	// clean up after ourselves	
 
-		StandardGetFile(0, 1, &tt, &sf);
-		if(sf.sfGood)
-		{
-			*out = sf.sfFile;
-			return true;
-		}
-		else
-			return false;
-	}
-#endif
+	return retVal;
 }
 
 static pascal char ColorFilePut(FSSpec *f)
@@ -1265,7 +1239,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 					pt.v=100;
 					if(GetColor(pt, "\p", &shadowircColors[item-4], &rgb))
 					{
-						GetDialogItem(PrefsDlg, item, &itemType, &(Handle)hnd, &box);
+						GetDialogItem(PrefsDlg, item, &itemType, (Handle*)&hnd, &box);
 						shadowircColors[item-4]=rgb;
 						**(RGBColorHdl)GetControlDataHandle(hnd) = rgb;
 						Draw1Control(hnd);
@@ -1482,7 +1456,7 @@ static pascal void EndCancel(char cancel)
 
 pascal void OpenPreferencesWindow(short panelID)
 {
-	static loadPane = 0;
+	static short loadPane = 0;
 	short i, i2, x;
 	short menuSelection, oldMenuSelection;
 	ControlHandle ch;
@@ -1492,7 +1466,9 @@ pascal void OpenPreferencesWindow(short panelID)
 	short rf = CurResFile();
 	char cancelPrefs = 0;
 	pPWClosedData pd;
-	
+	MWPtr xmw;
+	TextStyle ts;
+				
 	UseResFile(gApplResFork);
 	GetPort(&gp);
 	PrefsDlg=GetNewDialog(kwPrefMain, 0, (WindowPtr)-1);
@@ -1562,6 +1538,7 @@ pascal void OpenPreferencesWindow(short panelID)
 			default:
 				HitPreferencesWindow(oldMenuSelection, i);
 		}
+		DrawDialog(PrefsDlg); // Seems to be necessary in OS X
 	} while(i!=1 && i!= 2);
 	
 	loadPane = GetControlValue(ch) - 1;
@@ -1576,28 +1553,21 @@ pascal void OpenPreferencesWindow(short panelID)
 	
 	EndCancel(cancelPrefs);
 	
-	if(hasAppearance11)
-	{
-		MWPtr x;
-		TextStyle ts;
-					
-		ts.tsColor = shadowircColors[sicStandard];
-		
-		linkfor(x, mwl)
-			if(!x->protect)
-			{
-				SetWindowContentColor(x->w, &shadowircColors[sicWindowBG]);
-				if(x->il)
-					WESetStyle(weDoColor, &ts, x->il);
-			}
-	}
+	ts.tsColor = shadowircColors[sicStandard];
+	
+	linkfor(xmw, mwl)
+		if(!xmw->protect)
+		{
+			SetWindowContentColor(xmw->w, &shadowircColors[sicWindowBG]);
+			if(xmw->il)
+				WESetStyle(weDoColor, &ts, xmw->il);
+		}
 	
 	pd.canceled = cancelPrefs;
 	runPlugins(pPWClosedMessage, &pd);
 }
 
 #pragma mark -
-#pragma internal on
 
 pascal void InitColorPrefs(void)
 {
@@ -1623,5 +1593,3 @@ pascal void InitColorPrefs(void)
 	//timestamp color
 	SetRGBColor(sic[sicTimestampColor], 0, 0, 0);
 }
-
-#pragma internal reset

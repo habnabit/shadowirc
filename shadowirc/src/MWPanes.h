@@ -65,8 +65,6 @@ enum mwPaneAlign {
 };
 
 
-#pragma lib_export on
-#pragma export on
 pascal mwWidgetPtr MWNewWidget(MWPtr mw, long type, short align, short width);
 pascal void MWRecalculateRects(MWPtr mw);
 pascal void MWDestroyWidget(mwWidgetPtr w);
@@ -78,10 +76,7 @@ pascal void MWPaneRecalculate(MWPtr mw);
 pascal void MWPaneResize(MWPtr mw);
 pascal char MWDestroyPane(mwPanePtr o);
 pascal void MWPaneUpdate(MWPtr mw);
-#pragma export off
-#pragma lib_export off
 
-#pragma internal on
 pascal void MWDestroyAllPanes(MWPtr mw);
 pascal void MWDestroyAllWidgets(MWPtr mw);
 
@@ -90,5 +85,4 @@ pascal mwPanePtr MWFindPanePoint(MWPtr mw, Point p);
 pascal void MWPaneActivate(MWPtr mw, char activate);
 pascal void MWPaneClick(MWPtr mw, EventRecord *e);
 
-#pragma internal reset
 #endif

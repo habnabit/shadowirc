@@ -22,20 +22,12 @@
 #ifndef _InetConfig
 #define _InetConfig
 
-#ifndef __INTERNETCONFIG_
-#include <InternetConfig.h>
-#endif
+#include <Carbon/Carbon.h>
 
-#pragma internal on
-extern ComponentInstance internetConfig;
+extern ICInstance internetConfig;
 
 pascal void StartupIC(void);
 pascal void StopIC(void);
-#pragma internal off
 
-#pragma lib_export on
-#pragma export on
 pascal OSErr OpenURL(Str255 url);
-#pragma export off
-#pragma lib_export off
 #endif

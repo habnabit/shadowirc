@@ -19,12 +19,9 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Appearance.h>
 #include "AppearanceHelp.h"
-#include <ControlDefinitions.h>
 #include "IRCGlobals.h"
 
-#pragma internal on
 const RGBColor white = {-1, -1, -1};
 const RGBColor black = {0, 0, 0};
 const RGBColor VLtGrey = {cVLtGrey, cVLtGrey, cVLtGrey};
@@ -34,7 +31,6 @@ const RGBColor HalfGrey = {cHalfGrey, cHalfGrey, cHalfGrey};
 const RGBColor MDkGrey = {cMDkGrey, cMDkGrey, cMDkGrey};
 const RGBColor DkGrey = {cDkGrey, cDkGrey, cDkGrey};
 const RGBColor VDkGrey = {cVDkGrey, cVDkGrey, cVDkGrey};
-#pragma internal reset
 
 pascal ListHandle GetAppearanceListBoxHandle(DialogPtr theDialog, short itemNum)
 {
@@ -119,110 +115,10 @@ typedef struct dpPaintRgnInfo {
 	Rect ir;
 } dpPaintRgnInfo;
 
-static DeviceLoopDrawingUPP dpPaintRgnUPP;
-
-static pascal void dpPaintRgn(short depth, short deviceFlags, GDHandle device, long data);
-static pascal void dpPaintRgn(short depth, short deviceFlags, GDHandle device, long data)
-{
-#pragma unused(deviceFlags, device)
-	dpPaintRgnInfo* x = (dpPaintRgnInfo*)data;
-
-	if(depth < 16)
-		RGBForeColor(&white);
-	else
-		RGBForeColor(x->color);
-	PaintRect(&x->ir);
-}
 
 pascal void DrawPlacard(const Rect *r, long state)
 {
-	if(hasAppearance11)
-		DrawThemePlacard(r, state);
-	else
-	{
-		RGBColor fore;
-		const RGBColor *cBorder, *cTLHilite, *cBRHilite, *cCorners, *cFill;
-		
-		if(state == kThemeStateActive)
-		{
-			cBorder = &black;
-			cTLHilite = &white;
-			cBRHilite = &MedGrey;
-			cCorners = &LtGrey;
-			cFill = &LtGrey;
-		}
-		else if(state == kThemeStatePressed)
-		{
-			cBorder = &black;
-			cTLHilite = &VDkGrey;
-			cBRHilite = &MedGrey;
-			cCorners = &MDkGrey;
-			cFill = &MDkGrey;
-		}
-		else if(state == kThemeStateInactive)
-		{
-			cBorder = &VDkGrey;
-			cTLHilite = &VLtGrey;
-			cBRHilite = &VLtGrey;
-			cCorners = &VLtGrey;
-			cFill = &VLtGrey;
-		}
-		else
-			return;
-		
-		//Save colors
-		GetForeColor(&fore);
-
-		//Draw black outline
-		RGBForeColor(cBorder);
-		MoveTo(r->left, r->top);
-		LineTo(r->right -1, r->top);
-		LineTo(r->right -1, r->bottom -1);
-		LineTo(r->left, r->bottom -1);
-		LineTo(r->left, r->top);
-		
-		//white hilite
-		RGBForeColor(cTLHilite);
-		MoveTo(r->right - 2, r->top + 1);
-		LineTo(r->left + 1, r->top + 1);
-		LineTo(r->left +1, r->bottom - 2);
-		
-		//Dark hilite
-		RGBForeColor(cBRHilite);
-		MoveTo(r->left + 2, r->bottom - 2);
-		LineTo(r->right - 2, r->bottom - 2);
-		LineTo(r->right - 2, r->top + 2);
-		
-		//Corner greys
-		RGBForeColor(cCorners);
-		MoveTo(r->left + 1, r->bottom -2);
-		LineTo(r->left + 1, r->bottom -2);
-		
-		MoveTo(r->right - 2, r->top +1);
-		LineTo(r->right - 2, r->top+1);
-		
-		if(!dpPaintRgnUPP)
-			dpPaintRgnUPP  = NewDeviceLoopDrawingProc(dpPaintRgn);
-		
-		{
-			dpPaintRgnInfo info;
-			RgnHandle dr = NewRgn();
-			GrafPtr gp;
-			
-			info.color = cFill;
-			info.ir.left = r->left + 2;
-			info.ir.right = r->right - 2;
-			info.ir.top = r->top + 2;
-			info.ir.bottom = r->bottom - 2;
-			RectRgn(dr, &info.ir);
-			GetPort(&gp);
-			DeviceLoop(dr, dpPaintRgnUPP, (long)&info, 0);
-			DisposeRgn(dr);
-		}
-		
-		//Restore colors
-		RGBForeColor(&fore);
-	}
+	DrawThemePlacard(r, state);
 }
 
 pascal void SetTextColor(short color)
@@ -254,78 +150,20 @@ typedef struct InternalDrawingState InternalDrawingState;
 //But, assuming we have a color port, since ShadowIRC only generates color windows...
 pascal void GetDrawingState(DrawingState *outState)
 {
-	if(TARGET_CARBON || hasAppearance11)
-		GetThemeDrawingState((ThemeDrawingState*)outState);
-#if(!TARGET_CARBON)
-	else
-	{
-		InternalDrawingState* state = (InternalDrawingState*)NewPtr(sizeof(InternalDrawingState));
-		GrafPtr	 curPort;
-		
-		*outState = (DrawingState)state;
-		GetPort(&curPort);
-		
-		state->pnPixPat = nil;
-		state->bkPixPat = nil;
-
-		GetForeColor(&state->foreColor);
-		GetBackColor(&state->backColor);
-		
-		// If the pen pattern is not an old style pattern,
-		// copy the handle. If it is an old style pattern,
-		// GetPenState below will save the right thing.
-		if ( (**((CGrafPtr)curPort)->pnPixPat).patType != 0 )
-			state->pnPixPat = ((CGrafPtr)curPort)->pnPixPat;
-		
-		// If the pen pattern is not an old style pattern,
-		// copy the handle, else get the old pattern into
-		// bkPat for restoring that way.
-		if ( (**((CGrafPtr)curPort)->bkPixPat).patType != 0 )
-			state->bkPixPat = ((CGrafPtr)curPort)->bkPixPat;
-		else
-			state->bkPat = *(PatPtr)(*(**((CGrafPtr)curPort)->bkPixPat).patData);
-			
-		GetPenState(&state->pen);
-		state->textMode = GetPortTextMode(curPort);
-	}
-#endif
+	GetThemeDrawingState((ThemeDrawingState*)outState);
 }
 
 pascal void SetDrawingState(DrawingState instate)
 {
-	if(TARGET_CARBON || hasAppearance11)
-		SetThemeDrawingState((ThemeDrawingState)instate, true);
-#if(!TARGET_CARBON)
-	else
-	{
-		InternalDrawingState *state = (InternalDrawingState*)instate;
-		GrafPtr	 curPort;
-		
-		GetPort( &curPort );
-
-		SetPenState( &state->pen );
-
-		RGBForeColor( &state->foreColor );
-		RGBBackColor( &state->backColor );
-
-		if ( state->pnPixPat )
-			PenPixPat( state->pnPixPat );
-
-		if ( state->bkPixPat )
-			BackPixPat( state->bkPixPat );
-		else
-			BackPat( &state->bkPat );
-
-		TextMode( state->textMode );
-	}
-#endif
+	SetThemeDrawingState((ThemeDrawingState)instate, true);
 }
 
 pascal void NormalizeDrawingState()
 {
-	Pattern			whitePat = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	Pattern			whitePat;
 	GrafPtr			curPort;
 	
+	GetQDGlobalsWhite(&whitePat);
 	GetPort( &curPort );
 	
 	if(IsPortColor( curPort ) )
@@ -338,31 +176,3 @@ pascal void NormalizeDrawingState()
 	TextMode( srcOr );
 }
 
-#pragma mark -
-
-#if !TARGET_CARBON
-#pragma internal on
-//Glue necessary to call AppendDialogItemList.
-#define RESULT_OFFSET(type) ((sizeof(type) == 1) ? 3 : ((sizeof(type) == 2) ? 1 : 0))
-
-pascal OSErr
-AppendDialogItemList( DialogPtr dialog, SInt16 ditlID, DITLMethod method )
-{
-	long	private_result;
-	
-	private_result = CallUniversalProc((UniversalProcPtr)GetToolTrapAddress(0xAA68),
-		kD0DispatchedPascalStackBased
-		 | RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
-		 | DISPATCHED_STACK_ROUTINE_SELECTOR_SIZE(kTwoByteCode)
-		 | DISPATCHED_STACK_ROUTINE_PARAMETER(1, SIZE_CODE(sizeof(dialog)))
-		 | DISPATCHED_STACK_ROUTINE_PARAMETER(2, SIZE_CODE(sizeof(ditlID)))
-		 | DISPATCHED_STACK_ROUTINE_PARAMETER(3, SIZE_CODE(sizeof(method))),
-		0x0412,
-		dialog,
-		ditlID,
-		method );
-		
-	return *(((OSErr*)&private_result) + RESULT_OFFSET(OSErr));
-}
-#pragma internal off
-#endif

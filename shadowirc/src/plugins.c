@@ -19,7 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Navigation.h>
+#include <Carbon/Carbon.h>
 
 #include "StringList.h"
 #include "IRCGlobals.h"
@@ -40,15 +40,12 @@
 
 #include "IRCAux.h"
 #include "Floaters.h"
-#include "Libs.h"
 #include "IRCNComm.h"
 #include "IRCInput.h"
 #include "InetConfig.h"
 #include "DragDrop.h"
 #include "MenuCommands.h"
 #include "ApplBase.h"
-
-#pragma internal on
 
 wMenuServicesHand wMenuServices = 0;
 
@@ -68,12 +65,8 @@ static pascal void InitPlugins(void);
 
 pascal OSErr FSpGetDirectoryID(FSSpec*, long*, char*);
 static pascal void CheckPluginPrefsFolder(void);
-#pragma internal reset
 
-#pragma lib_export on
-#pragma export on 
 pascal long _UndocumentedAPI(long type, long data);
-#pragma export reset
 
 static pascal plugsPtr IPCFind(FourCharCode IPCType, long *version, long *data);
 
@@ -380,8 +373,6 @@ pascal short HMIAdd(ConstStr63Param name)
 }
 
 #pragma mark -
-
-#pragma internal on
 
 #define SavePluginState() \
 	plugsPtr prevInfo = sidr.yourInfo; \
@@ -836,11 +827,6 @@ inline void initSIDR(void)
 	sidr.inBackground=&inBackground;
 	sidr.lastInput=&lastInput;
 	sidr.lastKey=&lastKey;
-	sidr.reserved = sidr.reserved2 = sidr.reserved3 = 1;
-	sidr.hasCM=hasCM;
-	sidr.shasAppearance11 = hasAppearance11;
-	sidr.hasDrag = 1;
-	sidr.shasWM11 = hasWM11;
 	sidr.connections=&fConn;
 	sidr.allowConnections=&allowConnections;
 	sidr.curUserNum=&userNum;
@@ -917,7 +903,7 @@ pascal void makePlugsDB(void)
 	
 	hmiList=(hmiListHand)NewHandleClear(sizeof(long));
 	
-	FindAppSpec(&pluginsFolderFSSpec); //Get the app apec
+	FindAppSpec(&pluginsFolderFSSpec); //Get the app spec
 	if(FSMakeFSSpec(pluginsFolderFSSpec.vRefNum, pluginsFolderFSSpec.parID, GetIntStringPtr(spFiles, sPluginsFolder), &pluginsFolderFSSpec))
 	{
 		//no plugins folder, so make it
@@ -972,8 +958,6 @@ pascal void pluginHitDialog(DialogPtr win, pluginDlgInfoPtr p, short i)
 	pl.item=i;
 	runIndPlugin(p->pluginRef, pUIDialogItemHitMessage, &pl);
 }
-
-#pragma internal reset
 
 pascal DialogPtr pluginNewDialog(short dialogID)
 {

@@ -34,6 +34,12 @@
 #include "HashTable.h"
 #endif
 
+#ifndef _TCP
+# include "TCP.h"
+#endif
+
+#include "IRCGlobals.h"
+
 #ifndef __CONNECTIONS__
 #define CONST const
 #else
@@ -96,8 +102,14 @@ struct Connection {
 #endif
 	void* refCon;
 	linkPtr link;
-	
-	unsigned long ip;
+	/*
+         * ip: store ip address
+         * ip2: used w/ storing SOCKS proxy IP address
+         * sockfd: hold TCP socket
+         */
+	struct in_addr ip;
+        struct in_addr ip2;
+        int sockfd;
 	Str255 name;
 	unsigned short port;
 	short connectStage;
@@ -116,7 +128,6 @@ struct Connection {
 	struct plugsRec* pluginRef;
 	
 	unsigned long closeTime;
-	unsigned long ip2;
 	
 	Str63 socksName;
 	short socksPort;
@@ -181,7 +192,6 @@ struct Link {
 	LongString firstHalfOfIncoming;
 };
 
-#pragma internal on
 extern connectionPtr fConn;
 extern linkPtr firstLink;
 
@@ -198,12 +208,9 @@ pascal void newIRCConnection(linkPtr link);
 
 pascal void ConnStale(connectionPtr conn);
 pascal void ConnDeSOCKS(connectionPtr conn);
-#pragma internal reset
 
 pascal void ConnSetup(connectionPtr c, ConstStr255Param name, unsigned short port);
 
-#pragma lib_export on
-#pragma export on
 pascal char IsLinkValid(linkPtr link);
 
 pascal char LinkCanMode(linkPtr link, char mode, char umode);
@@ -211,25 +218,20 @@ pascal void deleteConnection(connectionPtr *c);
 pascal connectionPtr findConnectionSock(long sock);
 pascal connectionPtr pluginNewConnection(char textOrBinary);
 
-pascal void ConnAbort(connectionPtr conn);
 pascal void ConnClose(connectionPtr conn);
 pascal char ConnNewActive(connectionPtr c);
-pascal char ConnNewPassive(connectionPtr c);
-pascal OSErr ConnGetData(connectionPtr conn, Ptr d, short len);
-pascal long ConnCharsAvail(connectionPtr conn);
+pascal char ConnNewListen(connectionPtr c, int backlog);
+size_t ConnGetData(connectionPtr conn, Ptr d, size_t len);
+size_t ConnGetUntil(connectionPtr conn, Ptr d, char c, size_t len);
 pascal unsigned short ConnGetLocalPort(connectionPtr conn);
-#pragma export off
-#pragma lib_export off
 
 pascal char ConnNewPassiveBlankListener(connectionPtr c);
 pascal OSErr NetGetLocalIP(unsigned long *ip);
-pascal OSErr ConnGetUpTo(connectionPtr conn, char term, long timeout, Ptr readPtr, long readSize, long *readPos, char *gotterm);
 
 pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host);
 
 pascal OSErr ConnSend(connectionPtr conn, const void* writePtr, short writeCount, char push);
-pascal connectionPtr ConnNewDNSIP(ConstStr255Param name);
-pascal connectionPtr ConnNewDNSName(ConstStr255Param ip);
+pascal connectionPtr ConnNewDNS(ConstStr255Param name, short type);
 
 #undef CONST
 #endif

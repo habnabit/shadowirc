@@ -22,8 +22,6 @@
 #ifndef _IRCAux
 #define _IRCAux
 
-#pragma lib_export on
-#pragma export on
 pascal void MakeChannel(StringPtr s);
 
 #ifdef _connections
@@ -35,10 +33,6 @@ pascal void ConnPut(connectionPtr *conn, const void* p, long len);
 pascal void ConnPutText(connectionPtr *conn, void* p, long len);
 pascal void ConnPutLS(connectionPtr *conn, LongString *ls);
 #endif
-#pragma export off
-#pragma lib_export off
-
-#pragma internal on
 pascal void ConnectionMenuSetup(void);
 pascal void ConnectionMenuHilites(void);
 
@@ -50,6 +44,5 @@ pascal void connection2(connectionPtr conn);
 pascal void LinkSuccessfulConnection(linkPtr link, char reg);
 pascal void LinkFailedConnection(linkPtr link);
 #endif
-#pragma internal reset
 
 #endif

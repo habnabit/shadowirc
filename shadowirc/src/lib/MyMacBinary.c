@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -21,9 +21,7 @@
 	Note: This code based on code by Peter N. Lewis.
 */
 
-#if TARGET_CARBON
-#include <Files.h>
-#endif
+#include <Carbon/Carbon.h>
 
 #include "MacBinary.h"
 #include "MyMemory.h"

@@ -14,16 +14,11 @@
 
 #include "WASTEIntf.h"
 
-#ifndef __FOLDERS__
-#include <Folders.h>
-#endif
+#include <Carbon/Carbon.h>
 
 #if WASTE_IC_SUPPORT
 #ifndef __INTERNETCONFIG__
 #include "InternetConfig.h"
-#endif
-#ifndef __PROCESSES__
-#include <Processes.h>
 #endif
 #endif // WASTE_IC_SUPPORT
 
@@ -1475,9 +1470,6 @@ pascal void _WEResolveURL(EventModifiers modifiers, SInt32 urlStart, SInt32 urlE
 
 	if (ICStart(&inst, signature) == noErr)
 	{
-#if !defined(TARGET_API_MAC_CARBON) || !TARGET_API_MAC_CARBON
-		if (ICFindConfigFile(inst, 0, nil) == noErr)
-#endif
 		{
 			saveTextLock = _WESetHandleLock(pWE->hText, true);
 

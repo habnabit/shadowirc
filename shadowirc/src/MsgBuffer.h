@@ -34,23 +34,15 @@ typedef struct messageBufferRec {
 	long unused[2];
 } messageBufferRec, *messageBufferPtr;
 
-#pragma internal on
 extern messageBufferPtr messagebuffers[10];
 extern messageBufferRec mblist[10];
 extern int mbnum;
 extern char mbInput;
 
 pascal void MBInit(void);
-#pragma internal reset
-
-#pragma lib_export on
-#pragma export on
 pascal void MBIdle(void);
 
 pascal messageBufferPtr MBFindNick(linkPtr link, ConstStr255Param nick);
 pascal void MBNewMessage(linkPtr link, ConstStr255Param nick);
-
-#pragma export off
-#pragma lib_export off
 
 #endif

@@ -134,8 +134,7 @@ typedef struct dccRec {
 	char reverse;
 } dccRec, *dccPtr;
 
-#pragma lib_export on
-#pragma export on
+extern char IsDCCName(ConstStringPtr s);
 
 pascal void DCCWindowClose(MWPtr mw);
 
@@ -167,11 +166,6 @@ pascal short DCCTypeAdd(ConstStringPtr type);
 pascal short DCCTypeFind(ConstStr255Param s);
 pascal void DCCGetStatus(dccPtr d, dccStatus *status);
 
-#pragma export off
-#pragma lib_export off
-
-#pragma internal on
-
 pascal void DCCConnOpened(connectionPtr *cn);
 pascal void DCCFailed(connectionPtr *conn, ConstStr255Param reason);
 
@@ -180,6 +174,5 @@ pascal void DCCSSayQuiet(connectionPtr *x, LongString *ls);
 #endif
 
 pascal void DCCTypeInit(void);
-#pragma internal reset
 
 #endif

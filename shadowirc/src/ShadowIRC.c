@@ -31,8 +31,7 @@
 #include "ApplBase.h"
 #include "IRCChannels.h"
 
-#pragma internal on
-void main(void);
+int main(void);
 
 pascal void ToolboxInit(void);
 pascal void ApplicationInit(void);
@@ -46,7 +45,7 @@ static pascal void RunStartupConnections(void)
 			OpenConnection(curLink);
 }
 
-void main(void)
+int main(void)
 {
 	EventRecord e;
 	
@@ -54,7 +53,7 @@ void main(void)
 	
 	EventAvail(everyEvent, &e);
 	if(e.modifiers & controlKey)
-		return;
+		return 0;
 	
 	GetDateTime(&now);
 	ApplicationInit();
@@ -70,4 +69,6 @@ void main(void)
 	DrawMenuBar();
 	
 	ApplRun();
+	
+	return 0;
 }

@@ -40,8 +40,6 @@ typedef struct AETEList {
 
 static AETEListHand aeteList;
 
-#pragma internal reset
-
 pascal long RegisterAETE(Handle aete)
 {
 	int i;
@@ -62,31 +60,31 @@ pascal long RegisterAETE(Handle aete)
 		return -1;
 }
 
-#pragma internal on
+static pascal OSErr aeOApp(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
+static pascal OSErr aeQuit(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
+static pascal OSErr aeODoc(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
+static pascal OSErr aePDoc(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
+static pascal OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
+static pascal OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, long refcon);
 
-static pascal OSErr aeOApp(const AppleEvent *theAEvent, AppleEvent *theReply, unsigned long refCon);
-static pascal OSErr aeQuit(const AppleEvent *theAEvent, AppleEvent *theReply, unsigned long refCon);
-static pascal OSErr aeODoc(const AppleEvent *theAEvent, AppleEvent *theReply, unsigned long refCon);
-static pascal OSErr aePDoc(const AppleEvent *theAEvent, AppleEvent *theReply, unsigned long refCon);
-static pascal OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply, unsigned long refCon);
-static pascal OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, unsigned long refcon);
-
-static pascal char GetAETEResource(Handle *res);
 static pascal OSErr EasyHasUnusedParameters(const AppleEvent *theAEvent);
 
-static pascal OSErr aeOApp(const AppleEvent *, AppleEvent *, unsigned long)
+static pascal OSErr aeOApp(const AppleEvent * ae, AppleEvent *reply, long refCon)
 {
+	#pragma unused(ae, reply, refCon)
 	return noErr;
 }
 
-static pascal OSErr aeQuit(const AppleEvent *, AppleEvent *, unsigned long)
+static pascal OSErr aeQuit(const AppleEvent *ae, AppleEvent *reply, long refCon)
 {
+	#pragma unused(ae, reply, refCon)
 	doQuit(0);
 	return noErr;
 }
 
-static pascal OSErr aeODoc(const AppleEvent *theAEvent, AppleEvent *, unsigned long)
+static pascal OSErr aeODoc(const AppleEvent *theAEvent, AppleEvent *reply, long refCon)
 {
+	#pragma unused(reply, refCon)
 	OSErr error = noErr, firstError = noErr;
 	short numErrors = 0;
 	AEDesc theList;
@@ -150,13 +148,15 @@ static pascal OSErr aeODoc(const AppleEvent *theAEvent, AppleEvent *, unsigned l
 	return(error);
 }
 
-static pascal OSErr aePDoc(const AppleEvent *, AppleEvent *, unsigned long)
+static pascal OSErr aePDoc(const AppleEvent *ae, AppleEvent *reply, long refCon)
 {
+	#pragma unused(ae, reply, refCon)
 	return errAEEventNotHandled;
 }
 
-static pascal OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply, unsigned long)
+static pascal OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon)
 {
+	#pragma unused(refCon)
 	OSErr err;
 	long actualSize;
 	short languageCode;
@@ -220,8 +220,9 @@ static OSErr OpenURLString(LongString *url)
 	return paramErr;
 }
 
-static pascal OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, unsigned long)
+static pascal OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, long refCon)
 {
+	#pragma unused(refCon)
 	LongString url;
 	DescType typeCode;
 	Size actualSize;
@@ -269,7 +270,7 @@ static pascal OSErr EasyHasUnusedParameters(const AppleEvent *theAEvent)
 		return errAEEventNotHandled;
 }
 
-#define InstHand(aeClass, aeType, proc) do {error = AEInstallEventHandler(aeClass, aeType, NewAEEventHandlerProc(proc), 0, false); if(error) return error;}while(0)
+#define InstHand(aeClass, aeType, proc) do {error = AEInstallEventHandler(aeClass, aeType, NewAEEventHandlerUPP(proc), 0, false); if(error) return error;}while(0)
 
 pascal OSErr InstallAEHandlers(void)
 {

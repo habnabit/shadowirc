@@ -22,17 +22,10 @@
 #ifndef _IRCPreferences_
 #define _IRCPreferences_
 
-#pragma lib_export on
-#pragma export on
 pascal void OpenPreferencesWindow(short panelID);
 
 pascal short PMLAdd(ConstStr63Param name);
-#pragma export off
-#pragma lib_export off
-
-#pragma internal on
 pascal void InitColorPrefs(void);
 
 pascal void InitPrefs(void);
-#pragma internal reset
 #endif

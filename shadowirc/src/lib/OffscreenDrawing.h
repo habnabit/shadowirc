@@ -31,10 +31,6 @@ typedef struct {
 } BufferData, *BufferDataPtr;
 
 
-#pragma lib_export on
-#pragma export on
 pascal char StartDrawingOffscreen(Ptr *data, RectPtr bounds, Boolean copyDest);
 pascal void EndDrawingOffscreen(Ptr data);
 pascal void AbortDrawingOffscreen(Ptr data);
-#pragma export off
-#pragma lib_export off

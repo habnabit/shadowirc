@@ -38,10 +38,7 @@
 #include "IRCNotify.h"
 #include "TextManip.h"
 
-#pragma internal on
 static pascal void startConnection(linkPtr link);
-#pragma internal reset
-
 
 pascal void ConnectionMenuSetup(void)
 {
@@ -54,8 +51,8 @@ pascal void ConnectionMenuSetup(void)
 	{
 		menuConnectionList = NewMenu(ConnectionListMenu, "\p");
 		menuSignoffConnectionList = NewMenu(SignoffConnectionListMenu, "\p");
-		InsertMenu(menuConnectionList, -1);
-		InsertMenu(menuSignoffConnectionList, -1);
+		InsertMenu(menuConnectionList, hierMenu);
+		InsertMenu(menuSignoffConnectionList, hierMenu);
 		y = 0;
 	}
 
@@ -112,20 +109,11 @@ pascal void ServerOK(short status, linkPtr link)
 			a=S_OFFLINE;
 			n=3;
 			break;
-		case C_NameSearchFailed:
-			a=S_OFFLINE;
-			n=4;
-			break;
 		case C_FailedToOpen:
 			a=S_OFFLINE;
 			n=5;
 			break;
-		case C_Closing:
-			a=S_OFFLINE;
-			n=6;
-			break;
 		case C_Closed:
-		case -23008: //connection dodesn't exist
 			a=S_OFFLINE;
 			n=S_OFFLINE;
 			break;
@@ -193,7 +181,7 @@ pascal void ConnPutText(connectionPtr *cn, void* p, long len)
 	long i;
 
 	for(i=0;i<len;i++)
-		((char*)p)[i]=ISOEncode[((char*)p)[i]];
+		((unsigned char*)p)[i]=ISOEncode[((unsigned char*)p)[i]];
 	
 	if(debugOn)
 	{
@@ -320,7 +308,8 @@ static pascal void CreateIdentdConn(connectionPtr conn)
 			else
 				identConn->refCon = NewPString(conn->link->linkPrefs->user);
 			
-			ConnNewPassive(identConn);
+			//Allow for a 10 connection backlog. This is more than enough.
+			ConnNewListen(identConn, 10);
 		}
 	}
 }
@@ -329,14 +318,14 @@ static pascal void CreateIdentdConn(connectionPtr conn)
 //connect to the server, and then open the identd connection
 pascal void connection2(connectionPtr conn)
 {
-	if(conn->ip!=-1)
+	if(conn->ip.s_addr != -1)
 	{
 		LongString ls;
 		Str255 s;
 		pServiceCWLinkStateChangeData p;
 		linkPtr link = conn->link;
 	
-		hostToIPStr(conn->ip, s);
+		inet_ntoa_str(conn->ip, s);
 		LSParamString(&ls, GetIntStringPtr(spInfo, sIPForIs), conn->name, s, 0, 0);
 		SMPrefix(&ls, dsConsole);
 		if(conn->socksType == connIRC)

@@ -125,7 +125,7 @@ WELookupTable _weMainSelectorTable[] = {
 { weURLHint,				FIELD_DESC(hURLHint,          		WERec) },
 #endif
 
-{ 0, 					0, 0 }};
+{ 0, 					{0, 0}}};
 
 #if WASTE_OBJECTS
 

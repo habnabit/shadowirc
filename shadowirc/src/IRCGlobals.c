@@ -44,22 +44,14 @@ short gApplResFork;
 
 TableChars ISOEncode, ISODecode;
 
-char hasCM=0;
-char hasSpeech;
-
-char has85 = 0;
-char has86 = 0;
-char hasNav=0;
-char hasAppearance11 = 0;
-char hasWM11 = 0;
-char hasFloatingWindows = 0;
+char hasAquaMenuMgr;
 
 MenuHandle menuConnectionList, menuSignoffConnectionList;
 MenuHandle menuHelpWidget, helpMenu;
 
 short defaultHelpItems = 0, normHelpMenuItems = 0;
 
-int wLastServiceItem = 1;
+int wLastServiceItem = wFirstServiceItem - 1;
 
 ModalFilterUPP StdDlgFilter = 0;
 

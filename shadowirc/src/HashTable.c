@@ -91,7 +91,7 @@ static int _HTHash(HTPtr table, ConstStr255Param name)
 
 static char _HTFind(htEltPtr current, ConstStr255Param find, htDataType* type, void** found)
 {
-	linkfor(current, current);
+	linkfor(current, current)
 		if(pstrcmp(current->name, find))
 		{
 			if(type)
@@ -145,7 +145,7 @@ static void _HTSetElt(htEltPtr elt, void* newData, int type)
 	if(type == htTypeInt)
 		elt->data = newData;
 	else
-		_HTStrDup(newData, &(StringPtr)elt->data);
+		_HTStrDup(newData, (StringPtr*)&elt->data);
 }
 
 

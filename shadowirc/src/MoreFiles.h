@@ -1,6 +1,8 @@
 #ifndef _MOREFILES_
 #define _MOREFILES_
 
+#include <Carbon/Carbon.h>
+
 pascal	OSErr GetCatInfoNoName(short vRefNum,
 							   long dirID,
 							   ConstStr255Param name,

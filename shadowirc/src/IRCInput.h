@@ -22,8 +22,6 @@
 #ifndef _IRCInput
 #define _IRCInput
 
-#pragma lib_export on
-#pragma export on
 #ifdef _IRCChannels
 pascal void InputHandler(LongString *ls, targetPtr targ);
 #endif
@@ -33,10 +31,7 @@ pascal void ProcessLine(LongString* ls, char stackup, char action, MWPtr mw);
 
 pascal void LockInput(void);
 pascal void UnlockInput(void);
-#pragma export off
-#pragma lib_export off
 
-#pragma internal on
 pascal void Key(EventRecord *e, char dontProcess);
 pascal void parseShortcutText(ConstStr255Param s);
 pascal void processPaste(MWPtr mw, char dragAndDrop);
@@ -48,5 +43,4 @@ extern long lastInput, lastKey;
 extern char iwFront;
 extern char inputLocked;
 
-#pragma internal reset
 #endif

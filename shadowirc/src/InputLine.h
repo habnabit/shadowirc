@@ -115,7 +115,6 @@ typedef struct inputLineRec {
 	CONST char lock;
 } inputLineRec, *inputLinePtr;
 
-#pragma internal on
 extern inputLineRec inputLine;
 
 #ifdef _MsgWindows_
@@ -131,13 +130,9 @@ pascal char ILWEIsInput(WEReference we);
 pascal WEReference ILGetWE(void);
 #endif
 
-#pragma internal reset
-
 pascal void IWLock();
 pascal void IWUnlock();
 
-#pragma lib_export on
-#pragma export on
 pascal void SetInputLineCursorSelection(long start, long finish);
 pascal void GetInputLineCursorSelection(long *start, long *finish);
 pascal void SetInputLine(LongString *ls);
@@ -156,8 +151,6 @@ pascal char ILSetLine(MWPtr mw, LongString *ls);
 pascal char ILGetLine(MWPtr mw, LongString *ls);
 #endif
 #endif
-#pragma export off
-#pragma lib_export off
 
 #undef CONST
 

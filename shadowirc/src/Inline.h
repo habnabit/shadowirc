@@ -19,39 +19,17 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#define linkfor(list, init) for((list) = (init); (list); (list)=(list)->next)
+#include <Carbon/Carbon.h>
 
-#pragma macsbug off
-#pragma traceback off
-#pragma dont_inline off
+#define linkfor(list, init) for((list) = (init); (list); (list)=(list)->next)
 
 //inline void pstrcpy(ConstStringPtr f, StringPtr dest) {BlockMoveData(f, dest, f[0]+1);}
 #define pstrcpy(src, dest) BlockMoveData(src, dest, (src)[0] + 1)
 
 #define SetRGBColor(color, r, g, b) ((color).red = r, (color).green = g, (color).blue = b)
 
-inline char IsChannel(ConstStringPtr s)
-{
-	if((s[0]!=0) && ((s[1]=='#') || (s[1]=='&') || (s[1]=='+')))
-		return true;
-	else
-		return false;
-}
-
-inline char IsDCCName(ConstStringPtr s)
-{
-	if((s[0]!=0)&&(s[1]=='='))
-		return true;
-	else
-		return false;
-}
-
-inline char inupc(char c)
-{
-	if((c>='a') && (c<='z'))
-		c-=32;
-	return c;
-}
+extern pascal char inupc(char c);
+extern void DebugLS(char *str);
 
 #define LineMsg(ls) MWMessage(consoleWin, ls)
 
@@ -65,6 +43,3 @@ inline char inupc(char c)
 
 #define pstrcmpX(str, l, l2) (*(long*)str == (((long)l << 24L) + l2))
 
-#pragma macsbug reset
-#pragma traceback reset
-#pragma dont_inline reset

@@ -14,21 +14,6 @@
 
 #include "WASTEIntf.h"
 
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #if TARGET_RT_MAC_CFM
-  #ifndef __CODEFRAGMENTS__
-  #include <CodeFragments.h>
-  #endif
-  #endif
-#else
-  #if GENERATINGCFM
-  #ifndef __CODEFRAGMENTS__
-  #include <CodeFragments.h>
-  #endif
-  #endif
-#endif
-
-
 const Point kOneToOneScaling = { 1, 1 };
 
 // static variables
@@ -192,122 +177,6 @@ static pascal SInt16 _WEStdCharType(Ptr pText, SInt16 textOffset, ScriptCode scr
 #pragma unused(hWE)
 	return CharacterType(pText, textOffset, script);
 }
-
-//	_WEScriptToFont, _WEOldWordBreak, _WEOldCharByte and _WEOldCharType
-//	are only needed to support version 7.0 / 7.0.1 of MacOS;
-//	CFM-based code (both PowerPC and CFM68K) doesn't need these routines
-//	as the Code Fragment Manager requires at least MacOS 7.1.2
-//	(on the PowerPC) or MacOS 7.1 (for CFM68K)
-
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #define NEW_SCRIPT_SUPPORT 	(SystemSevenFiveOrLater || TARGET_RT_MAC_CFM)
-#else
-  #define NEW_SCRIPT_SUPPORT 	(SystemSevenFiveOrLater || GENERATINGCFM)
-#endif
-
-#if ! NEW_SCRIPT_SUPPORT
-
-pascal SInt16 _WEScriptToFont(ScriptCode script)
-{
-	// given an explicit script code, return the first font ID in the corresponding range
-	// for an explanation of the formula given below, see IM: Text, page B-8
-
-	if (script == smRoman)
-	{
-		return 2;
-	}
-	else if ((script > smRoman) && (script <= smUninterp))
-	{
-		return (0x3E00 + 0x200 * script);
-	}
-	else
-	{
-		return systemFont;	// unknown script code (?)
-	}
-}
-
-static pascal void _WEOldWordBreak(Ptr pText, SInt16 textLength, SInt16 offset,
-				WEEdge edge, OffsetTable breakOffsets, ScriptCode script,
-				WEHandle hWE)
-{
-	GrafPtr savePort, tempPort;
-	SInt16 saveFont;
-
-	// the old (now obsolete) FindWord routine gets an implicit script parameter through
-	// the current graphics port txFont field, so first of all we must have a valid port
-	GetPort(&savePort);
-	tempPort = (*hWE)->port;
-	SetPort(tempPort);
-
-	// then set the txFont field to a font number in the specified script range
-	saveFont = tempPort->txFont;
-	TextFont(_WEScriptToFont(script));
-
-	// call _FindWord
-	FindWord(pText, textLength, offset, (Boolean)edge, nil, breakOffsets);
-
-	// restore font and port
-	TextFont(saveFont);
-	SetPort(savePort);
-
-}
-
-static pascal SInt16 _WEOldCharByte(Ptr pText, SInt16 textOffset, ScriptCode script,
-				WEHandle hWE)
-{
-	GrafPtr savePort, tempPort;
-	SInt16 saveFont;
-	SInt16 retVal;
-
-	// the old (now obsolete) CharByte routine gets an implicit script parameter through
-	// the current graphics port txFont field, so first of all we must have a valid port
-	GetPort(&savePort);
-	tempPort = (*hWE)->port;
-	SetPort(tempPort);
-
-	// then set the txFont field to a font number in the specified script range
-	saveFont = tempPort->txFont;
-	TextFont(_WEScriptToFont(script));
-
-	// call _CharByte
-	retVal = CharByte(pText, textOffset);
-
-	// restore font and port
-	TextFont(saveFont);
-	SetPort(savePort);
-
-	return retVal;
-}
-
-static pascal SInt16 _WEOldCharType(Ptr pText, SInt16 textOffset, ScriptCode script,
-				WEHandle hWE)
-{
-	GrafPtr savePort, tempPort;
-	SInt16 saveFont;
-	SInt16 retVal;
-
-	// the old (now obsolete) CharType routine gets an implicit script parameter through
-	// the current graphics port txFont field, so first of all we must have a valid port
-	GetPort(&savePort);
-	tempPort = (*hWE)->port;
-	SetPort(tempPort);
-
-	// then set the txFont field to a font number in the specified script range
-	saveFont = tempPort->txFont;
-	TextFont(_WEScriptToFont(script));
-
-	// call _CharType
-	retVal = CharType(pText, textOffset);
-
-	// restore font and port
-	TextFont(saveFont);
-	SetPort(savePort);
-
-	return retVal;
-
-}
-
-#endif
 
 static pascal Boolean _WEStdClickLoop(WEHandle hWE)
 {
@@ -526,17 +395,6 @@ pascal void _WESetStandardHooks(WEHandle hWE)
 			_weStdLineBreakProc = NewWELineBreakProc(_WERomanLineBreak);
 		}
 
-#if ! NEW_SCRIPT_SUPPORT
-
-		if (GetScriptManagerVariable(smVersion) < 0x0710)
-		{
-			// pre-7.1 version of the Script Manager: must use old hooks
-			_weStdWordBreakProc = NewWEWordBreakProc(_WEOldWordBreak);
-			_weStdCharByteProc = NewWECharByteProc(_WEOldCharByte);
-			_weStdCharTypeProc = NewWECharTypeProc(_WEOldCharType);
-		}
-		else
-#endif
 		{
 			// Script Manager version 7.1 or newer
 			_weStdWordBreakProc = NewWEWordBreakProc(_WEStdWordBreak);

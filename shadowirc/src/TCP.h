@@ -26,17 +26,14 @@
 #include "TCPStuff.h"
 #endif
 
-#pragma internal on
+
 
 enum {
 	C_NoEvent,
 	C_Found,
 	C_SearchFailed,
-	C_NameFound,
-	C_NameSearchFailed,
 	C_Established,
 	C_FailedToOpen,
-	C_Closing,
 	C_Closed,
 	C_CharsAvailable
 };
@@ -52,29 +49,45 @@ typedef struct connectionEventRecord {
 	CONST char timedout;
 	const short PAD;
 	CONST long connection;
-	CONST TCPConnectionPtr tcpc;
+        /* Formerly named tcpc (for TCPConnection)
+         * Berkely Sockets use a normal file descriptor
+         * Use 'int sockfd'
+         */
+	int sockfd;
+        /*
+         * XXX landonf: The "const" long "value" is used to pass back a pointer
+         * to a pascal string (hostname). It also was used to pass back the IP address.
+	 * addr will hold the IP address instead
+         */
 	CONST long value;
+	struct in_addr addr;
 } connectionEventRecord, *CEPtr;
 
 #undef CONST
 
 //TCPConnections
-pascal OSErr NewPassiveConnection (long*, long, short, long, short);
-pascal OSErr NewActiveConnection (long*, long, short, long, short);
+// XXX landonf: These will be reworked for TCP sockets
+// First long * argument is a connectionIndex
+pascal OSErr NewListenConnection (long * cp, u_short localport, int backlog);
+pascal OSErr NewActiveConnection (long * cp, struct in_addr remotehost, u_short remoteport);
 
 pascal OSErr InitConnections(void);
 pascal OSErr FindAddress(long*, ConstStr255Param);
 pascal OSErr FindName(long*, long);
 
-pascal TCPConnectionPtr GetConnectionTCPC(long cp);
+void inet_ntoa_str(struct in_addr addr, StringPtr string);
+void ntohl_str(u_int32_t net32, StringPtr string);
+u_int32_t str_htonl(StringPtr string);
 
-pascal OSErr TCPReceiveUpTo(TCPConnectionPtr, char, long, Ptr, long, long*, char*);
-pascal OSErr TCPReceiveChars(TCPConnectionPtr, void*, short);
+int GetConnectionSocket(long cp);
+
+size_t TCPReceiveUntil(int sockfd, Ptr d, char c, size_t len);
+size_t TCPReceiveChars(int sockfd, Ptr d, size_t len);
 
 pascal void AbortConnection(long);
 pascal void CloseTCPConnection(long);
 pascal void FinishEverything(void);
 pascal char GetConnectionEvent(CEPtr);
-#pragma internal reset
+
 
 #endif

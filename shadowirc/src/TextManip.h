@@ -75,9 +75,6 @@ enum nickFormats
 pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nickC, int type);
 pascal void FormatMessage(ConstStr255Param nick, const LongString *text, ConstStringPtr nickC, ConstStringPtr textC, int type, LongString *out);
 
-#pragma lib_export on
-#pragma export on
-
 pascal void MWColor(LongString *ls, short colorNum);
 pascal void MWIrcleColor(LongString *ls, short colorNum);
 
@@ -93,8 +90,5 @@ pascal char SMPrefixLinkColor(linkPtr link, LongString *ls, short where, short c
 pascal char SMPrefixLinkIrcleColor(linkPtr link, LongString *ls, short where, short color);
 pascal char SMPrefixRGBLinkColor(linkPtr link, LongString *ls, short where, const RGBColor *rgb);
 #endif
-
-#pragma export off
-#pragma lib_export off
 
 #endif

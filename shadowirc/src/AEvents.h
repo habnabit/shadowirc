@@ -19,15 +19,5 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#pragma internal on
-
 pascal OSErr InstallAEHandlers(void);
-
-#pragma lib_export on
-#pragma export on 
 pascal long RegisterAETE(Handle aete);
-#pragma export off
-#pragma lib_export off
-
-
-#pragma internal reset

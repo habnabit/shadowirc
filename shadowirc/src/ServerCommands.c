@@ -34,15 +34,12 @@
 #include "plugins.h"
 #include "IRCCommands.h"
 #include "utils.h"
-#include "Sound.h"
 #include "Inline.h"
 #include "Floaters.h"
-#include "Timer.h"
 #include "CTCP.h"
 #include "IRCNComm.h"
 #include "TextManip.h"
 
-#pragma internal on
 inline pascal void checkLimitKey(linkPtr link, char mode, channelPtr curChannel, StringPtr modeChange);
 inline pascal void checkOpsBans(linkPtr link, char up, char voice, StringPtr modeChange, channelPtr curChannel, ConstStringPtr setBy);
 pascal void doMODE(linkPtr link, ConstStringPtr channel, StringPtr modeChange, ConstStringPtr setBy, LongString *tls);

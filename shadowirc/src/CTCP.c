@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -32,18 +32,16 @@
 #include "plugins.h"
 #include "IRCCommands.h"
 #include "Inline.h"
-#include "Timer.h"
+//#include "Timer.h"
 #include "TextManip.h"
 
 
-#pragma internal on
 static pascal void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *ctcp, char ign);
 inline void quote(LongString *s);
 inline void unquote(StringPtr s);
 static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, ConstStr255Param ta, ConstStr255Param co, StringPtr re);
 static pascal void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, Str255 re);
 static pascal void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstStr255Param fr, ConstStr255Param re);
-#pragma internal reset
 
 inline void quote(LongString *s)
 {
@@ -279,7 +277,7 @@ static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param 
 	}
 	else if(pstrcmp7(co, 'VER', 'SION'))
 	{
-		LSConcatStrAndStrAndStr("\pShadowIRC ", CL_VERSION, "\p © John Bafford 1996-2001 (", &ls);
+		LSConcatStrAndStrAndStr("\pShadowIRC ", CL_VERSION, "\p © John Bafford 1996-2002 (", &ls);
 		LSConcatLSAndStrAndStr(&ls, cdt, "\p), ", &ls);
 		SendCTCPReply(link, fr, co, &ls);
 	}
@@ -463,11 +461,13 @@ pascal char doCTCP(ConstStr255Param from, ConstStr255Param uah, ConstStr255Param
 
 	runPlugins(pCTCPMessage, &p);
 	if(!p.completelyProcessed && !ign)
+	{
 		if(isReply)
 			CTCPReply(link, from, comm, rest);
 		else
 			ok=CTCPComm(link, from, uah, target, comm, rest);
-
+	}
+	
 	if(!ign && !isReply && ok)
 	{
 		s->len=j;

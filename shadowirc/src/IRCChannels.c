@@ -19,7 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Appearance.h>
+#include <Carbon/Carbon.h>
 
 #include "WASTE.h"
 
@@ -49,7 +49,6 @@
 #include "ApplBase.h"
 #include "TextManip.h"
 
-#pragma internal on
 static pascal void MWWidgetInternalDraw(mwWidgetPtr o, char winActive);
 inline void DrawTopic(mwWidgetPtr o, char winActive);
 static void DrawChannelModes(mwWidgetPtr o, char winActive);
@@ -74,7 +73,6 @@ inline pascal void linkWinDel(MWPtr win);
 
 static pascal char TrackCSMouse(Point p, const Rect *cr, short c, char modePlus);
 static pascal void RollCSMouseCall(short l, char mc, char cl, Rect *cr, Point p, LongString *ls, char *b);
-#pragma internal off
 
 inline pascal void linkWinAdd(MWPtr win, int i)
 {
@@ -409,7 +407,6 @@ static pascal unsigned char TopicWidgetDialogFilter(DialogPtr d, EventRecord *e,
 
 pascal void ChTopicWindow(channelPtr ch)
 {
-	static count = 0;
 	Str255 s1;
 	DialogPtr d;
 	short i;
@@ -568,7 +565,7 @@ static pascal void DoModesWidget(mwWidgetPtr o, Point p)
 	MWPtr mw = o->mw;
 	channelPtr ch = MWGetChannel(mw);
 	linkPtr link = ch->link;
-	char x;
+	int x;
 	short off = p.h - o->drawArea.left;
 	short *modePt = (short*)o->data;
 	char *themode = ch->modes;
@@ -1191,7 +1188,7 @@ pascal void DrawMWinStatus(MWPtr mw)
 restart:
 	r = p->drawArea;
 
-	r2=WGetBBox(mw->w);
+	WGetBBox(mw->w, &r2);
 	GlobalToLocal((Point*)&r2.bottom);
 
 	r.top=r.bottom-15;

@@ -19,7 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Navigation.h>
+#include <Carbon/Carbon.h>
 
 #include "LongStrings.h"
 #include "StringList.h"
@@ -30,6 +30,7 @@
 #include "DCC.h"
 #include "connections.h"
 #include "utils.h"
+#include "channels.h"
 #include "IRCChannels.h"
 #include "CTCP.h"
 #include "InputLine.h"
@@ -55,8 +56,6 @@ enum ShadowIRCCookies {
 	kCookieNoReply = 'REPX'
 };
 
-#pragma internal on
-
 static dccTypeListHand dccTypeList;
 static long dccSENDRevCount= 0;
 
@@ -79,7 +78,6 @@ static pascal void DCCGetLineGet(connectionPtr conn);
 static pascal void DCCGetLineSend(connectionPtr conn);
 static pascal void StartDCCGet(connectionPtr x);
 
-static pascal short DCCSendFileHook(short item, DialogPtr d, dccsendbitPtr info);
 static void DCCSendFileNavHookMouseDown(NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
 static pascal void DCCSendFileNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
 
@@ -89,8 +87,13 @@ static pascal void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr2
 
 static pascal void DCCNMRequest(connectionPtr x, char overwriteFile);
 
-#pragma internal reset
-
+char IsDCCName(ConstStringPtr s)
+{
+	if((s[0]!=0)&&(s[1]=='='))
+		return true;
+	else
+		return false;
+}
 pascal void DCCTypeInit(void)
 {
 	dccTypeListPtr p;
@@ -374,33 +377,6 @@ pascal char DCCCreate(linkPtr link, short typ, ConstStr255Param fr, connectionPt
 	}
 }
 
-#if !TARGET_CARBON
-static pascal short DCCSendFileHook(short item, DialogPtr d, dccsendbitPtr info)
-{
-	if(GetWRefCon((WindowPtr)d) == (long)sfMainDialogRefCon)
-	{
-		if(item == -1) //init
-		{
-			setCheckBox(d, 10 + info->macbinary, 1);
-		}
-		else if(item == 10)
-		{
-			setCheckBox(d, 10, 1);
-			setCheckBox(d, 11, 0);
-			info->macbinary = false;
-		}
-		else if(item == 11)
-		{
-			setCheckBox(d, 10, 0);
-			setCheckBox(d, 11, 1);
-			info->macbinary = true;
-		}
-	}
-	
-	return item;
-}
-#endif
-
 static void DCCSendFileNavHookMouseDown(NavCBRecPtr callBackParms, NavCallBackUserData callBackUD)
 {
 	ControlHandle	whichControl;				
@@ -536,82 +512,48 @@ pascal char DCCGetAFile(FSSpec *f, char *macbinary)
 {
 	char b = 0;
 	
-	if(hasNav)
+	NavReplyRecord		theReply;
+	NavDialogOptions	dialogOptions;
+	OSErr theErr;
+    NavEventUPP eventUPP = NewNavEventUPP(DCCSendFileNavHook);
+		
+	theErr = NavGetDefaultDialogOptions(&dialogOptions);
+	dialogOptions.preferenceKey = kNavGetFile;
+	
+	pstrcpy("\pShadowIRC", dialogOptions.clientName);
+	GetIntString(dialogOptions.actionButtonLabel, spFile, sSend);
+	
+	dialogOptions.dialogOptionFlags-=kNavAllowMultipleFiles;
+	
+	theErr = NavGetFile(0, &theReply, &dialogOptions, eventUPP, 0, 0, 0, macbinary);
+	
+	DisposeNavEventUPP(eventUPP);
+	
+	if (theReply.validRecord && theErr == noErr)
 	{
-		NavReplyRecord		theReply;
-		NavDialogOptions	dialogOptions;
-		OSErr theErr;
-		NavEventUPP			eventUPP = NewNavEventProc(DCCSendFileNavHook);
+		long count = 0;
+		AEKeyword key;
+		long index;
 		
-		theErr = NavGetDefaultDialogOptions(&dialogOptions);
-		dialogOptions.preferenceKey = kNavGetFile;
-		
-		pstrcpy("\pShadowIRC", dialogOptions.clientName);
-		GetIntString(dialogOptions.actionButtonLabel, spFile, sSend);
-		
-		dialogOptions.dialogOptionFlags-=kNavAllowMultipleFiles;
-		
-		theErr = NavGetFile(0, &theReply, &dialogOptions, eventUPP, 0, 0, 0, macbinary);
-		
-		DisposeNavEventUPP(eventUPP);
-		
-#if !TARGET_CARBON
-		if(theErr == memFullErr)
-			goto standardFileFallback;
-#endif
-		
-		if (theReply.validRecord && theErr == noErr)
-		{
-			long count = 0;
-			AEKeyword key;
-			long index;
-			
-			// since we allow for multiple objects to be returned,
-			// grab the target FSSpecs from 'theReply.fileRef' list for opening:	
-			AEDesc 	resultDesc;
+		// since we allow for multiple objects to be returned,
+		// grab the target FSSpecs from 'theReply.fileRef' list for opening:	
+		AEDesc 	resultDesc;
 
-			// we are ready to open the document(s), grab information about each file for opening:
-			theErr = AECountItems(&(theReply.selection),&count);
-			for (index=1;index<=count;index++)
+		// we are ready to open the document(s), grab information about each file for opening:
+		theErr = AECountItems(&(theReply.selection),&count);
+		for (index=1;index<=count;index++)
+		{
+			if ((theErr = AEGetNthDesc(&(theReply.selection),index,typeFSS, &key ,&resultDesc)) == noErr)
 			{
-				if ((theErr = AEGetNthDesc(&(theReply.selection),index,typeFSS, &key ,&resultDesc)) == noErr)
-				{
-					AEGetDescData(&resultDesc, f, sizeof(FSSpec));
+				AEGetDescData(&resultDesc, f, sizeof(FSSpec));
 
-					b = 1;
-					theErr = AEDisposeDesc(&resultDesc);
-				}
+				b = 1;
+				theErr = AEDisposeDesc(&resultDesc);
 			}
-			
-			theErr = NavDisposeReply(&theReply);	// clean up after ourselves	
 		}
-	}
-#if !TARGET_CARBON
-	else
-	{
-		StandardFileReply reply;
-		Point p;
-		DlgHookYDUPP dialogHook;
-		dccsendbit info;
-
-standardFileFallback:
-		p.h = p.v = -1;
-		dialogHook=NewDlgHookYDProc(&DCCSendFileHook);
 		
-		info.macbinary= *macbinary;
-		
-		CustomGetFile(0, 0, 0, &reply, -301, p, dialogHook, 0, 0, 0, (Ptr)&info);
-		if(reply.sfGood)
-		{
-			*f=reply.sfFile;
-			
-			*macbinary = info.macbinary;
-			b=true;
-		}
-
-		DisposeRoutineDescriptor(dialogHook);
+		theErr = NavDisposeReply(&theReply);	// clean up after ourselves	
 	}
-#endif	
 	return b;
 }
 
@@ -917,7 +859,7 @@ pascal void DCCOpen(connectionPtr *x)
 		if(!NetGetLocalIP(&cc->ip) && ConnNewPassiveBlankListener(cc))
 		{
 			cc->port=ConnGetLocalPort(cc);
-			ulongstr(cc->ip, ipa);
+			ntohl_str(cc->ip.s_addr, ipa);
 			ulongstr(cc->port, pn);
 			args[0]=0;
 			
@@ -971,7 +913,7 @@ pascal void DCCOpen(connectionPtr *x)
 	}
 	else if(d->dccFlags==offered)
 	{
-		hostToIPStr(cc->ip, des);
+		inet_ntoa_str(cc->ip, des);
 		NumToString(cc->port, args);
 		ConnSetup(cc, des, cc->port);
 		if(cc->connType == connSOCKS)
@@ -1396,10 +1338,9 @@ static pascal void DCCGetLineChat(connectionPtr conn)
 	char b;
 	pDCCIncomingChatDataRec p;
 	
-	nn=0;
-	if(!ConnGetUpTo(conn, 10, readTimeout, (Ptr)&ls.data[1], 512, &nn, &b))
+	if((nn = ConnGetUntil(conn, (Ptr)&ls.data[1], '\n', 512)) != -1)
 	{
-		while((nn>0) && ((ls.data[nn]==10) || (ls.data[nn]==13)))
+		while((nn>0) && ((ls.data[nn]=='\n') || (ls.data[nn]=='\r')))
 			nn--;
 		ls.len=nn;
 		
@@ -1514,7 +1455,10 @@ static pascal void DCCGetLineGet(connectionPtr conn)
 
 	while(conn)
 	 {
-		nn = ConnCharsAvail(conn);
+                /*
+                 * XXX replace with c->value
+                 */
+		//nn = ConnCharsAvail(conn);
 		if(nn<1)
 			break;
 			
@@ -1683,7 +1627,11 @@ static pascal void DCCGetLineSend(connectionPtr conn)
 	
 	while(conn)
 	 {
-	 	nn = ConnCharsAvail(conn);
+                /*
+                 * XXX
+                 * replace with c->value
+                 */
+	 	//nn = ConnCharsAvail(conn);
 		if(nn<sizeof(long))
 			break;
 		if(nn>sizeof(long))
@@ -1736,7 +1684,6 @@ pascal void dccEvent(CEPtr c, connectionPtr conn)
 			DCCFailed(&conn, GetIntStringPtr(spDCC, sFailedToOpen));
 			break;
 		
-		case C_Closing:
 		case C_Closed:
 			DCCFailed(&conn, "\pClosed");
 			break;
@@ -1746,7 +1693,7 @@ pascal void dccEvent(CEPtr c, connectionPtr conn)
 			break;
 			
 		case C_Found:
-			conn->ip=c->value;
+			memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
 			break;
 	}
 }
@@ -1789,14 +1736,14 @@ static pascal void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255
 		NextArg(s, 0); //IP
 		NextArg(s, 0); //port
 		x->refCon = (void*)revNum;
-		x->ip = x->port = 0;
+		x->ip.s_addr = x->port = 0;
 		d->dccFlags = closed;
 		d->reverse = true;
 	}
 	else
 	{
 		NextArg(s, c); //IP
-		x->ip=ulongval(c);
+		x->ip.s_addr = str_htonl(c);
 		NextArg(s, c); //port
 		StringToNum(c, &l);
 		x->port=l;
@@ -1812,7 +1759,7 @@ static pascal void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255
 	{
 		Str255 st2;
 		
-		hostToIPStr(x->ip,c);
+		inet_ntoa_str(x->ip, c);
 		NumToString(x->port, st);
 		pstrcat(c, "\p:", st2);
 		pstrcat(st2, st, st2);
@@ -1826,7 +1773,7 @@ static pascal void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255
 
 static pascal void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, StringPtr s, long revNum)
 {
-	const t = dccGET;
+	const short t = dccGET;
 	Str255 c;
 	long l;
 	connectionPtr x;
@@ -1865,14 +1812,14 @@ static pascal void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255P
 		NextArg(s, 0); //IP
 		NextArg(s, 0); //port
 		x->refCon = (void*)revNum;
-		x->ip = x->port = 0;
+		x->ip.s_addr = x->port = 0;
 		d->dccFlags = closed;
 		d->reverse = true;
 	}
 	else
 	{
 		NextArg(s, c); //IP
-		x->ip=ulongval(c);
+		x->ip.s_addr = str_htonl(c);
 		NextArg(s, c); //port
 		StringToNum(c, &l);
 		x->port=l;
@@ -1912,7 +1859,7 @@ static pascal void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255P
 	}
 	else
 	{
-		hostToIPStr(x->ip,c);
+		inet_ntoa_str(x->ip, c);
 		NumToString(x->port, st);
 		LSConcatStrAndStrAndStr(c, "\p:", st, &ls);
 		LSMakeStr(ls);
@@ -2011,7 +1958,7 @@ static pascal void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr2
 					{
 						NextArg(s, 0); //name
 						NextArg(s, c); //IP
-						x->ip=ulongval(c);
+						x->ip.s_addr = str_htonl(c);
 						NextArg(s, c); //port
 						StringToNum(c, &l);
 						x->port=l;

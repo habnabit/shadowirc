@@ -28,8 +28,6 @@ typedef struct DNSLookupData {
 	Ptr u;
 } DNSLookupData, *DNSLookupDataPtr;
 
-#pragma lib_export on
-#pragma export on
 pascal void doBroadcast(linkPtr link, const LongString *ls, char action);
 pascal void DoONotice(channelPtr ch, const LongString *text);
 pascal void DNSLookup(Str255 addr, long saveReply);
@@ -42,14 +40,10 @@ pascal void DoServer(linkPtr link, LongString *rest, const LongString* reason);
 pascal void DoSignoff(linkPtr link, const LongString *reason);
 pascal void NickListAdd(linkPtr link, ConstStr255Param n);
 pascal void ChannelListAdd(linkPtr link, ConstStr255Param n);
-#pragma export off
-#pragma lib_export off
 
-#pragma internal on
 pascal void sendCTCP(linkPtr link, ConstStr255Param t, LongString *ls);
 
 pascal void RegUser(linkPtr link);
 pascal int signoffClearChannels(linkPtr link);
 pascal void finishConnect(linkPtr link);
-#pragma internal reset
 #endif

@@ -22,20 +22,14 @@
 #ifndef _utils_
 #define _utils_
 
-#if TARGET_CARBON
-#include <Types.h>
-#include <Menus.h>
-#include <Dialogs.h>
-#include <Lists.h>
-#include <QuickDraw.h>
-#endif
+#include <Carbon/Carbon.h>
 
 #ifndef _LongStrings
 #include "LongStrings.h"
 #endif
 
-#pragma lib_export on
-#pragma export on
+
+void * safe_malloc (size_t size);
 pascal char upc(unsigned char c);
 pascal void ucase(StringPtr str);
 pascal void pdelete(StringPtr s, short start, short len);
@@ -73,12 +67,8 @@ pascal unsigned char StandardDialogFilter(DialogPtr d, EventRecord *e, short *it
 typedef struct NavCBRec* NavCBRecPtr;
 #endif
 pascal void NavDialogFilter(const long callBackSelector, NavCBRecPtr callBackParms, void* callBackUD);
-pascal SInt32 MySendControlMessage ( ControlHandle inControl, SInt16 inMessage, SInt32 inParam );
 pascal void SetDlogItemTextHdl( DialogPtr dp, short item, const char *buf, long bufLen );
 
-#if !TARGET_CARBON
-pascal void GetQD(QDGlobals* *qdg);
-#endif
 
 pascal void pstrcpymax(ConstStringPtr src, StringPtr dest, char max);
 pascal OSErr CopyResource(ResType type, short id, short src, short des);
@@ -86,12 +76,8 @@ pascal void pstrcat(ConstStr255Param src1, ConstStr255Param src2, StringPtr des)
 
 pascal void NextArg(StringPtr from, StringPtr arg);
 
-#pragma export off
-#pragma lib_export off
-
 pascal void DeleteResourceType(short resFile, ResType type);
 
-#pragma internal on
 pascal void strp2c(unsigned char *pstr);
 pascal void strc2p(char *cstr);
 
@@ -110,8 +96,6 @@ pascal void LSGetIntString(LongString *ls, STRnPtr list, short elt);
 #endif
 
 pascal StringPtr NewPString(const unsigned char *pstr);
-
-#pragma internal reset
 
 #define SAppend1(s,ch){(s)[++((s)[0])]=ch;}
 #define SAppend2(s,sh){(s)[0]+=2;*(short*)&(s)[(s)[0]-1]=sh;}

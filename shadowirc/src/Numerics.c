@@ -36,9 +36,6 @@
 #include "IRCNotify.h"
 #include "TextManip.h"
 
-#pragma internal on
-#pragma dont_inline on
-
 pascal void doMODE(linkPtr link, ConstStringPtr channel, StringPtr modeChange, ConstStringPtr setBy, LongString *tls);
 
 static pascal void AttemptNickRegainNickChange(linkPtr link, ConstStringPtr cantUse)

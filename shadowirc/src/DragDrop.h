@@ -22,18 +22,12 @@
 #ifndef _DragDrop_
 #define _DragDrop_
 
-#pragma lib_export on
-#pragma export on
 pascal void DragHilightRect(const Rect *re, DragReference drag);
 pascal void DragHilightRectBG(const Rect *re, DragReference drag, char hilite);
 pascal char DragIsTypeAvail(DragReference drag, long type);
 pascal char DragGetType(DragReference drag, long type, void* *data, long *size);
 pascal char DragGetPtr(DragReference drag, long type, void* *data);
 pascal char DragAddPtr(DragReference drag, ItemReference item, long type, void* data, long flags);
-#pragma export off
-#pragma lib_export off
-
-#pragma internal on
 
 #ifdef _WASTE_
 extern WEPreTrackDragUPP sPreTrackerUPP;
@@ -41,6 +35,5 @@ extern WEPreTrackDragUPP sPreTrackerUPP;
 
 pascal void InitDrag(void);
 pascal void RemoveDragHandlers(void);
-#pragma internal reset
 
 #endif

@@ -34,7 +34,6 @@
 #include "plugins.h"
 #include "TextManip.h"
 
-#pragma internal on
 static pascal void trashNotify(linkPtr link, notifyPtr n);
 
 pascal void ListNotify(linkPtr link)

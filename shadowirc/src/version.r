@@ -1,4 +1,4 @@
-#include "Types.r"
+#include <Carbon/Carbon.r>
 
 resource 'vers' (1)
 {

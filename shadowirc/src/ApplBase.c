@@ -19,15 +19,10 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Appearance.h>
-#include <balloons.h>
-#include <Sound.h>
-#include <Navigation.h>
+#include <Carbon/Carbon.h>
 #include "WASTE.h"
-#include <ControlDefinitions.h>
 
 #include "AppearanceHelp.h"
-#include "SmartScrollAPI.h"
 
 #include "StringList.h"
 #include "Inline.h"
@@ -60,9 +55,9 @@
 #include "InetConfig.h"
 #include "MenuCommands.h"
 #include "Shortcuts.h"
+#include "Events.h"
 #include "ApplBase.h"
 
-#pragma internal on
 static pascal void WindowActivate(WindowPtr window, char activate);
 static pascal void floatingWindowClick(EventRecord *e);
 static pascal void inZoomInOutHandler(const EventRecord *e, short part);
@@ -71,14 +66,12 @@ inline void inProxyHandler(EventRecord *e);
 static pascal void inContentHandler(EventRecord *e);
 inline void inGoAwayHandler(const EventRecord *e);
 static pascal void inGrowHandler(const EventRecord *e);
-static pascal char CheckMem(void);
 static pascal void DoMouseMovedEvent(const EventRecord *e);
 static pascal void doMouseUp(EventRecord *e);
 static pascal void doMouseDown(EventRecord *e);
 static pascal void doTCPEvent(CEPtr message);
 static pascal void ApplEvents(EventRecord *e);
 static pascal char doDialogEvent(EventRecord *e);
-static pascal void FinishStaleConnections(void);
 static pascal void ApplExit(void);
 
 WindowPtr ContextWindow = 0;
@@ -149,8 +142,6 @@ static pascal void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand 
 	asp->isFinished=1;
 	*asp->gSoundIsFinished=1;
 }
-
-#pragma internal reset
 
 pascal OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel)
 {
@@ -319,162 +310,6 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 	runService(pServiceActivateWin, &ps);
 }
 
-enum memorySizes {
-	LOFREEMEM = 1500,		//die if we have less than 1.5k free
-	HIFREEMEM = 25600		//warn if we have less than 25k free
-};
-
-static pascal char CheckMem(void)
-{
-	static long lastCheck = 0;
-	static long lastFmem = 0;
-	static char lowmemWarning = 0;
-	static char purged = 0, dieNow = 0;
-	long fm = FreeMem();
-	LongString ls;
-	long i;
-	linkPtr link;
-	MWPtr mw;
-	char purgedAnything = 0;
-	
-	if(fm>HIFREEMEM)
-	{
-		purged=dieNow=lowmemWarning=0;
-		goto exitCheckMem;
-	}
-	else if(fm>LOFREEMEM)
-	{
-		dieNow=0;
-	}
-	
-	if(dieNow)
-	{
-		LSStrLS("\pQUIT :Ran out of memory", &ls);
-		linkfor(link, firstLink)
-			SendCommand(link, &ls);
-			
-		Delay(90, (unsigned long*)&i);
-		
-		SysBeep(0);
-		ParamText(GetIntStringPtr(spError, sRanOutOfMemory), "\p", "\p", "\p");
-		Alert(130, 0);
-		ApplExit();
-	}
-	else if(purged)
-	{
-		if(fm<LOFREEMEM)
-		{
-			//Before we give up, let's try one last ditch effort to free up memory.
-			//That means, troll through the windows and find the help window. If there's one,
-			//close it and hope we don't get back here.
-			//If there isn't, troll through and ask to close text windows. If they close one, stop,
-			//else keep trolling.
-			linkfor(mw, mwl)
-				if(mw->winType == helpWin)
-				{
-					CloseHelp();
-					purgedAnything = 1;
-					goto exitCheckMem;
-				}
-			
-			//If no help window
-			linkfor(mw, mwl)
-				if(mw->winType == textWin)
-					if(TWClose(mw, true))
-					{
-						purgedAnything = 1;
-						goto exitCheckMem;
-					}
-			
-			//if no help window, and we didn't close a text window, we're in trouble.
-			//We should scan through and find inactive channel/query/dcc windos and close them
-			
-			dieNow=1;
-			goto exitCheckMem;
-		}
-	}
-	
-	if(fm < LOFREEMEM && lowmemWarning)
-	{
-		if(purged)
-			dieNow=1;
-		else
-		{
-			purged=1;
-			PurgeMem(maxSize);
-			SysBeep(1);
-		}
-	}
-	else if(fm < (HIFREEMEM + 1536)) //at himem + 1.5k, purge stuff.
-	{
-		//Troll through the message windows, and for those windows that have more than 10k of text, delete the first 1k.
-		long len;
-		long s0, s1;
-		WEReference we;
-		
-		linkfor(mw, mwl)
-		{
-			if(mw->winType != helpWin && mw->winType != textWin)
-			{
-				we = mw->we;
-				len=WEGetTextLength(we);
-				if(len>7168) //if there's more than 7kb of text in the window
-				{
-					int shorten =  len - 6144; //shorten it to 6kb
-					
-					WEGetSelection(&s0, &s1, we);
-					WEDeactivate(we);
-					WEFeatureFlag(weFAutoScroll, weBitClear, we);
-					WESetSelection(0, shorten, we);
-					WEDelete(we);
-					s0-=shorten;
-					if(s0<0)
-						s0=0;
-					s1-=shorten;
-					if(s1<0)
-						s1=0;
-					WESetSelection(s0, s1, we);
-					WEFeatureFlag(weFAutoScroll, weBitSet, we);
-					if(mw == MWActive)
-						WEActivate(we);
-
-					purgedAnything = 1;
-				}
-			}
-		}
-		LSGetIntString(&ls, spError, sLowOnMem);
-		LineMsg(&ls);
-		
-		fm=FreeMem();
-		if(fm < HIFREEMEM)
-		{
-			if(!lowmemWarning)
-			{
-				ConstStringPtr s, s2;
-				
-				lowmemWarning=1;
-				s = GetIntStringPtr(spError, sShadowIRCLowMem);
-				s2 = GetIntStringPtr(spError, sShadowIRCLowMem2);
-				ParamText(s, s2, "\p", "\p");
-				SysBeep(0);
-				EnterModalDialog();
-				Alert(136, 0);
-				ExitModalDialog();
-				
-				//check and see if we're in the bg
-				if(inBackground)
-				{
-				}
-			}
-		}
-	}
-
-exitCheckMem:	
-	lastFmem = fm;
-	lastCheck = TickCount();
-	return purgedAnything;
-}
-
 pascal void UpdateWindowPosition(WindowPtr win)
 {
 	MWPtr mw;
@@ -483,7 +318,7 @@ pascal void UpdateWindowPosition(WindowPtr win)
 	
 	if(win==inputLine.w)
 	{
-		r=WGetBBox(win);
+		WGetBBox(win, &r);
 		if(r.bottom-r.top>32)
 			mainPrefs->inputLoc = r;
 	}
@@ -498,7 +333,7 @@ pascal void UpdateWindowPosition(WindowPtr win)
 			if(pl && (pl->magic==PLUGIN_MAGIC))
 			{
 				p.w=win;
-				p.newpos=WGetBBox(win);
+				WGetBBox(win, &p.newpos);
 				runIndPlugin(pl->pluginRef, pUIWindowMoveMessage, &p);
 			}
 		}
@@ -726,11 +561,44 @@ static pascal void RetryConnections(void)
 		}
 }
 
-static pascal void IdleTasks(EventRecord *e)
+static void MinuteTimer(EventLoopTimerRef timer, void* data)
 {
-	static unsigned long userhostsTimer, minuteTimer, periodicTasksTimer;
+	MBIdle();
+	RunNotify();
+}
+
+static void Timer20(EventLoopTimerRef timer, void* data)
+{
 	linkPtr curLink;
 	
+	linkfor(curLink, firstLink)
+		if(curLink->serverStatus==S_CONN)
+			ProcessUserHosts(curLink);
+}
+
+static void Timer5(EventLoopTimerRef timer, void* data)
+{
+	checkConnections();
+	UpdateStatusLine();
+}
+
+static void InitTimers()
+{
+	EventLoopTimerUPP mtu, t20u, t5u;
+	EventLoopRef mainLoop = GetMainEventLoop();
+	EventLoopTimerRef timer;
+	
+	mtu = NewEventLoopTimerUPP(MinuteTimer);
+	t20u = NewEventLoopTimerUPP(Timer20);
+	t5u = NewEventLoopTimerUPP(Timer5);
+	
+	InstallEventLoopTimer(mainLoop, 60 * kEventDurationSecond, 60 * kEventDurationSecond, mtu, NULL, &timer);
+	InstallEventLoopTimer(mainLoop, 20 * kEventDurationSecond, 20 * kEventDurationSecond, t20u, NULL, &timer);
+	InstallEventLoopTimer(mainLoop, 5 * kEventDurationSecond, 5 * kEventDurationSecond, t5u, NULL, &timer);
+}
+
+static pascal void IdleTasks(EventRecord *e)
+{
 	if(gSoundIsFinished)
 		AsyncSoundCheck();
 	
@@ -753,32 +621,6 @@ static pascal void IdleTasks(EventRecord *e)
 	
 	RetryConnections();
 	
-	
-	//Periodic tasks
-	if(now-periodicTasksTimer>5)
-	{
-		periodicTasksTimer=now;
-		CheckMem();
-		checkConnections();
-		
-		if(now-userhostsTimer>20)
-		{
-			userhostsTimer = now;
-			linkfor(curLink, firstLink)
-				if(curLink->serverStatus==S_CONN)
-					ProcessUserHosts(curLink);
-		}
-		
-		if(now-minuteTimer>60)
-		{
-			minuteTimer = now;
-			MBIdle();
-			RunNotify();
-		}
-		
-		UpdateStatusLine();
-	}
-	
 	idlePlugins(e);
 }
 
@@ -795,7 +637,7 @@ static pascal void inZoomInOutHandler(const EventRecord *e, short part)
 		if(TrackBox(p->w, e->where, part))
 		{
 			ZoomWindow(p->w, part, 0);
-			r=WGetBBox(p->w);
+			WGetBBox(p->w, &r);
 			MWSetDimen(p, r.left, r.top, r.right-r.left, r.bottom-r.top);
 		}
 	}
@@ -820,7 +662,7 @@ static pascal void inGrowHandler(const EventRecord *e)
 			ii=GrowWindow(p->w, e->where, &r);
 			if(ii)
 			{
-				r=WGetBBox(p->w);
+				WGetBBox(p->w, &r);
 				MWSetDimen(p, r.left, r.top, ii&0x0000FFFF, ii >> 16);
 				UpdateWindowPosition(p->w);
 			}
@@ -914,7 +756,7 @@ static pascal void inContentHandler(EventRecord *e)
 
 static pascal void inDragHandler(EventRecord *e)
 {
-	if(hasWM11 && (IsWindowPathSelectClick((WindowPtr)e->message, e)))
+	if(IsWindowPathSelectClick((WindowPtr)e->message, e))
 		WindowPathSelect((WindowPtr)e->message, 0, 0);
 	else
 	{
@@ -1136,7 +978,7 @@ static pascal char processOutgoingConnectionEvent(CEPtr c, connectionPtr conn)
 			{
 				if(conn->connectStage == csLookingUp2)
 				{
-					conn->ip2 = c->value;
+                    memcpy(&conn->ip2, &c->addr, sizeof(conn->ip2));
 					ConnFindAddress(conn, link->conn->name);
 					
 					LSParamString(&ls, GetIntStringPtr(spInfo, sLookingUpIP), link->conn->name, 0, 0, 0);
@@ -1147,7 +989,7 @@ static pascal char processOutgoingConnectionEvent(CEPtr c, connectionPtr conn)
 				}
 				else
 				{
-					conn->ip = c->value;
+                    memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
 					connection2(conn);
 				}
 			}
@@ -1170,7 +1012,7 @@ static pascal char processOutgoingConnectionEvent(CEPtr c, connectionPtr conn)
 		{
 			if(c->event == C_Established)
 			{
-				conn->ip = c->value;
+                memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
 				
 				if(conn->connType == connSOCKS || conn->connType == connIRC)
 				{
@@ -1226,7 +1068,7 @@ static pascal char doDialogEvent(EventRecord *e)
 	short theItem;
 	pluginDlgInfoPtr pl;
 	
-	if((e->what==keyDown) && ((e->message & 255)==3) || ((e->message & 255)==13))
+	if((e->what==keyDown) && (((e->message & 255)==3) || ((e->message & 255)==13)))
 	{	//pressing return or enter in dlg
 		fw=FrontNonFloater();
 		e->message=(long)fw;
@@ -1359,22 +1201,11 @@ pascal void ApplRun(void)
 				if(!++x)
 					break;
 			}
-			
-			if(x >= -2) //lots of data...check memory to help protect from being flooded off
-				CheckMem();
 		}
 		ApplEvents(&e);
 	}
 	
 	ApplExit();
-}
-
-static pascal long GrowZoneProc(long needed)
-{
-#pragma unused(needed)
-	char ret  = CheckMem();
-	
-	return ret;
 }
 
 pascal void ApplInit(void)
@@ -1383,13 +1214,14 @@ pascal void ApplInit(void)
 	SetRectRgn(mouseRgn, -32767, -32767, 32766, 32766);
 	
 	MenuInit();
-
-	SetGrowZone(NewGrowZoneProc(GrowZoneProc));
+	InitEventHandlers();
 
 	FlushEvents(everyEvent, 0);
 	
 	ActivateWindowProcPtr=&WindowActivate;
-	scb=NewSndCallBackProc(AsyncSoundCallback);
+	scb=NewSndCallBackUPP(AsyncSoundCallback);
+	
+	InitTimers();
 }
 
 static pascal void ApplExit(void)
@@ -1403,11 +1235,7 @@ static pascal void ApplExit(void)
 	RemoveDragHandlers();
 	UnregisterAppearanceClient();
 	
-	if(hasNav)
-		NavUnload();
+	NavUnload();
 	
-	#if !TARGET_CARBON
-	DisposeAllSmartScrolls();
-	#endif
 	ExitToShell();
 }

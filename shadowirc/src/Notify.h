@@ -22,11 +22,7 @@
 #ifndef _Notify_
 #define _Notify_
 
-#pragma lib_export on
-#pragma export on
 pascal void Notify(char mark, Handle icon, Handle sound, ConstStr255Param s);
-#pragma export off
-#pragma lib_export off
 
 pascal void NotifyRemove(void);
 

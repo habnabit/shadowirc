@@ -21,7 +21,7 @@
 
 #define MSGWINDOWS
 
-#include <Appearance.h>
+#include <Carbon/Carbon.h>
 
 #include "WASTE.h"
 
@@ -32,19 +32,16 @@
 #include "MsgWindows.h"
 #include "IRCChannels.h"
 #include "plugins.h"
-#include "LongControls.h"
 #include "MWPanes.h"
 #include "AppearanceHelp.h"
 #include "inline.h"
 #include "TextManip.h"
 
-#pragma internal on
 static pascal void MWDestroyWidget2(mwWidgetPtr w);
 inline mwPanePtr MWInsertPaneAfter(MWPtr mw, short align);
 static pascal void UpdateTextRegion(mwPanePtr w);
 static pascal void UpdateInputRegion(mwPanePtr w);
 static pascal void DrawInputPane(mwPanePtr o);
-#pragma internal reset
 
 static pascal void UpdateInputRegion(mwPanePtr w)
 {
@@ -215,8 +212,6 @@ pascal void MWDestroyAllPanes(MWPtr mw)
 			{
 				if(mw->we)
 					WEDispose(mw->we);
-				if(mw->vscr)
-					LCDetach(mw->vscr);
 			}
 			else if(o->type == mwInputPane)
 			{
@@ -434,11 +429,13 @@ pascal void MWPaneResize(MWPtr mw)
 	mwPanePtr o;
 	pMWPaneResizeData p;
 	GrafPtr gp;
+	Rect portRect;
 	
 	GetPort(&gp);
 	SetPortWindowPort(mw->w);
-
-	InvalWindowRect(mw->w, GetPortBounds(GetWindowPort(mw->w), 0));
+	
+	GetPortBounds(GetWindowPort(mw->w), &portRect);
+	InvalWindowRect(mw->w, &portRect);
 	linkfor(o, mw->paneList)
 		if(o->creator == mwShadowIRCPane && !o->pluginRef)
 		{

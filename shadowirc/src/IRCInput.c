@@ -46,7 +46,6 @@ long lastInput, lastKey;
 char iwFront=0;
 char inputLocked = 0;
 
-#pragma internal on
 static pascal char MWNavKey(EventModifiers modifiers, long message);
 
 pascal void ServerCommands(LongString *ls, linkPtr link);
@@ -54,7 +53,6 @@ inline void pluginMWGotText(LongString *ls, MWPtr win);
 
 static pascal void SOCKSConnect(connectionPtr conn);
 static pascal char CommandPeriod(void);
-#pragma internal reset
 
 static pascal char CommandPeriod(void)
 {
@@ -162,7 +160,7 @@ pascal void processPaste(MWPtr mw, char dragAndDrop)
 			WEDelete(il);
 			
 			WEInsert(&p[lastCR+1], l - lastCR - 1, 0, 0, il);
-			WESetSelection(0x7FFFFFFFF, 0x7FFFFFFF, il);
+			WESetSelection(0x7FFFFFFF, 0x7FFFFFFF, il);
 			WESelView(il);
 		}
 	}
@@ -274,10 +272,12 @@ pascal void HandleMessage(LongString *ls, targetPtr targ)
 pascal void InputHandler(LongString *ls, targetPtr targ)
 {
 	if(ls->len)
+	{
 		if(ls->data[1]==CmdChar)
 			HandleCommand(targ->link, ls);
 		else
 			HandleMessage(ls, targ);
+	}
 	idleTime=now;
 }
 
@@ -361,8 +361,7 @@ pascal void Key(EventRecord *e, char dontProcess)
 			if(c!=27)
 			{
 				WEKey(c, e->modifiers, MWActive->we);
-				if(hasWM11)
-					SetWindowModified(MWActive->w, WEGetModCount(MWActive->we) != 0);
+				SetWindowModified(MWActive->w, WEGetModCount(MWActive->we) != 0);
 			}
 		}
 		return;
@@ -413,10 +412,12 @@ pascal void Key(EventRecord *e, char dontProcess)
 			else
 			{
 				if(++mbnum>=MAXMB || !messagebuffers[mbnum]->nick[0])
+				{
 					if(!mbnum)
 						mbnum=-1;
 					else
 						mbnum=0;
+				}
 			}
 			
 			if(mbnum>-1)
@@ -518,7 +519,7 @@ static pascal void SOCKSConnect(connectionPtr conn)
 		*(short*)send = 0x0401;
 		*(short*)&send[2] = conn->socksPort;
 		if(mainPrefs->firewallType == fwSOCKS4)
-			*(long*)&send[4] = conn->ip2;
+			*(struct in_addr*)&send[4] = conn->ip2;
 
 		nn = 9 + mainPrefs->socksUser[0];
 		if(mainPrefs->firewallType == fwSOCKS4A)
@@ -593,7 +594,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 		if(conn->connectStage == csSOCKSNegotiatingMethod)
 		{
 			//Read two bytes: version, and method
-			nn = ConnCharsAvail(conn); //This had better be >= 2.
+			nn = c->value; //This had better be >= 2.
 			if(nn < 2)
 				return;
 			nn = 2;
@@ -644,7 +645,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 		}
 		else if(conn->connectStage == csSOCKSSendingAuthRequest) //authing for user/host respponse
 		{
-			nn = ConnCharsAvail(conn); //This had better be >= 2.
+			nn = c->value; //This had better be >= 2.
 			if(nn < 2)
 				return;
 			nn = 2;
@@ -677,7 +678,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 		else if(conn->connectStage == csSOCKSSendingRequest)
 		{
 			//This is the reply to our connection request
-			nn = ConnCharsAvail(conn); //This had better be >= 2.
+			nn = c->value; //This had better be >= 2.
 			if(nn < 8)
 				return;
 			else if(nn>255)
@@ -758,13 +759,11 @@ pascal void processIdentd(CEPtr c, connectionPtr conn)
 	int i;
 	Str255 s;
 	long nn;
-	char cr;
 	LongString ls;
 	
 	if(c->event==C_CharsAvailable)
 	{
-		nn=0;
-		ConnGetUpTo(conn, 10, readTimeout, (Ptr)&s[1], 250, &nn, &cr);
+		nn = ConnGetUntil(conn, (Ptr)&s[1], '\n', 250);
 		while((nn>0) && ((s[nn]==10)||(s[nn]==13)))
 			nn--;
 		if(nn)
@@ -795,8 +794,9 @@ pascal void processServer(CEPtr c, connectionPtr conn)
 {
 	LongString ls;
 	long nn, i;
-	char cr;
+	size_t abytes = c->value;
 	linkPtr link = conn->link;
+	char cr = 0;
 	
 	if(c->event==C_CharsAvailable)
 	{
@@ -805,14 +805,13 @@ pascal void processServer(CEPtr c, connectionPtr conn)
 		conn->lastData=now;
 		do
 		{
-			nn=0;
 			//read to LF
-			ConnGetUpTo(conn, 10, readTimeout, (Ptr)&ls.data[1], maxLSlen-1, &nn, &cr);
+			nn = ConnGetUntil(conn, (Ptr)&ls.data[1], '\n', MIN(maxLSlen-1, abytes));
 			
 			conn->dataIn += nn;
-			
+			abytes -= nn;
 			//kill CR/LF at end
-			while(nn>0 && (ls.data[nn]==10 || ls.data[nn]==13))
+			while(nn>0 && (ls.data[nn]=='\n' || ls.data[nn]=='\r'))
 			{
 				cr = 1;
 				nn--;
@@ -832,7 +831,13 @@ pascal void processServer(CEPtr c, connectionPtr conn)
 				ServerCommands(&link->firstHalfOfIncoming, link);
 				link->firstHalfOfIncoming.len=0;
 			}
-		} while(++count && ConnCharsAvail(conn));
+                /*
+                 * abytes > nn is fuzzy math, but a reasonable way
+                 * to decide when to stop.
+                 * If the number of available bytes is less than the size of the last server message
+                 * then stop here.
+                 */
+		} while(++count && abytes > nn);
 	}
 	else
 		ServerOK(c->event, link);
@@ -841,19 +846,19 @@ pascal void processServer(CEPtr c, connectionPtr conn)
 pascal void processPlugin(CEPtr c, connectionPtr conn)
 {
 	long nn;
-	char cr;
+	size_t abytes;
 	LongString ls;
 	pConnectionData p;
 	
 	p.conn = conn;
 	p.event = c->event;
+	abytes = c->value;
 	p.sendEvent = false;
 	
 	if(c->event == C_CharsAvailable && conn->textOrBinary)
 	{
 		conn->lastData=now;
-		nn=0;
-		ConnGetUpTo(conn, 10, readTimeout, (Ptr)&ls.data[1], maxLSlen-1, &nn, &cr);
+		nn = ConnGetUntil(conn, (Ptr)&ls.data[1], '\n', MIN(maxLSlen-1, abytes));
 		ls.len=nn;
 		
 		conn->dataIn += nn;
@@ -884,7 +889,7 @@ pascal void dnsEvent(CEPtr c, connectionPtr conn)
 {
 	Str255 s2;
 	LongString ls;
-	long ip;
+	struct in_addr ip;
 	Str255 name;
 	pDNSLookupData p;
 	DNSLookupDataPtr dldp;
@@ -893,34 +898,27 @@ pascal void dnsEvent(CEPtr c, connectionPtr conn)
 	{
 		case C_Found:
 			p.successful=1;
-			ip=c->value;
-			break;
-		case C_SearchFailed:
-			p.successful=0;
-			break;
-		case C_NameFound:
-			p.successful=1;
+			memcpy(&ip, &c->addr, sizeof(ip));
 			pstrcpy(*(StringHandle)(c->value), name);
 			DisposeHandle((Handle)c->value);
 			*(long*)&c->value = 0; //const-cast
 			break;
-		case C_NameSearchFailed:
+		case C_SearchFailed:
 			p.successful=0;
-			name[0]=0;
 			break;
 	}
 	
 	if(conn->pluginRef) // then it's a plugin //conn->refCon && (dldp->magic!='SIRC')) //saving data
 	{
 		p.refCon=(long)conn->refCon;
-		p.ip=ip;
+		memcpy(&p.ip, &ip, sizeof(p.ip));
 		p.nameToIP=c->event<3;
 		p.search=conn->name;
 		if(p.successful)
 		{
 			if(p.nameToIP)
 			{
-				hostToIPStr(ip, s2);
+				inet_ntoa_str(ip, s2);
 				p.reply=s2;
 			}
 			else
@@ -949,7 +947,7 @@ pascal void dnsEvent(CEPtr c, connectionPtr conn)
 		{
 			if(conn->connType==connDNSIP)
 			{
-				hostToIPStr(ip, s2);
+				inet_ntoa_str(ip, s2);
 				LSConcatLSAndStr(&ls,s2,&ls);
 			}
 			else
@@ -965,7 +963,7 @@ pascal void processStale(CEPtr c, connectionPtr conn)
 	LongString ls;
 	Str255 s;
 	
-	if(!c || c->event == C_Closing || c->event == C_Closed)
+	if(!c || c->event == C_Closed)
 	{
 		if(conn->realConnType == connIDENTD)
 		{
@@ -999,7 +997,7 @@ pascal void processStale(CEPtr c, connectionPtr conn)
 		if(c->event==C_CharsAvailable)
 		{
 			do {
-				nn = ConnCharsAvail(conn);
+				nn = c->value;
 				if(!nn)
 					return;
 				if(nn > fm - 10000)

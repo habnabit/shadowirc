@@ -13,45 +13,7 @@
 #ifndef _WASTE_
 #define _WASTE_
 
-#ifndef __CONDITIONALMACROS__
-#include <ConditionalMacros.h>
-#endif
-
-#ifndef UNIVERSAL_INTERFACES_VERSION
-#error "You need Universal Headers version 2.1 or newer to use WASTE.h"
-#endif
-
-#ifndef __TYPES__
-#include <Types.h>
-#endif
-
-#ifndef __MIXEDMODE__
-#include <MixedMode.h>
-#endif
-
-#ifndef __QUICKDRAWTEXT__
-#include <QuickdrawText.h>
-#endif
-
-#ifndef __QUICKDRAW__
-#include <Quickdraw.h>
-#endif
-
-#ifndef __SCRIPT__
-#include <Script.h>
-#endif
-
-#ifndef __TEXTUTILS__
-#include <TextUtils.h>
-#endif
-
-#ifndef __TEXTEDIT__
-#include <TextEdit.h>
-#endif
-
-#ifndef __DRAG__
-#include <Drag.h>
-#endif
+#include <Carbon/Carbon.h>
 
 #ifndef __LONGCOORDINATES__
 #ifndef _LongCoords_
@@ -61,16 +23,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #if PRAGMA_STRUCT_ALIGN
-  #pragma options align=mac68k
-  #endif
-#else
-  #if PRAGMA_ALIGN_SUPPORTED
-  #pragma options align=mac68k
-  #endif
 #endif
 
 #if PRAGMA_IMPORT_SUPPORTED
@@ -884,16 +836,6 @@ extern pascal Boolean WELongPointInLongRect(const LongPt *lp, const LongRect *lr
 
 #if PRAGMA_IMPORT_SUPPORTED
 #pragma import off
-#endif
-
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #if PRAGMA_STRUCT_ALIGN
-  #pragma options align=reset
-  #endif
-#else
-  #if PRAGMA_ALIGN_SUPPORTED
-  #pragma options align=reset
-  #endif
 #endif
 
 #ifdef __cplusplus

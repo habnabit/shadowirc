@@ -51,18 +51,76 @@ enum CMStrings {
 	smSaveTextFile
 };
 
-#pragma lib_export on
-#pragma export on
+typedef enum menuCommand {
+    mcNull,
+    mcCloseWindow,
+    mcCopy,
+    mcCopyIL,
+    mcClear,
+    mcLog,
+    mcSaveText,
+    mcConnect,
+    mcTextSave,
+    mcTextSaveAs,
+    mcPlugin,
+    mcSubmenu,
+
+    mcILCut,
+    mcILCopy,
+    mcILPaste,
+    mcILClear
+} menuCommand;
+
+typedef struct CMItem {
+    MenuHandle m;
+    long key;
+    plugsPtr pluginRef;
+    short mid;
+    short command;
+} CMItem;
+
+typedef struct CMItemList {
+    long numItems;
+    CMItem list[1];
+} CMItemList, *CMItemListP, **CMItemListH;
+
+enum cmType {
+    cmMW = 'cmmw',
+    cmInputline = 'cmil',
+    cmPlugin = 'cmpl'
+};
+
+typedef struct cmmwData {
+    long type;
+
+    WindowPtr window;
+    MWPtr mw;
+    mwPanePtr pane;
+
+    Point where;
+
+    long s0, s1;
+    char noSelection;
+    char oneWord;
+    short unused;
+    Str255 theWord;
+
+    long id;
+    short menuID;
+    short popupsMenuID;
+
+    MenuHandle m;
+    MenuHandle colorMenu;
+    CMItemListH items;
+} cmmwData, *cmmwDataPtr;
+
+
 pascal void CMAdd(struct cmmwData* d, ConstStr255Param item, long key);
 pascal void CMAddSubmenu(struct cmmwData* d, ConstStr255Param item, short *id, MenuHandle *m);
 pascal void CMSetCheckmark(struct cmmwData *d, long key, char checked);
-#pragma export off
-#pragma lib_export off
 
-#pragma internal on
 pascal char DetermineCM(WindowPtr w, Point where, char optCM);
 pascal void CMSetCursor(void);
 pascal char CMClick(WindowPtr w, const EventRecord *e);
-#pragma internal reset
 
 #endif

@@ -21,9 +21,7 @@
 
 #define MSGWINDOWS
 
-#include <Navigation.h>
-#include <Sound.h>
-#include <ControlDefinitions.h>
+#include <Carbon/Carbon.h>
 
 #include "WASTE.h"
 
@@ -34,8 +32,6 @@
 #include "MsgWindows.h"
 #include "WindowList.h"
 #include "utils.h"
-#include "LongControls.h"
-#include "SmartScrollAPI.h"
 #include "connections.h"
 #include "TextManip.h"
 #include "channels.h"
@@ -46,8 +42,8 @@
 #include "DragDrop.h"
 #include "MWPanes.h"
 #include "InputLine.h"
+#include "Events.h"
 
-#pragma internal on
 MWPtr mwl = 0;
 
 MWPtr consoleWin=0, MWActive=0, MWLast=0;
@@ -121,7 +117,6 @@ static pascal void TextScrolled(WEReference we);
 static pascal void ScrollBarChanged(WEReference we, long val);
 
 pascal OSErr FSpGetDirectoryID(FSSpec*, long*, char*); //for MWStartLogging
-#pragma internal reset
 
 pascal char MWValid(MWPtr mw)
 {
@@ -246,20 +241,12 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 	HiliteControl(bar, kControlIndicatorPart);
 	
 	*(Point*)&constraint.limitRect = pt;
-	MySendControlMessage(bar, thumbCntl, (long)&constraint);
+	SendControlMessage(bar, thumbCntl, &constraint);
 	
 	range = constraint.limitRect.bottom - constraint.limitRect.top;
 	
-	if(hasAppearance11)
-	{
-		initial=old=cur=GetControl32BitValue(bar);
-		max=GetControl32BitMaximum(bar);
-	}
-	else
-	{
-		initial=old=cur=LCGetValue(bar);
-		max=LCGetMax(bar);
-	}
+	initial=old=cur=GetControl32BitValue(bar);
+	max=GetControl32BitMaximum(bar);
 	
 	WEGetViewRect(&viewRect, we);
 	while(StillDown())
@@ -278,11 +265,7 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 			if(cur != old)
 			{
 				WEGetDestRect(&destRect, we);
-
-				if(hasAppearance11)
-					SetControl32BitValue(bar, cur);
-				else
-					LCSetValue(bar, cur);
+				SetControl32BitValue(bar, cur);
 				WEScroll(0, viewRect.top-destRect.top-cur, we);
 				old=cur;
 			}
@@ -318,29 +301,13 @@ pascal void MWScroll(MWPtr mw, long delta)
 	long value;
 	long max;
 	
-	if(hasAppearance11)
-	{
-		value = GetControl32BitValue(vscr);
-		max = GetControl32BitMaximum(vscr);
-	}
-	else
-	{
-		value = LCGetValue(vscr);
-		max = LCGetMax(vscr);
-	}
+	value = GetControl32BitValue(vscr);
+	max = GetControl32BitMaximum(vscr);
 	
 	if(((value<max) && (delta>0)) || ((value>0) && (delta<0)))
 	{
-		if(hasAppearance11)
-		{
-			SetControl32BitValue(vscr, value+delta);
-			value = GetControl32BitValue(vscr);
-		}
-		else
-		{
-			LCSetValue(vscr, value+delta);
-			value = LCGetValue(vscr);
-		}
+		SetControl32BitValue(vscr, value+delta);
+		value = GetControl32BitValue(vscr);
 		ScrollBarChanged(mw->we, value);
 	}
 }
@@ -387,18 +354,9 @@ static pascal void TextScrolled(WEReference we)
 		if(max<0)
 			max=0;
 		
-		if(TARGET_CARBON || hasAppearance11)
-		{
-			SetControl32BitMaximum(bar, max);
-			SetControl32BitValue(bar, val);
-			SetControlViewSize(bar, vis);
-		}
-		else
-		{
-			LCSetMax(bar, max);
-			LCSetValue(bar, val);
-			SetSmartScrollInfo(bar, vis, tot);
-		}
+		SetControl32BitMaximum(bar, max);
+		SetControl32BitValue(bar, val);
+		SetControlViewSize(bar, vis);
 		
 		if(val>max)
 			WEScroll(0, viewRect.top-destRect.top-max, we);
@@ -657,7 +615,7 @@ pascal void MWReposition(MWPtr mw)
 	
 	if(mw->winType == conWin)
 	{
-		r = WGetBBox(win);
+		WGetBBox(win, &r);
 		if(r.bottom-r.top >= 64)
 			mainPrefs->consoleLoc = r;
 	}
@@ -665,14 +623,14 @@ pascal void MWReposition(MWPtr mw)
 	{
 		linkPrefsPtr lp = mw->link->linkPrefs;
 		
-		r=WGetBBox(win);
+		WGetBBox(win, &r);
 		if(r.bottom-r.top >= 64)
 			lp->windowLoc[mw->channelWindowNumber] = r;
 	}
 	else if(mw->pluginRef)
 	{
 		p.w = mw->w;
-		p.newpos = WGetBBox(win);
+		WGetBBox(win, &p.newpos);
 		runIndPlugin(mw->pluginRef, pUIWindowMoveMessage, &p);
 	}
 }
@@ -680,6 +638,7 @@ pascal void MWReposition(MWPtr mw)
 pascal void MWSetDimen(MWPtr win, short left, short top, short width, short height)
 {
 	GrafPtr gp;
+	Rect portRect;
 	
 	if(win)
 	{
@@ -690,7 +649,8 @@ pascal void MWSetDimen(MWPtr win, short left, short top, short width, short heig
 		SizeWindow(win->w, width, height, false);
 		GetPort(&gp);
 		SetPortWindowPort(win->w);
-		EraseRect(GetPortBounds(GetWindowPort(win->w), 0));
+		GetPortBounds(GetWindowPort(win->w), &portRect);
+		EraseRect(&portRect);
 		SetPort(gp);
 		
 		MWPaneRecalculate(win);
@@ -757,50 +717,33 @@ pascal void MWNewPosition(Rect *windowSize)
 	short x;
 	short windowTopHeight, windowBotHeight;
 	short windowLeftWid, windowRightWid;
+	BitMap screenBits;
 	Rect sb;
 
-#if TARGET_CARBON
-	sb = GetQDGlobalsScreenBits(0)->bounds;
-#else
-	sb=qd.screenBits.bounds;
-#endif
+	GetQDGlobalsScreenBits(&screenBits);
+	sb = screenBits.bounds;
 	
 	if(consoleWin)
 	{
-		RectPtr crr, srr;
+		Rect crr, srr;
 		RgnHandle cr, sr;
 		
-		if(hasAppearance11)
-		{
-			cr = NewRgn();
-			sr = NewRgn();
-			
-			GetWindowRegion(consoleWin->w, kWindowContentRgn, cr);
-			GetWindowRegion(consoleWin->w, kWindowStructureRgn, sr);
-			crr = GetRegionBounds(cr, 0);
-			srr = GetRegionBounds(sr, 0);
-		}
-#if !TARGET_CARBON
-		else
-		{
-			WindowPeek wp = (WindowPeek)consoleWin->w;
-
-			crr = &(**wp->contRgn).rgnBBox;
-			srr = &(**wp->strucRgn).rgnBBox;
-		}
-#endif
+		cr = NewRgn();
+		sr = NewRgn();
 		
-		windowTopHeight = crr->top - srr->top;
-		windowBotHeight = srr->bottom - crr->bottom;
-
-		windowLeftWid = crr->left - srr->left;
-		windowRightWid = srr->right - crr->right;
+		GetWindowRegion(consoleWin->w, kWindowContentRgn, cr);
+		GetWindowRegion(consoleWin->w, kWindowStructureRgn, sr);
+		GetRegionBounds(cr, &crr);
+		GetRegionBounds(sr, &srr);
 		
-		if(hasAppearance11)
-		{
-			DisposeRgn(cr);
-			DisposeRgn(sr);
-		}
+		windowTopHeight = crr.top - srr.top;
+		windowBotHeight = srr.bottom - crr.bottom;
+
+		windowLeftWid = crr.left - srr.left;
+		windowRightWid = srr.right - crr.right;
+
+		DisposeRgn(cr);
+		DisposeRgn(sr);
 		SetRect(&sb, -sb.left + windowLeftWid, -sb.top + GetMBarHeight() + 16, sb.right - sb.left - windowRightWid, sb.bottom - sb.top - 35);
 	}
 	else
@@ -829,6 +772,7 @@ static pascal void MWTallPosition(Rect *r)
 {
 	short windowTopHeight;
 	short windowLeftWid;
+	BitMap screenBits;
 	WindowPtr wp = consoleWin->w;
 
 	if(!IsVisible(wp))
@@ -837,36 +781,21 @@ static pascal void MWTallPosition(Rect *r)
 	if(wp)
 	{
 		RgnHandle cr, sr;
-		RectPtr crr, srr;
+		Rect crr, srr;
 		
-		if(hasAppearance11)
-		{
-			cr = NewRgn();
-			sr = NewRgn();
-			
-			GetWindowRegion(wp, kWindowContentRgn, cr);
-			GetWindowRegion(wp, kWindowStructureRgn, sr);
-			crr = GetRegionBounds(cr, 0);
-			srr = GetRegionBounds(sr, 0);
-		}
-#if !TARGET_CARBON
-		else
-		{
-			WindowPeek wp = (WindowPeek)consoleWin->w;
-
-			crr = &(**wp->contRgn).rgnBBox;
-			srr = &(**wp->strucRgn).rgnBBox;
-		}
-#endif
+		cr = NewRgn();
+		sr = NewRgn();
 		
-		windowTopHeight = crr->top - srr->top;
-		windowLeftWid = crr->left - srr->left;
+		GetWindowRegion(wp, kWindowContentRgn, cr);
+		GetWindowRegion(wp, kWindowStructureRgn, sr);
+		GetRegionBounds(cr, &crr);
+		GetRegionBounds(sr, &srr);
 		
-		if(hasAppearance11)
-		{
-			DisposeRgn(cr);
-			DisposeRgn(sr);
-		}
+		windowTopHeight = crr.top - srr.top;
+		windowLeftWid = crr.left - srr.left;
+		
+		DisposeRgn(cr);
+		DisposeRgn(sr);
 	}
 	else
 	{
@@ -877,14 +806,9 @@ static pascal void MWTallPosition(Rect *r)
 	r->left = windowLeftWid + 1;
 	r->top = windowTopHeight + GetMBarHeight() + 1;
 	r->right = 500;
-	#if TARGET_CARBON
-	r->bottom = GetQDGlobalsScreenBits(0)->bounds.bottom - 50;
-#else
-	r->bottom=qd.screenBits.bounds.bottom - 50;
-#endif
+	GetQDGlobalsScreenBits(&screenBits);
+	r->bottom = screenBits.bounds.bottom - 50;
 }
-
-#pragma internal reset
 
 #define STY_0 (sizeof(myScrpSTElement)+2)
 #define STY_1 sizeof(myScrpSTElement)
@@ -986,6 +910,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			goto failedWCreate;
 		else
 		{
+			MWInstallMouseWheelHandlers(h); // Events.c
 			SetPortWindowPort(h->w);
 			TextFont(fontNum);
 			TextSize(mainPrefs->defaultFontSize);
@@ -1006,9 +931,6 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			h->vscr=NewControl(h->w, &windowSize, "\p", true, 0, 0, 0, kControlScrollBarProc, 0);
 			DeactivateControl(h->vscr);
 				
-			if(!hasAppearance11)
-				LCAttach(h->vscr);
-			
 			h->winType=winType;
 			
 			//Create the style here. This way, we don't need to continually regenerate this
@@ -1026,25 +948,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 
 			if(!h->protect)
 			{
-#if !TARGET_CARBON
-				if(hasAppearance11)
-#endif
-					SetWindowContentColor(h->w, &shadowircColors[sicWindowBG]);
-#if !TARGET_CARBON
-				else
-				{
-					WCTabHandle wct;
-
-					wct=(WCTabHandle)NewHandleClear(8+sizeof(ColorSpec));
-					if(wct)
-					{
-						(**wct).ctSize=0;
-						(**wct).ctTable[0].value=wContentColor;
-						(**wct).ctTable[0].rgb=shadowircColors[sicWindowBG];
-						SetWinColor(h->w, wct);
-					}
-				}
-#endif
+				SetWindowContentColor(h->w, &shadowircColors[sicWindowBG]);
 			}
 
 			WEActivate(we);
@@ -1121,7 +1025,6 @@ failedWCreate:
 	return 0;
 }
 
-#pragma internal off
 pascal void MWDelete(MWPtr w)
 {
 	pMWDestroyData pd;
@@ -1150,9 +1053,6 @@ pascal void MWDelete(MWPtr w)
 				mwl=w->next;
 			break;
 		}
-	
-	if(w->vscr && !hasAppearance11)
-		LCDetach(w->vscr);
 	
 	if(w->w)
 	{
@@ -1281,10 +1181,7 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 		if(s0==s1)
 		{
 			s1 = s0 = 0x7FFFFFFF;
-			if(hasAppearance11)
-				noScroll= GetControl32BitMaximum(win->vscr) != GetControl32BitValue(win->vscr);
-			else
-				noScroll= LCGetMax(win->vscr) != LCGetValue(win->vscr);
+			noScroll= GetControl32BitMaximum(win->vscr) != GetControl32BitValue(win->vscr);
 		}
 		else
 			noScroll=1;
@@ -1665,7 +1562,6 @@ pascal void InitMsgWindows(void)
 		WSelect(consoleWin->w);
 }
 
-#pragma internal off
 pascal MWPtr NewPluginMWindow(ConstStr255Param title)
 {
 	MWPtr mw;

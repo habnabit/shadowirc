@@ -19,9 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Balloons.h>
-#include <Appearance.h>
-#include <Navigation.h>
+#include <Carbon/Carbon.h>
 
 #include "LongStrings.h"
 #include "StringList.h"
@@ -53,10 +51,9 @@
 #include "MenuCommands.h"
 #include "IRCChannels.h"
 
-#pragma internal on
 inline void AppleMenuURLInit(void);
 inline void CheckPreferences(void);
-pascal void ToolboxInit(void);
+void ToolboxInit(void);
 pascal void ApplicationInit(void);
 inline void SetupUPPs(void);
 
@@ -84,7 +81,9 @@ inline void AppleMenuURLInit(void)
 	int num;
 	
 	m = NewMenu(AppleURLMenu, "\p");
-	InsertMenu(m, -1);
+	InsertMenu(m, hierMenu);
+	// Tell it where to put the hierarchical URL menu
+	SetMenuItemHierarchicalID(gAppleMenu, 2, AppleURLMenu);
 	
 	num = *(short*)spAppleURL;
 	if(num>0)
@@ -107,28 +106,27 @@ static pascal void AboutDlgVersion(DialogPtr d, short i)
 	short type;
 	Handle item;
 		
-	if(i == 3) //version
+	switch (i)
 	{
-		GetDialogItem(d, i, &type, &item, &r);
-		MoveTo(r.left, r.bottom-5);
-		GetIndString(s, 128, 1);
-		DrawString(s);
-		DrawString(CL_VERSION);
-	}
-	else if(i==4) //registered to
-	{
-	}
-	else if(i==5) //serial number
-	{
+		case 2: // version in splash screen
+		case 3: // version in about box
+			GetDialogItem(d, i, &type, &item, &r);
+			MoveTo(r.left, r.bottom-5);
+			GetIndString(s, 128, 1);
+			DrawString(s);
+			DrawString(CL_VERSION);
+			break;
+
+		default:
+			break;
 	}
 }
 
 inline void SetupUPPs(void)
 {
-	StdDlgFilter = NewModalFilterProc(StandardDialogFilter);
-	AboutDlgVersionFilter = NewUserItemProc(AboutDlgVersion);
-	if(hasNav)
-		StdNavFilter = NewNavEventProc(NavDialogFilter);
+	StdDlgFilter = NewModalFilterUPP(StandardDialogFilter);
+	AboutDlgVersionFilter = NewUserItemUPP(AboutDlgVersion);
+	StdNavFilter = NewNavEventUPP(NavDialogFilter);
 }
 
 #if !TARGET_CARBON
@@ -165,7 +163,7 @@ inline void SetupHelpMenu(void)
 
 pascal void ApplicationInit(void)
 {
-	DialogPtr splashDlg;
+    WindowRef splashWindow = NULL;
 	LongString ls;
 	
 	spFiles = GetStrN(srFiles);
@@ -186,8 +184,7 @@ pascal void ApplicationInit(void)
 	
 	InstallAEHandlers();
 	
-	
-	InitCalcCRC();
+		InitCalcCRC();
 	
 	readMainPrefs();
 	initLinks();
@@ -195,21 +192,14 @@ pascal void ApplicationInit(void)
 	
 	if(!mainPrefs->hideSplashScreen)
 	{
-		Rect itemRect;
-		Handle itemHandle;
-		short itemType;
-		
-		splashDlg=GetNewDialog(1000, 0, (WindowPtr)-1);
-		SetDlogFont(splashDlg);
+		IBNibRef mainNibRef;
 
-		GetDialogItem(splashDlg, 2, &itemType, &itemHandle, &itemRect);
-		SetDialogItem(splashDlg, 2, itemType, (Handle)AboutDlgVersionFilter, &itemRect);
-
-		DrawDialog(splashDlg);
-		AboutDlgVersion(splashDlg,2);
+		if((CreateNibReference(CFSTR("main"), &mainNibRef) == noErr) && (CreateWindowFromNib(mainNibRef, CFSTR("Splash"), &splashWindow) == noErr))
+		{
+			DisposeNibReference(mainNibRef);
+			ShowWindow(splashWindow);
+		}
 	}
-	else
-		splashDlg=0;
 	
 	ApplInit();
 #if !TARGET_CARBON
@@ -240,71 +230,25 @@ pascal void ApplicationInit(void)
 	ConnectionMenuSetup();
 	AppleMenuURLInit();
 	
-	if(splashDlg)
-		DisposeDialog(splashDlg);
+	if(splashWindow)
+		DisposeWindow(splashWindow);
 }
 
-static pascal void Gestalts(void)
+static void Gestalts(void)
 {
-	long tempResult;
+	long response;
+	OSErr err;
 
-	if(!Gestalt(gestaltSystemVersion, &tempResult)) //this selector returns a short
+	if(!Gestalt(gestaltSystemVersion, &response)) //this selector returns a short
 	{
-		if(tempResult < 0x0810)
-		{
-			ParamText(GetIntStringPtr(spError, sMinimumOSVersion), "\p", "\p", "\p");
-			Alert(130, 0);
-			ExitToShell();
-		}
-		
-		has85=tempResult >= 0x0850;
-		has86=tempResult >= 0x0860;
-
-		if(!Gestalt(gestaltWindowMgrAttr, &tempResult))
-		{
-			if(tempResult & gestaltWindowMgrPresent) //has WM 1.1
-			{
-				hasWM11 = true;
-				//if(tempResult & gestaltHasFloatingWindows)
-				if(tempResult & 2)
-					hasFloatingWindows = true;
-hasFloatingWindows = 0;
-			}
-		}
+		// Check for Aqua Menu Manager
+		err = Gestalt(gestaltMenuMgrAttr, &response);
+		hasAquaMenuMgr = (!err && (response & gestaltMenuMgrAquaLayoutMask));
 	}
-	
-	if(!Gestalt(gestaltAppearanceVersion, &tempResult))
-	{
-		if(tempResult >= 0x0110) //appearance 1.1
-			hasAppearance11 = true;
-	}
-	
-	//Assume AppleEvents are present since we require 7.1
-
-	if(!Gestalt(gestaltContextualMenuAttr, &tempResult))
-		hasCM= (tempResult & (1 << gestaltContextualMenuTrapAvailable)) && !InitContextualMenus();
-
-	if(!Gestalt(gestaltSpeechAttr, &tempResult))
-		hasSpeech = (tempResult & (1 << gestaltSpeechMgrPresent)) != 0;
 }
 
-pascal void ToolboxInit(void)
+void ToolboxInit(void)
 {
-	long tempResult;
-	
-#if !TARGET_CARBON
-	InitGraf(&qd.thePort);
-	InitFonts();
-	if(hasFloatingWindows)
-		InitFloatingWindows();
-	else
-		InitWindows();
-	InitMenus();
-	TEInit();
-	InitDialogs(0);
-	MaxApplZone();
-#endif
-	
 	MoreMasters();
 	MoreMasters();
 	MoreMasters();
@@ -324,11 +268,7 @@ pascal void ToolboxInit(void)
 	
 	RegisterAppearanceClient();
 	
-	if(!Gestalt(gestaltComponentMgr, &tempResult))
-		if(tempResult)
-			StartupIC();
+	StartupIC();
 
 	InitDrag();
-	
-	hasNav = NavServicesAvailable() && !NavLoad();
 }

@@ -21,30 +21,16 @@
 
 #include "LongStrings.h"
 #include "MsgWindows.h"
-#include "IRCChannels.h"
 #include "IRCGlobals.h"
 
-pascal char IsChannel(ConstStringPtr s);
-pascal char IsDCCName(ConstStringPtr s);
 pascal void pstrcpy(ConstStringPtr f, StringPtr dest);
 pascal void LineMsg(const LongString *ls);
 
-#pragma lib_export on
-#pragma export on
-pascal char IsChannel(ConstStringPtr s)
+char inupc(char c)
 {
-	if((s[0]!=0) && ((s[1]=='#') || (s[1]=='&') || (s[1]=='+')))
-		return true;
-	else
-		return false;
-}
-
-pascal char IsDCCName(ConstStringPtr s)
-{
-	if((s[0]!=0)&&(s[1]=='='))
-		return true;
-	else
-		return false;
+	if((c>='a') && (c<='z'))
+		c-=32;
+	return c;
 }
 
 pascal void pstrcpy(ConstStringPtr f, StringPtr dest)
@@ -57,5 +43,3 @@ pascal void LineMsg(const LongString *ls)
 	MWMessage(consoleWin, ls);
 }
 
-#pragma export off
-#pragma lib_export off

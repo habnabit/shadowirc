@@ -19,7 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Timer.h>
+//#include <Timer.h>
 #include "WASTE.h"
 
 #include "LongStrings.h"
@@ -48,11 +48,9 @@
 #include "TextManip.h"
 #include "filesMan.h"
 
-#pragma internal on
 static pascal void doBanList(LongString *args, char e);
 pascal void rejoinDeactiveChannels(linkPtr link);
 static pascal void TranslateCommand(linkPtr link, LongString *s);
-#pragma internal reset
 
 pascal void GetSignoffMessage(linkPtr link, LongString *s)
 {
@@ -332,9 +330,9 @@ pascal void DNSLookup(Str255 addr, long saveReply)
 	}
 	
 	if(isIPNumber(addr))
-		c = ConnNewDNSName(addr);
+		c = ConnNewDNS(addr, connDNSNAME);
 	else
-		c = ConnNewDNSIP(addr);
+		c = ConnNewDNS(addr, connDNSIP);
 	
 	if(c)
 	{

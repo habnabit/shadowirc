@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -30,7 +30,13 @@
 #include "Inline.h"
 #include "plugins.h"
 
-#pragma dont_inline off
+char IsChannel(ConstStringPtr s)
+{
+	if((s[0]!=0) && ((s[1]=='#') || (s[1]=='&') || (s[1]=='+')))
+		return true;
+	else
+		return false;
+}
 
 static pascal void ULKillAllUsers(channelPtr channel);
 

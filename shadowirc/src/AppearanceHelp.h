@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -22,11 +22,7 @@
 #ifndef _AppearanceHelp_
 #define _AppearanceHelp_
 
-#if TARGET_CARBON
-#include <QuickDraw.h>
-#include <Menus.h>
-#include <Lists.h>
-#endif
+#include <Carbon/Carbon.h>
 
 enum {
 	cWhite = -1,
@@ -40,12 +36,9 @@ enum {
 	cVDkGrey = 21140
 };
 
-#pragma internal on
-extern const RGBColor white, black, VLtGrey, LtGrey, MedGrey, HalfGrey, MDkGrey, DkGrey, VDkGrey;
-#pragma internal reset
 
-#pragma lib_export on
-#pragma export on
+extern const RGBColor white, black, VLtGrey, LtGrey, MedGrey, HalfGrey, MDkGrey, DkGrey, VDkGrey;
+
 pascal ListHandle GetAppearanceListBoxHandle(DialogPtr theDialog, short itemNum);
 pascal void DrawPlacard(const Rect *r, long state);
 pascal void SetTextColor(short color);
@@ -57,8 +50,5 @@ typedef struct OpaqueDrawingState *DrawingState;
 pascal void GetDrawingState(DrawingState* state);
 pascal void SetDrawingState(DrawingState state);
 pascal void NormalizeDrawingState();
-
-#pragma export off
-#pragma lib_export off
 
 #endif

@@ -22,8 +22,6 @@
 #ifndef _IRCNComm_
 #define _IRCNComm_
 
-#pragma internal on
 pascal char NumericComm(short comm, StringPtr from, ConstStringPtr target, LongString *rest, linkPtr link);
-#pragma internal reset
 
 #endif

@@ -22,15 +22,9 @@
 #ifndef _CTCP
 #define _CTCP
 
-#pragma lib_export on
-#pragma export on
 pascal void SendCTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, LongString *st);
-#pragma export reset
-#pragma lib_export reset
 
-#pragma internal on
 pascal char doCTCP(ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *s, char isReply, char ign, linkPtr link);
 pascal char DCCCTCP(connectionPtr connn, LongString *ls);
-#pragma internal reset
 
 #endif

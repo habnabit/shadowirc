@@ -32,14 +32,10 @@ struct ignoreRec {
 
 extern ignorePtr ignores;
 
-#pragma lib_export on
-#pragma export on
 pascal void ListIgnores(void);
 pascal char IsIgnored(ConstStr255Param uah);
 pascal char IsIgnoredNickUser(ConstStr255Param nick, ConstStr255Param user);
 pascal void DoIgnore(LongString  *in);
 pascal ignorePtr findIgnore(ConstStr255Param mask, ignorePtr start);
-#pragma export off
-#pragma lib_export off
 
 #endif
