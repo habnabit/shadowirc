@@ -168,7 +168,7 @@ pascal void ApplicationInit(void)
 	
 	ShortcutsMenuUpdate();
 	MBInit();
-	ConnectionMenuSetup();
+	ConnectionMenuInit();
 	AppleMenuURLInit();
 	
 	if(splashWindow)

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -37,79 +37,9 @@
 #include "plugins.h"
 #include "IRCNotify.h"
 #include "TextManip.h"
-
 #include "MenuCommands.h"
 
 static pascal void startConnection(linkPtr link);
-
-pascal void ConnectionMenuSetup(void)
-{
-	short x, y;
-	linkPtr link;
-	
-	if(menuConnectionList)
-		y = CountMenuItems(menuConnectionList);
-	else
-	{
-		menuConnectionList = NewMenu(ConnectionListMenu, "\p");
-		menuSignoffConnectionList = NewMenu(SignoffConnectionListMenu, "\p");
-		menuSelectConnectionList = NewMenu(SelectConnectionListMenu, "\p");
-		InsertMenu(menuConnectionList, hierMenu);
-		InsertMenu(menuSignoffConnectionList, hierMenu);
-
-		SetMenuItemHierarchicalID(gFileMenu, 1, ConnectionListMenu);
-		SetMenuItemHierarchicalID(gFileMenu, 8, SignoffConnectionListMenu);
-		
-		y = 0;
-	}
-
-	for(x=1, link=firstLink; link; link=link->next,x++)
-	{
-		if(x > y)
-		{
-			AppendMenu(menuConnectionList, "\p-");
-			AppendMenu(menuSignoffConnectionList, "\p-");
-			AppendMenu(menuSelectConnectionList, "\p-");
-			SetMenuItemCommandID(menuConnectionList, x, 'CONO');
-			SetMenuItemCommandID(menuSignoffConnectionList, x, 'CONC');
-			SetMenuItemCommandID(menuSelectConnectionList, x, 'CONX');
-		}
-		SetMenuItemText(menuConnectionList, x, link->linkPrefs->linkName);
-		SetMenuItemText(menuSignoffConnectionList, x, link->linkPrefs->linkName);
-		SetMenuItemText(menuSelectConnectionList, x, link->linkPrefs->linkName);
-	}
-	
-	while(x < y)
-	{
-		DeleteMenuItem(menuConnectionList, y);
-		DeleteMenuItem(menuSignoffConnectionList, y);
-		DeleteMenuItem(menuSelectConnectionList, y--);
-	}
-	
-	ConnectionMenuHilites();
-}
-
-pascal void ConnectionMenuHilites(void)
-{
-	int x;
-	linkPtr link;
-	
-	for(x=1, link=firstLink; link; link=link->next,x++)
-	{
-		if(link->conn == 0)
-		{
-			EnableMenuItem(menuConnectionList, x);
-			EnableMenuItem(menuSelectConnectionList, x);
-			DisableMenuItem(menuSignoffConnectionList, x);
-		}
-		else
-		{
-			DisableMenuItem(menuConnectionList, x);
-			DisableMenuItem(menuSelectConnectionList, x);
-			EnableMenuItem(menuSignoffConnectionList, x);
-		}
-	}
-}
 
 pascal void ServerOK(short status, linkPtr link)
 {

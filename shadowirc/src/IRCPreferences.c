@@ -44,6 +44,7 @@
 #include "TextManip.h"
 #include "ServerList.h"
 #include "MoreFiles.h"
+#include "MenuCommands.h"
 
 enum PrefsWindowID {
 	kwPrefConn = 1001,
@@ -781,7 +782,7 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			StringToNum(s, &l);
 			lp->retryDelay=l;
 
-			ConnectionMenuSetup();
+			ConnectionMenuInit();
 			break;
 		
 		case kwPrefStartup:

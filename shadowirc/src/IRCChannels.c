@@ -48,6 +48,7 @@
 #include "TextWindows.h"
 #include "ApplBase.h"
 #include "TextManip.h"
+#include "MenuCommands.h"
 
 static pascal void MWWidgetInternalDraw(mwWidgetPtr o, char winActive);
 inline void DrawTopic(mwWidgetPtr o, char winActive);

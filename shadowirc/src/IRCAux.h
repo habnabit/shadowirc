@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -33,8 +33,6 @@ pascal void ConnPut(connectionPtr *conn, const void* p, long len);
 pascal void ConnPutText(connectionPtr *conn, void* p, long len);
 pascal void ConnPutLS(connectionPtr *conn, LongString *ls);
 #endif
-pascal void ConnectionMenuSetup(void);
-pascal void ConnectionMenuHilites(void);
 
 #ifdef _connections
 pascal void StatusMsg(linkPtr link, short n);

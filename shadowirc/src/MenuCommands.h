@@ -35,5 +35,7 @@ pascal void MenuBarClick(const EventRecord *e);
 
 pascal void MenuInit(void);
 void AppleMenuURLInit(void);
+void ConnectionMenuInit(void);
+void ConnectionMenuHilites(void);
 
 void WindowClose(WindowPtr wp);

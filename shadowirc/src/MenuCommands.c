@@ -714,6 +714,75 @@ static void HelpMenuInit(void)
 	InsertMenu(menuHelpWidget, -1);
 }
 
+void ConnectionMenuInit(void)
+{
+	short x, y;
+	linkPtr link;
+	
+	if(menuConnectionList)
+		y = CountMenuItems(menuConnectionList);
+	else
+	{
+		menuConnectionList = NewMenu(ConnectionListMenu, "\p");
+		menuSignoffConnectionList = NewMenu(SignoffConnectionListMenu, "\p");
+		menuSelectConnectionList = NewMenu(SelectConnectionListMenu, "\p");
+		InsertMenu(menuConnectionList, hierMenu);
+		InsertMenu(menuSignoffConnectionList, hierMenu);
+
+		SetMenuItemHierarchicalID(gFileMenu, 1, ConnectionListMenu);
+		SetMenuItemHierarchicalID(gFileMenu, 8, SignoffConnectionListMenu);
+		
+		y = 0;
+	}
+
+	for(x=1, link=firstLink; link; link=link->next,x++)
+	{
+		if(x > y)
+		{
+			AppendMenu(menuConnectionList, "\p-");
+			AppendMenu(menuSignoffConnectionList, "\p-");
+			AppendMenu(menuSelectConnectionList, "\p-");
+			SetMenuItemCommandID(menuConnectionList, x, 'CONO');
+			SetMenuItemCommandID(menuSignoffConnectionList, x, 'CONC');
+			SetMenuItemCommandID(menuSelectConnectionList, x, 'CONX');
+		}
+		SetMenuItemText(menuConnectionList, x, link->linkPrefs->linkName);
+		SetMenuItemText(menuSignoffConnectionList, x, link->linkPrefs->linkName);
+		SetMenuItemText(menuSelectConnectionList, x, link->linkPrefs->linkName);
+	}
+	
+	while(x < y)
+	{
+		DeleteMenuItem(menuConnectionList, y);
+		DeleteMenuItem(menuSignoffConnectionList, y);
+		DeleteMenuItem(menuSelectConnectionList, y--);
+	}
+	
+	ConnectionMenuHilites();
+}
+
+void ConnectionMenuHilites(void)
+{
+	int x;
+	linkPtr link;
+	
+	for(x=1, link=firstLink; link; link=link->next,x++)
+	{
+		if(link->conn == 0)
+		{
+			EnableMenuItem(menuConnectionList, x);
+			EnableMenuItem(menuSelectConnectionList, x);
+			DisableMenuItem(menuSignoffConnectionList, x);
+		}
+		else
+		{
+			DisableMenuItem(menuConnectionList, x);
+			DisableMenuItem(menuSelectConnectionList, x);
+			EnableMenuItem(menuSignoffConnectionList, x);
+		}
+	}
+}
+
 pascal void MenuInit(void)
 {
 	IBNibRef mainNibRef;

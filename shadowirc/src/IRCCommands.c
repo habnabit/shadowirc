@@ -47,6 +47,7 @@
 #include "InetConfig.h"
 #include "TextManip.h"
 #include "filesMan.h"
+#include "MenuCommands.h"
 
 static pascal void doBanList(LongString *args, char e);
 pascal void rejoinDeactiveChannels(linkPtr link);
