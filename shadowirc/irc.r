@@ -1285,12 +1285,6 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			"Attempt to Regain Lost Nicks"
 		},
 		/* [31] */
-		{272, 339, 287, 439},
-		CheckBox {
-			enabled,
-			"TalkCity Server"
-		},
-		/* [32] */
 		{76, 421, 96, 518},
 		Button {
 			enabled,
@@ -4011,22 +4005,6 @@ resource 'dftb' (1001) {
 				""
 			},
 			/* [30] */
-			dataItem {
-				1,
-				-2,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				""
-			},
-			/* [31] */
 			dataItem {
 				1,
 				-2,

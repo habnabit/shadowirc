@@ -534,10 +534,6 @@ pascal long _UndocumentedAPI(long type, long data)
 	
 	switch(type)
 	{
-		case 'tlkc':
-			gTalkCityPlug = 1;
-			return 0;
-		
 		case 'mail':
 			if(data < 5)
 			{

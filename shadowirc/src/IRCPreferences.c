@@ -520,9 +520,6 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				SetText(PrefsDlg, 32, s);
 				setCheckBox(PrefsDlg, 33, lp->regainNick);
 				
-				setButtonEnable(PrefsDlg, 34, gTalkCityPlug);
-				setCheckBox(PrefsDlg, 34, lp->isTalkCity);
-				
 				connectionsItemSetup(lp->reconnect);
 				break;
 			
@@ -773,7 +770,6 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			lp->modeW= getCheckBox(PrefsDlg, 22);
 			lp->modeS= getCheckBox(PrefsDlg, 21);
 			lp->regainNick= getCheckBox(PrefsDlg, 33);
-			lp->isTalkCity= getCheckBox(PrefsDlg, 34);
 
 			GetText(PrefsDlg, 31, s);
 			StringToNum(s, &l);
@@ -995,11 +991,10 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 					case 22:
 					case 27:
 					case 33:
-					case 34:
 						setCheckBox(PrefsDlg, item, !getCheckBox(PrefsDlg, item));
 						break;
 					
-					case 35:
+					case 34:
 					{
 						linkPrefsPtr lp = &linkPrefsArray[connPrefsRowNum];
 						ServerListServiceData p;

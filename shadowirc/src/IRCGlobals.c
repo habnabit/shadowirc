@@ -55,5 +55,3 @@ int wLastServiceItem = wFirstServiceItem - 1;
 ModalFilterUPP StdDlgFilter = 0;
 
 ProcessSerialNumber gPSN;
-
-char gTalkCityPlug = 0;

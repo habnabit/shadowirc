@@ -87,8 +87,7 @@ char unusedX;
 	Str255 fingerMessage;				//CTCP finger message
 	Str255 userinfoMessage;			//CTCP userinfo message
 	char regainNick;
-	char isTalkCity;
-	char unusedC[2];
+	char unusedC[3];
 	long unused[2];
 	long networkID;
 	
@@ -267,8 +266,6 @@ extern char inBackground;
 extern TableChars ISOEncode, ISODecode;
 
 extern char hasAquaMenuMgr;
-
-extern char gTalkCityPlug;
 
 extern MenuHandle menuConnectionList, menuSignoffConnectionList, menuSelectConnectionList;
 extern MenuHandle menuHelpWidget, gHelpMenu;

@@ -586,7 +586,6 @@ static pascal void ReadInPrefs(void)
 					BlockMoveData(&lpp->unusedX, lpp->recentNicks, (64 * 10 + 256 * 10));
 					lpp->unusedX = 0;
 					lpp->regainNick = 0;
-					lpp->isTalkCity = 0;
 				}
 				
 				p.prefsUpdate = PrefsUpdateLevel;
@@ -790,9 +789,10 @@ static pascal void CreateNewPrefsLinks(void)
 		lp->fingerMessage[0] = 0;
 		lp->userinfoMessage[0] = 0;
 		
-		lp->regainNick = lp->isTalkCity = 0;
+		lp->regainNick = 0;
 		lp->unusedC[0] = 
-		lp->unusedC[1] = 0;
+		lp->unusedC[1] =
+		lp->unusedC[2] = 0;
 		lp->unused[0] = 
 		lp->unused[1] = 0;
 		
