@@ -121,7 +121,6 @@ pascal void ILAddHistory(MWPtr mw, LongString *line);
 
 void OpenInputLine(void);
 pascal void StatusLineClick(Point where, short modifiers, long when);
-pascal void IWGrow(const EventRecord *e);
 
 #ifdef _WASTE_
 pascal char ILWEIsInput(WEReference we);

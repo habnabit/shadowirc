@@ -313,9 +313,6 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 	channelPtr ch;
 	pServiceActivateWinData ps;
 	
-	if(window==inputLine.w)
-		return;
-
 	p=MWFromWindow(window);
 	if(p)
 	{
@@ -368,20 +365,10 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 pascal void UpdateWindowPosition(WindowPtr win)
 {
 	MWPtr mw;
-	Rect r;
 	
-	if(win==inputLine.w)
-	{
-		WGetBBox(win, &r);
-		if(r.bottom-r.top>32)
-			mainPrefs->inputLoc = r;
-	}
-	else
-	{
-		mw=MWFromWindow(win);
-		if(mw)
-			MWReposition(mw);
-	}
+	mw=MWFromWindow(win);
+	if(mw)
+		MWReposition(mw);
 }
 
 static pascal void floatingWindowClick(EventRecord *e) //this also takes care of handling the float clicks
@@ -660,23 +647,20 @@ static pascal void inGrowHandler(const EventRecord *e)
 	GrafPtr port;
 	
 	GetPort (&port);
-	if(inputLine.w==(WindowPtr)e->message)
-		IWGrow(e);
-	else
+
+	p=MWFromWindow((WindowPtr)e->message);
+	if(p)
 	{
-		p=MWFromWindow((WindowPtr)e->message);
-		if(p)
+		SetRect(&r, 125, 60, 32767, 32767);
+		ii=GrowWindow(p->w, e->where, &r);
+		if(ii)
 		{
-			SetRect(&r, 125, 60, 32767, 32767);
-			ii=GrowWindow(p->w, e->where, &r);
-			if(ii)
-			{
-				WGetBBox(p->w, &r);
-				MWSetDimen(p, r.left, r.top, ii&0x0000FFFF, ii >> 16);
-				UpdateWindowPosition(p->w);
-			}
+			WGetBBox(p->w, &r);
+			MWSetDimen(p, r.left, r.top, ii&0x0000FFFF, ii >> 16);
+			UpdateWindowPosition(p->w);
 		}
 	}
+
 	SetPort(port);
 }
 
@@ -800,29 +784,14 @@ static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef even
 
 pascal void doUpdateEvent(EventRecord *e)
 {
-	GrafPtr gp;
-	
-	if((WindowPtr)e->message == inputLine.w) //inputline
-	{
-		GetPort(&gp);
-		SetPortWindowPort(inputLine.w);
-		BeginUpdate(inputLine.w);
-		WEUpdate(0, ILGetWE());
-		UpdateStatusLine();
-		EndUpdate(inputLine.w);
-		SetPort(gp);
-	}
-	else
-	{
-		MWPtr mw=MWFromWindow((WindowPtr)e->message);
+	MWPtr mw=MWFromWindow((WindowPtr)e->message);
 
-		if(mw)
-		{
-			BeginUpdate(mw->w);
-			DrawControls(mw->w);
-			MWPaneUpdate(mw);
-			EndUpdate(mw->w);
-		}
+	if(mw)
+	{
+		BeginUpdate(mw->w);
+		DrawControls(mw->w);
+		MWPaneUpdate(mw);
+		EndUpdate(mw->w);
 	}
 }
 

@@ -221,10 +221,8 @@ pascal iwWidgetPtr IWNewWidget(long type, short align, short width)
 	return o;
 }
 
-pascal void IWGrow(const EventRecord *e)
+static void IWGrow(WindowRef window, Rect r)
 {
-	Rect r;
-	long ii;
 	LongRect lr;
 	GrafPtr gp;
 	WEReference il;
@@ -234,38 +232,30 @@ pascal void IWGrow(const EventRecord *e)
 	
 	il = ILGetWE();
 	
-	SetRect(&r, 300, 32, 32767, 32767);
-	ii=GrowWindow(inputLine.w, e->where, &r);
-	if(ii)
-	{
-		WGetBBox(inputLine.w, &r);
-		r.right=r.left+(ii&0x0000FFFF);
-		r.bottom=r.top+*(short*)&ii;
-		
-		SizeWindow(inputLine.w,(ii&0x0000FFFF), *(short*)&ii, 1);
-		mainPrefs->inputLoc=r;
-		
-		GetPort(&gp);
-		SetPortWindowPort(inputLine.w);
-		GlobalToLocal((Point*)&r.bottom);
-		
-		r.left = r.right-14;
-		r.top = inputLine.statusLineHeight+2;
-		EraseRect(&r);
-		
-		WEGetDestRect(&lr, il);
-		lr.top=inputLine.statusLineHeight+2;
-		lr.right=r.right-16;
-		lr.bottom=r.bottom;
-		
-		WESetDestRect(&lr, il);
-		WESetViewRect(&lr, il);
-		WECalText(il);
-		GetPortBounds(GetWindowPort(inputLine.w), &r);
-		InvalWindowRect(inputLine.w, &r);
-		SetPort(gp);
-		IWRecalculateRects();
-	}
+	WGetBBox(window, &r);
+	
+	mainPrefs->inputLoc=r;
+	
+	GetPort(&gp);
+	SetPortWindowPort(window);
+	GlobalToLocal((Point*)&r.bottom);
+	
+	r.left = r.right-14;
+	r.top = inputLine.statusLineHeight+2;
+	EraseRect(&r);
+	
+	WEGetDestRect(&lr, il);
+	lr.top=inputLine.statusLineHeight+2;
+	lr.right=r.right-16;
+	lr.bottom=r.bottom;
+	
+	WESetDestRect(&lr, il);
+	WESetViewRect(&lr, il);
+	WECalText(il);
+	GetPortBounds(GetWindowPort(window), &r);
+	InvalWindowRect(window, &r);
+	SetPort(gp);
+	IWRecalculateRects();
 }
 
 pascal char ILWEIsInput(WEReference we)
@@ -276,6 +266,71 @@ pascal char ILWEIsInput(WEReference we)
 		return true;
 	else
 		return false;
+}
+
+#pragma mark -
+
+static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
+{
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	switch(eventClass)
+	{
+		case kEventClassWindow:
+		{
+			WindowRef ilWindow;
+			GetEventParameter(event, kEventParamDirectObject, typeWindowRef, NULL, sizeof(WindowRef), NULL, &ilWindow);
+			switch (eventKind)
+			{
+				//For now, we do nothing as it is consistent with what we used to do. This will need to be fixed, however...
+				case kEventWindowActivated:
+				case kEventWindowDeactivated:
+					result = noErr;
+					break;
+				
+				case kEventWindowDrawContent:
+				{
+					Rect tempRect;
+					
+					EraseRect(GetWindowPortBounds(ilWindow, &tempRect));
+					WEUpdate(0, ILGetWE());
+					UpdateStatusLine();
+					result = noErr;
+					break;
+				}
+				case kEventWindowHandleContentClick:
+				{
+					// NOTE: this part is coming -- will require work on WASTE
+					// since WEClick() isn't Carbon-friendly in 1.3 [smcgovern]
+					break;
+				}
+				case kEventWindowGetMinimumSize:
+				{
+					const Point minSize = {32, 200};
+					
+					SetEventParameter(event, kEventParamDimensions, typeQDPoint, sizeof(Point), &minSize);
+					result = noErr;
+					break;
+				}
+				case kEventWindowBoundsChanged:
+				{
+					Rect growRect;
+					
+					GetEventParameter(event, kEventParamCurrentBounds, typeQDRectangle, NULL, sizeof(Rect), NULL, &growRect);
+					IWGrow(ilWindow, growRect);
+					result = noErr;
+					break;
+				}
+			}
+			break;
+		}
+	}
+
+	return result;
 }
 
 void OpenInputLine()
@@ -291,6 +346,15 @@ void OpenInputLine()
 		char offscreen;
 		ConstStringPtr s;
 		Rect wr;
+		EventTypeSpec ilSpec[] = {
+			{kEventClassWindow, kEventWindowDrawContent},
+			// {kEventClassWindow, kEventWindowHandleContentClick},
+			{kEventClassWindow, kEventWindowGetMinimumSize},
+			{kEventClassWindow, kEventWindowBoundsChanged},
+			{kEventClassWindow, kEventWindowActivated},
+			{kEventClassWindow, kEventWindowDeactivated}
+		};
+		static EventHandlerUPP ilUPP = NULL;
 
 		if(mainPrefs->nonGlobalInput)
 		{
@@ -302,7 +366,8 @@ void OpenInputLine()
 		(*inputLine._hist)[0]=0;
 
 		s = GetIntStringPtr(spInfo, sInputline);
-		inputLine.w= WCreate(&mainPrefs->inputLoc, s, kWindowResizableAttribute, 0, true);
+		// add Live Resize and attach the Standard Handler [smcgovern]
+		inputLine.w= WCreate(&mainPrefs->inputLoc, s, kWindowResizableAttribute | kWindowLiveResizeAttribute | kWindowStandardHandlerAttribute, 0, true);
 		if(inputLine.w)
 		{
 			// Get rid of the close box
@@ -364,7 +429,9 @@ void OpenInputLine()
 			dr.right=(mainPrefs->inputLoc.right - mainPrefs->inputLoc.left)-14; //local coord
 			dr.bottom=(mainPrefs->inputLoc.bottom - mainPrefs->inputLoc.top) - 5; //local coord
 			
-			WENew(&dr,&dr, weDoUndo + weDoAutoScroll + weDoDrawOffscreen + weDoMonoStyled + weDoDragAndDrop,&inputLine._il);
+			// switched off DrawOffscreen, as Aqua does that anyways
+			// (prevent triple-buffering) [smcgovern]
+			WENew(&dr,&dr, weDoUndo + weDoAutoScroll + weDoMonoStyled + weDoDragAndDrop,&inputLine._il);
 			WESetInfo(weRefCon, &inputLine.w, inputLine._il);
 			WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, inputLine._il);
 			WESetUserInfo(kInputField, kInputField, inputLine._il);
@@ -376,9 +443,17 @@ void OpenInputLine()
 			iws->maxLineWid=(CharWidth('n') * (22+22+32+1)) + iws->awayWidth + iws->istalkingwithWidth + iws->onWidth;
 			
 			inputLine.statuslineFlags = kUmodeFlagsOn + kUmodeFlagsPlus + kBoldedPopups;
+			
+			// assign Event Handler to the window [smcgovern]
+			if(!ilUPP)
+				ilUPP = NewEventHandlerUPP(InputLineWindowEventHandler);
+	
+			InstallWindowEventHandler(inputLine.w, ilUPP, GetEventTypeCount(ilSpec), ilSpec, NULL, NULL);
 		}
 	}
 }
+
+#pragma mark -
 
 pascal long IWPopUpMenu(Point p, MenuHandle m, long curItem)
 {
