@@ -6,7 +6,7 @@
   </object>
   <array count="31" name="allObjects">
     <object class="IBCarbonWindow" id="168">
-      <string name="windowRect">210 360 662 832 </string>
+      <string name="windowRect">188 59 640 531 </string>
       <string name="title">Shortcuts</string>
       <object name="rootControl" class="IBCarbonRootControl" id="169">
         <string name="bounds">0 0 452 472 </string>
@@ -17,102 +17,97 @@
             <string name="title">Shortcuts</string>
           </object>
           <object class="IBCarbonStaticText" id="173">
-            <string name="bounds">63 20 78 38 </string>
+            <string name="bounds">63 25 78 43 </string>
             <int name="controlID">4</int>
             <string name="title">1:</string>
           </object>
           <object class="IBCarbonStaticText" id="174">
-            <string name="bounds">91 20 106 38 </string>
+            <string name="bounds">91 25 106 43 </string>
             <int name="controlID">5</int>
             <string name="title">2:</string>
           </object>
           <object class="IBCarbonStaticText" id="175">
-            <string name="bounds">119 20 134 38 </string>
+            <string name="bounds">119 25 134 43 </string>
             <int name="controlID">6</int>
             <string name="title">3:</string>
           </object>
           <object class="IBCarbonStaticText" id="176">
-            <string name="bounds">147 20 162 38 </string>
+            <string name="bounds">147 25 162 43 </string>
             <int name="controlID">7</int>
             <string name="title">4:</string>
           </object>
           <object class="IBCarbonStaticText" id="177">
-            <string name="bounds">175 20 190 38 </string>
+            <string name="bounds">175 25 190 43 </string>
             <int name="controlID">8</int>
             <string name="title">5:</string>
           </object>
           <object class="IBCarbonStaticText" id="178">
-            <string name="bounds">203 20 218 38 </string>
+            <string name="bounds">203 25 218 43 </string>
             <int name="controlID">9</int>
             <string name="title">6:</string>
           </object>
           <object class="IBCarbonStaticText" id="179">
-            <string name="bounds">231 20 246 38 </string>
+            <string name="bounds">231 25 246 43 </string>
             <int name="controlID">10</int>
             <string name="title">7:</string>
           </object>
           <object class="IBCarbonStaticText" id="180">
-            <string name="bounds">259 20 274 38 </string>
+            <string name="bounds">259 25 274 43 </string>
             <int name="controlID">11</int>
             <string name="title">8:</string>
           </object>
           <object class="IBCarbonStaticText" id="181">
-            <string name="bounds">287 20 302 38 </string>
+            <string name="bounds">287 25 302 43 </string>
             <int name="controlID">12</int>
             <string name="title">9:</string>
           </object>
-          <object class="IBCarbonStaticText" id="182">
-            <string name="bounds">315 20 330 38 </string>
-            <int name="controlID">13</int>
-            <string name="title">10:</string>
-          </object>
           <object class="IBCarbonEditText" id="183">
-            <string name="bounds">63 43 77 443 </string>
+            <string name="bounds">63 49 77 443 </string>
             <ostype name="controlSignature">SHOR</ostype>
             <int name="controlID">1</int>
           </object>
           <object class="IBCarbonEditText" id="184">
-            <string name="bounds">91 43 105 443 </string>
+            <string name="bounds">91 49 105 443 </string>
             <ostype name="controlSignature">SHOR</ostype>
             <int name="controlID">2</int>
           </object>
           <object class="IBCarbonEditText" id="185">
-            <string name="bounds">119 43 133 443 </string>
+            <string name="bounds">119 49 133 443 </string>
             <ostype name="controlSignature">SHOR</ostype>
             <int name="controlID">3</int>
           </object>
           <object class="IBCarbonEditText" id="186">
-            <string name="bounds">147 43 161 443 </string>
+            <string name="bounds">147 49 161 443 </string>
             <ostype name="controlSignature">SHOR</ostype>
             <int name="controlID">4</int>
           </object>
           <object class="IBCarbonEditText" id="187">
-            <string name="bounds">175 43 189 443 </string>
+            <string name="bounds">175 49 189 443 </string>
             <ostype name="controlSignature">SHOR</ostype>
             <int name="controlID">5</int>
           </object>
           <object class="IBCarbonEditText" id="188">
-            <string name="bounds">203 43 217 443 </string>
+            <string name="bounds">203 49 217 443 </string>
             <ostype name="controlSignature">SHOR</ostype>
             <int name="controlID">6</int>
           </object>
           <object class="IBCarbonEditText" id="189">
-            <string name="bounds">231 43 245 443 </string>
+            <string name="bounds">231 49 245 443 </string>
             <ostype name="controlSignature">SHOR</ostype>
             <int name="controlID">7</int>
           </object>
           <object class="IBCarbonEditText" id="190">
-            <string name="bounds">259 43 273 443 </string>
+            <string name="bounds">259 49 273 443 </string>
             <ostype name="controlSignature">SHOR</ostype>
             <int name="controlID">8</int>
           </object>
           <object class="IBCarbonEditText" id="191">
-            <string name="bounds">287 43 301 443 </string>
+            <string name="bounds">287 49 301 443 </string>
             <ostype name="controlSignature">SHOR</ostype>
             <int name="controlID">9</int>
           </object>
           <object class="IBCarbonEditText" id="192">
-            <string name="bounds">315 43 329 443 </string>
+            <string name="bounds">315 49 329 443 </string>
             <ostype name="controlSignature">SHOR</ostype>
             <int name="controlID">10</int>
           </object>
@@ -154,6 +149,11 @@
             <string name="title">OK</string>
             <ostype name="command">ok  </ostype>
             <int name="buttonType">1</int>
+          </object>
+          <object class="IBCarbonStaticText" id="182">
+            <string name="bounds">313 19 328 42 </string>
+            <int name="controlID">13</int>
+            <string name="title">10:</string>
           </object>
         </array>
       </object>
