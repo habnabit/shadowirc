@@ -943,15 +943,19 @@ static void AllocateNewPrefs(void)
 void FolderErrorToConsole(CFStringRef errorKey)
 {
 	CFStringRef string;
-	Str255 pstring;
-	LongString ls;
 	
 	string = CFCopyLocalizedString(errorKey, NULL);
-	CFStringGetPascalString(string, pstring, sizeof(Str255), CFStringGetSystemEncoding());
-	CFRelease(string);
+	if (string)
+	{
+		Str255 pstring;
+		LongString ls;
 	
-	LSStrLS(pstring, &ls);
-	LineMsg(&ls);
+		CFStringGetPascalString(string, pstring, sizeof(Str255), CFStringGetSystemEncoding());
+		CFRelease(string);
+	
+		LSStrLS(pstring, &ls);
+		LineMsg(&ls);
+	}
 }
 
 pascal char readMainPrefs(void)
