@@ -35,7 +35,7 @@
 #endif
 
 #ifndef _TCP
-# include "TCP.h"
+#include "TCP.h"
 #endif
 
 #include "IRCGlobals.h"
