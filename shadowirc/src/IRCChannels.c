@@ -645,6 +645,11 @@ typedef struct sqData {
 	long size;
 } sqData;
 
+typedef struct mkData {
+	WindowRef win;
+	Str255 key;
+} mkData;
+
 static pascal OSStatus ModeLEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
@@ -683,6 +688,53 @@ static pascal OSStatus ModeLEventHandler(EventHandlerCallRef myHandler, EventRef
 					if(0)
 				case kHICommandCancel:
 						data->size = -1;
+					QuitAppModalLoopForWindow(data->win);
+					result = noErr;
+					break;
+			}
+			break;
+		}
+	}
+	
+	return result;
+}
+
+static pascal OSStatus ModeKEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+{
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	WindowRef aboutWindow;
+	mkData *data = (mkData*)userData;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	aboutWindow = (WindowRef)userData;
+	
+	switch(eventClass)
+	{
+		case kEventClassControl:
+		{
+			ControlRef theControl = NULL;
+			UInt32 cmd;
+			ControlRef itemCtrl;
+			const ControlID item = {'SIRC', 4};
+			CFStringRef theStr;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &theControl);
+			GetControlCommandID(theControl, &cmd);
+			
+			switch(cmd)
+			{
+				case kHICommandOK:
+					GetControlByID(data->win, &item, &itemCtrl);
+					
+					GetControlData(itemCtrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theStr, NULL);
+					CFStringGetPascalString(theStr, data->key, sizeof(Str255), CFStringGetSystemEncoding());
+					
+					if(0)
+				case kHICommandCancel:
+						data->key[0] = 0;
 					QuitAppModalLoopForWindow(data->win);
 					result = noErr;
 					break;
@@ -764,38 +816,67 @@ CantInstallDialogHandler:
 
 void DoModeKWindow(channelPtr ch, LongString *ls)
 {
-	char b;
-	DialogPtr d;
-	short i;
-	Str255 s;
+	static EventHandlerUPP swUPP = NULL;
+	WindowRef fsWin;
+	IBNibRef channelsNib;
+	OSStatus status;
+	mkData sq;
+	ControlRef itemCtrl;
+	const ControlID item = {'SIRC', 4};
+	CFStringRef theStr;
 	
-	b=0;
-	EnterModalDialog();
-	d=GetNewDialog(10002, 0, (WindowPtr)-1);
-	SetText(d, 4, ch->key);
+	const EventTypeSpec ctSpec[] = {
+		{ kEventClassControl, kEventControlHit }
+	};
+	
+	if(!swUPP)
+		swUPP = NewEventHandlerUPP(ModeKEventHandler);
+	
+	status = CreateNibReference(kNibChannel, &channelsNib);
+	require_noerr(status, CantFindDialogNib);
+	
+	status = CreateWindowFromNib(channelsNib, kNibWinModeK, &fsWin);
+	require_noerr(status, CantCreateDialogWindow);
+	
+	DisposeNibReference(channelsNib);
+	
+	status = InstallWindowEventHandler(fsWin, swUPP, GetEventTypeCount(ctSpec), ctSpec, (void *)&sq, NULL);
+	require_noerr(status, CantInstallDialogHandler);
+	
+	//Put the current font size here.
+	
+	sq.win = fsWin;
+	pstrcpy(ch->key, sq.key);
+	
 	ParamText(ch->chName, "\p", "\p", "\p");
-	SelectDialogItemText(d, 4, 0, 255);
-	SetupModalDialog(d, 1, 2);
-	do
-	{
-		ModalDialog(StdDlgFilter, &i);
-		if((i==1) || (i==2))
-			b=1;
-	} while(!b);
 	
-	b=0;
-	if(i==1)
+	GetControlByID(fsWin, &item, &itemCtrl);
+	theStr = CFStringCreateWithPascalString(NULL, ch->key, kCFStringEncodingMacRoman);
+	SetControlData(itemCtrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theStr);
+	CFRelease(theStr);
+	
+	ShowWindow(fsWin);
+	SelectWindow(fsWin);
+	
+	SetKeyboardFocus(fsWin, itemCtrl, kControlFocusNextPart);
+	
+	status = RunAppModalLoopForWindow(fsWin);
+	
+	DisposeWindow(fsWin);
+	
+	if(sq.key[0])
 	{
-		GetText(d, 4, s);
-		if(s[0])
-		{
-			LSAppend1(*ls, ' ');
-			LSConcatLSAndStr(ls, s, ls);
-			b=1;
-		}
+		LSAppend1(*ls, ' ');
+		LSConcatLSAndStr(ls, sq.key, ls);
+		
+		return;
 	}
-	DisposeDialog(d);
-	FinishModalDialog();
+	
+	//Fall-through if cancel button hit
+CantFindDialogNib:
+CantCreateDialogWindow:
+CantInstallDialogHandler:
+	ls->len = 0;
 }
 
 static const char modelist[] = "TNIMPSLK";
