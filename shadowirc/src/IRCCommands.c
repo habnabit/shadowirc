@@ -795,7 +795,6 @@ pascal void RegUser(linkPtr link)
 		}
 		
 		link->connectedTime=now;
-		link->conn->tryingToConnect=0;
 		link->UserRegistered=1;
 		link->outstandingUSERHOST = 0; //Probabally unnecessary, but it can't hurt.
 		LinkSetStage(link, csSentRegistration);

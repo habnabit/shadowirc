@@ -254,40 +254,38 @@ static pascal void CreateIdentdConn(connectionPtr conn)
 	}
 }
 
+void DisplayLookupResult(connectionPtr conn)
+{
+	LongString ls;
+	Str255 s;
+
+	inet_ntoa_str(conn->ip, s);
+	LSParamString(&ls, GetIntStringPtr(spInfo, sIPForIs), conn->name, s, 0, 0);
+	SMPrefix(&ls, dsConsole);
+}
+
 //We found the IP for the server we're trying to connect to.
 //connect to the server, and then open the identd connection
 pascal void connection2(connectionPtr conn)
 {
-	if(conn->ip.s_addr != -1)
+	linkPtr link = conn->link;
+
+	if(ConnNewActive(conn)) //this makes the connection to the (socks) server
 	{
-		LongString ls;
-		Str255 s;
-		linkPtr link = conn->link;
-	
-		inet_ntoa_str(conn->ip, s);
-		LSParamString(&ls, GetIntStringPtr(spInfo, sIPForIs), conn->name, s, 0, 0);
-		SMPrefix(&ls, dsConsole);
 		if(conn->socksType == connIRC)
 		{
+			CreateIdentdConn(conn);
+			LinkSetStage(link, csOpeningConnection);
 			link->serverStatus=S_OPENING;
 			UpdateStatusLine();
 		}
-
-		if(ConnNewActive(conn)) //this makes the connection to the (socks) server
+	}
+	else
+	{
+		if(conn->socksType == connIRC)
 		{
-			if(conn->socksType == connIRC)
-			{
-				CreateIdentdConn(conn);
-				LinkSetStage(link, csOpeningConnection);
-			}
-		}
-		else
-		{
-			if(conn->socksType == connIRC)
-			{
-				LinkSetStage(link, csFailedToConnect);
-				ServerOK(C_FailedToOpen, link);
-			}
+			LinkSetStage(link, csFailedToConnect);
+			ServerOK(C_FailedToOpen, link);
 		}
 	}
 }

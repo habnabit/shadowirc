@@ -547,8 +547,6 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 	long nn;
 	LongString ls;
 	
-	conn->tryingToConnect = false;
-	
 	if(c->event == C_Found)
 	{
 		if(conn->socksSecondLookup)
@@ -568,13 +566,13 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 	}
 	else if(c->event == C_Established)
 	{
-		if(conn->socksType == connIRC)
-			LinkSuccessfulConnection(conn->link, false);
-
 		conn->socksStage=csSOCKSNegotiatingMethod;
 		
 		if(conn->socksType == connIRC)
+		{
+			LinkSuccessfulConnection(conn->link, false);
 			LinkSetStage(conn->link, conn->socksStage);
+		}
 		
 		if(mainPrefs->firewallType == fwSOCKS5)
 		{

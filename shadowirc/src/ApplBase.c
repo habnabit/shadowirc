@@ -978,12 +978,14 @@ static void doTCPEvent(CEPtr c)
 		{
 			case C_Found:
 				memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
+				DisplayLookupResult(conn);
 				if(!conn->socksSecondLookup)
 					connection2(conn);
 				break;
 			
 			case C_Established:
 				memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
+				conn->tryingToConnect = false;
 				break;
 		}
 	}
