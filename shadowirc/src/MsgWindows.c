@@ -1249,6 +1249,7 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 	char dontLog;
 	unsigned char noCR;
 	pMWTextDataRec p;
+	char reactivate;
 
 	if(msg->len && win)
 	{
@@ -1561,6 +1562,7 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 		}
 		
 		len=WEGetTextLength(we);
+		reactivate = WEIsActive(we);
 		WEDeactivate(we);
 		if(len>30720)
 		{
@@ -1613,7 +1615,7 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 		//else
 			//WESelView(we);
 		
-		if(win==MWActive)
+		if(reactivate)
 			WEActivate(we);
 		
 		//If noCR, then we don't want to output ls.data[0].
