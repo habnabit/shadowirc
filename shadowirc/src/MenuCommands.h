@@ -32,6 +32,7 @@ extern MenuHandle gAppleMenu, gEditMenu, gFileMenu, gShortcutsMenu, gWindowMenu,
 
 void DoFind(char again);
 void DoFontSizeWindow(void);
+void HitFontsMenu(short item);
 
 void HitAppleURLMenu(short item);
 void HitSelectConnectionMenu(short item);
@@ -43,8 +44,6 @@ int HitWindowPluginServiceMenu(const short item);
 int HitWindowSelectWindowMenu(const short item);
 
 pascal void HitEditMenu(short item);
-
-pascal void MenuBarClick(const EventRecord *e);
 
 pascal void MenuInit(void);
 void AppleMenuURLInit(void);

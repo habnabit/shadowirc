@@ -650,12 +650,8 @@ static void ApplEvents(EventRecord *e)
 			WindowPtr p;
 			
 			i=FindWindow(e->where, &p);
-			switch(i)
-			{
-				case inMenuBar:
-					MenuBarClick(e);
-					break;
-			}
+			if(i == inMenuBar)
+				MenuSelect(e->where);
 			break;
 		}
 	}

@@ -594,6 +594,10 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 			return noErr;
 		
 		//Font Menu
+		case 'FONT':
+			HitFontsMenu(hiCommand.menu.menuItemIndex);
+			return noErr;
+		
 		case 'FTSZ':
 			DoFontSizeWindow();
 			return noErr;

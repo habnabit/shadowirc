@@ -48,8 +48,6 @@ static MenuHandle gFontsMenu;
 
 static void DoFind2(MWPtr mw);
 
-static void HitFontsMenu(short item);
-
 void FontsMenuInit(void);
 
 static long FindText(Handle t, long start, Str255 searchFor, char caseSen, char reverse)
@@ -582,7 +580,7 @@ CantInstallDialogHandler:
 	;
 }
 
-static void HitFontsMenu(short item)
+void HitFontsMenu(short item)
 {
 	Str255 s;
 	long l;
@@ -658,20 +656,7 @@ pascal void MenuSignoffConnectionList(short item)
 
 #pragma mark -
 
-static void DoMenuEvent(long menuitem)
-{
-	int menuNum, itemNum;
-	
-	menuNum = menuitem >> 16;
-	itemNum = menuitem & 0x0000FFFF;
-	
-	if(menuNum == fontsMenu)
-		HitFontsMenu(itemNum);
-	
-	HiliteMenu(0);
-}
-
-pascal void MenuBarClick(const EventRecord *e)
+static OSStatus DoShowFontsMenu(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
 	static int previousFontCheck = 0;
 	static int previousSizeCheck = 0;
@@ -680,9 +665,18 @@ pascal void MenuBarClick(const EventRecord *e)
 	int x, y;
 	long l;
 	MWPtr mw = GetActiveMW();
+	static MWPtr lastmw = NULL;
+	Boolean firstOpen;
+	
+	GetEventParameter(event, kEventParamMenuFirstOpen, typeBoolean, NULL, sizeof(Boolean), NULL, &firstOpen);
+	
+	if(!firstOpen && lastmw == mw) //bail out if we're redisplaying the menu
+		return noErr;
+		
+	lastmw = mw;
 	
 	//Update fonts menu, but only if we have one..
-	if(mw && gFontsMenu)
+	if(mw)
 	{
 		m = gFontsMenu;
 		
@@ -718,7 +712,7 @@ pascal void MenuBarClick(const EventRecord *e)
 		}
 	}
 	
-	DoMenuEvent(MenuSelect(e->where));
+	return noErr;
 }
 
 #pragma mark -
@@ -758,10 +752,27 @@ void FontsMenuInit(void)
 	}
 	else
 	{
+		int x, max;
+		static EventHandlerUPP fmHUPP = NULL;
+		const EventTypeSpec fmEvents[] = {
+			{kEventClassMenu, kEventMenuOpening},
+		};
+		
 		MenuHandle mh = GetMenuHandle(fontsMenu);
 		gFontsMenu = mh;
-		fontsBegin=CountMenuItems(mh);
+		fontsBegin = CountMenuItems(mh);
 		CreateStandardFontMenu(mh, fontsBegin, 0, kNilOptions, 0);
+		
+		max = CountMenuItems(mh);
+		for(x = 1; x < fontsBegin - 1; x++)
+			SetMenuItemCommandID(mh, x, 'FONT');
+		for(x = fontsBegin + 1; x < max; x++)
+			SetMenuItemCommandID(mh, x, 'FONT');
+		
+		if(!fmHUPP)
+			fmHUPP = NewEventHandlerUPP(DoShowFontsMenu);
+		
+		InstallMenuEventHandler(mh, fmHUPP, GetEventTypeCount(fmEvents), fmEvents, mh, NULL);
 	}
 }
 
