@@ -598,14 +598,6 @@ pascal long _UndocumentedAPI(long type, long data)
 				return 0;
 			break;
 		
-		case 'srvl':
-			if(!IsWindowVisible(consoleWin->w))
-				ShowWindow(consoleWin->w);
-			LSStrLS("\pThe ServerList plugin is no longer necessary. Please delete it.", &ls);
-			SMPrefixIrcleColor(&ls, dsConsole, '2');
-			return pVersionPluginTooOld;
-			break;
-		
 		case 'popu':
 			if(data < 7)
 			{
