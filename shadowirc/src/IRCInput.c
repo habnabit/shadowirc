@@ -304,18 +304,18 @@ static char MWNavKey(MWPtr mw, UInt32 modifiers, char c)
 	else if((modifiers & controlKey) == controlKey)
 	{
 		if(c == 30)
-			MWScroll(mw, -mw->scrpHeight);
+			MWPage(mw, kMWScrollLineDown);
 		else if(c==31)
-			MWScroll(mw, mw->scrpHeight);
+			MWPage(mw, kMWScrollLineUp);
 		else
 			proc = 0;
 	}
 	else if(!cmd)
 	{
 		if(c == 1) //home
-			MWPage(mw, 3);
+			MWPage(mw, kMWScrollHome);
 		else if(c==4)
-			MWPage(mw, 2);
+			MWPage(mw, kMWScrollEnd);
 		else
 			proc = 0;
 	}

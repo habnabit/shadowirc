@@ -62,33 +62,6 @@ enum {
 * Carbon Event Handlers
 */
 
-static OSStatus MWDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
-{
-#pragma unused(nextHandler)
-	OSStatus myErr = eventNotHandledErr;
-	Point mouseLoc;
-	EventMouseWheelAxis wheelAxis;
-	long wheelDelta;
-	MWPtr mw = userData;
-	
-	GetEventParameter(theEvent, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(mouseLoc), NULL, &mouseLoc);
-	GetEventParameter(theEvent, kEventParamMouseWheelAxis, typeMouseWheelAxis, NULL, sizeof(wheelAxis), NULL, &wheelAxis);
-	GetEventParameter(theEvent, kEventParamMouseWheelDelta, typeLongInteger, NULL, sizeof(wheelDelta), NULL, &wheelDelta);
-	
-	if(wheelAxis == kEventMouseWheelAxisY)
-	{
-		// Scroll the vertical scroll bar
-		int maxValue = GetControl32BitMaximum(mw->vscr);
-		int numLines = WECountLines(mw->we);
-		float lineValue = (float)maxValue/(float)numLines;
-		long adjustedDelta = (((float)lineValue * (float)wheelDelta) + ((wheelDelta < 0)?(-0.5):(0.5)));
-		
-		MWScroll((MWPtr)userData, 4 * -adjustedDelta);
-		myErr = noErr;
-	}
-	
-	return myErr;
-}
 
 static const OSType appServiceDataTypes[] =
 {
@@ -439,11 +412,8 @@ static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef even
 
 void MWInstallEventHandlers(MWPtr mw)
 {
-	static EventHandlerUPP mouseWheelHandler = NULL;
 	static EventHandlerUPP uiCommandHandler = NULL;
 	static EventHandlerUPP mwEventHandler = NULL;
-	static ControlActionUPP caction = NULL;
-	const EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
 	const EventTypeSpec commandType[] = {
 			{kEventClassService, kEventServiceGetTypes},
 			{kEventClassService, kEventServiceCopy}, 
@@ -461,20 +431,14 @@ void MWInstallEventHandlers(MWPtr mw)
 			{kEventClassWindow, kEventWindowHandleContentClick},
 	};
 	
-	if(!mouseWheelHandler)
+	if(!uiCommandHandler)
 	{
-		mouseWheelHandler = NewEventHandlerUPP(MWDoMouseWheelEvent);
 		uiCommandHandler = NewEventHandlerUPP(MWUICommandHandler);
 		mwEventHandler = NewEventHandlerUPP(MWEventHandler);
-		caction = NewControlActionUPP(MWVScrollTrack);
 	}
 	
-	InstallWindowEventHandler(mw->w, mouseWheelHandler, 1, &wheelType, mw, NULL);
 	InstallWindowEventHandler(mw->w, uiCommandHandler, GetEventTypeCount(commandType), commandType, mw, NULL);
 	InstallWindowEventHandler(mw->w, mwEventHandler, GetEventTypeCount(mwEvents), mwEvents, mw, NULL);
-	
-	SetControlProperty(mw->vscr, kApplicationSignature, MW_MAGIC, sizeof(MWPtr), &mw);
-	SetControlAction(mw->vscr, caction);
 	
 	if(mw->winType == conWin)
 	{

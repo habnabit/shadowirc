@@ -275,7 +275,7 @@ static void ScrollBarChanged(WEReference we, long val)
 	WEScroll(0, viewRect.top-destRect.top-val, we);
 }
 
-pascal void MWScroll(MWPtr mw, long delta)
+static void MWScroll(MWPtr mw, long delta)
 {
 	if(mw)
 	{
@@ -295,7 +295,7 @@ pascal void MWScroll(MWPtr mw, long delta)
 	}
 }
 
-void MWVScrollTrack(ControlRef vscr, ControlPartCode part)
+static void MWVScrollTrack(ControlRef vscr, ControlPartCode part)
 {
 	MWPtr mw;
 	long scrollStep;
@@ -337,25 +337,52 @@ void MWVScrollTrack(ControlRef vscr, ControlPartCode part)
 		MWScroll(mw, scrollStep);
 }
 
-pascal void MWPage(MWPtr mw, char up)
+void MWPage(MWPtr mw, char scrollType)
 {
-	LongRect viewRect;
-	long pageSize;
+	long scrollDiff;
+	char scrollSize = scrollType & kMWScrollSizeMask;
 	
-	if(mw)
+	if(scrollSize == kMWScrollSizePage)
 	{
+		LongRect viewRect;
+		long pageSize;
+		
 		WEGetViewRect(&viewRect, mw->we);
-		pageSize=viewRect.bottom-viewRect.top;
-
-		if(up==1)
-			MWScroll(mw, -(pageSize-mw->scrpHeight));
-		else if(up==0)
-			MWScroll(mw, pageSize-mw->scrpHeight);
-		else if(up==3)
-			MWScroll(mw, -0x6FFFFFFF);
-		else if(up==2)
-			MWScroll(mw, 0x6FFFFFFF);
+		pageSize = viewRect.bottom - viewRect.top;
+		
+		scrollDiff = pageSize - mw->scrpHeight;
 	}
+	else if(scrollSize == kMWScrollSizeDocument)
+		scrollDiff = 0x6FFFFFFF;
+	else //if(scrollSize == kMWScrollSizeLine)
+		scrollDiff = mw->scrpHeight;
+	
+	if(scrollType & kMWScrollDirectionUp)
+		MWScroll(mw, -scrollDiff);
+	else
+		MWScroll(mw, scrollDiff);
+}
+
+static OSStatus MWDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
+{
+#pragma unused(nextHandler)
+	OSStatus myErr = eventNotHandledErr;
+	Point mouseLoc;
+	EventMouseWheelAxis wheelAxis;
+	long wheelDelta;
+	MWPtr mw = userData;
+	
+	GetEventParameter(theEvent, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(mouseLoc), NULL, &mouseLoc);
+	GetEventParameter(theEvent, kEventParamMouseWheelAxis, typeMouseWheelAxis, NULL, sizeof(wheelAxis), NULL, &wheelAxis);
+	GetEventParameter(theEvent, kEventParamMouseWheelDelta, typeLongInteger, NULL, sizeof(wheelDelta), NULL, &wheelDelta);
+	
+	if(wheelAxis == kEventMouseWheelAxisY)
+	{
+		MWScroll(mw, 4 * mw->scrpHeight * wheelDelta);
+		myErr = noErr;
+	}
+	
+	return myErr;
 }
 
 static void TextScrolled(WEReference we)
@@ -1041,6 +1068,9 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 		else
 		{
 			const long translucencyTreshold = 200000;
+			static ControlActionUPP caction = NULL;
+			static EventHandlerUPP mouseWheelHandler = NULL;
+			static const EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
 			
 			SetPortWindowPort(h->w);
 			TextFont(fontNum);
@@ -1062,7 +1092,16 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			h->magic=MW_MAGIC;
 			h->vscr=NewControl(h->w, &windowSize, "\p", true, 0, 0, 0, kControlScrollBarLiveProc, 0);
 			DeactivateControl(h->vscr);
-				
+			
+			if(!caction)
+			{
+				caction = NewControlActionUPP(MWVScrollTrack);
+				mouseWheelHandler = NewEventHandlerUPP(MWDoMouseWheelEvent);
+			}
+			
+			SetControlProperty(h->vscr, kApplicationSignature, MW_MAGIC, sizeof(MWPtr), &h);
+			SetControlAction(h->vscr, caction);
+			
 			h->winType=winType;
 			
 			//Create the style here. This way, we don't need to continually regenerate this
@@ -1127,6 +1166,8 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			if(h->next)
 				h->next->prev = h;
 			mwl = h;
+			
+			InstallWindowEventHandler(h->w, mouseWheelHandler, 1, &wheelType, h, NULL);
 
 			MWInstallEventHandlers(h);
 		}

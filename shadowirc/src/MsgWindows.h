@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -125,6 +125,7 @@ struct MessageWindow {
 	CONST WindowPtr w;			//The window.
 	const short unused;
 	CONST short winType;			//The type of window. (What to do if a user tries to close it.)
+	
 	CONST ControlHandle vscr;	//The vertical scroll bar.
 	
 #ifndef _WASTE_
@@ -136,6 +137,7 @@ struct MessageWindow {
 	CONST short vislines;			//Number of visible lines
 	CONST short scrpHeight;		//height of one line.
 	CONST short font,size;
+	
 	CONST myStScrpHandle sty;
 	CONST short logRefNum;
 	short colorMethod;
@@ -180,8 +182,6 @@ enum{
 MWPtr GetFrontMW(void);
 MWPtr GetActiveMW(void);
 
-void MWVScrollTrack(ControlRef vscr, ControlPartCode part);
-
 pascal char MWValid(MWPtr mw);
 pascal MWPtr NewPluginMWindow(ConstStr255Param title);
 void MWSetDimen(MWPtr win, short left, short top, short width, short height);
@@ -215,8 +215,27 @@ enum {
 extern const RGBColor macColors[kMaxMacColors];
 extern const RGBColor mircColors[kMaxMircColors];
 
-pascal void MWPage(MWPtr mw, char up);
-pascal void MWScroll(MWPtr mw, long delta);
+enum {
+	kMWScrollDirectionMask = 1,
+	kMWScrollDirectionDown = 0,
+	kMWScrollDirectionUp = 1 << 0,
+	
+	kMWScrollSizeMask = 6,
+	kMWScrollSizePage = 0,
+	kMWScrollSizeDocument = 1 << 1,
+	kMWScrollSizeLine = 1 << 2,
+	
+	kMWScrollPageDown = kMWScrollDirectionDown | kMWScrollSizePage,
+	kMWScrollPageUp = kMWScrollDirectionUp | kMWScrollSizePage,
+	
+	kMWScrollEnd = kMWScrollDirectionDown | kMWScrollSizeDocument,
+	kMWScrollHome = kMWScrollDirectionUp | kMWScrollSizeDocument,
+	
+	kMWScrollLineDown = kMWScrollDirectionDown | kMWScrollSizeLine,
+	kMWScrollLineUp = kMWScrollDirectionUp | kMWScrollSizeLine,
+};
+
+void MWPage(MWPtr mw, char scrollType);
 
 pascal void MWNewPosition(Rect *windowSize);
 
