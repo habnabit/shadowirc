@@ -49,9 +49,9 @@
 #include "filesMan.h"
 #include "MenuCommands.h"
 
-static pascal void doBanList(LongString *args, char e);
+static void doBanList(LongString *args, char e);
 pascal void rejoinDeactiveChannels(linkPtr link);
-static pascal void TranslateCommand(linkPtr link, LongString *s);
+static void TranslateCommand(linkPtr link, LongString *s);
 
 pascal void GetSignoffMessage(linkPtr link, LongString *s)
 {
@@ -344,7 +344,7 @@ pascal void DNSLookup(Str255 addr, long saveReply)
 	}
 }
 
-static pascal void doBanList(LongString *args, char e)
+static void doBanList(LongString *args, char e)
 {
 	channelPtr ch;
 	bansP f;
@@ -799,15 +799,707 @@ pascal void RegUser(linkPtr link)
 	}
 }
 
-static pascal void TranslateCommand(linkPtr link, LongString *s)
+
+#pragma mark -
+#pragma mark ¥ÊCommand Handlers
+
+static void _ucBroadcast(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	doBroadcast(0, rest, false);
+	
+	s->len = 0;
+}
+
+static void _ucBract(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	doBroadcast(0, rest, true);
+	
+	s->len = 0;
+}
+
+static void _ucQuit(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	doQuit(rest);
+	
+	s->len = 0;
+}
+
+static void _ucConnectDisconnect(char connect, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	char b;
+	long l;
+	
+	LSNextArg(rest, s1);
+	if(isNumber(s1))
+	{
+		StringToNum(s1, &l);
+		l--;
+	}
+	else
+	{
+		linkPtr lp;
+		
+		ucase(s1);
+		b=0;
+		linkfor(lp, firstLink)
+			if(pstrcasecmp2(s1, lp->linkPrefs->linkName))
+			{
+				b = 1;
+				break;
+			}
+		if(!b)
+			l=-1;
+	}
+	
+	if(l>=0 && l < 10)
+	{
+		linkPtr lnk = GetLinkNum(l);
+		
+		if(connect)
+		{
+			if(rest->len)
+				DoServer(lnk, rest, 0);
+			else
+				OpenConnection(lnk);
+		}
+		else
+			DoSignoff(lnk, rest);
+	}
+
+	s->len=0;
+}
+
+static void _ucC(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	_ucConnectDisconnect(true, rest, s);
+}
+
+static void _ucD(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	_ucConnectDisconnect(false, rest, s);
+}
+
+static void _ucClear(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	MWPtr mw = CurrentTarget.mw;
+	if(mw)
+	{
+		WEDeactivate(mw->we);
+		WESetSelection(0,0x7FFFFFFF, mw->we);
+		WEDelete(mw->we);
+		SetControlMaximum(mw->vscr, 0);
+		if(IsWindowHilited(mw->w))
+			WEActivate(mw->we);
+	}
+	s->len=0;
+}
+
+static void _ucDNS(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	
+	LSNextArg(rest, s1);
+	if(s1[0])
+		DNSLookup(s1, 0);
+	s->len=0;
+}
+
+static void _ucBans(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	doBanList(rest, false);
+	s->len = 0;
+}
+
+static void _ucExceptions(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	doBanList(rest, true);
+	s->len = 0;
+}
+
+static void _ucIgnore(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	DoIgnore(rest, false);
+	s->len = 0;
+}
+
+static void _ucJoin(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	if(rest->len)
+	{
+		LSMakeStr(*rest);
+		MakeChannel(rest->data);
+		LSConcatStrAndStr("\pJOIN ", rest->data, s);
+	}
+}
+
+static void _ucKill(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	
+	LSNextArg(rest, s1);
+	if(s1[0])
+	{
+		LSConcatStrAndStrAndStr("\pKILL ", s1, "\p :", s);
+		LSConcatLSAndLS(s, rest, s);
+	}
+}
+
+static void _ucPart(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	
+	s1[0]=0;
+	LSNextArgND(rest, s1);
+	
+	if(IsChannel(s1))
+		LSNextArg(rest, 0);
+	else
+	{
+		if(!CurrentTarget.bad && CurrentTarget.type == targChannel)
+			pstrcpy(CurrentTarget.chan->chName, s1);
+	}
+	
+	if(s1[0])
+	{
+		LSConcatStrAndStr("\pPART ", s1, s);
+		if(rest->len)
+		{
+			LSConcatLSAndStrAndLS(s, "\p :",rest, s);
+		}
+	}
+	else
+		s->len=0;
+}
+
+static void _ucRping(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	UnsignedWide t;
+	Str255 s1, s2, s3;
+	
+	LSNextArg(rest, s1);
+	SAppend1(s1, ' ');
+	Microseconds(&t);
+	*(unsigned long long*)&t/=1000;
+	ulongstr(t.hi, s2);
+	ulongstr(t.lo, s3);
+	LSStrCat4(s, "\pRPING ", s1, s2, s3);
+}
+
+static void _ucSay(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	if(rest->len)
+		HandleMessage(rest, &CurrentTarget);
+	s->len = 0;
+}
+
+static void _ucTopic(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	
+	LSNextArg(rest, s1);
+	if(rest->len)
+	{
+		LSConcatStrAndStrAndStr("\pTOPIC ", s1, "\p :", s);
+		LSConcatLSAndLS(s, rest, s);
+	}
+	else
+		LSConcatStrAndStr("\pTOPIC ", s1, s);
+}
+
+static void _ucUnixtime(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1, s2, s3;
+	long l;
+	
+	LSNextArg(rest, s1);
+	if(s1[0])
+	{
+		StringToNum(s1, &l);
+		l+=ircDateModifier;
+		DateString(l, longDate, s2, 0);
+		TimeString(l, true, s3, 0);
+		LSConcatStrAndStrAndStr(s2, "\p @ ", s3, s);
+		LSConcatStrAndStr("\pUnix time \"", s1, rest);
+		LSAppend3(*rest, 0x223A2000); //": _
+		LSConcatLSAndLS(rest, s, rest);
+		SMPrefix(rest, dsFrontWin);
+	}
+	s->len=0;
+}
+
+static void _ucWallops(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	if(rest->len)
+		LSConcatStrAndLS("\pWALLOPS :", rest, s);
+}
+
+static void _ucWallchops(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	
+	LSNextArg(rest, s1);
+	if(s1[0] && rest->len)
+	{
+		LSConcatStrAndStrAndStr("\pWALLCHOPS ", s1, "\p :", s);
+		LSConcatLSAndLS(s, rest, s);
+	}
+}
+
+static void _ucNamesWho(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	if(!rest->len && !CurrentTarget.bad)
+	{
+		switch(CurrentTarget.type)
+		{
+			case targChannel:
+			case targQuery:
+			case targDCC:
+				LSConcatStrAndStrAndStr(com, "\p ", MWGetName(CurrentTarget.mw, 0), s);
+				break;
+		}
+	}
+}
+
+static void _ucQuote(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	LSCopy(rest, 0, 0, s);
+}
+
+static void _ucWhois(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	if(!rest->len && !CurrentTarget.bad)
+	{
+		switch(CurrentTarget.type)
+		{
+			case targQuery:
+			case targDCC:
+				LSConcatStrAndStr("\pWHOIS ", MWGetName(CurrentTarget.mw, 0), s);
+				break;
+		}
+	}
+	else
+		LSConcatStrAndLS("\pWHOIS ", rest, s);
+}
+
+static void _ucWhowas(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	LSConcatStrAndLS("\pWHOWAS ", rest, s);
+}
+
+static void _ucVersion(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	LSConcatStrAndStrAndStr("\pClient is ShadowIRC ", CL_VERSION, "\p (", rest);
+	LSConcatLSAndStr(rest, cdt, rest);
+	LSAppend1(*rest, ')');
+	SMPrefix(rest, dsFrontWin);
+}
+
+static void _ucDebug(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	debugOn=!debugOn;
+	if(debugOn)
+		LSStrLS("\pDebug On", s);
+	else
+		LSStrLS("\pDebug Off", s);
+	LineMsg(s);
+	s->len=0;
+}
+
+static void _ucHttp(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	LSConcatStrAndLS("\phttp://", rest, s);
+	LSMakeStr(*s);
+	OpenURL(s->data);
+	s->len = 0;
+}
+
+static void _ucFtp(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	LSConcatStrAndLS("\pftp://", rest, s);
+	LSMakeStr(*s);
+	OpenURL(s->data);
+	s->len = 0;
+}
+
+static void _ucNick(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	
+	LSNextArg(rest, s1);
+	if(s1[0] || !link)
+		LSConcatStrAndStr("\pNICK ", s1, s);
+	else
+		LSConcatStrAndStr("\pNICK ", link->linkPrefs->nick, s);
+}
+
+static void _ucUmode(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	if(link)
+	{
+		LSConcatStrAndStr("\pMODE ", link->CurrentNick, s);
+		LSAppend1(*s, ' ');
+		LSConcatLSAndLS(s, rest, s);
+	}
+}
+
+static void _ucCTCP(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	short i;
+	
+	i=LSPosChar(' ', rest);
+	if(!i)
+	{
+		LSCopyString(rest, 1, 255, s1);
+		rest->len=0;
+	}
+	else
+	{
+		LSCopyString(rest, 1, i-1, s1);
+		LSDelete(rest, 1, i);
+	}
+	sendCTCP(link, s1, rest);
+	s->len=0;
+}
+
+static void _ucDCC(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	LSMakeStr(*rest);
+	DCCCommand(link, rest->data);
+	s->len=0;
+}
+
+static void _ucSignoff(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	DoSignoff(link, rest);
+	s->len = 0;
+}
+
+static void _ucISON(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	HandleISON(link, rest);
+	s->len=0;
+}
+
+static void _ucMsg(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	char quiet = com[0] != 4;
+	
+	//That's not really a good way of determining if it's msgq, but, oh well...
+	
+	LSNextArg(rest, s1);
+
+	if(mbInput && mbnum >= 0 && mbnum < MAXMB && pstrcmp(s1, messagebuffers[mbnum]->nick))
+		link = messagebuffers[mbnum]->link;
+
+	if(IsChannel(s1))
+	{
+		LSConcatStrAndStr("\p> ", s1, s);
+		LSAppend1(*s, ' ');
+		LSConcatLSAndLS(s, rest, s);
+	}
+	else
+	{
+		if(quiet) //only tack on if /msg; since ShadowIRC uses /msgq internally, this stops stuff like /ctcp from adding to list
+		{
+			MBNewMessage(link, s1);
+			if(mainPrefs->autoQuery && (mainPrefs->autoQueryOpen != aqIncoming) && !pos(',', s1))
+				DoJoinQuery(s1, link);
+		}
+		LSConcatStrAndStrAndStr("\p--> *", s1, "\p* ", s);
+		LSConcatLSAndLS(s, rest, s);
+	}
+	
+	if(quiet) //otherwise it's len 4 and msgq
+	{
+		MWColor(s, sicOutgoing);
+		ChannelMsg(link, s1, s); //might be a channel
+	}
+	LSConcatStrAndStrAndStr("\pPRIVMSG ", s1, "\p :", s);
+	LSConcatLSAndLS(s, rest, s);
+	
+	SendCommand(link, s);
+	s->len = 0;
+}
+
+static void _ucNotice(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	char quiet = com[0] != 7;
+	
+	LSNextArg(rest, s1);
+	FormatNick(s1, s, 0, kNickNotice + kNickSend);
+	LSConcatLSAndLS(s, rest, s);
+	if(!quiet)
+	{
+		MWColor(s, sicNotice);
+		ChannelMsg(link, s1,s); //might be a channel
+	}
+	LSConcatStrAndStrAndStr("\pNOTICE ", s1, "\p :", s);
+	LSConcatLSAndLS(s, rest, s);
+}
+
+static void _ucNotify(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	DoNotify(link, rest);
+	s->len=0;
+}
+
+static void _ucONotice(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	if(CurrentTarget.chan)
+		DoONotice(CurrentTarget.chan, rest);
+	else
+	{
+		LSGetIntString(rest, spInfo, sOnoticeRequiresChannel); //The /onotice command can only be used in a channel.
+		SMPrefixLink(link, rest, dsFrontWin);
+	}
+	s->len=0;
+}
+
+static void _ucQuery(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	char b;
+	
+	LSNextArg(rest, s1);
+	if(s1[0])
+	{
+		int x, m = s1[0];
+		char ch;
+		
+		b=0;
+		for(x=1;x<=m;x++)
+		{
+			ch = s1[x];
+			if(ch == '~' || ch=='(' || ch == ')' || ch=='#' || ch=='&' || ch=='+')
+			{
+				LSGetIntString(rest, spInfo, sCantMakeQuery); //Can't make query window. Illegal character in nickname.
+				SMPrefixLink(link, rest, dsFrontWin);
+				b = 1;
+				break;
+			}
+		}
+		if(!b)
+		{
+			MWPtr mw = DoJoinQuery(s1, link);
+			if(rest->len) //they have a message. Send it too.
+			{
+				target targ;
+				
+				SetTarget(mw, &targ);
+				HandleMessage(rest, &targ);
+			}
+		}
+	}
+	s->len=0;
+}
+
+static void _ucServer(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	s->len=0;
+	DoServer(link, rest, 0);
+}
+
+static void _ucAway(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	LSConcatStrAndLS("\pAWAY :", rest, s);
+	LSMakeStr(*rest);
+	if(link)
+	{
+		if(link->awayString)
+			DisposePtr((Ptr)link->awayString);
+		if(rest->data[0])
+			link->awayString = NewPString(rest->data);
+		else
+			link->awayString = 0;
+	}
+}
+
+static void _ucCping(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1, s2;
+	UnsignedWide t;
+	short i;
+	
+	Microseconds(&t);
+	*(unsigned long long*)&t/=1000;
+	ulongstr(t.hi, s1);
+	ulongstr(t.lo, s2);
+	LSConcatStrAndStrAndStr("\pPING ", s1, s2, s);
+	i=LSPosChar(' ', rest);
+	if(i)
+	{
+		LSCopy(rest, i, 255, rest);
+		LSConcatLSAndLS(s, rest, s);
+		rest->len=i-1;
+	}
+	if(!rest->len && link)
+		pstrcpy(link->CurrentNick, s1);
+	else
+		LSCopyString(rest, 1, 255, s1);
+	sendCTCP(link, s1, s);
+	s->len=0;
+}
+
+static void _ucKick(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1, s2;
+	
+	if(rest->len)
+	{
+		LSNextArg(rest, s1);
+		MakeChannel(s1);
+		LSNextArg(rest, s2);
+		LSStrCat(5, s, "\pKICK ", s1, "\p ", s2, "\p :");
+		if(rest->len)
+			LSConcatLSAndLS(s, rest, s);
+		else if(link)
+			LSConcatLSAndStr(s, link->linkPrefs->kickMessage, s);
+	}
+}
+
+static void _ucMe(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	Str255 s1;
+	ConstStringPtr sp;
+	
+	if(!CurrentTarget.bad)
+	{
+		LSCopyString(rest, 1, 255, s1);
+		LSConcatStrAndLS("\pACTION ", rest, s);
+		
+		FormatMessage(CurrentTarget.link->CurrentNick, rest, 0, 0, kNickAction | kNickSend, rest);
+		switch(CurrentTarget.type)
+		{
+			case targChannel:
+				ChMsg(CurrentTarget.chan, rest);
+				sendCTCP(link, CurrentTarget.chan->chName, s);
+				break;
+			
+			case targQuery:
+				sp = MWGetName(CurrentTarget.mw, 0);
+				ChannelMsg(link, sp, rest);
+				sendCTCP(link, sp, s);
+				break;
+			
+			case targDCC:
+				MWMessage(CurrentTarget.mw, rest);
+				LSConcatStrAndLS("\p\1", s, s);
+				LSAppend1(*s, 1);
+				DCCSSayQuiet(&CurrentTarget.dcc, s);
+				break;
+		}
+	}
+	s->len=0;
+}
+
+static void _ucUserhost(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	if(link)
+		link->outstandingUSERHOST++;
+}
+
+typedef void (*UserCommandProcPtr)(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s);
+
+typedef struct UserCommandItem {
+	const StringPtr commandName;
+	const UserCommandProcPtr commandFunc;
+} UserCommandItem;
+
+static const UserCommandItem TranslateCommandList[] = {
+	//Commands that don't have anything to do with the connection
+	{"\pBROADCAST",	_ucBroadcast},
+	{"\pBRACT",	_ucBract},
+	{"\pBYE",	_ucQuit},
+	{"\pQUIT",	_ucQuit},
+	{"\pEXIT",	_ucQuit},
+	{"\pC",	_ucC},
+	{"\pD",	_ucD},
+	{"\pCLEAR",	_ucClear},
+	{"\pDNS",	_ucDNS},
+	{"\pBANS",	_ucBans},
+	{"\pEXCEPTIONS",	_ucExceptions},
+	{"\pIGNORE",	_ucIgnore},
+	{"\pJOIN",	_ucJoin},
+	{"\pJ",	_ucJoin},
+	{"\pKILL",	_ucKill},
+	{"\pPART",	_ucPart},
+	{"\pLEAVE",	_ucPart},
+	{"\pRPING",	_ucRping},
+	{"\pSAY",	_ucSay},
+	{"\pTOPIC",	_ucTopic},
+	{"\pUNIXTIME",	_ucUnixtime},
+	{"\pWALLOPS",	_ucWallops},
+	{"\pWALLCHOPS",	_ucWallchops},
+	{"\pNAMES",	_ucNamesWho},
+	{"\pWHO",	_ucNamesWho},
+	{"\pQUOTE",	_ucQuote},
+	{"\pRAW",	_ucQuote},
+	{"\pWHOIS",	_ucWhois},
+	{"\pWH",	_ucWhois},
+	{"\pWHOWAS",	_ucWhowas},
+	{"\pWW",	_ucWhowas},
+	{"\pVERSION",	_ucVersion},
+	{"\pDEBUG",	_ucDebug},
+	{"\pHTTP",	_ucHttp},
+	{"\pFTP",	_ucFtp},
+	
+	//Safe commands that directly access the link
+	{"\pNICK",	_ucNick},
+	{"\pUMODE",	_ucUmode},
+	
+	//Commands that deal with the connection, but don't directly access the link
+	{"\pCTCP",	_ucCTCP},
+	{"\pDCC",	_ucDCC},
+	{"\pSIGNOFF",	_ucSignoff},
+	{"\pISON",	_ucISON},
+	{"\pM",	_ucMsg},
+	{"\pMSG",	_ucMsg},
+	{"\pMSGQ",	_ucMsg},
+	{"\pNOTICE",	_ucNotice},
+	{"\pNOTICEQ",	_ucNotice},
+	{"\pNOTIFY",	_ucNotify},
+	{"\pONOTICE",	_ucONotice},
+	{"\pQ",	_ucQuery},
+	{"\pQUERY",	_ucQuery},
+	{"\pSERVER",	_ucServer},
+	
+	//Fixed unsafe commands
+	{"\pAWAY",	_ucAway},
+	{"\pPING",	_ucCping},
+	{"\pCPING",	_ucCping},
+	{"\pKICK",	_ucKick},
+	{"\pME",	_ucMe},
+	{"\pUSERHOST",	_ucUserhost},
+	{0, 0}
+};
+
+static char _ucTranslate(linkPtr link, ConstStringPtr com, LongString *rest, LongString *s)
+{
+	UserCommandItem const *uci = TranslateCommandList;
+	
+	while(uci->commandName)
+	{
+		if(pstrcmp(com, uci->commandName))
+		{
+			uci->commandFunc(link, com, rest, s);
+			return true;
+		}
+		uci++;
+	}
+	
+	return false;
+}
+
+static void TranslateCommand(linkPtr link, LongString *s)
 {
 	LongString rest;
-	Str255 com, s1, s2;
-	ConstStringPtr sp;
+	Str255 com;
 	short i;
-	long l;
 	pCommandDataRec p;
-	char b;
 	
 	if((s->len)&&(s->data[1]==CmdChar))
 		LSDelete(s, 1, 1);
@@ -840,525 +1532,7 @@ static pascal void TranslateCommand(linkPtr link, LongString *s)
 	runPlugins(pUserCommandMessage, &p);
 	
 	if(!p.dontProcess)
-	{
-		//Commands that don't have anything to do with the connection
-		
-		if(pstrcmp9(com, 'BRO', 'ADCA', 'ST')) //BROADCAST
-		{
-			doBroadcast(0,&rest, false);
-			s->len=0;
-		}
-		else if(pstrcmp5(com, 'BRA', 'CT')) //BRACT
-		{
-			doBroadcast(0, &rest, true);
-			s->len=0;
-		}
-		else if(pstrcmp3(com, 'BYE') || (com[4]=='T' && (*(long*)com==0x04455849 || *(long*)com==0x04515549))) //BYE, EXIT, QUIT
-		{
-			doQuit(&rest);
-
-			s->len = 0;
-		}
-		else if(*(short*)com == 0x0143 || *(short*)com == 0x0144) //C || D
-		{
-			LSNextArg(&rest, s1);
-			if(isNumber(s1))
-			{
-				StringToNum(s1, &l);
-				l--;
-			}
-			else
-			{
-				linkPtr lp;
-				
-				ucase(s1);
-				b=0;
-				linkfor(lp, firstLink)
-					if(pstrcasecmp2(s1, lp->linkPrefs->linkName))
-					{
-						b = 1;
-						break;
-					}
-				if(!b)
-					l=-1;
-			}
-			
-			if(l>=0 && l < 10)
-			{
-				linkPtr lnk = GetLinkNum(l);
-				
-				if(com[1]=='C')
-				{
-					if(rest.len)
-						DoServer(lnk, &rest, 0);
-					else
-						OpenConnection(lnk);
-				}
-				else //if(com[1]=='D')
-					DoSignoff(lnk, &rest);
-			}
-
-			s->len=0;
-		}
-		else if(pstrcmp5(com, 'CLE', 'AR')) //CLEAR
-		{
-			MWPtr mw = CurrentTarget.mw;
-			if(mw)
-			{
-				WEDeactivate(mw->we);
-				WESetSelection(0,0x7FFFFFFF, mw->we);
-				WEDelete(mw->we);
-				SetControlMaximum(mw->vscr, 0);
-				if(IsWindowHilited(mw->w))
-					WEActivate(mw->we);
-			}
-			s->len=0;
-		}
-		else if(pstrcmp3(com, 'DNS')) //DNS
-		{
-			LSNextArg(&rest, s1);
-			if(s1[0])
-				DNSLookup(s1, 0);
-			s->len=0;
-		}
-		else if(pstrcmp4(com, 'BAN', 'S')) //BANS
-		{
-			doBanList(&rest, false);
-			s->len=0;
-		}
-		else if(pstrcmp(com, "\pEXCEPTIONS")) //EXCEPTIONS
-		{
-			doBanList(&rest, true);
-			s->len=0;
-		}
-		else if(pstrcmp6(com, 'IGN', 'OR', 'E')) //IGNORE
-		{
-			DoIgnore(&rest, false);
-			s->len=0;
-		}
-		else if(pstrcmp4(com, 'JOI', 'N') || (*(short*)com==0x014A)) //J
-		{
-			if(rest.len)
-			{
-				LSMakeStr(rest);
-				MakeChannel(rest.data);
-				LSConcatStrAndStr("\pJOIN ", rest.data, s);
-			}
-		}
-		else if(pstrcmp4(com, 'KIL', 'L')) //KILL
-		{
-			LSNextArg(&rest, s1);
-			if(s1[0])
-			{
-				LSConcatStrAndStr("\pKILL ", s1, s);
-				LSAppend2(*s, ' :');
-				LSConcatLSAndLS(s, &rest, s);
-			}
-		}
-		else if(pstrcmp5(com, 'LEA', 'VE') || pstrcmp4(com, 'PAR', 'T')) //LEAVE, PART
-		{
-			s1[0]=0;
-			LSNextArgND(&rest, s1);
-			
-			if(IsChannel(s1))
-				LSNextArg(&rest, 0);
-			else
-			{
-				if(!CurrentTarget.bad && CurrentTarget.type == targChannel)
-					pstrcpy(CurrentTarget.chan->chName, s1);
-			}
-			
-			if(s1[0])
-			{
-				LSConcatStrAndStr("\pPART ", s1, s);
-				if(rest.len)
-				{
-					LSConcatLSAndStrAndLS(s, "\p :", &rest, s);
-				}
-			}
-			else
-				s->len=0;
-		}
-		else if(pstrcmp5(com, 'RPI', 'NG')) //RPING
-		{
-			UnsignedWide t;
-			LSNextArg(&rest, s1);
-			SAppend1(s1, ' ');
-			Microseconds(&t);
-			*(unsigned long long*)&t/=1000;
-			ulongstr(t.hi, s2);
-			ulongstr(t.lo, com);
-			LSStrCat4(s, "\pRPING ", s1, s2, com);
-		}
-		else if(pstrcmp3(com, 'SAY')) //SAY
-		{
-			if(rest.len)
-				HandleMessage(&rest, &CurrentTarget);
-			s->len = 0;
-		}
-		else if(pstrcmp5(com, 'TOP', 'IC')) //TOPIC
-		{
-			LSNextArg(&rest, s1);
-			if(rest.len)
-			{
-				LSConcatStrAndStr("\pTOPIC ", s1, s);
-				LSAppend2(*s, ' :');
-				LSConcatLSAndLS(s, &rest, s);
-			}
-			else
-				LSConcatStrAndStr("\pTOPIC ", s1, s);
-		}
-		else if(pstrcmp8(com, 'UNI', 'XTIM', 'E')) //UNIXTIME
-		{
-			LSNextArg(&rest, s1);
-			if(s1[0])
-			{
-				StringToNum(s1, &l);
-				l+=ircDateModifier;
-				DateString(l, longDate, s2, 0);
-				TimeString(l, true, com, 0);
-				LSConcatStrAndStrAndStr(s2, "\p @ ", com, s);
-				LSConcatStrAndStr("\pUnix time \"", s1, &rest);
-				LSAppend3(rest, 0x223A2000); //": _
-				LSConcatLSAndLS(&rest, s, &rest);
-				SMPrefix(&rest, dsFrontWin);
-			}
-			s->len=0;
-		}
-		else if(pstrcmp7(com, 'WAL', 'LOPS')) //WALLOPS
-		{
-			if(rest.len)
-				LSConcatStrAndLS("\pWALLOPS :", &rest, s);
-		}
-		else if(pstrcmp9(com, 'WAL', 'LCHO', 'PS')) //WALLCHOPS
-		{
-			LSNextArg(&rest, s1);
-			if(s1[0] && rest.len)
-			{
-				LSConcatStrAndStr("\pWALLCHOPS ", s1, s);
-				LSAppend2(*s, ' :');
-				LSConcatLSAndLS(s, &rest, s);
-			}
-		}
-		else if(pstrcmp5(com, 'NAM', 'ES') || pstrcmp3(com, 'WHO')) //NAMES, WHO
-		{
-			if(!rest.len && !CurrentTarget.bad)
-			{
-				switch(CurrentTarget.type)
-				{
-					case targChannel:
-					case targQuery:
-					case targDCC:
-						LSConcatStrAndStrAndStr(com, "\p ", MWGetName(CurrentTarget.mw, 0), s);
-						break;
-				}
-			}
-		}
-		else if(pstrcmp5(com, 'QUO', 'TE') || pstrcmp3(com, 'RAW')) //QUOTE, RAW
-		{
-			LSCopy(&rest, 0, 0, s);
-		}
-		else if(pstrcmp5(com, 'WHO', 'IS') || (*(short*)com == 0x0257 && com[2] == 'H')) //WHOIS, WH
-		{
-			if(!rest.len && !CurrentTarget.bad)
-			{
-				switch(CurrentTarget.type)
-				{
-					case targQuery:
-					case targDCC:
-						LSConcatStrAndStr("\pWHOIS ", MWGetName(CurrentTarget.mw, 0), s);
-						break;
-				}
-			}
-			else
-				LSConcatStrAndLS("\pWHOIS ", &rest, s);
-		}
-		else if(pstrcmp6(com, 'WHO', 'WA', 'S') || (*(short*)com == 0x0257 && com[2] == 'W')) //WHOWAS, WW
-		{
-			LSConcatStrAndLS("\pWHOWAS ", &rest, s);
-		}
-		else if(pstrcmp7(com, 'VER', 'SION')) //VERSION
-		{
-			LSConcatStrAndStr("\pClient is ShadowIRC ", CL_VERSION, &rest);
-			LSAppend2(rest, ' (');
-			LSConcatLSAndStr(&rest, cdt, &rest);
-			LSAppend1(rest, ')');
-			SMPrefix(&rest, dsFrontWin);
-		}
-		else if(pstrcmp5(com, 'DEB', 'UG')) //DEBUG
-		{
-			debugOn=!debugOn;
-			if(debugOn)
-				LSStrLS("\pDebug On", s);
-			else
-				LSStrLS("\pDebug Off", s);
-			LineMsg(s);
-			s->len=0;
-		}
-		else if(pstrcmp4(com, 'HTT', 'P')) //HTTP
-		{
-			LSConcatStrAndLS("\phttp://", &rest, s);
-			LSMakeStr(*s);
-			OpenURL(s->data);
-			s->len = 0;
-		}
-		else if(pstrcmp3(com, 'FTP')) //FTP
-		{
-			LSConcatStrAndLS("\pftp://", &rest, s);
-			LSMakeStr(*s);
-			OpenURL(s->data);
-			s->len = 0;
-		}
-		
-		//Safe commands that directly access the link
-		else if(pstrcmp4(com, 'NIC', 'K')) //NICK
-		{
-			LSNextArg(&rest, s1);
-			if(s1[0] || !link)
-				LSConcatStrAndStr("\pNICK ", s1, s);
-			else
-				LSConcatStrAndStr("\pNICK ", link->linkPrefs->nick, s);
-		}
-		else if(pstrcmp5(com, 'UMO', 'DE')) //UMODE
-		{
-			if(link)
-			{
-				LSConcatStrAndStr("\pMODE ", link->CurrentNick, s);
-				LSAppend1(*s, ' ');
-				LSConcatLSAndLS(s, &rest, s);
-			}
-		}
-		
-		//Commands that deal with the connection, but don't directly access the link
-		else if(pstrcmp4(com, 'CTC', 'P')) //CTCP
-		{
-			i=LSPosChar(' ', &rest);
-			if(!i)
-			{
-				LSCopyString(&rest, 1, 255, com);
-				rest.len=0;
-			}
-			else
-			{
-				LSCopyString(&rest, 1, i-1, com);
-				LSDelete(&rest, 1, i);
-			}
-			sendCTCP(link, com, &rest);
-			s->len=0;
-		}
-		else if(pstrcmp3(com, 'DCC')) //DCC
-		{
-			LSMakeStr(rest);
-			DCCCommand(link, rest.data);
-			s->len=0;
-		}
-		else if(pstrcmp7(com, 'SIG', 'NOFF')) //SIGNOFF
-		{
-			DoSignoff(link, &rest);
-			s->len = 0;
-		}
-		else if(pstrcmp4(com, 'ISO', 'N')) //ISON
-		{
-			HandleISON(link, &rest);
-			s->len=0;
-		}
-		else if(pstrcmp3(com, 'MSG') || (*(short*)com==0x014D) || pstrcmp4(com, 'MSG', 'Q')) //MSG, M, MSGQ
-		{
-			LSNextArg(&rest, s1);
-
-			if(mbInput && mbnum >= 0 && mbnum < MAXMB && pstrcmp(s1, messagebuffers[mbnum]->nick))
-				link = messagebuffers[mbnum]->link;
-
-			if(IsChannel(s1))
-			{
-				LSConcatStrAndStr("\p> ", s1, s);
-				LSAppend1(*s, ' ');
-				LSConcatLSAndLS(s, &rest, s);
-			}
-			else
-			{
-				if(com[0]!=4) //only tack on if /msg; since ShadowIRC uses /msgq internally, this stops stuff like /ctcp from adding to list
-				{
-					MBNewMessage(link, s1);
-					if(mainPrefs->autoQuery && (mainPrefs->autoQueryOpen != aqIncoming) && !pos(',', s1))
-						DoJoinQuery(s1, link);
-				}
-				LSConcatStrAndStr("\p--> *", s1, s);
-				LSAppend2(*s, '* ');
-				LSConcatLSAndLS(s, &rest, s);
-			}
-			
-			if(com[0]<4) //otherwise it's len 4 and msgq
-			{
-				MWColor(s, sicOutgoing);
-				ChannelMsg(link, s1, s); //might be a channel
-			}
-			LSConcatStrAndStr("\pPRIVMSG ", s1, s);
-			LSAppend2(*s, ' :');
-			LSConcatLSAndLS(s, &rest, s);
-			
-			SendCommand(link, s);
-			s->len = 0;
-		}
-		else if(pstrcmp6(com, 'NOT', 'IC', 'E') || pstrcmp7(com, 'NOT', 'ICEQ')) //NOTICE, NOTICEQ
-		{
-			LSNextArg(&rest, s1);
-			FormatNick(s1, s, 0, kNickNotice + kNickSend);
-			LSConcatLSAndLS(s, &rest, s);
-			if(com[0]<7)
-			{
-				MWColor(s, sicNotice);
-				ChannelMsg(link, s1,s); //might be a channel
-			}
-			LSConcatStrAndStr("\pNOTICE ", s1, s);
-			LSAppend2(*s, ' :');
-			LSConcatLSAndLS(s, &rest, s);
-		}
-		else if(pstrcmp6(com, 'NOT', 'IF', 'Y')) //NOTIFY
-		{
-			DoNotify(link, &rest);
-			s->len=0;
-		}
-		else if(*(long*)com==0x074F4E4F && *(long*)&com[4]==0x54494345) //ONOTICE
-		{
-			if(CurrentTarget.chan)
-				DoONotice(CurrentTarget.chan, &rest);
-			else
-			{
-				LSGetIntString(&rest, spInfo, sOnoticeRequiresChannel); //The /onotice command can only be used in a channel.
-				SMPrefixLink(link, &rest, dsFrontWin);
-			}
-			s->len=0;
-		}
-		else if(pstrcmp5(com, 'QUE', 'RY') || *(short*)com == 0x0151) //QUERY, Q
-		{
-			LSNextArg(&rest, s1);
-			if(s1[0])
-			{
-				int x, m = s1[0];
-				char ch;
-				
-				b=0;
-				for(x=1;x<=m;x++)
-				{
-					ch = s1[x];
-					if(ch == '~' || ch=='(' || ch == ')' || ch=='#' || ch=='&' || ch=='+')
-					{
-						LSGetIntString(&rest, spInfo, sCantMakeQuery); //Can't make query window. Illegal character in nickname.
-						SMPrefixLink(link, &rest, dsFrontWin);
-						b = 1;
-						break;
-					}
-				}
-				if(!b)
-				{
-					MWPtr mw = DoJoinQuery(s1, link);
-					if(rest.len) //they have a message. Send it too.
-					{
-						target targ;
-						
-						SetTarget(mw, &targ);
-						HandleMessage(&rest, &targ);
-					}
-				}
-			}
-			s->len=0;
-		}
-		else if(pstrcmp6(com, 'SER', 'VE', 'R')) //SERVER
-		{
-			s->len=0;
-			DoServer(link, &rest, 0);
-		}
-		
-		//Fixed unsafe commands
-		else if(pstrcmp4(com, 'AWA', 'Y')) //AWAY
-		{
-			LSConcatStrAndLS("\pAWAY :", &rest, s);
-			LSMakeStr(rest);
-			if(link)
-			{
-				if(link->awayString)
-					DisposePtr((Ptr)link->awayString);
-				if(rest.data[0])
-					link->awayString = NewPString(rest.data);
-				else
-					link->awayString = 0;
-			}
-		}
-		else if(pstrcmp4(com, 'PIN', 'G') || pstrcmp5(com, 'CPI', 'NG')) //PING, CPING
-		{
-			UnsignedWide t;
-			Microseconds(&t);
-			*(unsigned long long*)&t/=1000;
-			ulongstr(t.hi, s1);
-			ulongstr(t.lo, s2);
-			LSConcatStrAndStrAndStr("\pPING ", s1, s2, s);
-			i=LSPosChar(' ', &rest);
-			if(i)
-			{
-				LSCopy(&rest, i, 255, &rest);
-				LSConcatLSAndLS(s, &rest, s);
-				rest.len=i-1;
-			}
-			if(!rest.len && link)
-				pstrcpy(link->CurrentNick, s1);
-			else
-				LSCopyString(&rest, 1, 255, s1);
-			sendCTCP(link, s1, s);
-			s->len=0;
-		}
-		else if(pstrcmp4(com, 'KIC', 'K') || (*(short*)com==0x014B)) //KICK, K
-		{
-			if(rest.len)
-			{
-				LSNextArg(&rest, s1);
-				MakeChannel(s1);
-				LSNextArg(&rest, s2);
-				LSStrCat4(s, "\pKICK ", s1, "\p ", s2);
-				LSAppend2(*s, ' :');
-				if(rest.len)
-					LSConcatLSAndLS(s, &rest, s);
-				else if(link)
-					LSConcatLSAndStr(s, link->linkPrefs->kickMessage, s);
-			}
-		}
-		else if(*(short*)com == 0x024D && com[2] == 'E') //ME
-		{
-			if(!CurrentTarget.bad)
-			{
-				LSCopyString(&rest, 1, 255, s1);
-				LSConcatStrAndLS("\pACTION ", &rest, s);
-				
-				FormatMessage(CurrentTarget.link->CurrentNick, &rest, 0, 0, kNickAction | kNickSend, &rest);
-				switch(CurrentTarget.type)
-				{
-					case targChannel:
-						ChMsg(CurrentTarget.chan, &rest);
-						sendCTCP(link, CurrentTarget.chan->chName, s);
-						break;
-					
-					case targQuery:
-						sp = MWGetName(CurrentTarget.mw, 0);
-						ChannelMsg(link, sp, &rest);
-						sendCTCP(link, sp, s);
-						break;
-					
-					case targDCC:
-						MWMessage(CurrentTarget.mw, &rest);
-						LSConcatStrAndLS("\p\1", s, s);
-						LSAppend1(*s, 1);
-						DCCSSayQuiet(&CurrentTarget.dcc, s);
-						break;
-				}
-			}
-			s->len=0;
-		}
-		else if(pstrcmp8(com, 'USE', 'RHOS', 'T')) //USERHOST
-		{
-			if(link)
-				link->outstandingUSERHOST++;
-		}
-	}
+		_ucTranslate(link, com, &rest, s);
 }
 
 pascal void HandleCommand(linkPtr link, LongString *ls)
