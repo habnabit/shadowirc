@@ -91,6 +91,18 @@ enum {
 	kHICommandTopicText = 'Topc'
 };
 
+typedef struct TopicWindowInfo {
+	channelPtr ch;
+	long time;
+	short topicLen;
+	char hadOps;
+} TopicWindowInfo, *TopicWindowInfoPtr;
+
+enum {
+	kTopicWindowDataProperty = 'TOPC'
+};
+
+
 inline void linkWinAdd(MWPtr win, int i)
 {
 	linkPtr link = win->link;
@@ -322,19 +334,52 @@ inline char TrackTopicMouse(const Rect *cr)
 	return b;
 }
 
-static struct TopicWindowInfo {
-	channelPtr ch;
-	long time;
-	short topicLen;
-	char hadOps;
-} twi;
+#pragma mark -
+
+static TopicWindowInfoPtr NewTopicWindowInfo(WindowPtr win, channelPtr ch)
+{
+	TopicWindowInfoPtr twi = (TopicWindowInfoPtr)NewPtrClear(sizeof(TopicWindowInfo));
+	
+	SetWindowProperty(win, kApplicationSignature, kTopicWindowDataProperty, sizeof(twi), &twi);
+	
+	twi->ch = ch;
+
+	if(ch->hasOps || ch->hasHalfOps || !ch->modes[modeT])
+		twi->hadOps = true;
+	else
+		twi->hadOps = false;
+	
+	return twi;
+}
+
+static TopicWindowInfoPtr GetTopicWindowInfo(WindowPtr win)
+{
+	TopicWindowInfoPtr twi;
+	UInt32 actualSize;
+	
+	GetWindowProperty(win, kApplicationSignature, kTopicWindowDataProperty, sizeof(twi), &actualSize, (void*)&twi);
+	
+	return twi;
+}
+
+static void DeleteTopicWindowInfo(WindowPtr win)
+{
+	TopicWindowInfoPtr twi = GetTopicWindowInfo(win);
+	
+	RemoveWindowProperty(win, kApplicationSignature, kTopicWindowDataProperty);
+	
+	DisposePtr((void*)twi);
+}
+
+#pragma mark -
 
 static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 {
 	ControlRef topicOpsControl = NULL;
 	ControlID topicOpsControlID = { kApplicationSignature, kSIRCTopicOpsControlID };
 	int maxLen = HTFindNumericDefault(ch->link->serverOptions, "\pTOPICLEN", 0);
-
+	TopicWindowInfoPtr twi = GetTopicWindowInfo(dlgWindow);
+	
 	GetControlByID(dlgWindow, &topicOpsControlID, &topicOpsControl);
 
 	if(!maxLen)
@@ -351,7 +396,7 @@ static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 		GetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
 
 		CFStringGetPascalString(theString, st, sizeof(Str255), CFStringGetSystemEncoding());
-		twi.topicLen = st[0];
+		twi->topicLen = st[0];
 		NumToString(st[0], st);
 		NumToString(maxLen, st2);
 
@@ -375,14 +420,15 @@ static void TopicWindowSet(WindowRef dlgWindow, channelPtr ch)
 	ControlID topicCancelControlID = { kApplicationSignature, kSIRCTopicCancelControlID };
 	CFStringRef theString;
 	Str255 s1, s2;		/* can these eventually go byebye? */
-
+	TopicWindowInfoPtr twi = GetTopicWindowInfo(dlgWindow);
+	
 	GetControlByID(dlgWindow, &topicSetControlID, &topicSetControl);
 	GetControlByID(dlgWindow, &topicTextControlID, &topicTextControl);
 	GetControlByID(dlgWindow, &topicOpsControlID, &topicOpsControl);
 	GetControlByID(dlgWindow, &topicOKControlID, &topicOKControl);
 	GetControlByID(dlgWindow, &topicCancelControlID, &topicCancelControl);
 
-	twi.time = ch->topicSetOn;
+	twi->time = ch->topicSetOn;
 	if(ch->topicSetOn) //if there's a time the topic was set
 	{
 		DateString(ch->topicSetOn, longDate, s1, 0);
@@ -410,8 +456,8 @@ static void TopicWindowSet(WindowRef dlgWindow, channelPtr ch)
 	SetControlData(topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
 	DrawOneControl(topicTextControl);
 
-	if(twi.hadOps)
-		_TopicWindowLengthDisplay(dlgWindow, twi.ch);
+	if(twi->hadOps)
+		_TopicWindowLengthDisplay(dlgWindow, twi->ch);
 	else
 	{
 		theString = CFStringCreateWithPascalString(NULL, GetIntStringPtr(spError, sNoOpsCantTopic), kCFStringEncodingMacRoman);
@@ -437,17 +483,20 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 	LongString ls;	/* BLECH! */
 	channelPtr ch;
 	UInt32 cmd;
-
+	TopicWindowInfoPtr twi;
+	
 	GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &control);
 	GetControlCommandID(control, &cmd);
 
 	sheet =(WindowRef)userData;
-	ch = twi.ch;
+	
+	twi = GetTopicWindowInfo(sheet);
+	ch = twi->ch;
 
 	switch(cmd)
 	{
 		case kHICommandTopicText:		// find out if there's a way to see if text has been typed or not
-			if(twi.hadOps)
+			if(twi->hadOps)
 			{
 				GetControlByID(sheet, &topicOKControlID, &topicOKControl);
 				SetWindowDefaultButton(sheet, topicOKControl);
@@ -456,6 +505,7 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 		
 		case kHICommandCancel:
 			HideSheetWindow(sheet);
+			DeleteTopicWindowInfo(sheet);
 			DisposeWindow(sheet);
 			ExitModalDialog();
 			break;
@@ -470,6 +520,7 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 				SendCommand(ch->link, &ls);
 			}
 			HideSheetWindow(sheet);
+			DeleteTopicWindowInfo(sheet);
 			DisposeWindow(sheet);
 			ExitModalDialog();
 			break;
@@ -496,13 +547,9 @@ void ChTopicWindow(channelPtr ch)
 
 	status = InstallWindowEventHandler(channelTopicSheet, ctUPP, 1, &ctSpec,(void *)channelTopicSheet, NULL);
 	require_noerr(status, CantInstallDialogHandler);
-
-	if(ch->hasOps || ch->hasHalfOps || !ch->modes[modeT])
-			twi.hadOps = true;
-	else
-			twi.hadOps = false;
-	twi.ch = ch;
-
+	
+	NewTopicWindowInfo(channelTopicSheet, ch);
+	
 	TopicWindowSet(channelTopicSheet, ch);
 
 	parentWindow = ch->window->w;
