@@ -266,28 +266,6 @@ void MWInstallEventHandlers(MWPtr mw)
 
 #pragma mark -
 
-static void WindowClose(WindowPtr wp)
-{
-	long i;
-	
-	if(wp)
-	{
-		i=GetWRefCon(wp);
-		if(i)
-		{
-			if(((pluginDlgInfoPtr)i)->magic==PLUGIN_MAGIC)
-				pluginCloseWindow((WindowPtr)wp, (pluginDlgInfoPtr)i);
-		}
-	}
-}
-
-static void CloseFrontWindow(void)
-{
-	WindowClose(ActiveNonFloatingWindow());
-}
-
-#pragma mark -
-
 static OSStatus AboutWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
  {
 	OSStatus result = eventNotHandledErr;
@@ -577,10 +555,6 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 		
 		
 		//File Menu
-		case kHICommandClose:
-			CloseFrontWindow();
-			return noErr;
-		
 		case kHICommandSave:
 			writeAllFiles();
 			return noErr;

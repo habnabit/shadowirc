@@ -844,14 +844,6 @@ pascal void makePlugsDB(void)
 	InitPlugins();
 }
 
-pascal void pluginCloseWindow(WindowPtr win, pluginDlgInfoPtr p)
-{
-	pUIWindowCloseDataRec pp;
-	pp.w=win;
-	pp.mw=0;
-	runIndPlugin(p->pluginRef, pUIWindowCloseMessage, &pp);
-}
-
 WindowPtr pluginNewWindow(const Rect *boundsRect, ConstStr255Param title, WindowAttributes flags, char isFloater)
 {
 	pluginDlgInfoPtr p;

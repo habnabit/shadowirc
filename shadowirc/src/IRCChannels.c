@@ -1808,7 +1808,6 @@ void MWPart(MWPtr mw)
 				break;
 			
 			case pluginWin:
-				p.w=mw->w;
 				p.mw=mw;
 				runIndPlugin(mw->pluginRef, pUIWindowCloseMessage, &p); //pUIWindowClose
 				break;

@@ -142,8 +142,7 @@ enum messagesList
 		</font></b></blink>
 */
 
-//Here, "window" means a DialogPtr or WindowPtr, unless stated.
-	pUIWindowCloseMessage			=51,		//User attempted to close one of your windows.
+	pUIWindowCloseMessage			=51,		//User attempted to close one of your message windows.
 	pMWWindowMoveMessage			=52,		//User moved one of your message windows.
 	pUIMWGotTextMessage				=54,		//User typed text to one of your plugin's message windows
 	pUIMWInfoRefresh						=252,	//ShadowIRC is refreshing your Message Window's status bar. Tell it what you want it to do.
@@ -727,8 +726,7 @@ typedef struct pDCCConnOpenedData {
 /*	pUIWindowCloseDataRec
 */
 typedef struct pUIWindowCloseDataRec {
-	WindowPtr w;	//a WindowPtr to the window that was a target of a close action.
-	MWPtr mw;		//A MWPtr to the window closed if the window is a message window. Otherwise nil.
+	MWPtr mw;		//A MWPtr to the window closed.
 } pUIWindowCloseDataRec, pUIWindowCloseDataPtr;
 
 #endif
@@ -1099,8 +1097,6 @@ pascal void runPlugins(short message, void* messageData);
 pascal void runAllPlugins(short message, void* messageData);
 pascal void runService(short message, void* messageData); //messages to any service
 pascal void runIndService(long serviceType, short message, void* messageData); //messages to a specific service
-
-pascal void pluginCloseWindow(WindowPtr win, pluginDlgInfoPtr p);
 
 pascal long FindService(FourCharCode serviceType);
 pascal void SoundService(long sound, long data);
