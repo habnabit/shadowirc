@@ -600,6 +600,16 @@ static void InitTimers()
 
 static pascal void IdleTasks(EventRecord *e)
 {
+	connectionEventRecord connEvt;
+	int x = -8;
+	
+	while(GetConnectionEvent(&connEvt))
+	{
+		doTCPEvent(&connEvt);
+		if(!++x)
+			break;
+	}
+	
 	if(gSoundIsFinished)
 		AsyncSoundCheck();
 	
@@ -1044,23 +1054,11 @@ pascal void doNetworkCheck(void)
 pascal void ApplRun(void)
 {
 	EventRecord e;
-	connectionEventRecord connEvt;
-	int x;
 	
 	while(!QuitRequest)
 	{
 		WaitNextEvent(-1, &e, 1, mouseRgn);
 		GetDateTime(&now);
-		if(e.what==nullEvent)
-		{
-			x=-8;
-			while(GetConnectionEvent(&connEvt))
-			{
-				doTCPEvent(&connEvt);
-				if(!++x)
-					break;
-			}
-		}
 		ApplEvents(&e);
 	}
 	
