@@ -146,7 +146,6 @@ enum messagesList
 	pCMPopupsReturnMessage			=259,	//User has selected one of your items from a contextual menu managed by ShadowIRC.
 	pHelpMenuMessage					=64,		//User selected something from the help menu that your plugin put in.
 	pAsyncSoundCompletionMessage=80,	//Completion message from AsyncSoundPlay(). The sound has finished playing.
-	pMenuItemSelectedMessage		=59,		//A menu item was selected
 
 /* Services messages
 */
@@ -970,7 +969,6 @@ typedef struct ShadowIRCDataRecord {
 	const MWPtr *const mwList;				//A pointer to the message window list.
 	
 	const Ptr internetConfig;						//The Internet Config component. Nil if IC is not installed. Typecast to internetConfigurationComponent.
-	const WindowPtr* const ContextWindow;	//The WindowPtr for the last activated/clicked window.
 } ShadowIRCDataRecord;
 
 
@@ -1805,19 +1803,6 @@ typedef struct pDCCStatusData {
 	dccPtr dcc;				//The dcc you should return status for
 	dccStatus *status;	//Your status
 } pDCCStatusData, *pDCCStatusDataPtr;
-
-
-enum menuIDs {
-	kEditMenuID = 258
-};
-
-/*	pMenuItemSelectedData
-*/
-typedef struct pMenuItemSelectedData {
-	WindowPtr contextWindow;
-	short menuID;
-	short itemID;
-} pMenuItemSelectedData, *pMenuItemSelectedDataPtr;
 
 
 /*	where codes for SMPrefix and SMPrefixColor

@@ -28,8 +28,6 @@
 #include "LongStrings.h"
 #endif
 
-extern WindowPtr ContextWindow;
-
 pascal void ApplRun(void);
 pascal void ApplInit(void);
 pascal char doQuit(LongString *reason);

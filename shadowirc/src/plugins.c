@@ -830,7 +830,6 @@ inline void initSIDR(void)
 	sidr.mwList = &mwl;
 	
 	sidr.internetConfig = (Ptr)internetConfig;
-	sidr.ContextWindow = &ContextWindow;
 }
 
 static pascal void CheckPluginPrefsFolder(void)

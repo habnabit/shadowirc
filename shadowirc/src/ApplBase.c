@@ -70,8 +70,6 @@ static void doTCPEvent(CEPtr message);
 static pascal void ApplEvents(EventRecord *e);
 static pascal void ApplExit(void);
 
-WindowPtr ContextWindow = 0;
-
 static pascal void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord);
 
 static RgnHandle mouseRgn;
@@ -315,9 +313,6 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 	channelPtr ch;
 	pServiceActivateWinData ps;
 	
-	if(activate)
-		ContextWindow = window;
-	
 	if(window==inputLine.w)
 		return;
 
@@ -405,7 +400,6 @@ static pascal void floatingWindowClick(EventRecord *e) //this also takes care of
 	pluginDlgInfoPtr pd;
 	
 	i=FindWindow(e->where, &wp);
-	ContextWindow = wp;
 	if(wp==inputLine.w)
 	{
 		if(i==inContent)
@@ -729,7 +723,6 @@ static pascal void inContentHandler(EventRecord *e)
 	WindowPtr w;
 	
 	GetPort(&gp);
-	ContextWindow = w = (WindowPtr)e->message;
 	SetPortWindowPort(w);
 	
 	mw = MWFromWindow(w);

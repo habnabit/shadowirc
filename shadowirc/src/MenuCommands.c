@@ -395,23 +395,7 @@ pascal void HitEditMenu(short item)
 		we=activeMW->we;
 	else if(otherFront) //this was a dangerous assumption.
 	{
-		if(ContextWindow) //this isn't one of my windows. Is it a plugin's?
-		{
-			s0 = GetWRefCon(ContextWindow);
-			if(s0 && ((pluginDlgInfoPtr)s0)->magic == PLUGIN_MAGIC)
-			{
-				plugsPtr plug = GetPluginWindowOwner(ContextWindow);
-				pMenuItemSelectedData p;
-				
-				p.contextWindow = ContextWindow;
-				p.menuID = 258;
-				p.itemID = item;
-				
-				runIndPlugin(plug, pMenuItemSelectedMessage, &p);
-			}
-			
-			return; //don't know what to do.
-		}
+		return; //don't know what to do.
 	}
 	
 	if(te || we)
