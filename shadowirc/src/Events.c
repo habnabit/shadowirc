@@ -86,28 +86,85 @@ static OSStatus MWDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef th
 
 static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
 {
-	OSStatus myErr = eventNotHandledErr;
+	OSStatus result = eventNotHandledErr;
 	HICommand hiCommand;
+	UInt32 eventClass, eventKind;
 	MWPtr mw = (MWPtr)userData;
 	
-	GetEventParameter(theEvent, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
+	eventClass = GetEventClass(theEvent);
+	eventKind = GetEventKind(theEvent);
 	
-	switch(hiCommand.commandID)
+	switch(eventClass)
 	{
-		case kHICommandClose:
-			MWPart(mw);
-			return noErr;
-		
-		case 'FIND':
-			DoFind(false);
-			return noErr;
+		case kEventClassCommand:
+		{
+			GetEventParameter(theEvent, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
+			
+			switch(eventKind)
+			{
+				case kEventCommandUpdateStatus:
+					switch(hiCommand.commandID)
+					{
+						case kHICommandUndo:
+						case kHICommandCut:
+							DisableMenuCommand(NULL, hiCommand.commandID);
+							break;
+						
+						case kHICommandCopy:
+						{
+							SInt32 selStart, selEnd;
+							WEGetSelection(&selStart, &selEnd, mw->we);
+							if (selStart != selEnd) {
+								EnableMenuCommand(NULL, hiCommand.commandID);
+								result = noErr;
+							}
+							else
+								DisableMenuCommand(NULL, hiCommand.commandID);
+							break;
+						}
+							
+						case kHICommandPaste:
+						{
+							ScrapRef scrap;
+							ScrapFlavorFlags scrapFlags;
+							
+							GetCurrentScrap(&scrap);
+							result = GetScrapFlavorFlags(scrap, kScrapFlavorTypeText, &scrapFlags);
+							if (result == noErr)
+								EnableMenuCommand(NULL, hiCommand.commandID);
+							else
+								DisableMenuCommand(NULL, hiCommand.commandID);
+							break;
+						}
+						
+						case kHICommandClear:
+						case kHICommandSelectAll:
+							DisableMenuCommand(NULL, hiCommand.commandID);
+							break;
+					}
+					break;
 
-		case 'FAGN':
-			DoFind(true);
-			return noErr;
+				case kEventProcessCommand:
+					switch(hiCommand.commandID)
+					{
+						case kHICommandClose:
+							MWPart(mw);
+							return noErr;
+						
+						case 'FIND':
+							DoFind(false);
+							return noErr;
+						
+						case 'FAGN':
+							DoFind(true);
+							return noErr;
+					}
+					break;
+			}
+		}
 	}
 	
-	return myErr;
+	return result;
 }
 
 static OSStatus MWConsoleEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
@@ -241,7 +298,10 @@ void MWInstallEventHandlers(MWPtr mw)
 	static EventHandlerUPP mwEventHandler = NULL;
 	static ControlActionUPP caction = NULL;
 	const EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
-	const EventTypeSpec commandType = {kEventClassCommand, kEventProcessCommand};
+	const EventTypeSpec commandType[] = {
+			{kEventClassCommand, kEventCommandUpdateStatus},
+			{kEventClassCommand, kEventProcessCommand}
+	};
 	const EventTypeSpec mwEvents[] = {
 			{kEventClassWindow, kEventWindowActivated},
 			{kEventClassWindow, kEventWindowDeactivated},
@@ -264,7 +324,7 @@ void MWInstallEventHandlers(MWPtr mw)
 		caction = NewControlActionUPP(MWVScrollTrack);
 	
 	InstallWindowEventHandler(mw->w, mouseWheelHandler, 1, &wheelType, mw, NULL);
-	InstallWindowEventHandler(mw->w, uiCommandHandler, 1, &commandType, mw, NULL);
+	InstallWindowEventHandler(mw->w, uiCommandHandler, GetEventTypeCount(commandType), commandType, mw, NULL);
 	InstallWindowEventHandler(mw->w, mwEventHandler, GetEventTypeCount(mwEvents), mwEvents, mw, NULL);
 	
 	SetControlProperty(mw->vscr, kApplicationSignature, MW_MAGIC, sizeof(MWPtr), &mw);
