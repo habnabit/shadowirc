@@ -225,6 +225,7 @@ static void ULHitHeader(ULI ul, const EventRecord *e)
 			Point pt;
 			Rect r = ul->uwinSize;
 			short min;
+			MouseTrackingResult trackingResult;
 			
 			if(ul->scrollbarLeft)
 				min = 55 + scrollbarWidth;
@@ -232,9 +233,9 @@ static void ULHitHeader(ULI ul, const EventRecord *e)
 				min = 55;
 
 			r.right -= 10;
-			while(StillDown())
+			GetMouse(&pt);
+			do
 			{
-				GetMouse(&pt);
 				if(ul->ulType == ulMessageWindow)
 				{
 					pt.h-=ul->pane->drawArea.left + (ul->rightSide?kInWindowBorder:0) + (ul->scrollbarLeft?scrollbarWidth:0);
@@ -253,7 +254,9 @@ static void ULHitHeader(ULI ul, const EventRecord *e)
 						ListDraw(ul);
 					}
 				}
-			}
+				
+				TrackMouseLocation(NULL, &pt, &trackingResult);
+			} while(trackingResult != kMouseTrackingMouseReleased);
 		}
 		else if(e->where.h < divider) //nick
 		{
@@ -583,6 +586,7 @@ static void ULScrollbarLive(ULI ul, const EventRecord *e)
 	Point mouse;
 	long initial, old, cur, max;
 	short range, delta;
+	MouseTrackingResult trackingResult;
 
 	HiliteControl(ul->bar, kControlIndicatorPart);
 
@@ -594,9 +598,9 @@ static void ULScrollbarLive(ULI ul, const EventRecord *e)
 	initial=old=cur=GetControlValue(ul->bar);
 	max=GetControlMaximum(ul->bar);
 	
-	while(StillDown())
+	GetMouse(&mouse);
+	do
 	{
-		GetMouse(&mouse);
 		if(PtInRect(mouse, &constraint.slopRect))
 		{
 			delta=mouse.v - e->where.v;
@@ -614,7 +618,9 @@ static void ULScrollbarLive(ULI ul, const EventRecord *e)
 			ListDraw(ul);
 			old=cur;
 		}
-	}
+		
+		TrackMouseLocation(NULL, &mouse, &trackingResult);
+	} while(trackingResult != kMouseTrackingMouseReleased);
 
 	HiliteControl(ul->bar, kControlNoPart);
 }
