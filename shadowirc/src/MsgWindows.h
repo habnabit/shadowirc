@@ -192,6 +192,8 @@ pascal struct Channel* MWGetChannel(MWPtr mw);
 pascal ConstStringPtr MWGetName(MWPtr mw, StringPtr s);
 pascal connectionPtr MWGetDCC(MWPtr mw);
 
+void MWClearText(MWPtr mw);
+
 #ifdef _LongStrings
 pascal void MWMessage(MWPtr, const LongString *ls);
 #endif

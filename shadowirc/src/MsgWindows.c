@@ -1232,6 +1232,19 @@ pascal void MWDelete(MWPtr w)
 	DisposePtr((Ptr)w);
 }
 
+#pragma mark -
+#pragma mark Text Editing
+
+void MWClearText(MWPtr mw)
+{
+	WEDeactivate(mw->we);
+	WESetSelection(0,0x7FFFFFFF, mw->we);
+	WEDelete(mw->we);
+	SetControlMaximum(mw->vscr, 0);
+	if(IsWindowHilited(mw->w))
+		WEActivate(mw->we);
+}
+
 static Style DoAddHunk(Style s, myStScrpHandle sty, int i, int *nsty)
 {
 	myScrpSTElement *q;
@@ -1711,6 +1724,8 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 		}
 	}
 }
+
+#pragma mark -
 
 pascal void InitMsgWindows(void)
 {

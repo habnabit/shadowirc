@@ -899,15 +899,10 @@ static void _ucClear(linkPtr link, ConstStr255Param com, LongString *rest, LongS
 {
 #pragma unused(link,com,rest)
 	MWPtr mw = CurrentTarget.mw;
+	
 	if(mw)
-	{
-		WEDeactivate(mw->we);
-		WESetSelection(0,0x7FFFFFFF, mw->we);
-		WEDelete(mw->we);
-		SetControlMaximum(mw->vscr, 0);
-		if(IsWindowHilited(mw->w))
-			WEActivate(mw->we);
-	}
+		MWClearText(mw);
+	
 	s->len=0;
 }
 
