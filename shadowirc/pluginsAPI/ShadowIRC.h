@@ -229,7 +229,7 @@ typedef char CMArray[numMessages];
 typedef struct plugsRec {
 	const ProcPtr yourPlugin;			//Your main function.
 	long pluginRef;							//A reference to your plugin.
-	const Str31 pluginName;			//The name of your plugin's file
+	CFStringRef pluginName;			//The name of your plugin's file
 	const long timesCalled;				//The number of times your plugin has been called.
 	const short resFileRefNum;		//The File Manager refnum of your resource fork.
 	short idleThreshold;					//If you're recieving idle messages, how often to get them (minimally), in ticks.

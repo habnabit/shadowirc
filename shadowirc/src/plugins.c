@@ -510,6 +510,7 @@ pascal long _UndocumentedAPI(long type, long data)
 {
 	#pragma unused(data)
 	LongString ls;
+	Str255 pluginName;
 	int x;
 	
 	switch(type)
@@ -602,7 +603,8 @@ pascal long _UndocumentedAPI(long type, long data)
 		default:
 			if(!IsWindowVisible(consoleWin->w))
 				ShowWindow(consoleWin->w);
-			LSConcatStrAndStrAndStr("\pPlugin \"", sidr.yourInfo->pluginName, "\p\" can not run.", &ls);
+			CFStringGetPascalString(sidr.yourInfo->pluginName, pluginName, 256, kCFStringEncodingMacRoman);
+			LSConcatStrAndStrAndStr("\pPlugin \"", pluginName, "\p\" can not run.", &ls);
 			SMPrefixIrcleColor(&ls, dsConsole, '2');
 			for(x=0;x<numMessages;x++)
 				sidr.yourInfo->captureMessages[x] = 0;
@@ -617,6 +619,7 @@ static pascal void InitPlugins(void)
 	int y;
 	long version, v;
 	LongString ls;
+	Str255 pluginName;
 	char b=0;
 	
 	v = ShadowIRCVersion(0);
@@ -656,10 +659,12 @@ static pascal void InitPlugins(void)
 			}
 			b=1;
 			
+			CFStringGetPascalString(p->pluginName, pluginName, 256, kCFStringEncodingMacRoman);
+			
 			if(version <= pVersion11MessageReply)
-				LSConcatStrAndStrAndStr("\p\"", p->pluginName, "\p\" is too old, and is incompatible with this version of ShadowIRC.", &ls);
+				LSConcatStrAndStrAndStr("\p\"", pluginName, "\p\" is too old, and is incompatible with this version of ShadowIRC.", &ls);
 			else if(version > pVersionCheckMessageReply)
-				LSConcatStrAndStrAndStr("\p\"", p->pluginName, "\p\" can not run because it is too new for this version of ShadowIRC.", &ls);
+				LSConcatStrAndStrAndStr("\p\"", pluginName, "\p\" can not run because it is too new for this version of ShadowIRC.", &ls);
 			LineMsg(&ls);
 		}
 	}
@@ -694,9 +699,7 @@ static int LoadPluginFromBundle(CFBundleRef pluginBundle, CFStringRef pluginName
 			thisPlug->captureMessages[x++]=0;
 		} while(x<numMessages);
 
-		CFStringGetPascalString (pluginName, thisPlug->pluginName, 31, kCFStringEncodingMacRoman);
-
-		// pstrcpy(spec->name, thisPlug->pluginName);
+		thisPlug->pluginName = CFStringCreateCopy(NULL, pluginName);
 		thisPlug->idleThreshold=0;
 		thisPlug->xpluginRef=(long)&thisPlug;
 		thisPlug->timesCalled=0;
@@ -752,36 +755,32 @@ static int LoadPluginFromBundle(CFBundleRef pluginBundle, CFStringRef pluginName
 static void ProcessApplicationPlugins()
 {
 	CFBundleRef mainBundle;
-	CFArrayRef pluginURLs;
 	CFURLRef pluginURL;
+	CFArrayRef pluginRefs;
 	CFBundleRef pluginBundle;
-	CFStringRef pluginName;
 	int i;
 
 	// Get the main bundle for the app
 	mainBundle = CFBundleGetMainBundle();
-
-	// Get a list of URLs for all the bundles in the Plugins directory
-	pluginURLs = CFBundleCopyResourceURLsOfType(mainBundle, CFSTR("bundle"), CFSTR("../PlugIns"));
-	if(pluginURLs != NULL)
+	pluginURL = CFBundleCopyBuiltInPlugInsURL(mainBundle);
+	pluginRefs = CFBundleCreateBundlesFromDirectory(NULL, pluginURL, CFSTR("bundle"));
+	CFRelease(pluginURL);
+	
+	if(pluginRefs != NULL)
 	{
-		int pluginCount = CFArrayGetCount(pluginURLs);
+		CFStringRef pluginName;
+		
+		int pluginCount = CFArrayGetCount(pluginRefs);
 		// Loop through the CFArray and load each plugin
 		for(i=0; i < pluginCount; i++)
 		{
-			pluginURL = (CFURLRef)CFArrayGetValueAtIndex(pluginURLs, i);
-
-			// Make a bundle instance using the URLRef
-			pluginBundle = CFBundleCreate(kCFAllocatorDefault, pluginURL);
-			pluginName = CFURLCopyLastPathComponent(pluginURL);
+			pluginBundle = (CFURLRef)CFArrayGetValueAtIndex(pluginRefs, i);
+			pluginName = CFBundleGetIdentifier(pluginBundle);
 			if(LoadPluginFromBundle(pluginBundle, pluginName) != 0) // Couldn't load the plugin
 				CFRelease(pluginBundle);
-			
-			CFRelease(pluginName);
-			CFRelease(pluginURL);
 		}
-
-		CFRelease(pluginURLs);
+		
+		CFRelease(pluginRefs);
 		UseResFile(gApplResFork);
 	}
 }
