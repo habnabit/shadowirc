@@ -69,8 +69,6 @@ _SetInputLineCursorSelection
 _GetInputLineCursorSelection
 _GetInputLine
 _SetInputLine
-_pluginNewDialog
-_pluginDisposeDialog
 _pluginNewWindow
 _pluginDisposeWindow
 _GetPluginWindowOwner

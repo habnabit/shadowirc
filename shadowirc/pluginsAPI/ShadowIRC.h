@@ -97,10 +97,9 @@ enum messagesList
 		</font></b></blink>
 */
 
-//Here, "window" means a DialogPtr or WindowPtr, unless stated.
+//Here, "window" means a WindowPtr, unless stated.
 	pUIWindowCloseMessage			=51,		//User attempted to close one of your windows.
 	pUIWindowMoveMessage			=52,		//User moved one of your windows.
-	pUIDialogItemHitMessage			=53,		//User clicked a button in one of your windows.
 	pUIMWGotTextMessage				=54,		//User typed text to one of your plugin's message windows
 	pUIActivateMessage					=55,		//A window has become active or deactive.
 	pUIMouseUpDownMessage			=56,		//A user clicked in your window somewhere.
@@ -1497,13 +1496,6 @@ typedef struct pUIWindowMoveDataRec {
 	Rect newpos;	//where the window was moved to
 } pUIWindowMoveDataRec, *pUIWindowMoveDataPtr;
 
-/* pUIDialogItemHitDataRec
-*/
-typedef struct pUIDialogItemHitDataRec {
-	DialogPtr dlg;	//The dialog that was hit
-	short item;		//The item that was hit.
-} pUIDialogItemHitDataRec, *pUIDialogItemHitDataPtr;
-
 /*	pUIMWGotTextDataRec
 */
 typedef struct pUIMWGotTextDataRec {
@@ -2407,21 +2399,6 @@ pascal void SetInputLine(LongString *ls);
 				//Do your stuff
 			pluginDisposeDialog();
 			ExitModalDialog();
-*/
-
-pascal DialogPtr pluginNewDialog(short dialogID);
-/*	Creates a new dialog for a plugin.
-		Input:	dialogID - the ID number of a dialog. MAKE SURE IT IS ONE IN YOUR RESOURCE FORK.
-		Output:	return value: the DialogPtr.
-		Note:	¥ If the user hits return, you get a pUIDialogItemHit for item #1. If the user hits
-					escape, you get an event for item #2. (Thus, #1 should be your "ok" button, and #2 should
-					be your cancel button.)
-*/
-
-pascal void pluginDisposeDialog(DialogPtr d);
-/*	Deletes a dialog created by a plugin.
-		Input:	d - dialog to delete.
-		Output:	none
 */
 
 pascal WindowPtr pluginNewWindow(const Rect *boundsRect, ConstStr255Param title, short theProc, long flags);

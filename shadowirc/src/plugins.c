@@ -904,34 +904,6 @@ pascal void pluginCloseWindow(WindowPtr win, pluginDlgInfoPtr p)
 	runIndPlugin(p->pluginRef, pUIWindowCloseMessage, &pp);
 }
 
-pascal DialogPtr pluginNewDialog(short dialogID)
-{
-	DialogPtr d;
-	pluginDlgInfoPtr p;
-	
-	d=GetNewDialog(dialogID, 0, (WindowPtr)-1);
-	if(d)
-	{
-		p=(pluginDlgInfoPtr)NewPtr(sizeof(pluginDlgInfo));
-		p->magic=PLUGIN_MAGIC;
-		p->pluginRef=sidr.yourInfo;
-		SetWRefCon(GetDialogWindow(d), (long)p);
-	}
-	return d;
-}
-
-pascal void pluginDisposeDialog(DialogPtr d)
-{
-	pluginDlgInfoPtr p;
-	
-	if(d)
-	{
-		p=(pluginDlgInfoPtr)GetWRefCon(GetDialogWindow(d));
-		DisposePtr((Ptr)p);
-		DisposeDialog(d);
-	}
-}
-
 enum {
 	pnwHasCloseBox = 1L << 0,		//Does the window have a close box?
 	pnwHasGrowBox = 1L << 1,

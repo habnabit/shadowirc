@@ -146,7 +146,6 @@ enum messagesList
 //Here, "window" means a DialogPtr or WindowPtr, unless stated.
 	pUIWindowCloseMessage			=51,		//User attempted to close one of your windows.
 	pUIWindowMoveMessage			=52,		//User moved one of your windows.
-	pUIDialogItemHitMessage			=53,		//User clicked a button in one of your windows.
 	pUIMWGotTextMessage				=54,		//User typed text to one of your plugin's message windows
 	pUIActivateMessage					=55,		//A window has become active or deactive.
 	pUIMouseUpDownMessage			=56,		//A user clicked in your window somewhere.
@@ -810,13 +809,6 @@ typedef struct pUIWindowMoveDataRec {
 	Rect newpos;	//where the window was moved to
 } pUIWindowMoveDataRec, *pUIWindowMoveDataPtr;
 
-/* pUIDialogItemHitDataRec
-*/
-typedef struct pUIDialogItemHitDataRec {
-	DialogPtr dlg;	//The dialog that was hit
-	short item;		//The item that was hit.
-} pUIDialogItemHitDataRec, *pUIDialogItemHitDataPtr;
-
 #ifdef _MsgWindows_
 
 /*	pUIMWGotTextDataRec
@@ -1168,8 +1160,6 @@ pascal void SoundService(long sound, long data);
 pascal short WMSGetMenuItemNum(FourCharCode serviceType);
 
 pascal short HMIAdd(ConstStr63Param name);
-pascal DialogPtr pluginNewDialog(short dialogID);
-pascal void pluginDisposeDialog(DialogPtr d);
 pascal WindowPtr pluginNewWindow(const Rect *boundsRect, ConstStr255Param title, short theProc, long flags);
 pascal void pluginDisposeWindow(WindowPtr d);
 pascal plugsPtr GetPluginWindowOwner(WindowPtr w);
