@@ -979,7 +979,7 @@ pascal void DCCOpen(connectionPtr *x)
 		ConnSetup(cc, des, cc->port);
 		if(cc->connType == connSOCKS)
 		{
-			FindAddress(&cc->private_socket, cc->name);
+			ConnFindAddress(cc, cc->name);
 			cc->connectStage=csLookingUp;
 			cc->tryingToConnect = true;
 			cc->outgoing = true;

@@ -21,7 +21,7 @@
 
 #include "LongStrings.h"
 #include "StringList.h"
-#include  "AppearanceHelp.h"
+#include "AppearanceHelp.h"
 #include "MsgWindows.h"
 #include "IRCGlobals.h"
 #include "DCC.h"
@@ -464,7 +464,7 @@ pascal void startConnection(linkPtr link)
 		search = link->conn->name;
 	
 	p.link = link;
-	if(!FindAddress(&link->conn->private_socket, search))
+	if(!ConnFindAddress(link->conn, search))
 	{
 		if(mainPrefs->firewallType == fwSOCKS4)
 			link->conn->connectStage=csLookingUp2;

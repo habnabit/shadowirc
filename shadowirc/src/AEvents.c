@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -69,6 +69,7 @@ static pascal OSErr aeQuit(const AppleEvent *theAEvent, AppleEvent *theReply, un
 static pascal OSErr aeODoc(const AppleEvent *theAEvent, AppleEvent *theReply, unsigned long refCon);
 static pascal OSErr aePDoc(const AppleEvent *theAEvent, AppleEvent *theReply, unsigned long refCon);
 static pascal OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply, unsigned long refCon);
+static pascal OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, unsigned long refcon);
 
 static pascal char GetAETEResource(Handle *res);
 static pascal OSErr EasyHasUnusedParameters(const AppleEvent *theAEvent);
@@ -204,6 +205,51 @@ static pascal OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply,
 	return err;
 }
 
+enum {
+	kGetURLEventClass = 'GURL',
+	kGetURLEventID	 = 'GURL',
+	kGetURLToFileKeyword = 'dest'
+};
+
+#include "inputline.h"
+
+static OSErr OpenURLString(LongString *url)
+{
+	SetInputLine(url);
+	
+	return paramErr;
+}
+
+static pascal OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, unsigned long)
+{
+	LongString url;
+	DescType typeCode;
+	Size actualSize;
+	OSErr err = noErr;
+	OSErr result = noErr;
+
+	//if (!gStartupOK) return userCanceledErr;
+	
+	err = AEGetParamPtr(event, keyDirectObject, typeChar, &typeCode, &url.data[1], maxLSlen, &actualSize);
+	if(err != noErr)
+		return err;
+	url.len = actualSize;
+	
+	err = EasyHasUnusedParameters(event);
+	if(err != noErr)
+		return err;
+	
+	err = result = OpenURLString(&url);
+	if(reply->dataHandle != nil)
+	{
+		err = AEPutParamPtr(reply, keyDirectObject, typeShortInteger, &result, sizeof(result));
+		if(err != noErr)
+			return err;
+	}
+	
+	return noErr;
+}
+
 #pragma mark -
 
 static pascal OSErr EasyHasUnusedParameters(const AppleEvent *theAEvent)
@@ -233,6 +279,8 @@ pascal OSErr InstallAEHandlers(void)
 	InstHand(kCoreEventClass, kAEQuitApplication, aeQuit);
 	InstHand(kCoreEventClass, kAEOpenDocuments, aeODoc);
 	InstHand(kCoreEventClass, kAEPrintDocuments, aePDoc);
+	
+	InstHand(kGetURLEventClass, kGetURLEventID, aeGURL);
 
 	InstHand(kASAppleScriptSuite, kGetAETE, aeGetAETE);
 	

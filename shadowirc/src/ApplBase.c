@@ -1143,7 +1143,7 @@ static pascal void doTCPEvent(CEPtr c)
 					if(conn->connectStage == csLookingUp2)
 					{
 						conn->ip2 = c->value;
-						FindAddress(&conn->private_socket, link->conn->name);
+						ConnFindAddress(conn, link->conn->name);
 						
 						LSParamString(&ls, GetIntStringPtr(spInfo, sLookingUpIP), link->conn->name, 0, 0, 0);
 						SMPrefix(&ls, dsConsole);
@@ -1337,23 +1337,26 @@ pascal void ApplRun(void)
 	EventRecord e;
 	connectionEventRecord connEvt;
 	int x;
-
-	WaitNextEvent(-1, &e, 1, mouseRgn);
-	GetDateTime(&now);
-	if(e.what==nullEvent)
+	
+	while(!QuitRequest)
 	{
-		x=-8;
-		while(GetConnectionEvent(&connEvt))
+		WaitNextEvent(-1, &e, 1, mouseRgn);
+		GetDateTime(&now);
+		if(e.what==nullEvent)
 		{
-			doTCPEvent(&connEvt);
-			if(!++x)
-				break;
+			x=-8;
+			while(GetConnectionEvent(&connEvt))
+			{
+				doTCPEvent(&connEvt);
+				if(!++x)
+					break;
+			}
+			
+			if(x >= -2) //lots of data...check memory to help protect from being flooded off
+				CheckMem();
 		}
-		
-		if(x >= -2) //lots of data...check memory to help protect from being flooded off
-			CheckMem();
+		ApplEvents(&e);
 	}
-	ApplEvents(&e);
 }
 
 static pascal long GrowZoneProc(long needed)
@@ -1502,6 +1505,9 @@ pascal void ApplExit(void)
 	if(hasNav)
 		NavUnload();
 	#endif
+	
+	#if !TARGET_CARBON
 	DisposeAllSmartScrolls();
+	#endif
 	ExitToShell();
 }

@@ -239,7 +239,6 @@ pascal void SetBackground(short color)
 
 struct InternalDrawingState
 {
-	Boolean			colorPort;
 	RGBColor		foreColor;
 	RGBColor		backColor;
 	PenState		pen;
@@ -247,17 +246,17 @@ struct InternalDrawingState
 	PixPatHandle	pnPixPat;
 	PixPatHandle	bkPixPat;
 	Pattern			bkPat;
-	UInt32			fgColor;
-	UInt32			bkColor;
 };
 typedef struct InternalDrawingState InternalDrawingState;
 
 //Replacments for the color/pen state stuff that's in Appearance 1.1
 //Copied from Apple's code from somewhere, I think
+//But, assuming we have a color port, since ShadowIRC only generates color windows...
 pascal void GetDrawingState(DrawingState *outState)
 {
-	if(hasAppearance11)
+	if(TARGET_CARBON || hasAppearance11)
 		GetThemeDrawingState((ThemeDrawingState*)outState);
+#if(!TARGET_CARBON)
 	else
 	{
 		InternalDrawingState* state = (InternalDrawingState*)NewPtr(sizeof(InternalDrawingState));
@@ -269,47 +268,34 @@ pascal void GetDrawingState(DrawingState *outState)
 		state->pnPixPat = nil;
 		state->bkPixPat = nil;
 
-		state->colorPort = IsPortColor(curPort);
-
-		state->bkPat = curPort->bkPat;
-		state->bkColor = curPort->bkColor;
-		state->fgColor = curPort->fgColor;
-
-		if ( state->colorPort )
-		{
-			GetForeColor( &state->foreColor );
-			GetBackColor( &state->backColor );
+		GetForeColor(&state->foreColor);
+		GetBackColor(&state->backColor);
+		
+		// If the pen pattern is not an old style pattern,
+		// copy the handle. If it is an old style pattern,
+		// GetPenState below will save the right thing.
+		if ( (**((CGrafPtr)curPort)->pnPixPat).patType != 0 )
+			state->pnPixPat = ((CGrafPtr)curPort)->pnPixPat;
+		
+		// If the pen pattern is not an old style pattern,
+		// copy the handle, else get the old pattern into
+		// bkPat for restoring that way.
+		if ( (**((CGrafPtr)curPort)->bkPixPat).patType != 0 )
+			state->bkPixPat = ((CGrafPtr)curPort)->bkPixPat;
+		else
+			state->bkPat = *(PatPtr)(*(**((CGrafPtr)curPort)->bkPixPat).patData);
 			
-				// If the pen pattern is not an old style pattern,
-				// copy the handle. If it is an old style pattern,
-				// GetPenState below will save the right thing.
-				
-			if ( (**((CGrafPtr)curPort)->pnPixPat).patType != 0 )
-			{
-				state->pnPixPat = ((CGrafPtr)curPort)->pnPixPat;
-			}
-			
-				// If the pen pattern is not an old style pattern,
-				// copy the handle, else get the old pattern into
-				// bkPat for restoring that way.
-				
-			if ( (**((CGrafPtr)curPort)->bkPixPat).patType != 0 )
-			{
-				state->bkPixPat = ((CGrafPtr)curPort)->bkPixPat;
-			}
-			else
-				state->bkPat = *(PatPtr)(*(**((CGrafPtr)curPort)->bkPixPat).patData);
-		}
-			
-		GetPenState( &state->pen );
-		state->textMode = curPort->txMode;
+		GetPenState(&state->pen);
+		state->textMode = GetPortTextMode(curPort);
 	}
+#endif
 }
 
 pascal void SetDrawingState(DrawingState instate)
 {
-	if(hasAppearance11)
+	if(TARGET_CARBON || hasAppearance11)
 		SetThemeDrawingState((ThemeDrawingState)instate, true);
+#if(!TARGET_CARBON)
 	else
 	{
 		InternalDrawingState *state = (InternalDrawingState*)instate;
@@ -319,28 +305,20 @@ pascal void SetDrawingState(DrawingState instate)
 
 		SetPenState( &state->pen );
 
-		if ( IsPortColor( curPort ) && state->colorPort )
-		{
-			RGBForeColor( &state->foreColor );
-			RGBBackColor( &state->backColor );
+		RGBForeColor( &state->foreColor );
+		RGBBackColor( &state->backColor );
 
-			if ( state->pnPixPat )
-				PenPixPat( state->pnPixPat );
+		if ( state->pnPixPat )
+			PenPixPat( state->pnPixPat );
 
-			if ( state->bkPixPat )
-				BackPixPat( state->bkPixPat );
-			else
-				BackPat( &state->bkPat );
-		}
+		if ( state->bkPixPat )
+			BackPixPat( state->bkPixPat );
 		else
-		{
 			BackPat( &state->bkPat );
-			ForeColor( state->fgColor );
-			BackColor( state->bkColor );
-		}
 
 		TextMode( state->textMode );
 	}
+#endif
 }
 
 pascal void NormalizeDrawingState()

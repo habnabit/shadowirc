@@ -221,6 +221,8 @@ pascal unsigned short ConnGetLocalPort(connectionPtr conn);
 #pragma export off
 #pragma lib_export off
 
+pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host);
+
 pascal OSErr ConnSend(connectionPtr conn, const void* writePtr, short writeCount, char push);
 pascal connectionPtr ConnNewDNSIP(ConstStr255Param name);
 pascal connectionPtr ConnNewDNSName(ConstStr255Param ip);

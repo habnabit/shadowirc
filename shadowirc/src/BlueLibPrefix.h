@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -56,6 +56,9 @@ inline Rect* GetPortBounds(CGrafPtr port, Rect* bounds)
 #define GetPortPixMap(gp) ((gp)->portPixMap)
 #define GetPortVisibleRegion(gp, rgn) CopyRgn(gp->visRgn, rgn)
 #define GetPortClipRegion(gp, clip) CopyRgn(gp->clipRgn, clip)
+#define GetPortForeColor(gp, fc) (*(fc) = (gp)->fgColor)
+#define GetPortBackColor(gp, fc) (*(fc) = (gp)->bkColor)
+
 
 #define SetPortClipRegion(gp, clip) CopyRgn(clip, gp->clipRgn)
 #define SetPortVisibleRegion(gp, rgn) CopyRgn((rgn), (gp)->visRgn)

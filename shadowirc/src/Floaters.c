@@ -408,7 +408,10 @@ pascal void WDrag(WindowPtr w, Point startPoint, const Rect *boundsRect)
 		GetPort(&gp);
 		
 		screenPort = CreateNewPort();
-		OpenPort(screenPort);
+		
+		#if !TARGET_CARBON
+			OpenPort(screenPort);
+		#endif
 		SetPort(screenPort);
 		gray = GetGrayRgn();
 		SetPortBounds(screenPort, GetRegionBounds(gray, 0));
@@ -442,7 +445,9 @@ pascal void WDrag(WindowPtr w, Point startPoint, const Rect *boundsRect)
 		dragResult= DragGrayRgn(dragRegion, startPoint, &dragRect, &dragRect, noConstraint, 0);
 		
 		//Restore grafport
-		ClosePort(screenPort);
+		#if !TARGET_CARBON
+			ClosePort(screenPort);
+		#endif
 		SetPort(gp);
 		DisposePort(screenPort);
 		

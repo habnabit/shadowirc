@@ -387,7 +387,7 @@ static pascal void TextScrolled(WEReference we)
 		if(max<0)
 			max=0;
 		
-		if(hasAppearance11)
+		if(TARGET_CARBON || hasAppearance11)
 		{
 			SetControl32BitMaximum(bar, max);
 			SetControl32BitValue(bar, val);

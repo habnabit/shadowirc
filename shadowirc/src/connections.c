@@ -416,3 +416,8 @@ pascal OSErr ConnSend(connectionPtr conn, const void* writePtr, short writeCount
 {
 	return TCPSendAsync(GetConnectionTCPC(conn->private_socket), writePtr, writeCount, push);
 }
+
+pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host)
+{
+	return FindAddress(&conn->private_socket, host);
+}
