@@ -21,9 +21,7 @@
 
 #include "IRCGlobals.h"
 #include "utils.h"
-#include "inputline.h"
 #include "MsgWindows.h"
-#include "channels.h"
 #include "connections.h"
 #include "Inline.h"
 #include "plugins.h"

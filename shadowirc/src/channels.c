@@ -25,7 +25,6 @@
 #include "MsgWindows.h"
 #include "connections.h"
 #include "channels.h"
-#include "filesMan.h"
 #include "utils.h"
 #include "Inline.h"
 #include "plugins.h"

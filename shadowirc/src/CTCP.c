@@ -32,7 +32,6 @@
 #include "plugins.h"
 #include "IRCCommands.h"
 #include "Inline.h"
-//#include "Timer.h"
 #include "TextManip.h"
 
 

@@ -34,10 +34,7 @@
 #include "CMenus.h"
 #include "IRCCommands.h"
 #include "IRCAux.h"
-#include "ApplBase.h"
-#include "AppearanceHelp.h"
 #include "Floaters.h"
-#include "IRCInput.h"
 #include "MenuCommands.h"
 
 static void _CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key, short *id, MenuHandle *m);
