@@ -298,7 +298,7 @@ pascal void LSDelete(LongString *ls, short firstpos, short lastpos)
 		if(lastpos>ls->len)
 			lastpos=ls->len;
 		
-		BlockMoveData(&ls->data[lastpos+1], &ls->data[firstpos], ls->len - firstpos);
+		BlockMoveData(&ls->data[lastpos+1], &ls->data[firstpos], ls->len - lastpos);
 		ls->len+=(-1)-lastpos+firstpos;
 	}
 }
