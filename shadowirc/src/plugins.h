@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -146,8 +146,6 @@ enum messagesList
 	pUIMWInfoRefresh						=252,	//ShadowIRC is refreshing your Message Window's status bar. Tell it what you want it to do.
 
 //Drag and Drop
-	pUIDragTrackMessage				=253,	//Drag and Drop drag tracking handler
-	pUIDragReceiveMessage			=254,	//Drag and Drop drag receive handler
 	pMWPaneDragTrackMessage		=255,	//MW Pane D&D drag tracking message
 	pMWWidgetDragTrackMessage	=256,	//MW Widget D&D drag tracking message
 	pMWPaneDragReceiveMessage	=257,	//MW Pane D&D drag receive message
@@ -728,22 +726,6 @@ typedef struct pUIWindowCloseDataRec {
 } pUIWindowCloseDataRec, pUIWindowCloseDataPtr;
 
 #endif
-
-/*	pUIDragTrackData
-*/
-typedef struct pUIDragTrackData {
-	WindowPtr window;	//The window
-	long drag;					//The DragReference
-	short message;			//the DragTrackingMessage
-} pUIDragTrackData, *pUIDragTrackDataPtr;
-
-/*	pUIDragReceiveData
-*/
-typedef struct pUIDragReceiveData {
-	WindowPtr window;	//The window
-	long drag;					//The DragReference
-	OSErr returnVal;		//Receive Handler error code
-} pUIDragReceiveData, *pUIDragReceiveDataPtr;
 
 #ifdef _MsgWindows_
 

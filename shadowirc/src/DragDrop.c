@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -44,8 +44,6 @@ enum flavors{
 	kTextFlavor		= 'TEXT',
 	kMWinFlavor		= 'MWIN',
 	kUserFlavor		= 'USER',
-	
-	kHFSFlavor		= flavorTypeHFS
 };
 
 enum {
@@ -55,12 +53,7 @@ enum {
 };
 
 
-#define kFSO flavorSenderOnly
-
 WEPreTrackDragUPP sPreTrackerUPP = 0;
-
-static DragTrackingHandlerUPP sMyTrackingHandlerUPP = nil;
-static DragReceiveHandlerUPP sMyReceiveHandlerUPP = nil;
 
 static OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage message, DragReference drag);
 inline OSErr MWReceiveDrag(MWPtr mw, DragReference drag);
@@ -70,8 +63,8 @@ static OSErr MWTrackDragWidget2(mwWidgetPtr o, Point mouse, short state, DragRef
 static OSErr MWWidgetTrackDrag(MWPtr mw,  Point mouse, DragTrackingMessage message, DragReference drag);
 static OSErr MWWidgetReceiveDrag(MWPtr mw, Point mouse, DragReference drag);
 
-static OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr window, void* homeA5, DragReference drag);
-static OSErr MyReceiveHandler(WindowPtr window, void* homeA5, DragReference drag);
+static OSErr MWTrackingHandler(DragTrackingMessage message, WindowPtr window, void* refCon, DragReference drag);
+static OSErr MWReceiveHandler(WindowPtr window, void* refCon, DragReference drag);
 
 static OSErr PreDrag(DragReference drag, WEReference we);
 
@@ -347,7 +340,7 @@ static OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage mess
 		switch(o->type)
 		{
 			case mwTextPane:
-				if(!DragIsTypeAvail(drag, kTextFlavor) && DragIsTypeAvail(drag, kHFSFlavor))
+				if(!DragIsTypeAvail(drag, kTextFlavor) && DragIsTypeAvail(drag, kDragFlavorTypeHFS))
 				{
 					if(!mw->inactive && (mw->winType == queryWin || mw->winType == dccWin))
 					{
@@ -447,7 +440,7 @@ static OSErr MWTextPaneReceiveDrag(MWPtr mw, DragReference drag)
 	MWPtr mwFrom;
 	
 	ret = dragNotAcceptedErr;
-	if(!DragIsTypeAvail(drag, kTextFlavor) && DragIsTypeAvail(drag, kHFSFlavor))
+	if(!DragIsTypeAvail(drag, kTextFlavor) && DragIsTypeAvail(drag, kDragFlavorTypeHFS))
 	{
 		if(!mw->inactive && (mw->winType == queryWin || mw->winType == dccWin))
 		{
@@ -467,11 +460,11 @@ static OSErr MWTextPaneReceiveDrag(MWPtr mw, DragReference drag)
 			{
 				GetDragItemReferenceNumber(drag, i, &item);
 				
-				if(!GetFlavorFlags(drag, item, kHFSFlavor, &flags))
+				if(!GetFlavorFlags(drag, item, kDragFlavorTypeHFS, &flags))
 				{
-					GetFlavorDataSize(drag, item, kHFSFlavor, &siz);
+					GetFlavorDataSize(drag, item, kDragFlavorTypeHFS, &siz);
 					hf = (HFSFlavor*)NewPtr(siz);
-					GetFlavorData(drag, item, kHFSFlavor, hf, &siz, 0);
+					GetFlavorData(drag, item, kDragFlavorTypeHFS, hf, &siz, 0);
 					
 					DoDCCSendFile(mw->link, s, &hf->fileSpec, true, mainPrefs->dccReverseSends);
 
@@ -615,13 +608,9 @@ inline OSErr MWReceiveDrag(MWPtr mw, DragReference drag)
 	return ret;
 }
 
-static OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr window, void* homeA5, DragReference drag)
+static OSErr MWTrackingHandler(DragTrackingMessage message, WindowPtr window, void* refCon, DragReference drag)
 {
-#pragma unused(homeA5)
-
 	MWPtr mw;
-	pluginDlgInfoPtr pd;
-	pUIDragTrackData pt;
 	OSErr ret = dragNotAcceptedErr;
 	
 	if(!inputLocked)
@@ -634,28 +623,10 @@ static OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr window, vo
 		
 		if(window)
 		{
-			if(window == inputLine.w)
-				ret = WETrackDrag(message, drag, ILGetWE());
-			else
+			if(!(message == kDragTrackingEnterHandler || message == kDragTrackingLeaveHandler))
 			{
-				pd=(pluginDlgInfoPtr)GetWRefCon(window);
-				if(pd && (pd->magic==PLUGIN_MAGIC))
-				{
-					pt.window=window;
-					pt.message = message;
-					pt.drag = (long)drag;
-
-					runIndPlugin(pd->pluginRef, pUIDragTrackMessage, &pt);
-				}
-				else
-				{
-					if(!(message == kDragTrackingEnterHandler || message == kDragTrackingLeaveHandler))
-					{
-						mw = MWFromWindow(window);
-						if(mw)
-							ret = MWTrackDrag(mw, message, drag);
-					}
-				}
+				mw = (MWPtr)refCon;
+				ret = MWTrackDrag(mw, message, drag);
 			}
 		}
 	}
@@ -663,40 +634,15 @@ static OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr window, vo
 	return ret;
 }
 
-static OSErr MyReceiveHandler(WindowPtr window, void* homeA5, DragReference drag)
+static OSErr MWReceiveHandler(WindowPtr window, void* refCon, DragReference drag)
 {
-#pragma unused(homeA5)
 	MWPtr mw;
-	pluginDlgInfoPtr pd;
-	pUIDragReceiveData pr;
 	OSErr err = dragNotAcceptedErr;
 	
 	if(!inputLocked && window)
 	{
-		if(window == inputLine.w)
-		{
-			err= WEReceiveDrag(drag, ILGetWE());
-			if(!err)
-				processPaste(CurrentTarget.mw, true);
-		}
-		else
-		{
-			pd=(pluginDlgInfoPtr)GetWRefCon(window);
-			if(pd && (pd->magic==PLUGIN_MAGIC))
-			{
-				pr.window=window;
-				pr.drag = (long)drag;
-				pr.returnVal = 0;
-				runIndPlugin(pd->pluginRef, pUIDragReceiveMessage, &pr);
-				err = pr.returnVal;
-			}
-			else
-			{
-				mw = MWFromWindow(window);
-				if(mw)
-					err = MWReceiveDrag(mw, drag);
-			}
-		}
+		mw = (MWPtr)refCon;
+		err = MWReceiveDrag(mw, drag);
 	}
 	
 	return err;
@@ -730,11 +676,11 @@ static OSErr PreDrag(DragReference drag, WEReference we)
 	//	add a 'clnm' flavor containing the name of the document originating the drag
 	//	this flavor is used by the Finder (version 8.0 and later) to determine the
 	//	name of the clipping file
-	err = AddDragItemFlavor(drag, (ItemReference)we, 'clnm', title, title[0]+1, flavorNotSaved);
+	err = AddDragItemFlavor(drag, (ItemReference)we, kFlavorTypeClippingName, title, title[0]+1, flavorNotSaved);
 	
 	//Then, add a 'MWIN' flavor containing the MWPtr to the window.
 	if(!err)
-		err = DragAddPtr(drag, (ItemReference)we, kMWinFlavor, mw, kFSO);
+		err = DragAddPtr(drag, (ItemReference)we, kMWinFlavor, mw, flavorSenderOnly);
 	
 	//Check and see if we have a single word selected.
 	ch = MWGetChannel(mw);
@@ -750,26 +696,29 @@ static OSErr PreDrag(DragReference drag, WEReference we)
 			s[0]=s1-s0;
 			u = ULFindUserName(ch, s);
 			if(u)
-				DragAddPtr(drag, (ItemReference)we, kUserFlavor, u, kFSO);
+				DragAddPtr(drag, (ItemReference)we, kUserFlavor, u, flavorSenderOnly);
 		}
 	}
 	return err;
 }
 
-pascal void InitDrag(void)
+void InitDrag()
 {
-	void* l = 0;
 	sPreTrackerUPP = NewWEPreTrackDragProc(PreDrag);
-	
-	//Install Handlers
-	sMyTrackingHandlerUPP = NewDragTrackingHandlerUPP(MyTrackingHandler);
-	sMyReceiveHandlerUPP = NewDragReceiveHandlerUPP(MyReceiveHandler);
-	InstallTrackingHandler(sMyTrackingHandlerUPP, 0, l);
-	InstallReceiveHandler(sMyReceiveHandlerUPP, 0, l);
 }
 
-pascal void RemoveDragHandlers(void)
+void MWInitDrag(MWPtr mw)
 {
-	RemoveTrackingHandler(sMyTrackingHandlerUPP, 0);
-	RemoveReceiveHandler(sMyReceiveHandlerUPP, 0);
+	static DragTrackingHandlerUPP sMWTrackingHandlerUPP = nil;
+	static DragReceiveHandlerUPP sMWReceiveHandlerUPP = nil;
+	
+	//Create handlers if necessary
+	if(!sMWTrackingHandlerUPP)
+	{
+		sMWTrackingHandlerUPP = NewDragTrackingHandlerUPP(MWTrackingHandler);
+		sMWReceiveHandlerUPP = NewDragReceiveHandlerUPP(MWReceiveHandler);
+	}
+	
+	InstallTrackingHandler(sMWTrackingHandlerUPP, mw->w, mw);
+	InstallReceiveHandler(sMWReceiveHandlerUPP, mw->w, mw);
 }

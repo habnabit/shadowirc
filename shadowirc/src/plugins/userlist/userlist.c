@@ -51,9 +51,6 @@ INLINE void ULGotNamesList(pServiceULNamesEndData *p);
 static void ULSActivateWin(pServiceActivateWinData *p);
 static char MouseInWindow(ULI ul);
 
-static void ULDragTrack(pUIDragTrackData *p);
-static void ULDragReceive(pUIDragReceiveData *p);
-
 //static void ULContextualMenu(pCMPopupsData *p);
 //static void ULContextualMenuProcess(pCMPopupsReturnData *p);
 static void ProcessShortcuts(pShortcutProcessData *p);
@@ -476,10 +473,9 @@ INLINE void SULUserHosts(pServiceULUserhostsData *p)
 
 //static int hiliteUser = -1;
 
+/*
 static void ULDragTrack(pUIDragTrackData *p)
 {
-return;
-/*
 	int top, loc;
 	int mouseOver;
 	Point pt;
@@ -559,12 +555,10 @@ return;
 			ULIFinishDrawing(ul, gp);
 		}
 	}
-*/
 }
 
 static void ULDragReceive(pUIDragReceiveData *p)
 {
-/*
 	ULI ul = ULIFromWindow(p->window);
 
 	p->returnVal = dragNotAcceptedErr;
@@ -607,8 +601,8 @@ static void ULDragReceive(pUIDragReceiveData *p)
 			}
 		}
 	}
-*/
 }
+*/
 
 #pragma mark -
 
@@ -1921,14 +1915,6 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			ProcessShortcuts((pShortcutProcessDataPtr)sidrIN->messageData);
 			break;
 		
-		case pUIDragTrackMessage:
-			ULDragTrack((pUIDragTrackDataPtr)sidrIN->messageData);
-			break;
-		
-		case pUIDragReceiveMessage:
-			ULDragReceive((pUIDragReceiveDataPtr)sidrIN->messageData);
-			break;
-
 		case pMWNewMessage:
 			ULNewMessageWindow((pMWNewDataPtr)sidrIN->messageData);
 			break;

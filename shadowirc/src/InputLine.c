@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -400,6 +400,32 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 	return result;
 }
 
+static OSErr IWDragTrackingHandler(DragTrackingMessage message, WindowPtr window, void* refCon, DragReference drag)
+{
+#pragma unused(refCon)
+	OSErr ret = dragNotAcceptedErr;
+	
+	if(!inputLocked)
+		ret = WETrackDrag(message, drag, ILGetWE());
+	
+	return ret;
+}
+
+static OSErr IWDragReceiveHandler(WindowPtr window, void* refCon, DragReference drag)
+{
+#pragma unused(refCon)
+	OSErr err = dragNotAcceptedErr;
+	
+	if(!inputLocked)
+	{
+			err= WEReceiveDrag(drag, ILGetWE());
+			if(!err)
+				processPaste(CurrentTarget.mw, true);
+	}
+	
+	return err;
+}
+
 void OpenInputLine()
 {
 	if(!inputLine.w)
@@ -427,6 +453,8 @@ void OpenInputLine()
 			{kEventClassKeyboard, kEventRawKeyRepeat}
 		};
 		static EventHandlerUPP ilUPP = NULL;
+		static DragTrackingHandlerUPP iwTrackingHandlerUPP = nil;
+		static DragReceiveHandlerUPP iwReceiveHandlerUPP = nil;
 
 		if(mainPrefs->nonGlobalInput)
 		{
@@ -484,6 +512,15 @@ void OpenInputLine()
 				mainPrefs->inputLoc.bottom=mainPrefs->inputLoc.top+v;
 			}
 
+			//Add Drag Handlers
+			if(!iwTrackingHandlerUPP)
+			{
+				iwTrackingHandlerUPP = NewDragTrackingHandlerUPP(IWDragTrackingHandler);
+				iwReceiveHandlerUPP = NewDragReceiveHandlerUPP(IWDragReceiveHandler);
+			}
+			InstallTrackingHandler(iwTrackingHandlerUPP, inputLine.w, inputLine.w);
+			InstallReceiveHandler(iwReceiveHandlerUPP, inputLine.w, inputLine.w);
+			
 			//Allocate default Inputline objects
 			inputLine.status=IWNewWidget(iwStatusLine, iwLeft, -1);
 			

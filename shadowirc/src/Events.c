@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 2002 John Bafford, Chris Campbell
+	Copyright (C) 2003 John Bafford, Chris Campbell
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -27,6 +27,7 @@
 
 #include "channels.h"
 #include "MsgWindows.h"
+#include "DragDrop.h"
 #include "MWPanes.h"
 #include "InputLine.h"
 #include "plugins.h"
@@ -480,6 +481,8 @@ void MWInstallEventHandlers(MWPtr mw)
 		
 		InstallWindowEventHandler(mw->w, conWinHandler, GetEventTypeCount(conEvents), conEvents, mw, NULL);
 	}
+	
+	MWInitDrag(mw);
 }
 
 #pragma mark -

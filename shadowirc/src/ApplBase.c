@@ -687,7 +687,6 @@ static void ApplExit(void)
 	
 	StopIC();
 	
-	RemoveDragHandlers();
 	UnregisterAppearanceClient();
 	
 	NavUnload();

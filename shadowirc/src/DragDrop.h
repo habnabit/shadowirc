@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -33,7 +33,7 @@ pascal char DragAddPtr(DragReference drag, ItemReference item, long type, void* 
 extern WEPreTrackDragUPP sPreTrackerUPP;
 #endif
 
-pascal void InitDrag(void);
-pascal void RemoveDragHandlers(void);
+void MWInitDrag(MWPtr mw);
+void InitDrag();
 
 #endif
