@@ -874,13 +874,13 @@ void ConnectionMenuHilites(void)
 		if(link->conn == 0)
 		{
 			EnableMenuItem(menuConnectionList, x);
-			EnableMenuItem(menuSelectConnectionList, x);
+			DisableMenuItem(menuSelectConnectionList, x);
 			DisableMenuItem(menuSignoffConnectionList, x);
 		}
 		else
 		{
 			DisableMenuItem(menuConnectionList, x);
-			DisableMenuItem(menuSelectConnectionList, x);
+			EnableMenuItem(menuSelectConnectionList, x);
 			EnableMenuItem(menuSignoffConnectionList, x);
 		}
 	}
