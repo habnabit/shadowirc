@@ -178,7 +178,10 @@ enum fileStrings {
 };
 
 enum whoisStrings {
-	sWhSignedOnAt = 1
+	sWhSignedOnAt = 1,
+	sOnIRCVia,
+	sWasOnIRCVia,
+	sIdleFor
 };
 
 #endif

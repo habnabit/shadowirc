@@ -73,6 +73,7 @@ pascal void SecsToHMS(long l, LongString *ls)
 	}
 	
 	ls->len-=2;
+	LSMakeStr(*ls);
 }
 
 pascal ControlHandle GetControlHandle(DialogPtr theDialog, short theItem)

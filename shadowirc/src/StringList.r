@@ -91,7 +91,7 @@ resource 'STR#' (253, "Server Messages", locked, preload)
 		"^0 is on channels ",
 		"Inviting ^0 to channel ^1",
 		"Topic for ^0: ",
-		"^0 is already on channel ^1"
+		"^0 is already on channel ^1",
 	};
 };
 
@@ -282,7 +282,7 @@ resource 'STR#' (261, "URL Menu", locked, preload)
 	{
 		"ShadowIRC Home Page", "http://www.shadowirc.com/",
 		"SourceForge Project Page", "http://sourceforge.net/projects/shadowirc/",
-		"Comments and Suggestions", "http://www.shadowirc.com/comment.phtml",
+//		"Comments and Suggestions", "http://www.shadowirc.com/comment.phtml",
 		"ShadowIRC Support", "http://www.shadowirc.com/support.phtml",
 		"ShadowIRC Plugins", "http://plugins.shadowirc.com/",
 		"-", "-",
@@ -306,7 +306,10 @@ resource 'STR#' (262, "File Dialog Strings", locked, preload)
 resource 'STR#' (263, "WHOIS Strings", locked, preload)
 {
 	{
-		"^0 signed on at ^1, ^2"
+		"^0 signed on at ^1, ^2",
+		"^0 is on IRC via ^1 (^2)",
+		"^0 was on IRC via ^1 (^2)",
+		"^0 has been idle for ^1"
 	};
 };
 

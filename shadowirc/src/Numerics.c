@@ -307,6 +307,7 @@ inline void n433nickInUse(linkPtr link, LongString *rest)
 pascal char NumericComm(short comm, StringPtr from, ConstStringPtr target, LongString *rest, linkPtr link)
 {
 	Str255 s1, s2, s3, s4;
+	ConstStringPtr sp;
 	LongString ls;
 	unsigned long ul;
 	LongString unparsedrest;
@@ -836,16 +837,14 @@ _Skip:
 		case 312: //whois host/server
 			LSNextArg(rest, s1); //nick
 			LSNextArgIRC(rest, s2); //server
-			LSStrLS(s1, &ls);
-			if(link->lastNumerics[1]==314) //whowas
-				LSAppend4(ls, ' was')
-			else
-				LSAppend3(ls, ' is ');
 			
-			LSConcatLSAndStrAndStr(&ls, "\p on IRC via server ", s2, &ls);
-			LSAppend2(ls, ' (');
-			LSConcatLSAndLS(&ls, rest, &ls);
-			LSAppend1(ls, ')');
+			if(link->lastNumerics[1]==314) //whowas
+				sp = GetIntStringPtr(spWhois, sWasOnIRCVia);
+			else
+				sp = GetIntStringPtr(spWhois, sOnIRCVia);
+			
+			LSMakeStr(*rest);
+			LSParamString(&ls, sp, s1, s2, rest->data, 0);
 			SMPrefixLink(link, &ls, dsFrontWin);
 			break;
 		
@@ -857,8 +856,7 @@ _Skip:
 			
 			StringToNum(s2, &l);
 			SecsToHMS(l, rest);
-			LSConcatStrAndStr(s1, "\p has been idle for ", &ls);
-			LSConcatLSAndLS(&ls, rest, &ls);
+			LSParamString(&ls, GetIntStringPtr(spWhois, sIdleFor), s1, rest->data, 0, 0);
 			SMPrefixLink(link, &ls, dsFrontWin);
 			StringToNum(s3,  (long*)&ul);
 			ul+=ircDateModifier;
