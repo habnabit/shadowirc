@@ -55,7 +55,7 @@
       <boolean name="hasVerticalZoom">FALSE</boolean>
       <int name="carbonWindowClass">4</int>
       <int name="themeBrush">0</int>
-      <int name="windowPosition">0</int>
+      <int name="windowPosition">7</int>
     </object>
     <reference idRef="182"/>
     <reference idRef="183"/>
