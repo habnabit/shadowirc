@@ -50,38 +50,38 @@ struct target {
 
 extern target CurrentTarget;
 
-pascal void DoModeLWindow(channelPtr ch, LongString *ls);
-pascal void DoModeKWindow(channelPtr ch, LongString *ls);
+void DoModeLWindow(channelPtr ch, LongString *ls);
+void DoModeKWindow(channelPtr ch, LongString *ls);
 
-pascal MWPtr ChannelWindow(linkPtr link, ConstStr255Param ch);
+MWPtr ChannelWindow(linkPtr link, ConstStr255Param ch);
 
-pascal void ChTopicWindow(channelPtr ch);
+void ChTopicWindow(channelPtr ch);
 
 #ifdef _LongStrings
-pascal void Message(const LongString *msg);
-pascal void ChMsg(channelPtr ch, const LongString *msg);
-pascal void ChannelMsg(linkPtr link, ConstStr255Param ch, const LongString *msg);
+void Message(const LongString *msg);
+void ChMsg(channelPtr ch, const LongString *msg);
+void ChannelMsg(linkPtr link, ConstStr255Param ch, const LongString *msg);
 #endif
 
-pascal void DrawMWinStatus(MWPtr mw);
+void DrawMWinStatus(MWPtr mw);
 
 #ifdef _MsgWindows_
-pascal void MWPart(MWPtr mw);
+void MWPart(MWPtr mw);
 
-pascal void SetTarget(MWPtr w, targetPtr targ);
-pascal void ChPart(MWPtr w);
-pascal void DoJoinSelWin(MWPtr w);
-pascal void MWStatusClick(MWPtr mw, Point p);
+void SetTarget(MWPtr w, targetPtr targ);
+void ChPart(MWPtr w);
+void DoJoinSelWin(MWPtr w);
+void MWStatusClick(MWPtr mw, Point p);
 #endif
 
-pascal void GetIcons(void);
+void GetIcons(void);
 
-pascal MWPtr ChJoin(channelPtr ch);
-pascal MWPtr DoJoinQuery(ConstStr255Param ch, linkPtr link);
+MWPtr ChJoin(channelPtr ch);
+MWPtr DoJoinQuery(ConstStr255Param ch, linkPtr link);
 
-pascal void InvalTarget(targetPtr targ);
+void InvalTarget(targetPtr targ);
 
-pascal void CloseHelp(void);
-pascal void ShowHelp(short helpID);
+void CloseHelp(void);
+void ShowHelp(short helpID);
 
 #endif
