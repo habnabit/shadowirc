@@ -671,7 +671,7 @@ static pascal void CreateNewPrefsMain(void)
 	mp->defaultFontSize=9;
 	mp->noFontsMenu=0;
 	mp->disableColor=0;
-	mp->colorMethod=0;
+	mp->colorMethod = cmIrcle;
 	mp->disableStyles=0;
 	mp->squelchBeeps=0;
 	mp->textIndenting=1;

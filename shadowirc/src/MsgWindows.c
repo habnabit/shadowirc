@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -237,7 +237,6 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 	ControlHandle bar = mw->vscr;
 	LongRect viewRect, destRect;
 	WEReference we = mw->we;
-	MouseTrackingResult trackingResult;
 	
 	HiliteControl(bar, kControlIndicatorPart);
 	
@@ -250,9 +249,9 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 	max=GetControl32BitMaximum(bar);
 	
 	WEGetViewRect(&viewRect, we);
-	GetMouse(&mouse);
-	do
+	while(StillDown())
 	{
+		GetMouse(&mouse);
 		if(PtInRect(mouse, &constraint.slopRect))
 		{
 			delta=mouse.v - pt.v;
@@ -271,8 +270,7 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 				old=cur;
 			}
 		}
-		TrackMouseLocation(NULL, &mouse, &trackingResult);
-	}while(trackingResult != kMouseTrackingMouseReleased);
+	}
 	
 	HiliteControl(bar, kControlNoPart);
 }
@@ -1287,7 +1285,7 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 						if(cm == cmNone)
 							cm = mainPrefs->colorMethod;
 							
-						if(cm==cmIrcle)
+						if(cm == cmNone || cm == cmIrcle)
 						{
 							//Delete the ctrl-c and the character after it.
 							colornum=ls.data[i+1]-'0';
