@@ -98,12 +98,10 @@ enum messagesList
 
 //Here, "window" means a WindowPtr, unless stated.
 	pUIWindowCloseMessage			=51,		//User attempted to close one of your windows.
-	pUIWindowMoveMessage			=52,		//User moved one of your windows.
+	pMWWindowMoveMessage			=52,		//User moved one of your message windows.
 	pUIMWGotTextMessage				=54,		//User typed text to one of your plugin's message windows
 	pUIActivateMessage					=55,		//A window has become active or deactive.
 	pUIMouseUpDownMessage			=56,		//A user clicked in your window somewhere.
-	pUIUpdateMessage						=57,		//Update event from OS
-	pUIInGrowMessage					=58,		//User clicked on your grow box (if one exists).
 	pUIMWInfoRefresh						=252,	//ShadowIRC is refreshing your Message Window's status bar. Tell it what you want it to do.
 
 //Drag and Drop
@@ -1481,12 +1479,13 @@ typedef struct pMWWidgetDragReceiveData {
 	char received;						//True if you accepted the drag, false if not.
 } pMWWidgetDragReceiveData, *pMWWidgetDragReceiveDataPtr;
 
-/* pUIWindowMoveDataRec
+/* pMWWindowMoveDataRec
 */
-typedef struct pUIWindowMoveDataRec {
-	WindowPtr w;	//a WindowPtr, *NOT* a MWPtr, to the window that was moved.
+typedef struct pMWWindowMoveDataRec {
+	MWPtr mw;	//the window that was moved.
 	Rect newpos;	//where the window was moved to
-} pUIWindowMoveDataRec, *pUIWindowMoveDataPtr;
+} pMWWindowMoveDataRec, *pMWWindowMoveDataPtr;
+
 
 /*	pUIMWGotTextDataRec
 */
@@ -1561,19 +1560,6 @@ typedef struct pUIMouseUpDownData {
 	EventRecord *e;		//The full event record
 	char down;				//True if the mouse was pressed, false if it was released.
 } pUIMouseUpDownData, *pUIMouseUpDownDataPtr;
-
-/*	pUIUpdateData
-*/
-typedef struct pUIUpdateData {
-	EventRecord *e;	//The Event Record from the OS. Window is in e->message.
-} pUIUpdateData, *pUIUpdateDataPtr;
-
-/*	pUIInGrowData
-*/
-typedef struct pUIInGrowData {
-	WindowPtr window;			//window user is trying to resize
-	const EventRecord *e;		//The event record;
-} pUIInGrowData, *pUIInGrowDataPtr;
 
 /*	pUIMWInfoRefreshData
 */

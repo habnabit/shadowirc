@@ -704,7 +704,6 @@ pascal MWPtr MWFromWindow(WindowPtr w)
 pascal void MWReposition(MWPtr mw)
 {
 	Rect r;
-	pUIWindowMoveDataRec p;
 	WindowPtr win = mw->w;
 	
 	if(mw->winType == conWin)
@@ -723,9 +722,11 @@ pascal void MWReposition(MWPtr mw)
 	}
 	else if(mw->pluginRef)
 	{
-		p.w = mw->w;
+		pMWWindowMoveDataRec p;
+		
+		p.mw = mw;
 		WGetBBox(win, &p.newpos);
-		runIndPlugin(mw->pluginRef, pUIWindowMoveMessage, &p);
+		runIndPlugin(mw->pluginRef, pMWWindowMoveMessage, &p);
 	}
 }
 

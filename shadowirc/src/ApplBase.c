@@ -369,7 +369,6 @@ pascal void UpdateWindowPosition(WindowPtr win)
 {
 	MWPtr mw;
 	Rect r;
-	pUIWindowMoveDataRec p;
 	
 	if(win==inputLine.w)
 	{
@@ -382,16 +381,6 @@ pascal void UpdateWindowPosition(WindowPtr win)
 		mw=MWFromWindow(win);
 		if(mw)
 			MWReposition(mw);
-		else
-		{
-			pluginDlgInfoPtr pl = (pluginDlgInfoPtr)GetWRefCon(win);
-			if(pl && (pl->magic==PLUGIN_MAGIC))
-			{
-				p.w=win;
-				WGetBBox(win, &p.newpos);
-				runIndPlugin(pl->pluginRef, pUIWindowMoveMessage, &p);
-			}
-		}
 	}
 }
 
@@ -445,13 +434,6 @@ static pascal void floatingWindowClick(EventRecord *e) //this also takes care of
 					pdd.e = e;
 					pdd.down=true;
 					runIndPlugin(pd->pluginRef, pUIMouseUpDownMessage, &pdd);
-				}
-				else if(i==inGrow)
-				{
-					pUIInGrowData pgrow;
-					pgrow.window=wp;
-					pgrow.e = e;
-					runIndPlugin(pd->pluginRef, pUIInGrowMessage, &pgrow);
 				}
 				return;
 			}
@@ -694,21 +676,6 @@ static pascal void inGrowHandler(const EventRecord *e)
 				UpdateWindowPosition(p->w);
 			}
 		}
-		else
-		{
-			WindowPtr wp = (WindowPtr)e->message;
-			pluginDlgInfoPtr pd;
-			
-			pd=(pluginDlgInfoPtr)GetWRefCon(wp);
-			if(pd && (pd->magic==PLUGIN_MAGIC))
-			{
-				pUIInGrowData pgrow;
-				pgrow.window=wp;
-				pgrow.e = e;
-				mouseDownPluginRef=pd->pluginRef;
-				runIndPlugin(pd->pluginRef, pUIInGrowMessage, &pgrow);
-			}
-		}
 	}
 	SetPort(port);
 }
@@ -855,23 +822,6 @@ pascal void doUpdateEvent(EventRecord *e)
 			DrawControls(mw->w);
 			MWPaneUpdate(mw);
 			EndUpdate(mw->w);
-		}
-		else //not a message window - user window
-		{	//cancel updates
-			pUIUpdateData p;
-			pluginDlgInfoPtr l;
-			
-			GetPort(&gp);
-			SetPortWindowPort((WindowPtr)e->message);
-			BeginUpdate((WindowPtr)e->message);
-			l= (pluginDlgInfoPtr)GetWRefCon((WindowPtr)e->message);
-			if(l && l->magic==PLUGIN_MAGIC)
-			{
-				p.e = e;
-				runIndPlugin(l->pluginRef, pUIUpdateMessage, &p);
-			}
-			EndUpdate((WindowPtr)e->message);
-			SetPort(gp);
 		}
 	}
 }
