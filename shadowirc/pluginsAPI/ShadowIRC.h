@@ -3709,11 +3709,11 @@ pascal void CleanFolderFSp(FSSpec *fss);
 		Output:	fss - FSSpec for folder with it's id in the parID field and the name field blank.
 */
 
-pascal char DirectorySelectButton(FSSpec *fss);
+OSStatus DirectorySelectButtonRef(FSRef *ref);
 /*	Asks the user to select a directory.
-		Input:	fss - FSSpec to write to
-		Output:	fss - FSSpec the user selected, or unchanged.
-					return value: true if the user selected a directory, false if canceled.
+		Input:	ref - FSRef to write to
+		Output:	ref - FSRef the user selected, or unchanged.
+					return value: noErr if the user selected a directory, paramErr if canceled.
 */
 
 pascal long _UndocumentedAPI(long, long);

@@ -316,6 +316,9 @@ OSStatus DirectorySelectButtonRef(FSRef *ref)
 				CFRelease(dialogOptions.message);
 				NavDialogDispose(dialog);
 			}
+			
+			if((NavDialogGetUserAction(dialog)) == kNavUserActionCancel)
+				err = paramErr;
 		}
 	}
 	
@@ -323,40 +326,6 @@ OSStatus DirectorySelectButtonRef(FSRef *ref)
 	DisposeNavEventUPP(eventUPP);
 	
 	return err;
-}
-
-pascal char DirectorySelectButton(FSSpec *fss)
-{
-	NavReplyRecord theReply;
-	NavDialogOptions dialogOptions;
-	OSErr theErr = noErr;
-	char b = 0;
-	AEKeyword key;
-	
-	theErr = NavGetDefaultDialogOptions(&dialogOptions);
-	dialogOptions.preferenceKey = kNavGetFolder;
-	
-	GetIntString(dialogOptions.message, spFile, sPleaseChooseAFolder);
-	
-	theErr = NavChooseFolder(NULL, &theReply, &dialogOptions, NULL, NULL, 0);
-
-	if ((theReply.validRecord)&&(theErr == noErr))
-	{
-		// grab the target FSSpec from the AEDesc:	
-		AEDesc 	resultDesc;
-
-		if((theErr = AEGetNthDesc(&(theReply.selection),1,typeFSS, &key,&resultDesc)) == noErr)
-		{
-			AEGetDescData(&resultDesc, fss, sizeof(FSSpec));
-			CleanFolderFSp(fss);
-			b = 1;
-		}
-
-		AEDisposeDesc(&resultDesc);
-		theErr = NavDisposeReply(&theReply);
-	}
-	
-	return b;
 }
 
 #pragma mark -
