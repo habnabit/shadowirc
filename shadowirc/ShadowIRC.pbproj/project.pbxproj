@@ -268,6 +268,7 @@
 				F5BE65840359094B0132A983,
 			);
 			buildSettings = {
+				EXPORTED_SYMBOLS_FILE = pluginsAPI/shadowirc.exp;
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /Applications;
@@ -697,6 +698,13 @@
 			isa = PBXFileReference;
 			name = ShadowIRC.h;
 			path = pluginsAPI/ShadowIRC.h;
+			refType = 4;
+		};
+		F50FA7170358BEB70132A983 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			name = shadowirc.exp;
+			path = pluginsAPI/shadowirc.exp;
 			refType = 4;
 		};
 		F50FA7180358BEB70132A983 = {
@@ -1924,6 +1932,7 @@
 		F552BFC0021103B901A80061 = {
 			children = (
 				F50FA7160358BEB70132A983,
+				F50FA7170358BEB70132A983,
 				F552BFC1021103B901A80061,
 				F552BFC4021103B901A80061,
 				F552BFC7021103B901A80061,
