@@ -1282,35 +1282,6 @@ pascal void DeleteResourceType(short resFile, ResType type)
 	}
 }
 
-pascal void strc2p(char *cstr)
-{
-	if(*cstr)
-	{
-		char *cstrStart = cstr;
-		//strlen
-		int len = 0;
-		
-		while(*cstr++)
-			;
-		
-		len = cstr - cstrStart - 1;
-		
-		if(len > 255)
-			len = 255;
-		
-		BlockMoveData(cstrStart, cstrStart+1, len);
-		*(unsigned char*)cstrStart = len;
-	}
-}
-
-pascal void strp2c(unsigned char *pstr)
-{
-	int len = pstr[0];
-	
-	BlockMoveData(&pstr[1], &pstr[0], len);
-	pstr[len] = 0;
-}
-
 pascal void NextArg(StringPtr from, StringPtr arg)
 {
 	short i = pos(' ',from);

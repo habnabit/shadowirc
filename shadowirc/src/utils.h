@@ -78,9 +78,6 @@ pascal void NextArg(StringPtr from, StringPtr arg);
 
 pascal void DeleteResourceType(short resFile, ResType type);
 
-pascal void strp2c(unsigned char *pstr);
-pascal void strc2p(char *cstr);
-
 pascal void SetupModalDialog(DialogPtr d, short ok, short cancel);
 pascal void FinishModalDialog(void);
 
