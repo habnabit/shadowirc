@@ -1529,6 +1529,7 @@ pascal void WEClick(Point mouseLoc, EventModifiers modifiers, UInt32 clickTime, 
 #if WASTE_IC_SUPPORT
 	SInt32 urlStart, urlEnd;
 #endif
+	MouseTrackingResult trackingResult;
 
 	// stop any ongoing inline input session
 	WEStopInlineSession(hWE);
@@ -1683,9 +1684,8 @@ pascal void WEClick(Point mouseLoc, EventModifiers modifiers, UInt32 clickTime, 
 		}
 
 		// update mouse position
-		GetMouse(&mouseLoc);
-
-	} while(WaitMouseUp());
+		TrackMouseLocation(NULL, &mouseLoc, &trackingResult);
+	} while(trackingResult != kMouseTrackingMouseReleased);
 
 	// clear the weFMouseTracking bit
 	BCLR(pWE->flags, weFMouseTracking);

@@ -237,6 +237,7 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 	ControlHandle bar = mw->vscr;
 	LongRect viewRect, destRect;
 	WEReference we = mw->we;
+	MouseTrackingResult trackingResult;
 	
 	HiliteControl(bar, kControlIndicatorPart);
 	
@@ -249,9 +250,9 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 	max=GetControl32BitMaximum(bar);
 	
 	WEGetViewRect(&viewRect, we);
-	while(StillDown())
+	GetMouse(&mouse);
+	do
 	{
-		GetMouse(&mouse);
 		if(PtInRect(mouse, &constraint.slopRect))
 		{
 			delta=mouse.v - pt.v;
@@ -270,7 +271,8 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 				old=cur;
 			}
 		}
-	}
+		TrackMouseLocation(NULL, &mouse, &trackingResult);
+	}while(trackingResult != kMouseTrackingMouseReleased);
 	
 	HiliteControl(bar, kControlNoPart);
 }

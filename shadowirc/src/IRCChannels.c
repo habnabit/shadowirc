@@ -213,11 +213,13 @@ static pascal char TrackCSMouse(Point p, const Rect *cr, short c, char modePlus)
 	char b=0, pir;
 	Point m;
 	RGBColor saved;
+	MouseTrackingResult trackingResult;
+	
 	GetForeColor(&saved);
 	
+	GetMouse(&m);
 	do
 	{
-		GetMouse(&m);
 		pir = PtInRect(m, cr);
 		if(pir != b)
 		{
@@ -244,7 +246,8 @@ static pascal char TrackCSMouse(Point p, const Rect *cr, short c, char modePlus)
 			
 			DrawChar(c);
 		}
-	}while(StillDown());
+		TrackMouseLocation(NULL, &m, &trackingResult);
+	} while(trackingResult != kMouseTrackingMouseReleased);
 	
 	EraseRect(cr);
 	//released
@@ -282,17 +285,19 @@ inline char TrackTopicMouse(const Rect *cr)
 {
 	char b=0, pir;
 	Point m;
+	MouseTrackingResult trackingResult;
 	
+	GetMouse(&m);
 	do
 	{
-		GetMouse(&m);
 		pir = PtInRect(m, cr);
 		if(pir != b)
 		{
 			b = pir;
 			InvertRect(cr);
 		}
-	}while(StillDown());
+		TrackMouseLocation(NULL, &m, &trackingResult);
+	} while(trackingResult != kMouseTrackingMouseReleased);
 	
 	if(b)
 		InvertRect(cr);
