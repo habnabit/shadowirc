@@ -53,10 +53,6 @@
 #endif
 
 #define SA struct sockaddr
-typedef void* StreamPtr;
-typedef void (*TCPIOCompletionUPP)();
-typedef struct TCPiopb {} TCPiopb;
-typedef unsigned long ip_addr;
 
 /*
  * TCPConnection defines
@@ -92,17 +88,6 @@ typedef struct TCPConnection {
 	char inBuf[INCOMINGBUFSIZE];
 } TCPConnection;
 
-typedef struct MyControlBlock {
-	TCPControlBlock tcp;
-	UniversalProcPtr proc;
-	TCPConnectionPtr tcpc;
-	char inuse;
-} MyControlBlock, *MyControlBlockPtr;
-
-static OSErr ValidateConnection(TCPConnectionPtr conn);
-
-static void TCPRawState(TCPConnectionPtr conn, short *state, short *localport);
-
 OSErr TCPReceiveUpTo(connectionPtr conn, char term, long timeout, Ptr readPtr, long readSize, long *readPos, char *gotterm);
 
 typedef struct IPParamBlock IPControlBlock, *IPControlBlockPtr;
@@ -112,12 +97,6 @@ inline OSErr ipPBSync(IPControlBlockPtr cb) {return PBControlSync((ParamBlockRec
 inline OSErr PBSync(TCPControlBlockPtr cb) {return PBControlSync((ParamBlockRec*)cb);}
 inline OSErr PBAsync(TCPControlBlockPtr cb) {return PBControlAsync((ParamBlockRec*)cb);}
 */
-
-static void ZotBlocks(void);
-static void tcpDestroyConnection(TCPConnectionPtr *conn);
-static OSErr MyPBControlAsync(MyControlBlockPtr *cbp);
-
-static OSErr doTCPRelease(TCPConnectionPtr *connection);
 
 static void TCPFinish(void);
 
@@ -184,7 +163,6 @@ static OSErr CreateConnection(connectionIndex *cp);
 inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer, fd_set *rset, fd_set *wset);
 
 static void FindAddressDNR(DNRRecordPtr);
-static void DoIOCompletion(MyControlBlockPtr cbp);
 
 TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short remoteport);
 TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog);
@@ -388,45 +366,6 @@ static int nblk_accept(int sockfd, struct sockaddr *addr, int *addrlen)
 
 #pragma mark -
 
-static void ZotBlocks(void)
-{
-    /*
-	int i;
-	
-	for(i=0;i<dispose_block_max;i++)
-		if(disposeblocks[i])
-		{
-			DisposePtr(disposeblocks[i]);
-			disposeblocks[i] = 0;
-		}
-     */
-}
-
-static OSErr ValidateConnection(TCPConnectionPtr conn)
-{ 
-/* XXX only used by currently commented out routines. connectionDoesntExist doesn't exist :)
-	if(!conn || conn->magic != TCPMAGIC)
-		return connectionDoesntExist;
-	else
-		return noErr;
-*/
-    return noErr;
-}
-
-static OSErr MyPBControlAsync(MyControlBlockPtr *cbp)
-{
-    /*
-	OSErr err = PBAsync((TCPControlBlockPtr)*cbp);
-	if(err && *cbp) //Was FreeCB(cbp)
-	{
-		(*cbp)->inuse = false;
-		*cbp = 0;
-	}
-	return err;
-     */
-    return noErr;
-}
-
 /*
  * TCPReceiveChars
  * Attempt to read len bytes from fd sockfd, writing output to buffer d
@@ -504,47 +443,6 @@ OSErr TCPSendAsync(connectionPtr conn, const void* writePtr, short writeCount, c
     return err;
 }
 
-static OSErr doTCPRelease(TCPConnectionPtr *conn)
-{
-    /*
-	OSErr err;
-	
-	err = ValidateConnection(*conn);
-	if(!err)
-	{
-		ZotBlocks();
-		err = MTTCPRelease(&(*conn)->stream);
-		tcpDestroyConnection(conn);
-	}
-	return err;
-     */
-    return noErr;
-}
-
-static void TCPRawState(TCPConnectionPtr conn, short *state, short *localport)
-{
-    /*
-	TCPControlBlock cb;
-	
-	*localport = 0;
-	
-	if(ValidateConnection(conn))
-		*state = 0;
-	else
-	{
-		ZotBlocks();
-		ZeroCB(&cb, conn->stream, TCPStatus);
-		if(PBSync(&cb))
-			*state = 0;
-		else
-		{
-			*state = cb.csParam.status.connectionState;
-			*localport = cb.csParam.status.localPort;
-		}
-	}
-     */
-}
-
 static size_t TCPCharsAvailable(int sockfd)
 {
         char inBuf[INCOMINGBUFSIZE];
@@ -620,43 +518,6 @@ static void TCPFinish(void)
 			controlblocks[i]=0;
 		}
      */
-}
-
-static OSErr CreateStream(TCPConnectionPtr *conn, long buffersize)
-{
-    /*
-	OSErr err;
-	TCPConnectionPtr x;
-	
-	*conn = x = (TCPConnectionPtr)NewPtr(sizeof(TCPConnection));
-	if(x)
-	{
-		if(!buffersize)
-			buffersize = 6 * 1024;
-		else if(buffersize < 4096)
-			buffersize = 4096;
-		
-		if((x->buffer = NewPtr(buffersize)) != 0)
-		{
-			x->magic = TCPMAGIC;
-			x->asends = 0;
-			x->asendcompletes = 0;
-			x->closedone = false;
-			x->incomingSize = 0;
-			err = MTTCPCreate(&x->stream, x->buffer, buffersize);
-		}
-		else
-			err = memFullErr;
-		
-		if(err)
-			tcpDestroyConnection(conn);
-	}
-	else
-		err = memFullErr;
-	
-	return err;
-     */
-    return noErr;
 }
 
 /*
@@ -764,15 +625,6 @@ int GetConnectionSocket(long cp)
 		return 0;
 }
 
-static void DoIOCompletion(MyControlBlockPtr cbp)
-{
-    /*
-	cbp->inuse = false;
-	if(cbp->proc)
-		CallTCPIOCompletionProc((TCPIOCompletionUPP)cbp->proc, (TCPiopb*)cbp);
-     */
-}
-
 inline void AddBlock(void* p)
 {
     /*
@@ -784,16 +636,6 @@ inline void AddBlock(void* p)
 			disposeblocks[i] = (char*)p;
 			return;
 		}
-     */
-}
-
-static void TCPSendComplete(MyControlBlockPtr cbp)
-{
-    /*
-	AddBlock(cbp->tcp.csParam.send.wdsPtr);
-	if(++cbp->tcpc->asendcompletes == cbp->tcpc->asends && cbp->tcpc->closedone)
-		if(!GetCB(&cbp, cbp->tcpc, TCPClose, 0))
-			MyPBControlAsync(&cbp);
      */
 }
 
