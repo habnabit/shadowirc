@@ -508,27 +508,27 @@ static pascal void SOCKSConnect(connectionPtr conn)
 	{
 		*(long*)send = 0x05010003;
 		nn=4;
-		pstrcpy(conn->socksName, &send[4]);
+		pstrcpy(conn->socks.name, &send[4]);
 		nn+=send[4]+1;
-		*(short*)&send[nn] = conn->socksPort;
+		*(short*)&send[nn] = conn->socks.port;
 		nn+=2;
 	}
 	else if(mainPrefs->firewallType == fwSOCKS4A || mainPrefs->firewallType == fwSOCKS4)
 	{
 		pstrcpy(mainPrefs->socksUser, &send[7]);
 		*(short*)send = 0x0401;
-		*(short*)&send[2] = conn->socksPort;
+		*(short*)&send[2] = conn->socks.port;
 		if(mainPrefs->firewallType == fwSOCKS4)
-			*(struct in_addr*)&send[4] = conn->ip2;
+			*(struct in_addr*)&send[4] = conn->socks.ip;
 
 		nn = 9 + mainPrefs->socksUser[0];
 		if(mainPrefs->firewallType == fwSOCKS4A)
 		{
 			*(long*)&send[4] = 0x00000001; //dest ip 0.0.0.1
 			
-			pstrcpy(conn->socksName, &send[nn]);
+			pstrcpy(conn->socks.name, &send[nn]);
 			send[nn] = 0; //trailing null for name
-			nn+=conn->socksName[0] + 1;
+			nn+=conn->socks.name[0] + 1;
 		}
 
 		send[nn] = 0; //trailing null for name (or host)
@@ -536,9 +536,9 @@ static pascal void SOCKSConnect(connectionPtr conn)
 	
 	ConnPut(&conn, send, nn);
 
-	conn->socksStage = csSOCKSSendingRequest;
-	if(conn->socksType == connIRC)
-		LinkSetStage(conn->link, conn->socksStage);
+	conn->socks.stage = csSOCKSSendingRequest;
+	if(conn->socks.type == connIRC)
+		LinkSetStage(conn->link, conn->socks.stage);
 }
 
 void processSOCKS(CEPtr c, connectionPtr conn)
@@ -549,10 +549,10 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 	
 	if(c->event == C_Found)
 	{
-		if(conn->socksSecondLookup)
+		if(conn->socks.secondLookup)
 		{
 			//Move the ip from ip to ip2
-			memcpy(&conn->ip2, &conn->ip, sizeof(conn->ip2));
+			memcpy(&conn->socks.ip, &conn->ip, sizeof(conn->socks.ip));
 			
 			//Look up the server IP
 			ConnFindAddress(conn, conn->name);
@@ -561,17 +561,17 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 			SMPrefix(&ls, dsConsole);
 			
 			LinkSetStage(conn->link, csLookingUp);
-			conn->socksSecondLookup = false;
+			conn->socks.secondLookup = false;
 		}
 	}
 	else if(c->event == C_Established)
 	{
-		conn->socksStage=csSOCKSNegotiatingMethod;
+		conn->socks.stage = csSOCKSNegotiatingMethod;
 		
-		if(conn->socksType == connIRC)
+		if(conn->socks.type == connIRC)
 		{
 			LinkSuccessfulConnection(conn->link, false);
-			LinkSetStage(conn->link, conn->socksStage);
+			LinkSetStage(conn->link, conn->socks.stage);
 		}
 		
 		if(mainPrefs->firewallType == fwSOCKS5)
@@ -600,7 +600,7 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 	}
 	else if(c->event == C_CharsAvailable)
 	{
-		if(conn->socksStage == csSOCKSNegotiatingMethod)
+		if(conn->socks.stage == csSOCKSNegotiatingMethod)
 		{
 			//Read two bytes: version, and method
 			nn = c->value; //This had better be >= 2.
@@ -609,12 +609,12 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 			nn = 2;
 
 			ConnGetData(conn, (Ptr)send, nn);
-			conn->socksMethodVersion = send[0];
-			conn->socksMethod = send[1];
+			conn->socks.methodVersion = send[0];
+			conn->socks.method = send[1];
 			
-			if(conn->socksMethod == 0) //no auth
+			if(conn->socks.method == 0) //no auth
 				SOCKSConnect(conn);
-			else if(conn->socksMethod == 2) //user/pass auth
+			else if(conn->socks.method == 2) //user/pass auth
 			{
 				send[0] = 1;
 				pstrcpy(mainPrefs->socksUser, &send[1]);
@@ -623,30 +623,30 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 				nn+=send[nn]+1;
 				ConnPut(&conn, send, nn);
 
-				conn->socksStage=csSOCKSSendingAuthRequest;
-				if(conn->socksType == connIRC)
-					LinkSetStage(conn->link, conn->socksStage);
+				conn->socks.stage=csSOCKSSendingAuthRequest;
+				if(conn->socks.type == connIRC)
+					LinkSetStage(conn->link, conn->socks.stage);
 			}
-			else if(conn->socksMethod == 0xFF)
+			else if(conn->socks.method == 0xFF)
 			{
 				ConstStringPtr sp = GetIntStringPtr(spSOCKS, 12);
 
-				conn->socksStage=csSOCKSAuthFailed;
-				if(conn->socksType == connIRC)
+				conn->socks.stage=csSOCKSAuthFailed;
+				if(conn->socks.type == connIRC)
 				{
 					LSParamString(&ls, GetIntStringPtr(spSOCKS, 9), sp, 0, 0, 0);
 					SMPrefix(&ls, dsConsole);
 					
-					LinkSetStage(conn->link, conn->socksStage);
+					LinkSetStage(conn->link, conn->socks.stage);
 					ServerOK(kServerOKBadSOCKS, conn->link);
 				}
-				else if(conn->socksType == connDCC)
+				else if(conn->socks.type == connDCC)
 				{
 					DCCFailed(&conn, sp);
 				}
 			}
 		}
-		else if(conn->socksStage == csSOCKSSendingAuthRequest) //authing for user/host respponse
+		else if(conn->socks.stage == csSOCKSSendingAuthRequest) //authing for user/host respponse
 		{
 			nn = c->value; //This had better be >= 2.
 			if(nn < 2)
@@ -661,22 +661,22 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 			{
 				ConstStringPtr sp = GetIntStringPtr(spSOCKS, 11);
 				
-				conn->socksStage = csSOCKSAuthFailed;
-				if(conn->socksType == connIRC)
+				conn->socks.stage = csSOCKSAuthFailed;
+				if(conn->socks.type == connIRC)
 				{
 					LSParamString(&ls, GetIntStringPtr(spSOCKS, 9), sp, 0, 0, 0);
 					SMPrefix(&ls, dsConsole);
 					
-					LinkSetStage(conn->link, conn->socksStage);
+					LinkSetStage(conn->link, conn->socks.stage);
 					ServerOK(kServerOKBadSOCKS, conn->link);
 				}
-				else if(conn->socksType == connDCC)
+				else if(conn->socks.type == connDCC)
 				{
 					DCCFailed(&conn, sp);
 				}
 			}
 		}
-		else if(conn->socksStage == csSOCKSSendingRequest)
+		else if(conn->socks.stage == csSOCKSSendingRequest)
 		{
 			//This is the reply to our connection request
 			nn = c->value; //This had better be >= 2.
@@ -729,15 +729,15 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 					GetIntString(send, spSOCKS, send[1]);
 				}
 
-				conn->socksStage = csSOCKSConnectFailed;
-				if(conn->socksType == connIRC)
+				conn->socks.stage = csSOCKSConnectFailed;
+				if(conn->socks.type == connIRC)
 				{
 					LSParamString(&ls, sp, send, 0, 0, 0);
 					SMPrefix(&ls, dsConsole);
-					LinkSetStage(conn->link, conn->socksStage);
+					LinkSetStage(conn->link, conn->socks.stage);
 					ServerOK(kServerOKBadSOCKS, conn->link);
 				}
-				else if(conn->socksType == connDCC)
+				else if(conn->socks.type == connDCC)
 				{
 					DCCFailed(&conn, send);
 				}
@@ -746,9 +746,9 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 	}
 	else
 	{
-		if(conn->socksType == connIRC)
+		if(conn->socks.type == connIRC)
 			ServerOK(c->event, conn->link);
-		else if(conn->socksType == connDCC)
+		else if(conn->socks.type == connDCC)
 			dccEvent(c, conn);
 	}
 }

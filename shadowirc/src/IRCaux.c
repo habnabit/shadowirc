@@ -270,7 +270,7 @@ pascal void connection2(connectionPtr conn)
 {
 	if(ConnNewActive(conn)) //this makes the connection to the (socks) server
 	{
-		if(conn->socksType == connIRC)
+		if(conn->socks.type == connIRC)
 		{
 			CreateIdentdConn(conn);
 			LinkSetStage(conn->link, csOpeningConnection);
@@ -280,7 +280,7 @@ pascal void connection2(connectionPtr conn)
 	}
 	else
 	{
-		if(conn->socksType == connIRC)
+		if(conn->socks.type == connIRC)
 		{
 			LinkSetStage(conn->link, csFailedToConnect);
 			ServerOK(C_FailedToOpen, conn->link);
@@ -323,14 +323,14 @@ pascal void startConnection(linkPtr link)
 		ConnSetup(link->conn, link->serverTryingName, link->serverTryingPort);
 		
 	if(mainPrefs->firewallType == fwSOCKS4)
-		search = link->conn->socksName;
+		search = link->conn->socks.name;
 	else
 		search = link->conn->name;
 	
 	if(!ConnFindAddress(link->conn, search))
 	{
 		if(mainPrefs->firewallType == fwSOCKS4)
-			link->conn->socksSecondLookup = 1;
+			link->conn->socks.secondLookup = 1;
 		
 		LinkSetStage(link, csLookingUp);
 		LSParamString(&ls, GetIntStringPtr(spInfo, sLookingUpIP), search, 0, 0, 0);

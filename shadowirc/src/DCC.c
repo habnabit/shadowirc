@@ -263,7 +263,7 @@ pascal connectionPtr DCCFind(linkPtr link, short typ, ConstStr255Param fr)
 		pdelete(s1,1,1);
 	
 	linkfor(p, fConn)
-		if((p->socksType==connDCC)&&(p->dcc->dccType==typ) && (!link || link == p->link))
+		if((p->socks.type==connDCC)&&(p->dcc->dccType==typ) && (!link || link == p->link))
 			if(pstrcasecmp2(s1,p->dcc->dccUserName))
 				return p;
 
@@ -275,7 +275,7 @@ static pascal connectionPtr DCCFindSendPort(unsigned short port)
 	connectionPtr c;
 
 	linkfor(c, fConn)
-		if(c->socksType == connDCC && c->dcc->dccType == dccSEND && c->port == port)
+		if(c->socks.type == connDCC && c->dcc->dccType == dccSEND && c->port == port)
 			return c;
 	
 	return 0;
@@ -707,7 +707,7 @@ pascal void DCCCommand(linkPtr link, Str255 s)
 			case dcccLIST:
 				i=0;
 				linkfor(x, fConn)
-					if(x->connType == connDCC || x->socksType==connDCC)
+					if(x->connType == connDCC || x->socks.type==connDCC)
 					{
 						d=x->dcc;
 						

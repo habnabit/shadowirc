@@ -205,9 +205,9 @@ pascal void ConnSetup(connectionPtr c, ConstStr255Param name, unsigned short por
 		if(mainPrefs->socksHost[0] && mainPrefs->socksPort)
 		{
 			c->port = mainPrefs->socksPort;
-			c->socksPort=port;
+			c->socks.port=port;
 			pstrcpy(mainPrefs->socksHost, c->name);
-			pstrcpy(name, c->socksName);
+			pstrcpy(name, c->socks.name);
 		}
 		else //error message
 		{
@@ -283,12 +283,13 @@ pascal connectionPtr newConnection(short connType)
 		c->lineTerm=0;
 		c->closeTime = 0;
 		c->realConnType = 0;
-		c->socksName[0]=0;
-		c->socksPort=0;
-		c->socksType=connType;
-		c->socksMethodVersion = c->socksMethod = c->socksStage = 0;
-		c->socksSecondLookup = 0;
-		c->ip2.s_addr = 0;
+		
+		c->socks.name[0]=0;
+		c->socks.port=0;
+		c->socks.type=connType;
+		c->socks.methodVersion = c->socks.method = c->socks.stage = 0;
+		c->socks.secondLookup = 0;
+		c->socks.ip.s_addr = 0;
 		
 		ConnSetInputFunc(c);
 	}
@@ -438,7 +439,7 @@ pascal void ConnStale(connectionPtr conn)
 
 pascal void ConnDeSOCKS(connectionPtr conn)
 {
-	conn->connType = conn->socksType;
+	conn->connType = conn->socks.type;
 	ConnSetInputFunc(conn);
 }
 

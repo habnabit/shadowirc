@@ -103,7 +103,6 @@ struct Connection {
 	 * localip: local IP address (getsockname on sockfd)
          */
 	struct in_addr ip;
-	struct in_addr ip2;
 	struct in_addr localip;
 	Str255 name;
 	unsigned long lastData;
@@ -119,12 +118,16 @@ struct Connection {
 	
 	unsigned long closeTime;
 	
-	Str63 socksName;
-	short socksPort;
-	CONST short socksType;
-	char socksMethodVersion, socksMethod;
-	char socksSecondLookup;
-	short socksStage;
+	struct socksInfo {
+		Str63 name;
+		short port;
+		CONST short type;
+		char methodVersion, method;
+		char secondLookup;
+		short stage;
+		struct in_addr ip;
+	} socks;
+	
 	CONST short realConnType;
 };
 

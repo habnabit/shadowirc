@@ -979,7 +979,7 @@ static void doTCPEvent(CEPtr c)
 			case C_Found:
 				memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
 				DisplayLookupResult(conn);
-				if(!conn->socksSecondLookup)
+				if(!conn->socks.secondLookup)
 					connection2(conn);
 				break;
 			
