@@ -31,6 +31,7 @@
 #include "floaters.h"
 #include "TextManip.h"
 #include "IRCPreferences.h"
+#include "IRCCFPrefs.h"
 
 #include "MoreFiles.h"
 
@@ -587,12 +588,19 @@ pascal void writeMainPrefs(void)
 	WriteAlias(&logFolderFSp, logAlias);
 	WriteAlias(&dccFolderFSp, dccAlias);
 	ClosePrefs();
+        
+
 }
 
 pascal void writeAllFiles(void)
 {
 	writeMainPrefs();
 	runAllPlugins(pSavePreferencesMessage, 0);
+	
+	// Sync the CFPrefs to the data store. 
+	// Currently we'll place this here. This might move in
+	// the source files to a more appropriate location.
+	CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 }
 
 static pascal void ReadInPrefs(void)
@@ -981,6 +989,8 @@ pascal char readMainPrefs(void)
 		writeMainPrefs();
 	}
 	
+	ReadShortCutDataCFPrefs(mainPrefs->shortcuts); // This will go somewhere else.
+        
 	ClosePrefs();
 	
 	return created;

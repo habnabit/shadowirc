@@ -33,6 +33,7 @@
 #include "utils.h"
 #include "inline.h"
 #include "Shortcuts.h"
+#include "IRCCFPrefs.h"
 
 inline void PluginShortcutText(Handle lh);
 static pascal void ParseShortcutText(ConstStr255Param s);
@@ -79,7 +80,14 @@ static void SaveShortcutWindow(WindowRef shortcutsWin)
 {
 	ShortcutWindowDataPtr sdp = GetShortcutWindowData(shortcutsWin);
 	
+	// Send the data to the main prefs. This is to keep compatibility.
+	// The application will keep it's own local cache of the prefs to
+	// keep over modification of the current application down and also
+	// excessive conversions between CF data types and native data types. 
 	BlockMoveData(sdp->shorts, mainPrefs->shortcuts, sizeof(sdp->shorts));
+        
+	//New way to save the shortcut data.
+	SaveShortcutDataCFPrefs(sdp->shorts);
 	ShortcutsMenuUpdate();
 }
 
