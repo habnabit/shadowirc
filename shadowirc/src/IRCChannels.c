@@ -382,11 +382,6 @@ void ChCloseTopicWindow(channelPtr ch)
 
 #pragma mark -
 
-CFStringRef LSCreateCFStr(LongString *ls)
-{
-	return CFStringCreateWithBytes(NULL, &ls->data[1], ls->len, kCFStringEncodingMacRoman, false);
-}
-
 static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 {
 	ControlRef topicOpsControl = NULL;
@@ -414,7 +409,7 @@ static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 
 		LSParamString(&ls, GetIntStringPtr(spInfo, sTopicLength), st, st2, 0, 0);
 		
-		theString = LSCreateCFStr(&ls);
+		theString = LSCreateCFString(&ls);
 		SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
 		CFRelease(theString);
 		DrawOneControl(topicOpsControl);
@@ -508,7 +503,7 @@ static void UpdateTopicLength(WindowRef sheet, channelPtr ch)
 	
 	LSParamString(&ls, GetIntStringPtr(spInfo, sTopicLength), st, st2, 0, 0);
 	
-	theString = LSCreateCFStr(&ls);
+	theString = LSCreateCFString(&ls);
 	SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
 	CFRelease(theString);
 	DrawOneControl(topicOpsControl);

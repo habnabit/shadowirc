@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -75,6 +75,8 @@ pascal OSErr LSParamLS(LongString *ls, ConstStr255Param r0, ConstStr255Param r1,
 pascal void LSNextArgIRC(LongString *ls, StringPtr arg);
 pascal void LSStrCat4(LongString *out, ConstStr255Param s1, ConstStr255Param s2, ConstStr255Param s3, ConstStr255Param s4);
 pascal void LSConcatStrAndStrAndLS(ConstStr255Param s1, ConstStr255Param s2, const LongString *ls, LongString *out);
+
+CFStringRef LSCreateCFString(LongString *ls);
 
 #define LSAppend1(ls,ch){(ls).data[++((ls).len)]=ch;}
 #define LSAppend2(ls,sh){(ls).len+=2;*(short*)&(ls).data[(ls).len-1]=sh;}

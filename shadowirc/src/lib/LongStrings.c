@@ -894,3 +894,9 @@ pascal OSErr LSParamLS(LongString *ls, ConstStr255Param r0, ConstStr255Param r1,
 	LSParamString(ls, str, r0, r1, r2, r3);
 	return 0;
 }
+
+CFStringRef LSCreateCFString(LongString *ls)
+{
+	return CFStringCreateWithBytes(NULL, &ls->data[1], ls->len, kCFStringEncodingMacRoman, false);
+}
+
