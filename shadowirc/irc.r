@@ -1165,10 +1165,10 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			10124
 		},
 		/* [11] */
-		{78, 116, 90, 204},
-		StaticText {
-			disabled,
-			"Server Password:"
+		{176, 121, 291, 511},
+		Control {
+			enabled,
+			10100
 		},
 		/* [12] */
 		{198, 128, 213, 278},
@@ -1249,10 +1249,10 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			"Go \"Invisible\""
 		},
 		/* [25] */
-		{176, 121, 291, 511},
-		Control {
-			enabled,
-			10100
+		{78, 116, 90, 204},
+		StaticText {
+			disabled,
+			"Server Password:"
 		},
 		/* [26] */
 		{229, 135, 243, 289},
@@ -3865,8 +3865,20 @@ resource 'dftb' (1001) {
 				""
 			},
 			/* [11] */
-			skipItem {
-
+			dataItem {
+				1,
+				-2,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				""
 			},
 			/* [12] */
 			dataItem {
@@ -3993,20 +4005,8 @@ resource 'dftb' (1001) {
 				""
 			},
 			/* [25] */
-			dataItem {
-				1,
-				-2,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				""
+			skipItem {
+
 			},
 			/* [26] */
 			skipItem {
