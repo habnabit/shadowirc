@@ -215,6 +215,7 @@
 				F5F61A2F02A02E380132A988,
 				F5BA63C70315E9C70132A983,
 				F57375F103205FE90132A983,
+				F5A6AF1E032111060132A983,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -400,6 +401,7 @@
 				F5BA63C90315E9C70132A983,
 				F59209B9031789ED01A80166,
 				F57375F303205FE90132A983,
+				F5A6AF20032111060132A983,
 			);
 			isa = PBXResourcesBuildPhase;
 		};
@@ -2177,6 +2179,27 @@
 		};
 		F599D6550217A8B901A80061 = {
 			fileRef = F599D6530217A8B901A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5A6AF1E032111060132A983 = {
+			children = (
+				F5A6AF1F032111060132A983,
+			);
+			isa = PBXVariantGroup;
+			name = kill.nib;
+			path = "";
+			refType = 4;
+		};
+		F5A6AF1F032111060132A983 = {
+			isa = PBXFileReference;
+			name = English;
+			path = English.lproj/kill.nib;
+			refType = 4;
+		};
+		F5A6AF20032111060132A983 = {
+			fileRef = F5A6AF1E032111060132A983;
 			isa = PBXBuildFile;
 			settings = {
 			};

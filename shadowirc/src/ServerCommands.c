@@ -51,7 +51,7 @@ static pascal void nPart(linkPtr link, LongString *target, StringPtr from, Strin
 static pascal void nQuit(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target);
 static pascal void nTopic(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target);
 static pascal void nNick(linkPtr link, LongString *newNick, StringPtr from, StringPtr fromuser);
-static pascal void nKill(linkPtr link, LongString *ls, StringPtr from);
+static void nKill(linkPtr link, LongString *ls, StringPtr from);
 static pascal void nMode(linkPtr link, LongString *ls, StringPtr from, StringPtr target);
 static pascal void nKick(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target);
 static pascal void nInvite(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser);
@@ -547,30 +547,121 @@ static pascal void nNick(linkPtr link, LongString *ls, StringPtr from, StringPtr
 		AttemptNickRegainSignoff(link, from);
 }
 
-static pascal void nKill(linkPtr link, LongString *ls, StringPtr from)
+#define kNibKill CFSTR("kill")
+#define kNibWinKill CFSTR("Kill")
+
+static pascal OSStatus KillWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+{
+	OSStatus result = eventNotHandledErr;
+	WindowRef killWin = (WindowRef)userData;
+	UInt32 eventClass, eventKind;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	switch(eventClass)
+	{
+		case kEventClassControl:
+		{
+			ControlRef theControl = NULL;
+			UInt32 cmd;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &theControl);
+			GetControlCommandID(theControl, &cmd);
+			
+			switch(cmd)
+			{
+				case kHICommandOK:
+					DisposeWindow(killWin);
+					result = noErr;
+					break;
+			}
+			break;
+		}
+		
+		case kEventClassCommand:
+		{
+			HICommand hiCommand;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
+			
+			switch(hiCommand.commandID)
+			{
+				case kHICommandClose:
+					DisposeWindow(killWin);
+					result = noErr;
+					break;
+			}
+			break;
+		}
+	}
+	
+	return result;
+}
+
+static void NewKillWindow(StringPtr from, LongString *reason)
+{
+	static EventHandlerUPP handlerUPP = NULL;
+	WindowRef win;
+	IBNibRef theNib = NULL;
+	OSStatus status;
+	CFStringRef theStr;
+	
+	const EventTypeSpec ctSpec[] = {
+		{ kEventClassControl, kEventControlHit },
+		{ kEventClassCommand, kEventProcessCommand }
+	};
+	
+	const ControlID serverID = { kApplicationSignature, 1};
+	const ControlID reasonID = { kApplicationSignature, 2};
+	ControlRef ctrl;
+	
+	if(!handlerUPP)
+		handlerUPP = NewEventHandlerUPP(KillWindowEventHandler);
+	
+	status = CreateNibReference(kNibKill, &theNib);
+	require_noerr(status, CantFindDialogNib);
+	
+	status = CreateWindowFromNib(theNib, kNibWinKill, &win);
+	require_noerr(status, CantCreateDialogWindow);
+	
+	DisposeNibReference(theNib);
+	
+	status = InstallWindowEventHandler(win, handlerUPP, GetEventTypeCount(ctSpec), ctSpec,(void *)win, NULL);
+	require_noerr(status, CantInstallDialogHandler);
+	
+	GetControlByID(win, &serverID, &ctrl);
+	theStr = CFStringCreateWithPascalString(NULL, from, kCFStringEncodingMacRoman);
+	SetControlData(ctrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theStr);
+	CFRelease(theStr);
+	
+	GetControlByID(win, &reasonID, &ctrl);
+	theStr = LSCreateCFString(reason);
+	SetControlData(ctrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theStr);
+	CFRelease(theStr);
+		
+	ShowWindow(win);
+	SelectWindow(win);
+	
+CantFindDialogNib:
+CantCreateDialogWindow:
+CantInstallDialogHandler:
+	return;
+}
+
+static void nKill(linkPtr link, LongString *ls, StringPtr from)
 {
 	LongString tls;
-	DialogPtr d;
-	short i;
 	
 	SoundService(sndKill, 0);
 	LSParamString(&tls, GetIntStringPtr(spInfo, sRejected), from, 0, 0, 0);
 	LSConcatLSAndLS(&tls, ls, &tls);
-
-	//pop up alert to alert the user
-	d=GetNewDialog(260, 0, (WindowPtr)-1);
-	SetDlogItemTextHdl(d, 2, (char*)&tls.data[1], tls.len);
-
+	
+	NewKillWindow(from, ls);
+	
 	SMPrefixLink(link, &tls, dsConsole);
 	Message(&tls);
 	link->neverConnected=true; //don't try reconnecting
-	
-	SetupModalDialog(d, 1, 1);
-	do {
-		ModalDialog(StdDlgFilter, &i);
-	} while(i!=1);
-	DisposeDialog(d);
-	FinishModalDialog();
 }
 
 inline pascal void checkLimitKey(linkPtr link, char mode, channelPtr curChannel, StringPtr modeChange)

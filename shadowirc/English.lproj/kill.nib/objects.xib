@@ -1,0 +1,91 @@
+<?xml version="1.0" standalone="yes"?>
+<object class="NSIBObjectData">
+  <string name="targetFramework">IBCarbonFramework</string>
+  <object name="rootObject" class="NSCustomObject" id="1">
+    <string name="customClass">NSApplication</string>
+  </object>
+  <array count="10" name="allObjects">
+    <object class="IBCarbonWindow" id="168">
+      <string name="windowRect">83 88 288 503 </string>
+      <string name="title">Connection Terminated</string>
+      <object name="rootControl" class="IBCarbonRootControl" id="169">
+        <string name="bounds">0 0 205 415 </string>
+        <array count="6" name="subviews">
+          <object class="IBCarbonButton" id="170">
+            <string name="bounds">165 337 185 395 </string>
+            <int name="controlID">1</int>
+            <string name="title">OK</string>
+            <ostype name="command">ok  </ostype>
+            <int name="buttonType">1</int>
+          </object>
+          <object class="IBCarbonIcon" id="172">
+            <string name="bounds">12 20 44 52 </string>
+            <int name="contentResID">2</int>
+            <int name="creator">0</int>
+          </object>
+          <object class="IBCarbonStaticText" id="173">
+            <string name="bounds">12 60 28 395 </string>
+            <string name="title">You have been rejected from the server</string>
+          </object>
+          <object class="IBCarbonStaticText" id="175">
+            <string name="bounds">28 72 44 395 </string>
+            <ostype name="controlSignature">SIRC</ostype>
+            <int name="controlID">1</int>
+            <boolean name="small">TRUE</boolean>
+          </object>
+          <object class="IBCarbonStaticText" id="178">
+            <string name="bounds">49 60 65 395 </string>
+            <string name="title">Reason:</string>
+          </object>
+          <object class="IBCarbonStaticText" id="179">
+            <string name="bounds">65 72 151 395 </string>
+            <ostype name="controlSignature">SIRC</ostype>
+            <int name="controlID">2</int>
+            <boolean name="small">TRUE</boolean>
+          </object>
+        </array>
+      </object>
+      <boolean name="hasHorizontalZoom">FALSE</boolean>
+      <boolean name="isResizable">FALSE</boolean>
+      <boolean name="hasVerticalZoom">FALSE</boolean>
+      <int name="carbonWindowClass">6</int>
+      <int name="themeBrush">3</int>
+      <int name="windowPosition">7</int>
+    </object>
+    <reference idRef="169"/>
+    <reference idRef="170"/>
+    <reference idRef="172"/>
+    <reference idRef="173"/>
+    <reference idRef="175"/>
+    <object class="IBCarbonStaticText" id="176">
+      <string name="bounds">28506 21553 28522 21888 </string>
+      <string name="title">You have been rejected from the server:</string>
+    </object>
+    <object class="IBCarbonStaticText" id="177">
+      <string name="bounds">28522 21789 28538 22112 </string>
+      <int name="controlID">1</int>
+      <boolean name="small">TRUE</boolean>
+    </object>
+    <reference idRef="178"/>
+    <reference idRef="179"/>
+  </array>
+  <array count="10" name="allParents">
+    <reference idRef="1"/>
+    <reference idRef="168"/>
+    <reference idRef="169"/>
+    <reference idRef="169"/>
+    <reference idRef="169"/>
+    <reference idRef="169"/>
+    <reference idRef="169"/>
+    <reference idRef="169"/>
+    <reference idRef="169"/>
+    <reference idRef="169"/>
+  </array>
+  <dictionary count="2" name="nameTable">
+    <string>File&apos;s Owner</string>
+    <reference idRef="1"/>
+    <string>Kill</string>
+    <reference idRef="168"/>
+  </dictionary>
+  <unsigned_int name="nextObjectID">180</unsigned_int>
+</object>

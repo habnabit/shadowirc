@@ -817,29 +817,6 @@ resource 'DITL' (141, "Font Size") {
 	}
 };
 
-resource 'DITL' (260) {
-	{	/* array DITLarray: 3 elements */
-		/* [1] */
-		{141, 337, 161, 395},
-		Button {
-			enabled,
-			"OK"
-		},
-		/* [2] */
-		{3, 38, 136, 400},
-		StaticText {
-			disabled,
-			""
-		},
-		/* [3] */
-		{3, 4, 35, 36},
-		Icon {
-			disabled,
-			2
-		}
-	}
-};
-
 resource 'DITL' (500, "Servers") {
 	{	/* array DITLarray: 9 elements */
 		/* [1] */
@@ -2137,17 +2114,6 @@ resource 'DLOG' (141, "Font Size") {
 	141,
 	"Font Size",
 	alertPositionMainScreen
-};
-
-resource 'DLOG' (260, "Kill") {
-	{83, 88, 249, 492},
-	movableDBoxProc,
-	invisible,
-	goAway,
-	0x0,
-	260,
-	"Connection Terminated",
-	alertPositionParentWindowScreen
 };
 
 resource 'DLOG' (300) {
@@ -5160,12 +5126,6 @@ resource 'dlgx' (140) {
 };
 
 resource 'dlgx' (141) {
-	versionZero {
-		15
-	}
-};
-
-resource 'dlgx' (260) {
 	versionZero {
 		15
 	}
