@@ -39,7 +39,8 @@
 #include "MsgWindows.h"
 #include "DCC.h"
 
-short mainRefNum = 0, mainResNum = 0;
+static short mainRefNum = 0;
+short mainResNum = 0;
 static FSSpec mainPrefsLoc;
 
 typedef struct fileListRec {
@@ -597,8 +598,6 @@ pascal void writeMainPrefs(void)
 	FSWrite(mainRefNum, &l, (Ptr)linkPrefsArray);
 	
 	ClosePrefs();
-        
-
 }
 
 pascal void writeAllFiles(void)
@@ -723,11 +722,6 @@ static void ReadInPrefs(void)
 			lp->linkPrefs->linkName[0] += valid;
 		}
 	}
-
-	//write this back out
-	SetFPos(mainRefNum, fsFromStart, 0);
-	l=sizeof(p);
-	FSWrite(mainRefNum, &l, &p);
 }
 
 OSStatus UseDirFSRef(const FSRef *parentRef, CFStringRef string, Boolean create, FSRef *ref)

@@ -91,5 +91,5 @@ pascal short CreateUniqueFile(FSSpec *file, OSType creator, OSType type);
 
 pascal void OpenPrefs(void);
 pascal void ClosePrefs(void);
-extern short mainRefNum, mainResNum;
+extern short mainResNum;
 #endif
