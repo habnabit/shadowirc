@@ -934,8 +934,8 @@ pascal OSErr WEReceiveDrag(DragReference drag, WEHandle hWE)
 	Handle hFontTable = nil;
 #if WASTE_OBJECTS
 	Handle hSoup = nil;
-#endif
 	Handle hObjectData = nil;
+#endif
 	Point mouse;
 	LongPt dropLocation;
 	SInt32 insertionOffset;
@@ -1444,7 +1444,7 @@ pascal void _WEResolveURL(EventModifiers modifiers, SInt32 urlStart, SInt32 urlE
 #else
 	UInt32 junkLong;
 #endif
-	Handle hURL = nil;
+	//Handle hURL = nil; //commented since we don't use this anymore.
 	Boolean saveTextLock;
 
 	// get the hint string IC will use to parse slack URLs
