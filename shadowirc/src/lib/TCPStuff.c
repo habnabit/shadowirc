@@ -405,27 +405,12 @@ size_t TCPReceiveUntil(int sockfd, Ptr d, char c, size_t len)
         return (nbytes);
 }
 
-OSErr TCPSendAsync(connectionPtr conn, const void* writePtr, short writeCount, char push)
+OSErr TCPSendChars(int sockfd, const void* d, size_t len)
 {
-    OSErr err;
-    int bytes_sent;
-    int socket = GetConnectionSocket(conn->private_socket);
-
-    if(writeCount > 0) {
-        if (socket != 0) {
-            bytes_sent = write(socket, writePtr, writeCount);
-            if (bytes_sent == writeCount)
-                err = noErr;
-            else
-                err = C_Closed; // What error code should be returned?
-        }
-        else
-            err = C_Closed; // Invalid socket. What error code should be returned?
-		}
-		else if(writeCount < 0)
-        err = C_Closed; // What error code should be returned?
-
-    return err;
+    if((writen(sockfd, d, len) == len))
+        return (noErr);
+    else
+        return (C_Closed);
 }
 
 static size_t TCPCharsAvailable(int sockfd)

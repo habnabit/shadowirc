@@ -231,7 +231,7 @@ pascal OSErr ConnGetLocalIP(connectionPtr conn, struct in_addr *ip);
 
 pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host);
 
-pascal OSErr ConnSend(connectionPtr conn, const void* writePtr, short writeCount, char push);
+pascal OSErr ConnSend(connectionPtr conn, const void* d, size_t len);
 pascal connectionPtr ConnNewDNS(ConstStr255Param name, short type);
 
 #undef CONST

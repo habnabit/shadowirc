@@ -1102,7 +1102,7 @@ static pascal void DCCSendFileChunk(connectionPtr *cn)
 		if(!FSRead(dd->sfref, &dd->sendpacketlen, sendbuf))
 		{
 			dd->sent+=dd->sendpacketlen;
-			if(ConnSend(*cn, sendbuf, dd->sendpacketlen, true))
+			if(ConnSend(*cn, sendbuf, dd->sendpacketlen))
 				DCCFailed(cn, GetIntStringPtr(spDCC, sLostSendErr));
 		}
 		else
@@ -1123,7 +1123,7 @@ static pascal void DCCSendFileChunk(connectionPtr *cn)
 			case sendNIL:
 			case sendHeader:
 				//send just the MB header.
-				ConnSend(*cn, (Ptr)dd->macB, sizeof(MBIIHeader), true);
+				ConnSend(*cn, (Ptr)dd->macB, sizeof(MBIIHeader));
 				dd->sent=sizeof(MBIIHeader);
 				if(!dd->sfref)
 				{
@@ -1150,7 +1150,7 @@ static pascal void DCCSendFileChunk(connectionPtr *cn)
 					readIn += padLen;
 				}
 				
-				ConnSend(*cn, sendbuf, readIn, true);
+				ConnSend(*cn, sendbuf, readIn);
 				dd->sent+=readIn;
 				if(off + readIn >= eof) //read in entire file, so advance
 				{
@@ -1186,7 +1186,7 @@ static pascal void DCCSendFileChunk(connectionPtr *cn)
 					readIn += padLen;
 				}
 				
-				ConnSend(*cn, sendbuf, readIn, true);
+				ConnSend(*cn, sendbuf, readIn);
 				dd->sent+=readIn;
 				if(off + readIn >= eof) //read in entire file, so advance
 				{
@@ -1607,7 +1607,7 @@ static pascal void DCCGetLineGet(connectionPtr conn)
 					}
 				}
 				
-				if(ConnSend(conn, (Ptr)&dd->gotten, sizeof(long), true))
+				if(ConnSend(conn, (Ptr)&dd->gotten, sizeof(long)))
 					DCCFailed(&conn, GetIntStringPtr(spDCC, sLostAckErr));
 			}
 			else
@@ -2046,7 +2046,7 @@ pascal void DCCSSayQuiet(connectionPtr *x, LongString *ls)
 		ls->data[i]=ISOEncode[ls->data[i]];
 	
 	ls->data[n+1]=10;
-	if(ConnSend(*x, (Ptr)&ls->data[1], n+1, 0))
+	if(ConnSend(*x, (Ptr)&ls->data[1], n+1))
 		DCCClose(x, false);
 }
 
@@ -2067,7 +2067,7 @@ pascal void DCCSSay(connectionPtr *x, LongString *ls)
 		ls->data[i]=ISOEncode[ls->data[i]];
 	
 	ls->data[n+1]=10;
-	if(ConnSend(*x, (Ptr)&ls->data[1], n+1, 0))
+	if(ConnSend(*x, (Ptr)&ls->data[1], n+1))
 		DCCClose(x, false);
 }
 
@@ -2081,7 +2081,7 @@ pascal void DCCSendCookie(connectionPtr *x, long cky, LongString *ls)
 	LSConcatLSAndLS(&cookie, ls, &cookie);
 	LSAppend1(cookie, 10);
 	
-	if(ConnSend(*x, &cookie.data[1], cookie.len, 0))
+	if(ConnSend(*x, &cookie.data[1], cookie.len))
 		DCCClose(x, false);
 }
 
@@ -2096,7 +2096,7 @@ pascal void DCCSendCookieReply(connectionPtr *x, long cky, LongString *ls)
 	LSConcatLSAndLS(&cookie, ls, &cookie);
 	LSAppend1(cookie, 10);
 	
-	if(ConnSend(*x, &cookie.data[1], cookie.len, 0))
+	if(ConnSend(*x, &cookie.data[1], cookie.len))
 		DCCClose(x, false);
 }
 

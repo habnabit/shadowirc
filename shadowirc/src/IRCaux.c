@@ -157,7 +157,7 @@ pascal void ConnPut(connectionPtr *cn, const void* p, long len)
 	connectionPtr conn = *cn;
 	
 	conn->dataOut += len;
-	status = ConnSend(conn, p, len, false);
+	status = ConnSend(conn, p, len);
 	if(conn->connType==connIRC)
 		ServerOK(status, conn->link);
 	else if(conn->connType==connPLUGIN)

@@ -485,9 +485,9 @@ int ConnGetLocalPort(connectionPtr conn)
 	return TCPLocalPort(GetConnectionSocket(conn->private_socket));
 }
 
-pascal OSErr ConnSend(connectionPtr conn, const void* writePtr, short writeCount, char push)
+pascal OSErr ConnSend(connectionPtr conn, const void* d, size_t len)
 {
-	return TCPSendAsync(conn, writePtr, writeCount, push);
+	return TCPSendChars(GetConnectionSocket(conn->private_socket), d, len);
 }
 
 pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host)

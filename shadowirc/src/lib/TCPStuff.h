@@ -31,7 +31,7 @@
 
 typedef struct TCPConnection *TCPConnectionPtr;
 
-OSErr TCPSendAsync(connectionPtr conn, const void* writePtr, short writeCount, char push);
+OSErr TCPSendChars(int sockfd, const void* d, size_t len);
 
 int TCPLocalPort(int sockfd);
 long TCPRemoteIP(TCPConnectionPtr conn);
