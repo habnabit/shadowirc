@@ -59,7 +59,7 @@ inline char TrackTopicMouse(const Rect *cr);
 static void DoTopicWidget(mwWidgetPtr o);
 static void DoModesWidget(mwWidgetPtr o, Point p);
 static void StandardIconWidget(mwWidgetPtr o, CIconHandle icon[]);
-static pascal OSStatus TopicWidgetDialogEventHandler (EventHandlerCallRef myHandler, EventRef event, void *userData);
+static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData);
 static void TopicWindowSet(WindowRef dlgWindow, channelPtr ch);
 
 target CurrentTarget = {0, 0, 0, 0, 1, 0, 0};
@@ -335,12 +335,12 @@ static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 	ControlID topicOpsControlID = { kApplicationSignature, kSIRCTopicOpsControlID };
 	int maxLen = HTFindNumericDefault(ch->link->serverOptions, "\pTOPICLEN", 0);
 
-	GetControlByID (dlgWindow, &topicOpsControlID, &topicOpsControl);
+	GetControlByID(dlgWindow, &topicOpsControlID, &topicOpsControl);
 
 	if(!maxLen)
 	{
-		SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof (CFStringRef), CFSTR(""));
-		DrawOneControl (topicOpsControl);
+		SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), CFSTR(""));
+		DrawOneControl(topicOpsControl);
 	}
 	else
 	{
@@ -348,9 +348,9 @@ static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 		LongString ls;
 		Str255 st, st2;
 		
-		GetControlData (topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof (CFStringRef), &theString, NULL);
+		GetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
 
-		CFStringGetPascalString(theString, st, sizeof (Str255), CFStringGetSystemEncoding());
+		CFStringGetPascalString(theString, st, sizeof(Str255), CFStringGetSystemEncoding());
 		twi.topicLen = st[0];
 		NumToString(st[0], st);
 		NumToString(maxLen, st2);
@@ -358,10 +358,10 @@ static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 		LSParamString(&ls, GetIntStringPtr(spInfo, sTopicLength), st, st2, 0, 0);
 		LSMakeStr(ls);
 
-		theString = CFStringCreateWithPascalString (NULL, ls.data,kCFStringEncodingMacRoman);
-		SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof (CFStringRef), &theString);
-		CFRelease (theString);
-		DrawOneControl (topicOpsControl);
+		theString = CFStringCreateWithPascalString(NULL, ls.data,kCFStringEncodingMacRoman);
+		SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
+		CFRelease(theString);
+		DrawOneControl(topicOpsControl);
 	}
 }
 
@@ -376,56 +376,56 @@ static void TopicWindowSet(WindowRef dlgWindow, channelPtr ch)
 	CFStringRef theString;
 	Str255 s1, s2;		/* can these eventually go byebye? */
 
-	GetControlByID (dlgWindow, &topicSetControlID, &topicSetControl);
-	GetControlByID (dlgWindow, &topicTextControlID, &topicTextControl);
-	GetControlByID (dlgWindow, &topicOpsControlID, &topicOpsControl);
-	GetControlByID (dlgWindow, &topicOKControlID, &topicOKControl);
-	GetControlByID (dlgWindow, &topicCancelControlID, &topicCancelControl);
+	GetControlByID(dlgWindow, &topicSetControlID, &topicSetControl);
+	GetControlByID(dlgWindow, &topicTextControlID, &topicTextControl);
+	GetControlByID(dlgWindow, &topicOpsControlID, &topicOpsControl);
+	GetControlByID(dlgWindow, &topicOKControlID, &topicOKControl);
+	GetControlByID(dlgWindow, &topicCancelControlID, &topicCancelControl);
 
 	twi.time = ch->topicSetOn;
 	if(ch->topicSetOn) //if there's a time the topic was set
 	{
-		DateString (ch->topicSetOn, longDate, s1, 0);
-		TimeString (ch->topicSetOn, true, s2, 0);
-		ParamText (ch->chName, ch->topicSetBy, s1, s2);
+		DateString(ch->topicSetOn, longDate, s1, 0);
+		TimeString(ch->topicSetOn, true, s2, 0);
+		ParamText(ch->chName, ch->topicSetBy, s1, s2);
 	}
 	else
 	{
 		if(!ch->topic[0]) //if there is a topic set
 		{
-			ParamText (ch->chName, "\p", "\p", "\p");
-			theString = CFStringCreateWithPascalString (NULL, GetIntStringPtr(spError, sNoTopic), kCFStringEncodingMacRoman);
-			SetControlData(topicSetControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof (CFStringRef), &theString);
-			CFRelease (theString);
+			ParamText(ch->chName, "\p", "\p", "\p");
+			theString = CFStringCreateWithPascalString(NULL, GetIntStringPtr(spError, sNoTopic), kCFStringEncodingMacRoman);
+			SetControlData(topicSetControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
+			CFRelease(theString);
 			DrawOneControl(topicSetControl);
 		}
 		else
 			theString = CFSTR("");
 		
-		SetControlData(topicSetControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof (CFStringRef), &theString);
+		SetControlData(topicSetControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
 		DrawOneControl(topicSetControl);
 	}
 	
-	theString = CFStringCreateWithPascalString (NULL, ch->topic, kCFStringEncodingMacRoman);
-	SetControlData(topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof (CFStringRef), &theString);
+	theString = CFStringCreateWithPascalString(NULL, ch->topic, kCFStringEncodingMacRoman);
+	SetControlData(topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
 	DrawOneControl(topicTextControl);
 
 	if(twi.hadOps)
 		_TopicWindowLengthDisplay(dlgWindow, twi.ch);
 	else
 	{
-		theString = CFStringCreateWithPascalString (NULL, GetIntStringPtr(spError, sNoOpsCantTopic), kCFStringEncodingMacRoman);
-		SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof (CFStringRef), &theString);
-		CFRelease (theString);
+		theString = CFStringCreateWithPascalString(NULL, GetIntStringPtr(spError, sNoOpsCantTopic), kCFStringEncodingMacRoman);
+		SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
+		CFRelease(theString);
 		DrawOneControl(topicOpsControl);
 		DeactivateControl(topicOKControl);
-		DeactivateControl(topicTextControl);
 	}
-
-	SetWindowDefaultButton (dlgWindow, topicCancelControl);
+	
+	SetWindowCancelButton(dlgWindow, topicCancelControl);
+	SetWindowDefaultButton(dlgWindow, topicCancelControl);
 }
 
-static pascal OSStatus TopicWidgetDialogEventHandler (EventHandlerCallRef myHandler, EventRef event, void *userData)
+static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
 	WindowRef sheet = NULL;
@@ -438,32 +438,32 @@ static pascal OSStatus TopicWidgetDialogEventHandler (EventHandlerCallRef myHand
 	channelPtr ch;
 	UInt32 cmd;
 
-	GetEventParameter (event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &control);
-	GetControlCommandID (control, &cmd);
+	GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &control);
+	GetControlCommandID(control, &cmd);
 
-	sheet = (WindowRef)userData;
+	sheet =(WindowRef)userData;
 	ch = twi.ch;
 
-	switch (cmd)
+	switch(cmd)
 	{
 		case kHICommandTopicText:		// find out if there's a way to see if text has been typed or not
 			if(twi.hadOps)
 			{
-				GetControlByID (sheet, &topicOKControlID, &topicOKControl);
-				SetWindowDefaultButton (sheet, topicOKControl);
+				GetControlByID(sheet, &topicOKControlID, &topicOKControl);
+				SetWindowDefaultButton(sheet, topicOKControl);
 			}
 			break;
 		
 		case kHICommandCancel:
 			HideSheetWindow(sheet);
 			DisposeWindow(sheet);
-			ExitModalDialog ();
+			ExitModalDialog();
 			break;
 			
 		case kHICommandOK:
-			GetControlByID (sheet, &topicTextControlID, &topicTextControl);
-			GetControlData (topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof (CFStringRef), &theString, NULL);
-			CFStringGetPascalString(theString, s1, sizeof (Str255), CFStringGetSystemEncoding());
+			GetControlByID(sheet, &topicTextControlID, &topicTextControl);
+			GetControlData(topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
+			CFStringGetPascalString(theString, s1, sizeof(Str255), CFStringGetSystemEncoding());
 			if(s1[0])
 			{
 				LSStrCat4(&ls,"\pTOPIC ", ch->chName, "\p :", s1);
@@ -471,18 +471,18 @@ static pascal OSStatus TopicWidgetDialogEventHandler (EventHandlerCallRef myHand
 			}
 			HideSheetWindow(sheet);
 			DisposeWindow(sheet);
-			ExitModalDialog ();
+			ExitModalDialog();
 			break;
 	}
 		
-	return (result);
+	return(result);
 }
 
 void ChTopicWindow(channelPtr ch)
 {
 	IBNibRef mainNibRef;
 	WindowRef parentWindow = NULL, channelTopicSheet = NULL;
-	EventHandlerUPP ctUPP = NewEventHandlerUPP (TopicWidgetDialogEventHandler);
+	EventHandlerUPP ctUPP = NewEventHandlerUPP(TopicWidgetDialogEventHandler);
 	EventTypeSpec ctSpec = { kEventClassControl, kEventControlHit };
 	OSStatus status = noErr;
 
@@ -492,9 +492,9 @@ void ChTopicWindow(channelPtr ch)
 	status = CreateWindowFromNib(mainNibRef, kNibWinChannelTopic, &channelTopicSheet);
 	require_noerr(status, CantCreateDialogWindow);
 
-	DisposeNibReference (mainNibRef);
+	DisposeNibReference(mainNibRef);
 
-	status = InstallWindowEventHandler (channelTopicSheet, ctUPP, 1, &ctSpec, (void *)channelTopicSheet, NULL);
+	status = InstallWindowEventHandler(channelTopicSheet, ctUPP, 1, &ctSpec,(void *)channelTopicSheet, NULL);
 	require_noerr(status, CantInstallDialogHandler);
 
 	if(ch->hasOps || ch->hasHalfOps || !ch->modes[modeT])
@@ -503,11 +503,11 @@ void ChTopicWindow(channelPtr ch)
 			twi.hadOps = false;
 	twi.ch = ch;
 
-	TopicWindowSet (channelTopicSheet, ch);
+	TopicWindowSet(channelTopicSheet, ch);
 
 	parentWindow = ch->window->w;
 
-	EnterModalDialog ();
+	EnterModalDialog();
 
 	ShowSheetWindow(channelTopicSheet, parentWindow);
 	SelectWindow(channelTopicSheet);
@@ -542,7 +542,7 @@ void DoModeLWindow(channelPtr ch, LongString *ls)
 	Str255 s;
 	
 	EnterModalDialog();
-	d=GetNewDialog(10001, 0, (WindowPtr)-1);
+	d=GetNewDialog(10001, 0,(WindowPtr)-1);
 	NumToString(ch->limit, s);
 	SetText(d, 4, s);
 	ParamText(ch->chName, "\p", "\p", "\p");
