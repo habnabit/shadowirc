@@ -3499,9 +3499,10 @@ pascal void ListIgnores(void);
 		Output:	none
 */
 
-pascal void DoIgnore(LongString  *in);
+void DoIgnore(LongString  *in, char silent);
 /*	Does ignore list matinence. Equivilant to /ignore command.
-		Input: 	in - parameters for /ignore. If the first character is '¥', ShadowIRC will not output the ignore list.
+		Input: 	in - parameters for /ignore.
+				silent - if true, ShadowIRC will not output the ignore list.
 		Output:	none
 */
 

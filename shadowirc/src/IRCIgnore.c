@@ -148,21 +148,15 @@ inline void addignores(ConstStr255Param str)
 	ignores=ign;
 }
 
-pascal void DoIgnore(LongString  *in)
+void DoIgnore(LongString  *in, char silent)
 {
 	Str255 str;
 	char remove;
 	LongString out;
 	int x;
-	char dontList = 0;
 	
 	if(in->len)
 	{
-		if(in->data[1]=='¥')
-		{
-			dontList = 1;
-			LSDelete(in, 1, 1);
-		}
 		for(x=1;x<=in->len;x++)
 			if(in->data[x]==',')
 				in->data[x]=' ';
@@ -193,6 +187,6 @@ pascal void DoIgnore(LongString  *in)
 		}
 	}
 	
-	if(!dontList)
+	if(!silent)
 		ListIgnores();
 }

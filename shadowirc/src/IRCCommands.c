@@ -933,7 +933,7 @@ static pascal void TranslateCommand(linkPtr link, LongString *s)
 		}
 		else if(pstrcmp6(com, 'IGN', 'OR', 'E')) //IGNORE
 		{
-			DoIgnore(&rest);
+			DoIgnore(&rest, false);
 			s->len=0;
 		}
 		else if(pstrcmp4(com, 'JOI', 'N') || (*(short*)com==0x014A)) //J

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -35,7 +35,7 @@ extern ignorePtr ignores;
 pascal void ListIgnores(void);
 pascal char IsIgnored(ConstStr255Param uah);
 pascal char IsIgnoredNickUser(ConstStr255Param nick, ConstStr255Param user);
-pascal void DoIgnore(LongString  *in);
+void DoIgnore(LongString  *in, char silent);
 pascal ignorePtr findIgnore(ConstStr255Param mask, ignorePtr start);
 
 #endif
