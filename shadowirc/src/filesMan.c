@@ -405,11 +405,7 @@ pascal char DirectorySelectButton(FSSpec *fss)
 
 			if((theErr = AEGetNthDesc(&(theReply.selection),1,typeFSS, &key,&resultDesc)) == noErr)
 			{
-				#if TARGET_CARBON
-					AEGetDescData(&resultDesc, fss, sizeof(FSSpec));
-				#else
-					BlockMoveData(*resultDesc.dataHandle, fss,sizeof(FSSpec));
-				#endif
+				AEGetDescData(&resultDesc, fss, sizeof(FSSpec));
 				CleanFolderFSp(fss);
 				b = 1;
 			}
@@ -481,11 +477,7 @@ pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileNam
 			// retrieve the returned selection:
 			if((err = AEGetNthDesc(&(theReply.selection),1,typeFSS, &key,&resultDesc)) == noErr)
 			{
-				#if TARGET_CARBON
-					AEGetDescData(&resultDesc, f, sizeof(FSSpec));
-				#else
-					BlockMoveData(*resultDesc.dataHandle, f, sizeof(FSSpec));
-				#endif
+				AEGetDescData(&resultDesc, f, sizeof(FSSpec));
 
 				if(theReply.replacing)
 					if(allowReplace)
