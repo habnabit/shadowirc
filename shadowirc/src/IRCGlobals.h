@@ -235,10 +235,6 @@ enum {
 
 extern int wLastServiceItem;
 
-#define wPrevWindowItem (wLastServiceItem + 1)
-#define wNextWindowItem (wLastServiceItem + 2)
-#define wCascadeItem (wLastServiceItem + 3)
-#define wTileItem (wLastServiceItem + 4)
 #define windowsStart (wLastServiceItem + 5)
 
 #define creatorType 'SIRC'

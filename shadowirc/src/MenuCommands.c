@@ -649,13 +649,13 @@ pascal void MenuBarClick(const EventRecord *e)
 	//Update window menu
 	if((w = FrontNonFloater())!=0 && (w=GetNextWindow(w))!=0 && IsVisible(w))
 	{
-		EnableMenuItem(gWindowMenu, wPrevWindowItem);
-		EnableMenuItem(gWindowMenu, wNextWindowItem);
+		EnableMenuCommand(gWindowMenu, kCommandPrevWin);
+		EnableMenuCommand(gWindowMenu, kCommandNextWin);
 	}
 	else
 	{
-		DisableMenuItem(gWindowMenu, wPrevWindowItem);
-		DisableMenuItem(gWindowMenu, wNextWindowItem);
+		DisableMenuCommand(gWindowMenu, kCommandPrevWin);
+		DisableMenuCommand(gWindowMenu, kCommandNextWin);
 	}
 	CheckMenuItem(gWindowMenu, wConsoleItem, IsVisible(consoleWin->w));
 	DoMenuEvent(MenuSelect(e->where), e);

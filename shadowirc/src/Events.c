@@ -362,11 +362,11 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 			ToggleConsoleWindow();
 			return noErr;
 		
-		case 'PWIN':
+		case kCommandPrevWin:
 			DoCycleCommand(false);
 			return noErr;
 			
-		case 'NWIN':
+		case kCommandNextWin:
 			DoCycleCommand(true);
 			return noErr;
 			
