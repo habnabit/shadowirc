@@ -299,6 +299,7 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 {
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
+	HICommand hiCommand;
 	
 	eventClass = GetEventClass(event);
 	eventKind = GetEventKind(event);
@@ -338,7 +339,7 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 					if(!CMClick(ilWindow, event))
 						IWClick(ilWindow, event);
 					
-					iwFront = 0;
+					iwFront = 1;
 					result = noErr;
 					break;
 				
@@ -359,6 +360,27 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 					result = noErr;
 					break;
 				}
+			}
+			break;
+		}
+		
+		case kEventClassCommand:
+		{
+			GetEventParameter(event, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
+			
+			switch(eventKind)
+			{
+				case kEventCommandUpdateStatus:
+					switch(hiCommand.commandID)
+					{
+						case kHICommandCut:
+						case kHICommandCopy:
+						case kHICommandPaste:
+						case kHICommandClear:
+						case kHICommandSelectAll:
+							break;
+					}
+					break;
 			}
 			break;
 		}
@@ -400,6 +422,7 @@ void OpenInputLine()
 			{kEventClassWindow, kEventWindowDeactivated},
 			{kEventClassWindow, kEventWindowShown},
 			{kEventClassWindow, kEventWindowHidden},
+			{kEventClassCommand, kEventCommandUpdateStatus},
 			{kEventClassKeyboard, kEventRawKeyDown},
 			{kEventClassKeyboard, kEventRawKeyRepeat}
 		};
