@@ -57,14 +57,14 @@
 #include "Events.h"
 #include "ApplBase.h"
 
-static pascal void floatingWindowClick(EventRecord *e);
-static pascal void inContentHandler(EventRecord *e);
-static pascal void doMouseDown(EventRecord *e);
+static void floatingWindowClick(EventRecord *e);
+static void inContentHandler(EventRecord *e);
+static void doMouseDown(EventRecord *e);
 static void doTCPEvent(CEPtr message);
-static pascal void ApplEvents(EventRecord *e);
-static pascal void ApplExit(void);
+static void ApplEvents(EventRecord *e);
+static void ApplExit(void);
 
-static pascal void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord);
+static void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord);
 
 static RgnHandle mouseRgn;
 
@@ -116,7 +116,7 @@ static void AsyncSoundCleanup(EventLoopTimerRef timer, void* data)
 	SetEventLoopTimerNextFireTime(timer, kEventDurationForever);
 }
 
-static pascal void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord)
+static void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord)
 {
 	#pragma unused(theSoundChannel)
 	
@@ -193,7 +193,7 @@ typedef struct sqData {
 	int save;
 } sqData;
 
-static pascal OSStatus ConfirmQuitEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+static OSStatus ConfirmQuitEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
@@ -298,7 +298,7 @@ CantInstallDialogHandler:
 	return QuitRequest;
 }
 
-static pascal void floatingWindowClick(EventRecord *e) //this also takes care of handling the float clicks
+static void floatingWindowClick(EventRecord *e) //this also takes care of handling the float clicks
 {
 	GrafPtr p;
 	short i;
@@ -416,7 +416,7 @@ inline void ProcessUserHosts(linkPtr link)
 		ProcessUserHostsOutgoing(link, &ts);
 }
 
-static pascal void RetryConnections(void)
+static void RetryConnections(void)
 {
 	linkPtr curLink;
 	
@@ -516,7 +516,7 @@ static void InitTimers()
 
 #pragma mark -
 
-static pascal void inContentHandler(EventRecord *e)
+static void inContentHandler(EventRecord *e)
 {
 	MWPtr mw;
 	GrafPtr gp;
@@ -643,7 +643,7 @@ static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef even
 	return noErr;
 }
 
-static pascal void doMouseDown(EventRecord *e)
+static void doMouseDown(EventRecord *e)
 {
 	short i;
 	WindowPtr p;
@@ -711,7 +711,7 @@ static void doTCPEvent(CEPtr c)
 	conn->InputFunc(c, conn);
 }
 
-static pascal void ApplEvents(EventRecord *e)
+static void ApplEvents(EventRecord *e)
 {
 	switch(e->what)
 	{
@@ -782,7 +782,7 @@ void ApplInit(void)
 	InitTimers();
 }
 
-static pascal void ApplExit(void)
+static void ApplExit(void)
 {
 	runAllPlugins(pQuitMessage, 0);
 	

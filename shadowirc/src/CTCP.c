@@ -36,12 +36,12 @@
 #include "TextManip.h"
 
 
-static pascal void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *ctcp, char ign);
+static void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *ctcp, char ign);
 inline void quote(LongString *s);
 inline void unquote(StringPtr s);
-static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, ConstStr255Param ta, ConstStr255Param co, StringPtr re);
-static pascal void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, Str255 re);
-static pascal void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstStr255Param fr, ConstStr255Param re);
+static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, ConstStr255Param ta, ConstStr255Param co, StringPtr re);
+static void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, Str255 re);
+static void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstStr255Param fr, ConstStr255Param re);
 
 inline void quote(LongString *s)
 {
@@ -121,7 +121,7 @@ pascal void SendCTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co
 	}
 }
 
-static pascal void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *ctcp, char ign)
+static void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *ctcp, char ign)
 {
 	LongString ls;
 	channelPtr targChan;
@@ -167,7 +167,7 @@ static pascal void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255P
 	}
 }
 
-static pascal void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstStr255Param fr, ConstStr255Param re)
+static void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstStr255Param fr, ConstStr255Param re)
 {
 	LongString ls;
 	channelPtr targChan;
@@ -210,7 +210,7 @@ static pascal void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, 
 	}
 }
 
-static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, ConstStr255Param ta, ConstStr255Param co, StringPtr re)
+static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, ConstStr255Param ta, ConstStr255Param co, StringPtr re)
 {
 	Str255 st;
 	LongString ls;
@@ -316,7 +316,7 @@ static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param 
 	return 1;
 }
 
-static pascal void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, Str255 re)
+static void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, Str255 re)
 {
 	LongString ls;
 	

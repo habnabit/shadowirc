@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -34,7 +34,7 @@
 #include "plugins.h"
 #include "TextManip.h"
 
-static pascal void trashNotify(linkPtr link, notifyPtr n);
+static void trashNotify(linkPtr link, notifyPtr n);
 
 pascal void ListNotify(linkPtr link)
 {
@@ -88,7 +88,7 @@ pascal notifyPtr findNotify(linkPtr link, ConstStr255Param nick)
 	return 0;
 }
 
-static pascal void trashNotify(linkPtr link, notifyPtr n)
+static void trashNotify(linkPtr link, notifyPtr n)
 {
 	notifyPtr temp;
 	

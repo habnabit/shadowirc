@@ -59,34 +59,34 @@ pascal long RegisterAETE(Handle aete)
 		return -1;
 }
 
-static pascal OSErr aeOApp(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
-static pascal OSErr aeQuit(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
-static pascal OSErr aePDoc(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
-static pascal OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
-static pascal OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, long refcon);
+static OSErr aeOApp(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
+static OSErr aeQuit(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
+static OSErr aePDoc(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
+static OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
+static OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, long refcon);
 
-static pascal OSErr EasyHasUnusedParameters(const AppleEvent *theAEvent);
+static OSErr EasyHasUnusedParameters(const AppleEvent *theAEvent);
 
-static pascal OSErr aeOApp(const AppleEvent * ae, AppleEvent *reply, long refCon)
+static OSErr aeOApp(const AppleEvent * ae, AppleEvent *reply, long refCon)
 {
 	#pragma unused(ae, reply, refCon)
 	return noErr;
 }
 
-static pascal OSErr aeQuit(const AppleEvent *ae, AppleEvent *reply, long refCon)
+static OSErr aeQuit(const AppleEvent *ae, AppleEvent *reply, long refCon)
 {
 	#pragma unused(ae, reply, refCon)
 	doQuit(0);
 	return noErr;
 }
 
-static pascal OSErr aePDoc(const AppleEvent *ae, AppleEvent *reply, long refCon)
+static OSErr aePDoc(const AppleEvent *ae, AppleEvent *reply, long refCon)
 {
 	#pragma unused(ae, reply, refCon)
 	return errAEEventNotHandled;
 }
 
-static pascal OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon)
+static OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon)
 {
 	#pragma unused(refCon)
 	OSErr err;
@@ -152,7 +152,7 @@ static OSErr OpenURLString(LongString *url)
 	return paramErr;
 }
 
-static pascal OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, long refCon)
+static OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, long refCon)
 {
 	#pragma unused(refCon)
 	LongString url;
@@ -185,7 +185,7 @@ static pascal OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, long refC
 
 #pragma mark -
 
-static pascal OSErr EasyHasUnusedParameters(const AppleEvent *theAEvent)
+static OSErr EasyHasUnusedParameters(const AppleEvent *theAEvent)
 {
 	OSErr		error;
 	long		actualSize;

@@ -57,18 +57,18 @@ typedef struct fileListRec {
 
 static fileListPtr fileList = 0;
 
-static pascal fileListPtr FileFind(short fref);
+static fileListPtr FileFind(short fref);
 
-static pascal void ReadInPrefs(void);
-static pascal void CreateNewPrefsMain(void);
-static pascal void CreateNewPrefsLinks(void);
-static pascal void CreateNewPrefs(void);
-static pascal void AllocateNewPrefs(void);
+static void ReadInPrefs(void);
+static void CreateNewPrefsMain(void);
+static void CreateNewPrefsLinks(void);
+static void CreateNewPrefs(void);
+static void AllocateNewPrefs(void);
 
-static pascal void WriteAlias(const FSSpec *fs, short id);
-static pascal void ReadAlias(FSSpec *fs, short id);
+static void WriteAlias(const FSSpec *fs, short id);
+static void ReadAlias(FSSpec *fs, short id);
 
-static pascal fileListPtr FileFind(short fref)
+static fileListPtr FileFind(short fref)
 {
 	fileListPtr f = fileList;
 	
@@ -494,7 +494,7 @@ enum PrefsData {
 	SizeOfPrefs = sizeof(prefsStruct) + SizeOfPrefsDataArea
 };
 
-static pascal void WriteAlias(const FSSpec *fs, short id)
+static void WriteAlias(const FSSpec *fs, short id)
 {
 	AliasHandle alias;
 	Handle rh;
@@ -530,7 +530,7 @@ static pascal void WriteAlias(const FSSpec *fs, short id)
 	}
 }
 
-static pascal void ReadAlias(FSSpec *fs, short id)
+static void ReadAlias(FSSpec *fs, short id)
 {
 	AliasHandle alias;
 	short err;
@@ -602,7 +602,7 @@ pascal void writeAllFiles(void)
 	CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 }
 
-static pascal void ReadInPrefs(void)
+static void ReadInPrefs(void)
 {
 	prefsStruct p;
 	long l=sizeof(p);
@@ -726,7 +726,7 @@ static pascal void ReadInPrefs(void)
 	UseResFile(resNum);
 }
 
-static pascal void CreateNewPrefsMain(void)
+static void CreateNewPrefsMain(void)
 {
 	prefsPtr mp=mainPrefs;
 	int x;
@@ -840,7 +840,7 @@ mp->unused5 = 0;
 		mp->spare[x]=0;
 }
 
-static pascal void CreateNewPrefsLinks(void)
+static void CreateNewPrefsLinks(void)
 {
 	linkPrefsPtr lp;
 	int x, y;
@@ -903,14 +903,14 @@ static pascal void CreateNewPrefsLinks(void)
 	}
 }
 
-static pascal void CreateNewPrefs(void)
+static void CreateNewPrefs(void)
 {
 	CreateNewPrefsMain();
 	CreateNewPrefsLinks();
 	InitColorPrefs();
 }
 
-static pascal void AllocateNewPrefs(void)
+static void AllocateNewPrefs(void)
 {
 	mainPrefs=(prefsPtr)NewPtrClear(sizeof(prefsRec));
 	linkPrefsArray=(linkPrefsPtr)NewPtrClear(sizeof(linkPrefsRec) * maxLinks);

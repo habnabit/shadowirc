@@ -61,32 +61,32 @@ static DialogPtr PrefsDlg;
 static ListHandle connPrefsList = 0;
 static short connPrefsRowNum = 0;
 
-static pascal short dccsiztomenu(void);
-static pascal long dccmenutosiz(short num);
+static short dccsiztomenu(void);
+static long dccmenutosiz(short num);
 
-static pascal char ColorFileSelect(FSSpec *out);
-static pascal char ColorFilePut(FSSpec *f);
-static pascal void SetColorsPanel(void);
-static pascal void ExportColors(void);
-static pascal void ImportColors(void);
+static char ColorFileSelect(FSSpec *out);
+static char ColorFilePut(FSSpec *f);
+static void SetColorsPanel(void);
+static void ExportColors(void);
+static void ImportColors(void);
 
-static pascal void DoDirSel(FSSpec *fss, short item);
+static void DoDirSel(FSSpec *fss, short item);
 pascal unsigned char PrefsDialogFilter(DialogPtr d, EventRecord *e, short *item);
-static pascal void RedrawPreferencesWindow(DialogPtr d);
+static void RedrawPreferencesWindow(DialogPtr d);
 
-static pascal void ClosePreferencesWindow(short windowNum, char finished);
-static pascal void LoadPreferencesWindow(short windowNum);
+static void ClosePreferencesWindow(short windowNum, char finished);
+static void LoadPreferencesWindow(short windowNum);
 
-static pascal void firewallItemSetup(short fw);
-static pascal void connectionsItemSetup(char reconnect);
+static void firewallItemSetup(short fw);
+static void connectionsItemSetup(char reconnect);
 
-static pascal void SetPreferencesWindow(short windowNum, short connListNum);
-static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, short connListNum);
-static pascal char RetrievePreferencesWindow(short windowNum);
-static pascal void HitPreferencesWindow(short windowNum, short item);
-static pascal void PDConnectionsInit(void);
-static pascal void PDConnectionsTrash(void);
-static pascal void PDConnectionsListHit(short windowNum);
+static void SetPreferencesWindow(short windowNum, short connListNum);
+static char GetPreferencesWindow(short windowNum, StringPtr errorString, short connListNum);
+static char RetrievePreferencesWindow(short windowNum);
+static void HitPreferencesWindow(short windowNum, short item);
+static void PDConnectionsInit(void);
+static void PDConnectionsTrash(void);
+static void PDConnectionsListHit(short windowNum);
 
 typedef struct prefsCopy {
 	Handle mainPrefs;
@@ -97,8 +97,8 @@ typedef struct prefsCopy {
 
 static prefsCopy pc;
 
-static pascal char SetupCancel(void);
-static pascal void EndCancel(char cancel);
+static char SetupCancel(void);
+static void EndCancel(char cancel);
 
 typedef struct PreferencesMenuItemRec {
 	long dlgID; //0 = none.
@@ -137,7 +137,7 @@ pascal short PMLAdd(ConstStr63Param name)
 		return -1;
 }
 
-static pascal void _PMLAdd(ConstStr63Param name, short id)
+static void _PMLAdd(ConstStr63Param name, short id)
 {
 	long i = PMLAdd(name);
 	if(i>=0)
@@ -187,7 +187,7 @@ pascal void InitPrefs(void)
 	_PMLAdd("\p-", 0);
 }
 
-static pascal void PDConnectionsInit(void)
+static void PDConnectionsInit(void)
 {
 	Cell c;
 	linkPtr lp;
@@ -211,12 +211,12 @@ static pascal void PDConnectionsInit(void)
 	LSetDrawingMode(true, connPrefsList);
 }
 
-static pascal void PDConnectionsTrash(void)
+static void PDConnectionsTrash(void)
 {
 	connPrefsList = 0;
 }
 
-static pascal void PDConnectionsListHit(short windowNum)
+static void PDConnectionsListHit(short windowNum)
 {
 	Point c;
 	
@@ -250,7 +250,7 @@ static pascal void PDConnectionsListHit(short windowNum)
 
 #pragma mark -
 
-static pascal short dccsiztomenu(void)
+static short dccsiztomenu(void)
 {
 	switch(mainPrefs->dccSendPacketSize)
 	{
@@ -271,7 +271,7 @@ static pascal short dccsiztomenu(void)
 	}
 }
 
-static pascal long dccmenutosiz(short num)
+static long dccmenutosiz(short num)
 {
 	if(num < 1 || num > 6)
 		return 4096;
@@ -316,7 +316,7 @@ pascal void SetColorsPanel(void)
 	}
 }
 
-static pascal char ColorFileSelect(FSSpec *out)
+static char ColorFileSelect(FSSpec *out)
 {
 	char retVal;
 	OSErr theErr;
@@ -371,13 +371,13 @@ static pascal char ColorFileSelect(FSSpec *out)
 	return retVal;
 }
 
-static pascal char ColorFilePut(FSSpec *f)
+static char ColorFilePut(FSSpec *f)
 {
 	ConstStringPtr s = GetIntStringPtr(spFile, sSelectColorFileSaveLoc);
 	return MyStandardPutFile(s, "\pColor Set", 'COLR', 'SIRC', kNDefault, f, true) <= 0;
 }
 
-static pascal void ExportColors(void)
+static void ExportColors(void)
 {
 	FSSpec f;
 	short ref;
@@ -400,7 +400,7 @@ static pascal void ExportColors(void)
 	}
 }
 
-static pascal void ImportColors(void)
+static void ImportColors(void)
 {
 	FSSpec f;
 	short ref;
@@ -422,7 +422,7 @@ static pascal void ImportColors(void)
 	}
 }
 
-static pascal void firewallItemSetup(short fw)
+static void firewallItemSetup(short fw)
 {
 	if(fw == fwNone)
 	{
@@ -459,7 +459,7 @@ static pascal void firewallItemSetup(short fw)
 	}
 }
 
-static pascal void connectionsItemSetup(char reconnect)
+static void connectionsItemSetup(char reconnect)
 {
 	setButtonEnable(PrefsDlg, 29, reconnect);
 	setButtonEnable(PrefsDlg, 30, reconnect);
@@ -469,7 +469,7 @@ static pascal void connectionsItemSetup(char reconnect)
 
 #pragma mark -
 
-static pascal void SetPreferencesWindow(short windowNum, short connListNum)
+static void SetPreferencesWindow(short windowNum, short connListNum)
 {
 	short x, y;
 	ControlHandle item;
@@ -670,7 +670,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 		}
 }
 
-static pascal char RetrievePreferencesWindow(short windowNum)
+static char RetrievePreferencesWindow(short windowNum)
 {
 	Str255 err;
 	char out;
@@ -704,7 +704,7 @@ static pascal char RetrievePreferencesWindow(short windowNum)
 	return out;
 }
 
-static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, short connListNum)
+static char GetPreferencesWindow(short windowNum, StringPtr errorString, short connListNum)
 {
 	Str255 s;
 	long l;
@@ -906,7 +906,7 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 	return 1;
 }
 
-static pascal void DoDirSel(FSSpec *fss, short item)
+static void DoDirSel(FSSpec *fss, short item)
 {
 	short len;
 	Str255 st;
@@ -932,7 +932,7 @@ static pascal void DoDirSel(FSSpec *fss, short item)
 
 static EventRecord prefsWindowEventRecord;
 
-static pascal void HitPreferencesWindow(short windowNum, short item)
+static void HitPreferencesWindow(short windowNum, short item)
 {
 	char b;
 	Point pt;
@@ -1226,7 +1226,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 		}
 }
 
-static pascal void ClosePreferencesWindow(short windowNum, char finished)
+static void ClosePreferencesWindow(short windowNum, char finished)
 {
 	Rect r;
 	RgnHandle oldRgn;
@@ -1252,7 +1252,7 @@ static pascal void ClosePreferencesWindow(short windowNum, char finished)
 }
 
 static short currentPrefsWindowNum;
-static pascal void LoadPreferencesWindow(short windowNum)
+static void LoadPreferencesWindow(short windowNum)
 {
 	short oldRes;
 	int ok;
@@ -1302,7 +1302,7 @@ static pascal void LoadPreferencesWindow(short windowNum)
 	}
 }
 
-static pascal void RedrawPreferencesWindow(DialogPtr d)
+static void RedrawPreferencesWindow(DialogPtr d)
 {
 	PreferencesMenuItemPtr pp = &(**pmlList).list[currentPrefsWindowNum];
 	
@@ -1333,7 +1333,7 @@ pascal unsigned char PrefsDialogFilter(DialogPtr d, EventRecord *e, short *item)
 		return true;
 }
 
-static pascal char SetupCancel(void)
+static char SetupCancel(void)
 {
 	long s;
 	OSErr err;
@@ -1373,7 +1373,7 @@ static pascal char SetupCancel(void)
 	return 0;
 }
 
-static pascal void EndCancel(char cancel)
+static void EndCancel(char cancel)
 {
 	long s;
 	

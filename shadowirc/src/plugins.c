@@ -58,14 +58,14 @@ enum serviceStrings {
 
 inline void callIndPlugin(plugsPtr ref, void* msgD, short msg);
 inline void initSIDR(void);
-static pascal void AddService(FourCharCode serviceType, plugsPtr ref);
-static pascal void InitPlugins(void);
+static void AddService(FourCharCode serviceType, plugsPtr ref);
+static void InitPlugins(void);
 
 pascal OSErr FSpGetDirectoryID(FSSpec*, long*, char*);
 
 pascal long _UndocumentedAPI(long type, long data);
 
-static pascal plugsPtr IPCFind(FourCharCode IPCType, long *version, long *data);
+static plugsPtr IPCFind(FourCharCode IPCType, long *version, long *data);
 
 //For Inlined crap
 #define linkfor(list, init) for((list) = (init); (list); (list)=(list)->next)
@@ -126,7 +126,7 @@ pascal short WMSListAdd(FourCharCode serviceType, ConstStr255Param name)
 	return wLastServiceItem;
 }
 
-static pascal void AddService(FourCharCode serviceType, plugsPtr ref)
+static void AddService(FourCharCode serviceType, plugsPtr ref)
 {
 	slPtr p=(slPtr)NewPtr(sizeof(serviceListRec));
 	
@@ -248,7 +248,7 @@ pascal char IPCExists(FourCharCode IPCType, long *version, long *data)
 	return 0;
 }
 
-static pascal plugsPtr IPCFind(FourCharCode IPCType, long *version, long *data)
+static plugsPtr IPCFind(FourCharCode IPCType, long *version, long *data)
 {
 	IPCPtr p;
 	
@@ -613,7 +613,7 @@ pascal long _UndocumentedAPI(long type, long data)
 	return pUndocumentedAPIReply;
 }
 
-static pascal void InitPlugins(void)
+static void InitPlugins(void)
 {
 	plugsPtr p;
 	int y;

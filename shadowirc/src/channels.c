@@ -38,7 +38,7 @@ char IsChannel(ConstStringPtr s)
 		return false;
 }
 
-static pascal void ULKillAllUsers(channelPtr channel);
+static void ULKillAllUsers(channelPtr channel);
 
 long userNum=0;
 
@@ -67,7 +67,7 @@ pascal void ULDeleteUser(UserListPtr user)
 	}
 }
 
-static pascal void ULKillAllUsers(channelPtr channel)
+static void ULKillAllUsers(channelPtr channel)
 {
 	UserListPtr ul, ul2;
 	

@@ -38,7 +38,7 @@
 
 pascal void doMODE(linkPtr link, ConstStringPtr channel, StringPtr modeChange, ConstStringPtr setBy, LongString *tls);
 
-static pascal void AttemptNickRegainNickChange(linkPtr link, ConstStringPtr cantUse)
+static void AttemptNickRegainNickChange(linkPtr link, ConstStringPtr cantUse)
 {
 	LongString ls;
 	

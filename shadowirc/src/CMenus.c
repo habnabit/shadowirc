@@ -40,22 +40,22 @@
 #include "IRCInput.h"
 #include "MenuCommands.h"
 
-static pascal void _CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key, short *id, MenuHandle *m);
-static pascal void CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key);
+static void _CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key, short *id, MenuHandle *m);
+static void CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key);
 inline void CMILDelete(cmmwData *d, short item);
 inline void CMILStripEnd(cmmwData *d);
-static pascal void CMILDispose(cmmwData *d);
-static pascal void CMSubmenu(cmmwData *d, short menuID, short item);
+static void CMILDispose(cmmwData *d);
+static void CMSubmenu(cmmwData *d, short menuID, short item);
 
-static pascal void CMMWMake(cmmwData *d);
-static pascal void CMDoPopup(cmmwData *d, short item);
-static pascal void MyWEFindWord(long offset, long *selStart, long *selEnd, WEReference we);
+static void CMMWMake(cmmwData *d);
+static void CMDoPopup(cmmwData *d, short item);
+static void MyWEFindWord(long offset, long *selStart, long *selEnd, WEReference we);
 
 static OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBalloonAvailable, UInt32 inHelpType, ConstStr255Param inHelpItemString, const AEDesc* inSelection, UInt32* outUserSelectionType, SInt16* outMenuID, UInt16* outMenuItem);
 
-static pascal char CMMW(MWPtr mw, Point where, char optCM);
-static pascal char CMIW(Point where);
-static pascal char CMPlugin(WindowPtr w, Point where);
+static char CMMW(MWPtr mw, Point where, char optCM);
+static char CMIW(Point where);
+static char CMPlugin(WindowPtr w, Point where);
 
 void CMSetCursor(char ctrlDown)
 {
@@ -129,7 +129,7 @@ pascal void CMSetCheckmark(cmmwData *d, long key, char checked)
 	}
 }
 
-static pascal int CMCountItems(cmmwData *d)
+static int CMCountItems(cmmwData *d)
 {
 	CMItemListH list = d->items;
 	
@@ -139,7 +139,7 @@ static pascal int CMCountItems(cmmwData *d)
 		return (**list).numItems;
 }
 
-static pascal void _CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key, short *id, MenuHandle *m)
+static void _CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key, short *id, MenuHandle *m)
 {
 	CMItemListH list = d->items;
 	int i;
@@ -234,7 +234,7 @@ inline void CMILStripEnd(cmmwData *d)
 	}
 }
 
-static pascal void CMILDispose(cmmwData *d)
+static void CMILDispose(cmmwData *d)
 {
 	int x;
 	CMItem *list;
@@ -264,7 +264,7 @@ static pascal void CMILDispose(cmmwData *d)
 
 #pragma mark -
 
-static pascal void CMDoPopup(cmmwData *d, short item)
+static void CMDoPopup(cmmwData *d, short item)
 {
 	CMItem *list = (**d->items).list;
 	
@@ -276,7 +276,7 @@ static pascal void CMDoPopup(cmmwData *d, short item)
 	}
 }
 
-static pascal void CMSubmenu(cmmwData *d, short menuID, short item)
+static void CMSubmenu(cmmwData *d, short menuID, short item)
 {
 	CMItem *list;
 	int x;
@@ -298,7 +298,7 @@ static pascal void CMSubmenu(cmmwData *d, short menuID, short item)
 	HUnlock((Handle)d->items);
 }
 
-static pascal void CMMWMake(cmmwData *d)
+static void CMMWMake(cmmwData *d)
 {
 	MWPtr mw = d->mw;
 	linkPtr link = mw->link;
@@ -470,7 +470,7 @@ static char IsPunc(char c)
 	}
 }
 
-static pascal void MyWEFindWord(long offset, long *selStart, long *selEnd, WEReference we)
+static void MyWEFindWord(long offset, long *selStart, long *selEnd, WEReference we)
 {
 	Handle text;
 	Ptr t;
@@ -507,7 +507,7 @@ static pascal void MyWEFindWord(long offset, long *selStart, long *selEnd, WERef
 	*selEnd = s1;
 }
 
-static pascal void CMCreate(cmmwData *d)
+static void CMCreate(cmmwData *d)
 {
 	d->type = 0;
 
@@ -530,7 +530,7 @@ static pascal void CMCreate(cmmwData *d)
 	d->items=0;
 }
 
-static pascal char CMMW(MWPtr mw, Point where, char optCM)
+static char CMMW(MWPtr mw, Point where, char optCM)
 {
 	cmmwData d;
 	short outMenuID;
@@ -705,7 +705,7 @@ static pascal char CMMW(MWPtr mw, Point where, char optCM)
 	return true;
 }
 
-static pascal char CMIW(Point where)
+static char CMIW(Point where)
 {
 	cmmwData d;
 	short outMenuID;
@@ -809,7 +809,7 @@ static pascal char CMIW(Point where)
 	return 1;
 }
 
-static pascal char CMPlugin(WindowPtr w, Point where)
+static char CMPlugin(WindowPtr w, Point where)
 {
 	cmmwData d;
 	MenuHandle m;

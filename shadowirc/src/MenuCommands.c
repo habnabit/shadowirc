@@ -48,11 +48,11 @@ static MenuHandle gFontsMenu;
 
 static void DoFind2(MWPtr mw);
 
-static pascal void HitFontsMenu(short item);
+static void HitFontsMenu(short item);
 
 void FontsMenuInit(void);
 
-static pascal long FindText(Handle t, long start, Str255 searchFor, char caseSen, char reverse)
+static long FindText(Handle t, long start, Str255 searchFor, char caseSen, char reverse)
 {
 	long x;
 	char b;
@@ -192,7 +192,7 @@ static void FindWindowSet(WindowPtr findWin)
 	SetControlValue(ctrl, find.reverse);
 }
 
-static pascal OSStatus FindWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+static OSStatus FindWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	WindowPtr findWin = (WindowPtr)userData;
 	OSStatus result = eventNotHandledErr;
@@ -508,7 +508,7 @@ typedef struct sqData {
 	long size;
 } sqData;
 
-static pascal OSStatus FontSizeEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+static OSStatus FontSizeEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
@@ -621,7 +621,7 @@ CantInstallDialogHandler:
 	;
 }
 
-static pascal void HitFontsMenu(short item)
+static void HitFontsMenu(short item)
 {
 	Str255 s;
 	long l;

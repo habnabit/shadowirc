@@ -58,7 +58,7 @@ inline char TrackTopicMouse(const Rect *cr);
 static void DoTopicWidget(mwWidgetPtr o);
 static void DoModesWidget(mwWidgetPtr o, Point p);
 static void StandardIconWidget(mwWidgetPtr o, CIconHandle icon[]);
-static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData);
+static OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData);
 static void TopicWindowSet(WindowRef dlgWindow, channelPtr ch);
 
 target CurrentTarget = {0, 0, 0, 0, 1, 0, 0};
@@ -508,7 +508,7 @@ static void UpdateTopicLength(WindowRef sheet, channelPtr ch)
 	DrawOneControl(topicOpsControl);
 }
 
-static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+static OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
 	WindowRef sheet = NULL;
@@ -648,7 +648,7 @@ typedef struct mkData {
 	Str255 key;
 } mkData;
 
-static pascal OSStatus ModeLEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+static OSStatus ModeLEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
@@ -697,7 +697,7 @@ static pascal OSStatus ModeLEventHandler(EventHandlerCallRef myHandler, EventRef
 	return result;
 }
 
-static pascal OSStatus ModeKEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+static OSStatus ModeKEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;

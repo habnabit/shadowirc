@@ -62,18 +62,18 @@ WEPreTrackDragUPP sPreTrackerUPP = 0;
 static DragTrackingHandlerUPP sMyTrackingHandlerUPP = nil;
 static DragReceiveHandlerUPP sMyReceiveHandlerUPP = nil;
 
-static pascal OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage message, DragReference drag);
+static OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage message, DragReference drag);
 inline OSErr MWReceiveDrag(MWPtr mw, DragReference drag);
-static pascal OSErr MWTextPaneReceiveDrag(MWPtr mw, DragReference drag);
-static pascal OSErr MWTrackDrag(MWPtr mw,  DragTrackingMessage message, DragReference drag);
-static pascal OSErr MWTrackDragWidget2(mwWidgetPtr o, Point mouse, short state, DragReference drag);
-static pascal OSErr MWWidgetTrackDrag(MWPtr mw,  Point mouse, DragTrackingMessage message, DragReference drag);
-static pascal OSErr MWWidgetReceiveDrag(MWPtr mw, Point mouse, DragReference drag);
+static OSErr MWTextPaneReceiveDrag(MWPtr mw, DragReference drag);
+static OSErr MWTrackDrag(MWPtr mw,  DragTrackingMessage message, DragReference drag);
+static OSErr MWTrackDragWidget2(mwWidgetPtr o, Point mouse, short state, DragReference drag);
+static OSErr MWWidgetTrackDrag(MWPtr mw,  Point mouse, DragTrackingMessage message, DragReference drag);
+static OSErr MWWidgetReceiveDrag(MWPtr mw, Point mouse, DragReference drag);
 
-static pascal OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr window, void* homeA5, DragReference drag);
-static pascal OSErr MyReceiveHandler(WindowPtr window, void* homeA5, DragReference drag);
+static OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr window, void* homeA5, DragReference drag);
+static OSErr MyReceiveHandler(WindowPtr window, void* homeA5, DragReference drag);
 
-static pascal OSErr PreDrag(DragReference drag, WEReference we);
+static OSErr PreDrag(DragReference drag, WEReference we);
 
 pascal void DragHilightRect(const Rect *re, DragReference drag)
 {
@@ -189,7 +189,7 @@ pascal char DragIsTypeAvail(DragReference drag, long type)
 	return false;
 }
 
-static pascal OSErr MWWidgetReceiveDrag(MWPtr mw, Point mouse, DragReference drag)
+static OSErr MWWidgetReceiveDrag(MWPtr mw, Point mouse, DragReference drag)
 {
 	channelPtr ch;
 	mwWidgetPtr o;
@@ -246,7 +246,7 @@ static pascal OSErr MWWidgetReceiveDrag(MWPtr mw, Point mouse, DragReference dra
 	return ret;
 }
 
-static pascal OSErr MWTrackDragWidget2(mwWidgetPtr o, Point mouse, short state, DragReference drag)
+static OSErr MWTrackDragWidget2(mwWidgetPtr o, Point mouse, short state, DragReference drag)
 {
 	MWPtr mw;
 	
@@ -296,7 +296,7 @@ static pascal OSErr MWTrackDragWidget2(mwWidgetPtr o, Point mouse, short state, 
 static mwWidgetPtr lastWidget = 0;
 static mwPanePtr lastPane = 0;
 
-static pascal OSErr MWWidgetTrackDrag(MWPtr mw,  Point mouse, short state, DragReference drag)
+static OSErr MWWidgetTrackDrag(MWPtr mw,  Point mouse, short state, DragReference drag)
 {
 	mwWidgetPtr o;
 	OSErr ret = 0;
@@ -336,7 +336,7 @@ static pascal OSErr MWWidgetTrackDrag(MWPtr mw,  Point mouse, short state, DragR
 	return ret;
 }
 
-static pascal OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage message, DragReference drag)
+static OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage message, DragReference drag)
 {
 	OSErr ret;
 	
@@ -391,7 +391,7 @@ static pascal OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessa
 	return ret;
 }
 
-static pascal OSErr MWTrackDrag(MWPtr mw,  DragTrackingMessage message, DragReference drag)
+static OSErr MWTrackDrag(MWPtr mw,  DragTrackingMessage message, DragReference drag)
 {
 	mwPanePtr o;
 	Point mouse;
@@ -441,7 +441,7 @@ static pascal OSErr MWTrackDrag(MWPtr mw,  DragTrackingMessage message, DragRefe
 	}
 }
 
-static pascal OSErr MWTextPaneReceiveDrag(MWPtr mw, DragReference drag)
+static OSErr MWTextPaneReceiveDrag(MWPtr mw, DragReference drag)
 {
 	OSErr ret;
 	MWPtr mwFrom;
@@ -615,7 +615,7 @@ inline OSErr MWReceiveDrag(MWPtr mw, DragReference drag)
 	return ret;
 }
 
-static pascal OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr window, void* homeA5, DragReference drag)
+static OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr window, void* homeA5, DragReference drag)
 {
 #pragma unused(homeA5)
 
@@ -663,7 +663,7 @@ static pascal OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr win
 	return ret;
 }
 
-static pascal OSErr MyReceiveHandler(WindowPtr window, void* homeA5, DragReference drag)
+static OSErr MyReceiveHandler(WindowPtr window, void* homeA5, DragReference drag)
 {
 #pragma unused(homeA5)
 	MWPtr mw;
@@ -702,7 +702,7 @@ static pascal OSErr MyReceiveHandler(WindowPtr window, void* homeA5, DragReferen
 	return err;
 }
 
-static pascal OSErr PreDrag(DragReference drag, WEReference we)
+static OSErr PreDrag(DragReference drag, WEReference we)
 {
 	MWPtr mw = 0;
 	Str255 title;

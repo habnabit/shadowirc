@@ -51,10 +51,10 @@ static char MWNavKey(MWPtr mw, EventModifiers modifiers, long message);
 pascal void ServerCommands(LongString *ls, linkPtr link);
 inline void pluginMWGotText(LongString *ls, MWPtr win);
 
-static pascal void SOCKSConnect(connectionPtr conn);
-static pascal char CommandPeriod(void);
+static void SOCKSConnect(connectionPtr conn);
+static char CommandPeriod(void);
 
-static pascal char CommandPeriod(void)
+static char CommandPeriod(void)
 {
 	KeyMap map;
 	
@@ -501,7 +501,7 @@ pascal void Key(EventRecord *e, char dontProcess)
 
 #pragma mark -
 
-static pascal void SOCKSConnect(connectionPtr conn)
+static void SOCKSConnect(connectionPtr conn)
 {
 	Str255 send;
 	long nn;

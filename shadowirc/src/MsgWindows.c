@@ -106,13 +106,13 @@ const RGBColor mircColors[kMaxMircColors]=	{	{pct1000,	pct1000,	pct1000},
 												{pct774,	pct774,	pct774}
 											};
 
-static pascal Style DoAddHunk(Style s, myStScrpHandle sty, int i, int *nsty);
-static pascal Style DoAddColorHunk(Style s, myStScrpHandle sty, int i, int *nsty, int colornum, short colorMethod);
-static pascal void DoAddRGBColorHunk(myStScrpHandle sty, int i, int *nsty, const RGBColor *front, const RGBColor *back);
+static Style DoAddHunk(Style s, myStScrpHandle sty, int i, int *nsty);
+static Style DoAddColorHunk(Style s, myStScrpHandle sty, int i, int *nsty, int colornum, short colorMethod);
+static void DoAddRGBColorHunk(myStScrpHandle sty, int i, int *nsty, const RGBColor *front, const RGBColor *back);
 
 
 static WEScrollUPP sScrollerUPP = 0;
-static pascal void TextScrolled(WEReference we);
+static void TextScrolled(WEReference we);
 
 static void ScrollBarChanged(WEReference we, long val);
 
@@ -351,7 +351,7 @@ pascal void MWPage(MWPtr mw, char up)
 	}
 }
 
-static pascal void TextScrolled(WEReference we)
+static void TextScrolled(WEReference we)
 {
 	MWPtr mw;
 	
@@ -1034,7 +1034,7 @@ pascal void MWDelete(MWPtr w)
 	DisposePtr((Ptr)w);
 }
 
-static pascal Style DoAddHunk(Style s, myStScrpHandle sty, int i, int *nsty)
+static Style DoAddHunk(Style s, myStScrpHandle sty, int i, int *nsty)
 {
 	myScrpSTElement *q;
 
@@ -1057,7 +1057,7 @@ static pascal Style DoAddHunk(Style s, myStScrpHandle sty, int i, int *nsty)
 	return s;
 }
 
-static pascal Style DoAddColorHunk(Style s, myStScrpHandle sty, int i, int *nsty, int colornum, short colorMethod)
+static Style DoAddColorHunk(Style s, myStScrpHandle sty, int i, int *nsty, int colornum, short colorMethod)
 {
 	myScrpSTElement *q;
 
@@ -1089,7 +1089,7 @@ static pascal Style DoAddColorHunk(Style s, myStScrpHandle sty, int i, int *nsty
 	return s;
 }
 
-static pascal void DoAddRGBColorHunk(myStScrpHandle sty, int i, int *nsty, const RGBColor *front, const RGBColor *back)
+static void DoAddRGBColorHunk(myStScrpHandle sty, int i, int *nsty, const RGBColor *front, const RGBColor *back)
 {
 	myScrpSTElement *q;
 

@@ -36,7 +36,7 @@ int main(void);
 void ToolboxInit(void);
 void ApplicationInit(void);
 
-static pascal void RunStartupConnections(void)
+static void RunStartupConnections(void)
 {
 	linkPtr curLink;
 

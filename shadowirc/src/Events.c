@@ -288,7 +288,7 @@ static void CloseFrontWindow(void)
 
 #pragma mark -
 
-static pascal OSStatus AboutWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+static OSStatus AboutWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
  {
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;

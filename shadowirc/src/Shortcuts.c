@@ -36,7 +36,7 @@
 #include "IRCCFPrefs.h"
 
 inline void PluginShortcutText(Handle lh);
-static pascal void ParseShortcutText(ConstStr255Param s);
+static void ParseShortcutText(ConstStr255Param s);
 
 #define kNibShortcuts CFSTR("shortcuts")
 #define kNibWinShortcuts CFSTR("Shortcuts")
@@ -135,7 +135,7 @@ static void SetShortcutWindow(WindowRef shortcutsWin, int group)
 	}
 }
 
-static pascal OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+static OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
 	WindowRef shortcutsWin = (WindowRef)userData;
@@ -381,7 +381,7 @@ pascal void ProcessShortcutText(LongString *ls, short *cursorPos, short *endPos)
 	}
 }
 
-static pascal void ParseShortcutText(ConstStr255Param s)
+static void ParseShortcutText(ConstStr255Param s)
 {
 	Str255 s2,s3;
 	LongString ls;

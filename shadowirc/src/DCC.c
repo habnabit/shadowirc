@@ -64,26 +64,26 @@ typedef struct dccsendbit {
 	char stuffDCC;
 } dccsendbit, *dccsendbitPtr;
 
-static pascal void str10neg(StringPtr s);
+static void str10neg(StringPtr s);
 
-static pascal connectionPtr DCCFindSendPort(unsigned short port);
-static pascal void DCCSendReposition(connectionPtr conn, long newpos);
+static connectionPtr DCCFindSendPort(unsigned short port);
+static void DCCSendReposition(connectionPtr conn, long newpos);
 
-static pascal char DCCPutFile(connectionPtr x, char forceSave);
-static pascal void DCCSendFileChunk(connectionPtr *cn);
+static char DCCPutFile(connectionPtr x, char forceSave);
+static void DCCSendFileChunk(connectionPtr *cn);
 static void DCCGetLineChat(connectionPtr conn, CEPtr c);
 static void DCCGetLineGet(connectionPtr conn, CEPtr c);
 static void DCCGetLineSend(connectionPtr conn, CEPtr c);
-static pascal void StartDCCGet(connectionPtr x);
+static void StartDCCGet(connectionPtr x);
 
 static void DCCSendFileNavHookMouseDown(NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
-static pascal void DCCSendFileNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
+static void DCCSendFileNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
 
-static pascal void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, StringPtr s, long revNum);
-static pascal void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, StringPtr s, long revNum);
-static pascal void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr255Param uah, StringPtr s, short type);
+static void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, StringPtr s, long revNum);
+static void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, StringPtr s, long revNum);
+static void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr255Param uah, StringPtr s, short type);
 
-static pascal void DCCNMRequest(connectionPtr x, char overwriteFile);
+static void DCCNMRequest(connectionPtr x, char overwriteFile);
 
 char IsDCCName(ConstStringPtr s)
 {
@@ -269,7 +269,7 @@ pascal connectionPtr DCCFind(linkPtr link, short typ, ConstStr255Param fr)
 	return 0;
 }
 
-static pascal connectionPtr DCCFindSendPort(unsigned short port)
+static connectionPtr DCCFindSendPort(unsigned short port)
 {
 	connectionPtr c;
 
@@ -283,7 +283,7 @@ static pascal connectionPtr DCCFindSendPort(unsigned short port)
 
 #pragma mark -
 
-static pascal void DCCNMRequest(connectionPtr x, char overwriteFile)
+static void DCCNMRequest(connectionPtr x, char overwriteFile)
 {
 	LongString ls;
 	ConstStringPtr s;
@@ -407,7 +407,7 @@ static void DCCSendFileNavHookMouseDown(NavCBRecPtr callBackParms, NavCallBackUs
 	}
 }
 
-static pascal void DCCSendFileNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD)
+static void DCCSendFileNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD)
 {
 	static short gLastTryWidth;
 	static short gLastTryHeight;
@@ -540,7 +540,7 @@ pascal char DCCGetAFile(FSSpec *f, char *macbinary)
 	return b;
 }
 
-static pascal char DCCPutFile(connectionPtr x, char forceSave)
+static char DCCPutFile(connectionPtr x, char forceSave)
 {
 	dccGETDataPtr 	dd=(dccGETDataPtr)x->dcc->dccData;
 	ConstStringPtr s;
@@ -555,7 +555,7 @@ static pascal char DCCPutFile(connectionPtr x, char forceSave)
 	return MyStandardPutFile(s, dd->gfile.name, 'BINA', 'SIRC', kNNoTypePopup, &dd->gfile, true) <= 0;
 }
 
-static pascal void StartDCCGet(connectionPtr x)
+static void StartDCCGet(connectionPtr x)
 {
 	if(x->dcc->dccFlags == opening || x->dcc->dccFlags == open) //already open!!
 		return;
@@ -1023,7 +1023,7 @@ pascal void DCCClose(connectionPtr *cn, char silent)
 	}
 }
 
-static pascal void DCCSendReposition(connectionPtr conn, long newpos)
+static void DCCSendReposition(connectionPtr conn, long newpos)
 {
 	dccSENDDataPtr dd = (dccSENDDataPtr)conn->dcc->dccData;
 	long eof;
@@ -1053,7 +1053,7 @@ static pascal void DCCSendReposition(connectionPtr conn, long newpos)
 	}
 }
 
-static pascal void DCCSendFileChunk(connectionPtr *cn)
+static void DCCSendFileChunk(connectionPtr *cn)
 {
 	long off, eof, left, readIn, padLen;
 	int i;
@@ -1181,7 +1181,7 @@ static pascal void DCCSendFileChunk(connectionPtr *cn)
 }
 
 //Do not show window automatically.
-static pascal MWPtr DoJoinDCC(ConstStr255Param n, linkPtr link)
+static MWPtr DoJoinDCC(ConstStr255Param n, linkPtr link)
 {
 	MWPtr mw = MWFindDCC(n, link);
 	
@@ -1668,7 +1668,7 @@ void dccEvent(CEPtr c, connectionPtr conn)
 
 #pragma mark -
 
-static pascal void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, StringPtr s, long revNum)
+static void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, StringPtr s, long revNum)
 {
 	LongString ls;
 	Str255 des, c, st;
@@ -1739,7 +1739,7 @@ static pascal void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255
 		DCCOpen(&x);
 }
 
-static pascal void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, StringPtr s, long revNum)
+static void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, StringPtr s, long revNum)
 {
 	const short t = dccGET;
 	Str255 c;
@@ -1843,7 +1843,7 @@ static pascal void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255P
 }
 
 //DCC REVERSE PROTOCOL refcon filename ip port [size]
-static pascal void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr255Param uah, StringPtr s, short type)
+static void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr255Param uah, StringPtr s, short type)
 {
 	Str255 c, des, dccTypeStr, st;
 	connectionPtr x;
@@ -2082,7 +2082,7 @@ pascal long ulongval(ConstStr255Param s)
 	return l;
 }
 
-static pascal void str10neg(StringPtr s)
+static void str10neg(StringPtr s)
 {
 	unsigned char y[]="\p4294967296";
 	int i,x,c=0;

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -37,13 +37,13 @@
 #include "inline.h"
 #include "TextManip.h"
 
-static pascal void MWDestroyWidget2(mwWidgetPtr w);
+static void MWDestroyWidget2(mwWidgetPtr w);
 inline mwPanePtr MWInsertPaneAfter(MWPtr mw, short align);
-static pascal void UpdateTextRegion(mwPanePtr w);
-static pascal void UpdateInputRegion(mwPanePtr w);
-static pascal void DrawInputPane(mwPanePtr o);
+static void UpdateTextRegion(mwPanePtr w);
+static void UpdateInputRegion(mwPanePtr w);
+static void DrawInputPane(mwPanePtr o);
 
-static pascal void UpdateInputRegion(mwPanePtr w)
+static void UpdateInputRegion(mwPanePtr w)
 {
 	MWPtr mw = w->mw;
 	LongRect lr;
@@ -63,7 +63,7 @@ static pascal void UpdateInputRegion(mwPanePtr w)
 	WEUpdate(0, mw->il);
 }
 
-static pascal void MWInputPaneClick(mwPanePtr o, const EventRecord *e)
+static void MWInputPaneClick(mwPanePtr o, const EventRecord *e)
 {
 	extern char iwFront;
 	
@@ -109,7 +109,7 @@ static pascal void MWInputPaneClick(mwPanePtr o, const EventRecord *e)
 	}
 }
 
-static pascal void DrawInputPane(mwPanePtr o)
+static void DrawInputPane(mwPanePtr o)
 {
 	Rect r;
 	MWPtr mw = o->mw;
@@ -381,7 +381,7 @@ pascal void MWPaneUpdate(MWPtr mw)
 	SetPort(g);
 }
 
-static pascal void UpdateTextRegion(mwPanePtr w)
+static void UpdateTextRegion(mwPanePtr w)
 {
 	MWPtr mw = w->mw;
 	LongRect lr;
@@ -797,7 +797,7 @@ pascal mwWidgetPtr MWNewWidget(MWPtr mw, long type, short align, short width)
 	return o;
 }
 
-static pascal void MWDestroyWidget2(mwWidgetPtr w)
+static void MWDestroyWidget2(mwWidgetPtr w)
 {
 	pMWWidgetDestroyData p;
 	

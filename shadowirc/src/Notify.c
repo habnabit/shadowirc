@@ -33,10 +33,10 @@ typedef struct NotifyRec {
 static NMUPP nmResponseProc = 0;
 static NotifyPtr nmList = 0;
 	
-static pascal NMRecPtr NotifyAdd(void);
-static pascal void NotifyReply(NMRec *n);
+static NMRecPtr NotifyAdd(void);
+static void NotifyReply(NMRec *n);
 
-static pascal NMRecPtr NotifyAdd(void)
+static NMRecPtr NotifyAdd(void)
 {
 	NotifyPtr n = (NotifyPtr)NewPtr(sizeof(NotifyRec));
 	n->next = nmList;
@@ -65,7 +65,7 @@ pascal void Notify(char mark, Handle icon, Handle sound, ConstStr255Param s)
 	NMInstall(n);
 }
 
-static pascal void NotifyReply(NMRec *n)
+static void NotifyReply(NMRec *n)
 {
 	DisposePtr((Ptr)n->nmStr);
 	n->nmStr = 0;

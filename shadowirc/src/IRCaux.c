@@ -39,7 +39,7 @@
 #include "TextManip.h"
 #include "MenuCommands.h"
 
-static pascal void startConnection(linkPtr link);
+static void startConnection(linkPtr link);
 
 pascal void ServerOK(short status, linkPtr link)
 {
@@ -289,7 +289,7 @@ int connection2(connectionPtr conn)
         return 0;
 }
 
-pascal void startConnection(linkPtr link)
+static void startConnection(linkPtr link)
 {
 	linkPrefsPtr lp=link->linkPrefs;
 	LongString ls;

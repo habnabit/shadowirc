@@ -38,29 +38,29 @@
 static SLNetsHand netsRes = 0;
 static SLNetsPtr netsR = 0;
 
-static pascal void HiliteButtons(DialogPtr d, short net, short serv);
+static void HiliteButtons(DialogPtr d, short net, short serv);
 INLINE void SetupPrefsFile(void);
-static pascal void ServerOpenPrefs(void);
+static void ServerOpenPrefs(void);
 
 INLINE short findServer(SLServHand sv, Str255 s);
 INLINE short findNetworkType(long type);
-static pascal void fillNetsList(ListHandle nets);
+static void fillNetsList(ListHandle nets);
 pascal void SetOneServer(ListHandle servs, short curNet, short curServ, SLServHand servers[]);
 pascal void fillServsList(ListHandle servs, short curNet, SLServHand servers[]);
 pascal void SetupServers(SLServHand *servers[]);
 pascal void ReleaseServers(SLServHand servers[], char save);
 
 pascal void WriteString(short ref, StringPtr s);
-static pascal void ExportServers(SLServHand servers[], short ref);
+static void ExportServers(SLServHand servers[], short ref);
 INLINE void DoExport(SLServHand servers[]);
 pascal char AddServer(SLServHand servers[], short curNet, short curServ);
 INLINE char EditServer(SLServHand servers[], short curNet, short curServ);
 INLINE void DeleteServer(SLServHand servers[], short curNet, short curServ);
 INLINE char DoDefaults(ListHandle nets, ListHandle servs, SLServHand *servers[]);
-static pascal unsigned char ServerDialogFilter(DialogPtr d, EventRecord *e, short *item);
+static unsigned char ServerDialogFilter(DialogPtr d, EventRecord *e, short *item);
 pascal void DoServerSelect(ServerListServiceData *p);
 
-static pascal void HiliteButtons(DialogPtr d, short net, short serv)
+static void HiliteButtons(DialogPtr d, short net, short serv)
 {
 	char a, b;
 	
@@ -107,7 +107,7 @@ INLINE void SetupPrefsFile(void)
 	UseResFile(rf);
 }
 
-static pascal void ServerOpenPrefs(void)
+static void ServerOpenPrefs(void)
 {
 	short rf = CurResFile();
 	UseResFile(mainResNum);
@@ -215,7 +215,7 @@ pascal void fillServsList(ListHandle servs, short curNet, SLServHand servers[])
 	HUnlock((Handle)sH);
 }
 
-static pascal void fillNetsList(ListHandle nets)
+static void fillNetsList(ListHandle nets)
 {
 	int x;
 	Point c;
@@ -280,7 +280,7 @@ pascal void WriteString(short ref, StringPtr s)
 	FSWrite(ref, &l, &s[1]);
 }
 
-static pascal void ExportServers(SLServHand servers[], short ref)
+static void ExportServers(SLServHand servers[], short ref)
 {
 	int x, n = netsR->count;
 	int y, m;
@@ -540,7 +540,7 @@ static struct {
 	short *curNet, *curServ;
 } slData;
 
-static pascal unsigned char ServerDialogFilter(DialogPtr d, EventRecord *e, short *item)
+static unsigned char ServerDialogFilter(DialogPtr d, EventRecord *e, short *item)
 {
 	#pragma unused(item)
 	GrafPtr gp;

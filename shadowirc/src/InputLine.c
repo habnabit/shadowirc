@@ -50,12 +50,12 @@ char noFloatingInput = 0;
 
 inline void IWInternalDraw(iwWidgetPtr o);
 
-static pascal char _ILInsertLine(WEReference il, LongString *ls, char select);
-static pascal char _ILSetLine(WEReference il, LongString *ls);
-static pascal char _ILGetLine(WEReference il, LongString *ls);
-static pascal long _ILGetHpos(MWPtr mw);
-static pascal CharsHandle _ILGetHist(MWPtr mw);
-static pascal void _ILSetHpos(MWPtr mw, long hp);
+static char _ILInsertLine(WEReference il, LongString *ls, char select);
+static char _ILSetLine(WEReference il, LongString *ls);
+static char _ILGetLine(WEReference il, LongString *ls);
+static long _ILGetHpos(MWPtr mw);
+static CharsHandle _ILGetHist(MWPtr mw);
+static void _ILSetHpos(MWPtr mw, long hp);
 
 pascal void IWRecalculateRects(void)
 {
@@ -789,7 +789,7 @@ pascal WEReference ILGetWE(void)
 	}
 }
 
-static pascal CharsHandle _ILGetHist(MWPtr mw)
+static CharsHandle _ILGetHist(MWPtr mw)
 {
 	if(!noFloatingInput)
 		return inputLine._hist;
@@ -807,7 +807,7 @@ pascal CharsHandle ILGetHist(void)
 	return _ILGetHist(MWFromWindow(ActiveNonFloatingWindow()));
 }
 
-static pascal void _ILSetHpos(MWPtr mw, long hp)
+static void _ILSetHpos(MWPtr mw, long hp)
 {
 	if(!noFloatingInput)
 		inputLine._hpos = hp;
@@ -824,7 +824,7 @@ pascal void ILSetHpos(long hp)
 	_ILSetHpos(mw, hp);
 }
 
-static pascal long _ILGetHpos(MWPtr mw)
+static long _ILGetHpos(MWPtr mw)
 {
 	if(!noFloatingInput)
 		return inputLine._hpos;
@@ -852,7 +852,7 @@ pascal void GetInputLineCursorSelection(long *start, long *finish)
 	WEGetSelection(start, finish, ILGetWE());
 }
 
-static pascal char _ILSetLine(WEReference il, LongString *ls)
+static char _ILSetLine(WEReference il, LongString *ls)
 {
 	if(il)
 	{
@@ -882,7 +882,7 @@ pascal void SetInputLine(LongString *ls)
 	_ILSetLine(ILGetWE(), ls);
 }
 
-static pascal char _ILGetLine(WEReference il, LongString *ls)
+static char _ILGetLine(WEReference il, LongString *ls)
 {
 	long i;
 	
@@ -916,7 +916,7 @@ pascal void GetInputLine(LongString *line)
 	_ILGetLine(ILGetWE(), line);
 }
 
-static pascal char _ILInsertLine(WEReference il, LongString *ls, char select)
+static char _ILInsertLine(WEReference il, LongString *ls, char select)
 {
 	short i;
 	long sl, el;
@@ -1052,8 +1052,8 @@ restart:
 	reentrant = 0;
 }
 
-static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers);
-static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers)
+static void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers);
+static void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers)
 {
 	char sk=(modifiers&shiftKey)==shiftKey;
 	iwStatusObjectPtr stats = (iwStatusObjectPtr)o->data;

@@ -33,7 +33,7 @@ connectionPtr fConn;
 
 linkPtr firstLink;
 
-static pascal void ConnSetInputFunc(connectionPtr conn);
+static void ConnSetInputFunc(connectionPtr conn);
 
 pascal short CountLinks(void)
 {
@@ -57,7 +57,7 @@ pascal linkPtr GetLinkNum(int i)
 	return 0;	
 }
 
-static pascal void InitLink(linkPtr l, linkPrefsPtr lp, int linkNum)
+static void InitLink(linkPtr l, linkPrefsPtr lp, int linkNum)
 {
 	int y;
 	
@@ -233,7 +233,7 @@ pascal void ConnSetup(connectionPtr c, ConstStr255Param name, unsigned short por
 	}
 }
 
-static pascal void ConnSetInputFunc(connectionPtr conn)
+static void ConnSetInputFunc(connectionPtr conn)
 {
 	switch(conn->connType)
 	{
@@ -357,7 +357,7 @@ pascal char ConnStartNetworking()
 	return true;
 }
 
-static pascal void ConnFinishStaleConnections(void)
+static void ConnFinishStaleConnections(void)
 {
 	connectionPtr conn, conn2;
 	int x=0, y=0, z=0;
