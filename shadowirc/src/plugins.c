@@ -774,7 +774,7 @@ static void ProcessApplicationPlugins()
 		// Loop through the CFArray and load each plugin
 		for(i=0; i < pluginCount; i++)
 		{
-			pluginBundle = (CFURLRef)CFArrayGetValueAtIndex(pluginRefs, i);
+			pluginBundle = (CFBundleRef)CFArrayGetValueAtIndex(pluginRefs, i);
 			pluginName = CFBundleGetIdentifier(pluginBundle);
 			if(LoadPluginFromBundle(pluginBundle, pluginName) != 0) // Couldn't load the plugin
 				CFRelease(pluginBundle);
