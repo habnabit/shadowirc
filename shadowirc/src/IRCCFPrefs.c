@@ -206,7 +206,7 @@ void ReadColorCFPrefs(RGBColor colors[])
 				colors[x] = ShadowIRCDefaultColors[x];
 			else
 			{
-				CFArrayGetValues(colorComponentArr, colorRange, &colorVals);
+				CFArrayGetValues(colorComponentArr, colorRange, (void *)&colorVals);
 				
 				CFNumberListToRGBColor(colorVals, &colors[x]);
 			}

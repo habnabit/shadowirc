@@ -737,7 +737,7 @@ static void ApplicationURLMenuInit(void)
 		plistItems = malloc(sizeof(CFStringRef) * num);
 		ApplicationMenuURLs = malloc(sizeof(CFURLRef) * (num / 2));
 		
-		CFArrayGetValues(plist, range, plistItems);
+		CFArrayGetValues(plist, range, (void *)plistItems);
 		
 		y = 0;
 		for(x = 0; x < num; x+= 2)
