@@ -405,6 +405,7 @@ struct dccRec {
 	short dccFlags;				//DCC connection flags. (A dccFlagsRec)
 	Ptr DCCInputFunc;
 	Str255 dccUserName;	//The name of the user we're chatting with
+	void* refcon;					//Reference constant.
 	Ptr dccData;					//Pointer to dcc data. If the dcc is a plugin dcc type, this is free for your own use.
 	long timeOpened;			//The time the connection was opened
 	char failedDCC;				//True if the reason the dcc is being closed is because it failed.

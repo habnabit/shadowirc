@@ -218,7 +218,6 @@ pascal char LinkCanMode(linkPtr link, char mode, char umode);
 pascal void deleteConnection(connectionPtr *c);
 
 pascal connectionPtr findConnectionSock(long sock);
-connectionPtr ConnFindRefcon(void* refcon);
 
 pascal connectionPtr pluginNewConnection(char textOrBinary);
 

@@ -332,6 +332,7 @@ pascal char DCCCreate(linkPtr link, short typ, ConstStr255Param fr, connectionPt
 		pstrcpy(fr, d->dccUserName);
 		d->dccType=typ;
 		d->failedDCC=0;
+		d->refcon = NULL;
 		d->dccData = 0;
 		d->reverse = 0;
 		d->dccFlags = 0;
@@ -806,7 +807,7 @@ pascal void DCCOpen(connectionPtr *x)
 	{
 		d->dccFlags=offered;
 		//Make a fake
-		cc->refCon = (void*)++dccSENDRevCount;
+		d->refcon = (void*)++dccSENDRevCount;
 		
 		args[0] = 0;
 		if(d->dccType == dccSEND)
@@ -828,7 +829,7 @@ pascal void DCCOpen(connectionPtr *x)
 			i++;
 		}
 
-		ulongstr((long)cc->refCon, pn);
+		ulongstr((long)d->refcon, pn);
 		
 		sp = dccTypToStr(d->dccType);
 		LSStrCat(11, &ls, "\pPRIVMSG ", d->dccUserName, "\p :\1DCC REVERSE ", sp, "\p ", pn, "\p ", des, "\p 0 0 ", args, "\p\1");
@@ -852,8 +853,8 @@ pascal void DCCOpen(connectionPtr *x)
 			
 			if(d->reverse)
 			{
-				NumToString((long)cc->refCon, des);
-				cc->refCon = 0;
+				NumToString((long)d->refcon, des);
+				d->refcon = 0;
 				
 				if(d->dccType == dccCHAT)
 					pstrcpy(kShadowIRCChatCookie, args);
@@ -1703,8 +1704,8 @@ static void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param u
 	{
 		NextArg(s, 0); //IP
 		NextArg(s, 0); //port
-		x->refCon = (void*)revNum;
 		x->ip.s_addr = x->port = 0;
+		d->refcon = (void*)revNum;
 		d->dccFlags = closed;
 		d->reverse = true;
 	}
@@ -1779,8 +1780,8 @@ static void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param ua
 	{
 		NextArg(s, 0); //IP
 		NextArg(s, 0); //port
-		x->refCon = (void*)revNum;
 		x->ip.s_addr = x->port = 0;
+		d->refcon = (void*)revNum;
 		d->dccFlags = closed;
 		d->reverse = true;
 	}
@@ -1840,6 +1841,18 @@ static void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param ua
 	
 	if(mainPrefs->autoDCCGet)
 		StartDCCGet(x);
+}
+
+static connectionPtr DCCFindRefcon(void* refcon)
+{
+	connectionPtr c;
+
+	linkfor(c, fConn)
+		if(c->dcc)
+			if(c->dcc->refcon == refcon)
+				return c;
+	
+	return 0;
 }
 
 //DCC REVERSE PROTOCOL refcon filename ip port [size]
@@ -1923,7 +1936,7 @@ static void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr255Param
 				}
 				if(type == dccGET) //the response from a dcc reverse send
 				{
-					x = ConnFindRefcon((void*)l);
+					x = DCCFindRefcon((void*)l);
 					if(x)
 					{
 						NextArg(s, 0); //name

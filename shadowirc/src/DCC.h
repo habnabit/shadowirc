@@ -135,6 +135,7 @@ typedef struct dccRec {
 	short dccFlags; //dccFlagsRec
 	DCCInputFuncPtr DCCInputFunc;
 	Str255 dccUserName;
+	void* refcon;
 	void* dccData;
 	long timeOpened;
 	char failedDCC;
