@@ -421,6 +421,18 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 			HitSelectConnectionMenu(hiCommand.menu.menuItemIndex);
 			return noErr;
 		
+                //Edit Menu
+                case kHICommandUndo:
+                case kHICommandCut:
+                case kHICommandCopy:
+                case kHICommandPaste:
+                case kHICommandClear:
+                case kHICommandSelectAll:
+                case 'FIND':                
+                case 'FAGN':
+                        HitEditMenu(hiCommand.menu.menuItemIndex);
+                        return noErr;
+                
 		//Command Menu
 		case 'COMD':
 			HitCommandsMenu(hiCommand.menu.menuItemIndex);
