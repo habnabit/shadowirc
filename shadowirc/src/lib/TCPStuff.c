@@ -34,6 +34,8 @@
 
 #include <machine/endian.h>
 #include <sys/types.h>
+#include <sys/uio.h>
+#include <sys/wait.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/ioctl.h>
@@ -54,6 +56,8 @@
 #endif
 
 #define SA struct sockaddr
+
+#define IDENT_TOOL "ident_tool"
 
 /*
  * TCPConnection defines
@@ -341,6 +345,99 @@ static int nblk_accept(int sockfd, struct sockaddr *addr, int *addrlen)
         return retval;
 }
 
+ssize_t read_fd(int fd, void *ptr, size_t nbytes, int *recvfd) {
+	struct msghdr msg;
+	struct iovec iov[1];
+	ssize_t n;
+
+	union {
+		struct cmsghdr cm;
+		char control[CMSG_SPACE(sizeof(int))];
+	} control_un;
+	struct cmsghdr *cmptr;
+	
+	msg.msg_control = control_un.control;
+	msg.msg_controllen = sizeof(control_un.control);
+
+	msg.msg_name = NULL;
+	msg.msg_namelen = 0;
+
+	iov[0].iov_base = ptr;
+	iov[0].iov_len = nbytes;
+	msg.msg_iov = iov;
+	msg.msg_iovlen = 1;
+
+	if ((n = recvmsg(fd, &msg, 0)) < 0)
+		return (n);
+
+	if ((cmptr = CMSG_FIRSTHDR(&msg)) != NULL &&
+			cmptr->cmsg_len == CMSG_LEN(sizeof(int))) {
+		if (cmptr->cmsg_level != SOL_SOCKET)
+			return -1;
+		if (cmptr->cmsg_type != SCM_RIGHTS)
+			return -1;
+		*recvfd = *((int *) CMSG_DATA(cmptr));
+	} else
+		*recvfd = -1; /* descriptor was not passed */
+
+	return (n);
+}
+
+int ident_bind(void) {
+	int fd = -1, sockfd[2], status;
+	char c, path[MAXPATHLEN];
+        CFBundleRef bundle;
+        CFURLRef resources, toolURL;
+	pid_t pid;
+        
+        /* Get path to ident_tool */
+        bundle = CFBundleGetMainBundle();
+        if (!bundle)
+            return -1;
+        
+        resources = CFBundleCopyResourcesDirectoryURL(bundle);
+        if (!resources)
+            return -1;
+            
+        toolURL = CFURLCreateCopyAppendingPathComponent(NULL, resources, CFSTR(IDENT_TOOL), FALSE);
+        CFRelease(resources);
+        if (!toolURL)
+            return FALSE;
+            
+        CFURLGetFileSystemRepresentation(toolURL, TRUE, (UInt8 *) &path, MAXPATHLEN);
+        CFRelease(toolURL);
+
+	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sockfd) != 0)
+		return -1;
+
+	switch(pid = fork()) {
+		case 0: /* child */
+			close(sockfd[0]);
+			dup2(sockfd[1], STDOUT_FILENO);
+			execl(path, IDENT_TOOL, NULL);
+			_exit(1);
+		case -1: /* error */
+			close(sockfd[0]);
+			close(sockfd[1]);
+			return -1;
+	}
+	close(sockfd[1]);
+	if (waitpid(pid, &status, 0) != pid) {
+		goto exit;
+	}
+	if (!WIFEXITED(status)) {
+		goto exit;
+	}
+	if ((status = WEXITSTATUS(status)) == 0) {
+                read_fd(sockfd[0], &c, 1, &fd);
+	} else {
+		errno = status;
+	}
+exit:
+	close(sockfd[0]);
+	return fd;
+}
+
 #pragma mark -
 
 /*
@@ -525,10 +622,20 @@ TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog)
         servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
         servaddr.sin_port = htons(localport);
                 
+        /*
+         * Special case (low) ident port
+         */
+        if(localport == 113) {
+            if((*sockfd = ident_bind()) < 0)
+                    return (T_Failed);
+        } else {
         if((bind(*sockfd, (SA *) &servaddr, sizeof(servaddr))) < 0)
                 return (T_Failed);
+        }
+        
         if (listen(*sockfd, backlog) < 0)
                 return (T_Failed);
+
         fd_add(*sockfd);
         return T_Listening;
 }

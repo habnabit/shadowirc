@@ -130,6 +130,7 @@
 			projectDirPath = "";
 			targets = (
 				20286C34FDCF999611CA2CEA,
+				F59209370317839001A80166,
 			);
 		};
 		20286C29FDCF999611CA2CEA = {
@@ -192,6 +193,7 @@
 				F552BF550211030901A80061,
 				F552BF570211030901A80061,
 				F552BF590211030901A80061,
+				F592093A031783A601A80166,
 				F5DB413C0213AAFA01A80061,
 			);
 			isa = PBXGroup;
@@ -201,6 +203,7 @@
 		};
 		20286C2CFDCF999611CA2CEA = {
 			children = (
+				F59209380317839001A80166,
 				F5059DA802A5C0C70132A983,
 				F552BF300211030901A80061,
 				F552BF440211030901A80061,
@@ -255,6 +258,7 @@
 				WRAPPER_EXTENSION = app;
 			};
 			dependencies = (
+				F57375420317F4930132A983,
 			);
 			isa = PBXApplicationTarget;
 			name = ShadowIRC;
@@ -300,7 +304,7 @@
 	<key>CFBundleExecutable</key>
 	<string>ShadowIRC</string>
 	<key>CFBundleGetInfoString</key>
-	<string>2.0a3, © 1996-2002 John Bafford</string>
+	<string>2.0a4, © 1996-2002 John Bafford</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>ShadowIRC Help</string>
 	<key>CFBundleHelpBookName</key>
@@ -316,11 +320,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0a3</string>
+	<string>2.0a4</string>
 	<key>CFBundleSignature</key>
 	<string>SIRC</string>
 	<key>CFBundleVersion</key>
-	<string>2.0a3</string>
+	<string>2.0a4</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 </dict>
@@ -395,6 +399,7 @@
 				F5059DAA02A5C0C70132A983,
 				F5BA62B3030FFFCA0132A983,
 				F5BA63C90315E9C70132A983,
+				F59209B9031789ED01A80166,
 			);
 			isa = PBXResourcesBuildPhase;
 		};
@@ -2054,6 +2059,91 @@
 		};
 		F5732707021B6A3E01A82AF3 = {
 			fileRef = F5DB41490213AAFA01A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F57375420317F4930132A983 = {
+			isa = PBXTargetDependency;
+			target = F59209370317839001A80166;
+		};
+		F59209330317839001A80166 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXHeadersBuildPhase;
+		};
+		F59209340317839001A80166 = {
+			buildActionMask = 2147483647;
+			files = (
+				F592093C031783DF01A80166,
+			);
+			isa = PBXSourcesBuildPhase;
+		};
+		F59209350317839001A80166 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXFrameworksBuildPhase;
+		};
+		F59209360317839001A80166 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+		};
+		F59209370317839001A80166 = {
+			buildPhases = (
+				F59209330317839001A80166,
+				F59209340317839001A80166,
+				F59209350317839001A80166,
+				F59209360317839001A80166,
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ident_tool;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+			);
+			isa = PBXToolTarget;
+			name = ident_tool;
+			productInstallPath = /usr/local/bin;
+			productName = ident_tool;
+			productReference = F59209380317839001A80166;
+			shouldUseHeadermap = 0;
+		};
+		F59209380317839001A80166 = {
+			isa = PBXExecutableFileReference;
+			path = ident_tool;
+			refType = 3;
+		};
+		F592093A031783A601A80166 = {
+			children = (
+				F592093B031783DF01A80166,
+			);
+			isa = PBXGroup;
+			name = ident_tool;
+			path = src/ident_tool;
+			refType = 4;
+		};
+		F592093B031783DF01A80166 = {
+			isa = PBXFileReference;
+			path = ident_tool.c;
+			refType = 4;
+		};
+		F592093C031783DF01A80166 = {
+			fileRef = F592093B031783DF01A80166;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F59209B9031789ED01A80166 = {
+			fileRef = F59209380317839001A80166;
 			isa = PBXBuildFile;
 			settings = {
 			};
