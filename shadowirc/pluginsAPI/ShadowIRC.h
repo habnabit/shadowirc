@@ -2409,7 +2409,7 @@ pascal void SetInputLine(LongString *ls);
 		¥ If you don't use these API functions, you will also disrupt ShadowIRC's floating windows mechanism.
 
 		¥ DO NOT change the a dialog or window's refCon, since it's a pointer to a struct that tells ShadowIRC
-		where the window came from. Use pluginSetWRefCon() and pluginGetWRefCon()
+		where the window came from. Use GetWindowProperty()/SetWindowProperty() instead.
 		
 		¥ NEVER delete dialogs or windows behind ShadowIRC's back, since the refCon is a pointer
 		to a struct containing information about where the window came from. Although small,
@@ -2462,19 +2462,6 @@ pascal void pluginDisposeWindow(WindowPtr w);
 /*	Deletes a window created by a plugin.
 		Input:	w - window to delete
 		Output:	none
-*/
-
-pascal void pluginSetWRefCon(WindowPtr w, long refcon);
-/*	Sets the reference cosntant for a plugin window.
-		Input:	w - window to set reference constant for
-					refcon - reference constant
-		Output:	none
-*/
-
-pascal long pluginGetWRefCon(WindowPtr w);
-/*	Gets the reference cosntant for a plugin window.
-		Input:	w - window to get reference constant for
-		Output:	return value: reference constant
 */
 
 pascal void* GetPluginWindowOwner(WindowPtr w);

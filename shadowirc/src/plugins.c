@@ -996,7 +996,6 @@ pascal WindowPtr pluginNewWindow(const Rect *boundsRect, ConstStr255Param title,
 	p=(pluginDlgInfoPtr)NewPtr(sizeof(pluginDlgInfo));
 	p->magic=PLUGIN_MAGIC;
 	p->pluginRef = sidr.yourInfo;
-	p->refcon = 0;
 	
 	w = WCreate(boundsRect, title, whichWDEF, goAwayFlag, (long)p, floats);
 	if(!w) //error creating window, kill the data ptr
@@ -1014,31 +1013,6 @@ pascal plugsPtr GetPluginWindowOwner(WindowPtr w)
 	}
 	
 	return 0;
-}
-
-pascal void pluginSetWRefCon(WindowPtr w, long l)
-{
-	if(w)
-	{
-		pluginDlgInfoPtr p = (pluginDlgInfoPtr)GetWRefCon(w);
-		if(p)
-			p->refcon = l;
-	}
-}
-
-pascal long pluginGetWRefCon(WindowPtr w)
-{
-	if(w)
-	{
-		pluginDlgInfoPtr p = (pluginDlgInfoPtr)GetWRefCon(w);
-		
-		if(p)
-			return p->refcon;
-		else
-			return 0;
-	}
-	else
-		return 0;
 }
 
 pascal void pluginDisposeWindow(WindowPtr d)

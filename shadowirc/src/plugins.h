@@ -247,7 +247,6 @@ struct plugsRec {
 
 typedef struct pluginDlgInfo {
 	OSType magic;
-	long refcon;
 	plugsPtr pluginRef;
 } pluginDlgInfo, *pluginDlgInfoPtr;
 
@@ -1182,8 +1181,6 @@ pascal DialogPtr pluginNewDialog(short dialogID);
 pascal void pluginDisposeDialog(DialogPtr d);
 pascal WindowPtr pluginNewWindow(const Rect *boundsRect, ConstStr255Param title, short theProc, long flags);
 pascal void pluginDisposeWindow(WindowPtr d);
-pascal void pluginSetWRefCon(WindowPtr w, long l);
-pascal long pluginGetWRefCon(WindowPtr w);
 pascal plugsPtr GetPluginWindowOwner(WindowPtr w);
 
 pascal char NewService(FourCharCode serviceType);
