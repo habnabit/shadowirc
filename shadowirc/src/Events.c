@@ -108,6 +108,32 @@ static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef the
 	return myErr;
 }
 
+static OSStatus MWConsoleEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
+{
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	switch(eventClass)
+	{
+		case kEventClassWindow:
+		{
+			switch(eventKind)
+			{
+				case kEventWindowShown:
+				case kEventWindowHidden:
+					CheckMenuItem(gWindowMenu, wConsoleItem, eventKind == kEventWindowShown);
+					break;
+			}
+		}
+		break;
+	}
+	
+	return result;
+}
+
 static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
@@ -222,6 +248,20 @@ void MWInstallEventHandlers(MWPtr mw)
 	
 	SetControlProperty(mw->vscr, kApplicationSignature, MW_MAGIC, sizeof(MWPtr), &mw);
 	SetControlAction(mw->vscr, caction);
+	
+	if(mw->winType == conWin)
+	{
+		static EventHandlerUPP conWinHandler = NULL;
+		const EventTypeSpec conEvents[] = {
+			{kEventClassWindow, kEventWindowShown},
+			{kEventClassWindow, kEventWindowHidden},
+		};
+		
+		if(!conWinHandler)
+			conWinHandler = NewEventHandlerUPP(MWConsoleEventHandler);
+		
+		InstallWindowEventHandler(mw->w, conWinHandler, GetEventTypeCount(conEvents), conEvents, mw, NULL);
+	}
 }
 
 #pragma mark -

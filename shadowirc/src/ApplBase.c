@@ -563,6 +563,9 @@ static OSStatus EventHandler(EventHandlerCallRef handlerCallRef, EventRef event,
 						{
 							if(!mw) //if it's not a message window, then it's an invalid target
 							{
+								DisableMenuCommand(gEditMenu, 'FIND');
+								DisableMenuCommand(gEditMenu, 'FAGN');
+						
 								InvalTarget(&CurrentTarget);
 								UpdateStatusLine();
 								DrawMWinStatus(consoleWin);

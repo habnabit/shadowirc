@@ -720,18 +720,6 @@ pascal void MenuBarClick(const EventRecord *e)
 	long l;
 	MWPtr mw = GetActiveMW();
 	
-	//Update edit menu
-	if(mw)
-	{
-		EnableMenuItem(gEditMenu, 9);
-		EnableMenuItem(gEditMenu, 10);
-	}
-	else
-	{
-		DisableMenuItem(gEditMenu, 9);
-		DisableMenuItem(gEditMenu, 10);
-	}
-	
 	//Update fonts menu, but only if we have one..
 	if(mw && gFontsMenu)
 	{
@@ -769,7 +757,6 @@ pascal void MenuBarClick(const EventRecord *e)
 		}
 	}
 	
-	CheckMenuItem(gWindowMenu, wConsoleItem, IsWindowVisible(consoleWin->w));
 	DoMenuEvent(MenuSelect(e->where));
 }
 
