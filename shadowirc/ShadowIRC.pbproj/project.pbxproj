@@ -40,7 +40,6 @@
 				F552BFBC0211030901A80061,
 				F552BFBD0211030901A80061,
 				F552BFBE0211030901A80061,
-				F552BFBF0211030901A80061,
 				F54C279E02152A0001A80061,
 			);
 			isa = PBXRezBuildPhase;
@@ -243,7 +242,6 @@
 				F552BF480211030901A80061,
 				F552BF490211030901A80061,
 				F552BF4F0211030901A80061,
-				F552BF580211030901A80061,
 				0867D6AAFE840B52C02AAC07,
 				F54C279D02152A0001A80061,
 				F573F87E021878C501A80061,
@@ -285,7 +283,6 @@
 				LIBRARY_SEARCH_PATHS = "";
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_CFLAGS = "-Wall";
-				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = ShadowIRC;
 				SECTORDER_FLAGS = "";
@@ -1146,12 +1143,6 @@
 			path = src/version.c;
 			refType = 4;
 		};
-		F552BF580211030901A80061 = {
-			isa = PBXFileReference;
-			name = version.r;
-			path = src/version.r;
-			refType = 4;
-		};
 		F552BF590211030901A80061 = {
 			isa = PBXFileReference;
 			name = WindowList.c;
@@ -1652,12 +1643,6 @@
 		};
 		F552BFBE0211030901A80061 = {
 			fileRef = F552BF4F0211030901A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F552BFBF0211030901A80061 = {
-			fileRef = F552BF580211030901A80061;
 			isa = PBXBuildFile;
 			settings = {
 			};
