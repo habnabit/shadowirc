@@ -562,7 +562,7 @@ enum PrefsData {
 	kShadowIRC10PreferencesVersion = 1,
 	kShadowIRC11OldPreferencesVersion = 2,
 	kShadowIRC11PreferencesVersion = 3,
-	kShadowIRC20Alpha10PreferencesVersion = 3,
+	kShadowIRC20Alpha10PreferencesVersion = 4,
 	PreferencesVersion = kShadowIRC20Alpha10PreferencesVersion,
 	PrefsUpdateLevel = 0,
 	SizeOfPrefsDataArea = sizeof(prefsRec) + (sizeof(linkPrefsRec)*maxLinks),
