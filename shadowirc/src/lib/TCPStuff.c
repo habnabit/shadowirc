@@ -116,6 +116,7 @@ enum statusType {
 typedef struct DNRRecord {
     OSErr ioResult;
     pthread_t thread;
+    pthread_mutex_t lock;
     Str255 name;
     struct addrinfo *addr_list;
 } DNRRecord, *DNRRecordPtr;
@@ -815,7 +816,8 @@ static void DestroyConnection(connectionIndex *cp)
 /*
  * FindAddressDNR
  * Look up the host and/or IP address passed in as drp->name
- * Return the result of gethostbyname() in drp->name
+ * Return the result of getaddrinfo() in drp->name
+ * Called as a thread, uses mutex locks around shared structure 'drp'
  * If timeout is reached by the TCP event loop, pthread_cancel is called on
  * this thread.
  */
@@ -831,7 +833,7 @@ static void FindAddressDNR(DNRRecordPtr drp)
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_flags = AI_DEFAULT;
-
+	pthread_mutex_lock(&drp->lock);
 	error = getaddrinfo(str, NULL, &hints, &drp->addr_list);
 	free(str);
 	/*
@@ -849,6 +851,7 @@ static void FindAddressDNR(DNRRecordPtr drp)
 	} else {
 		drp->ioResult = noErr;
 	}
+	pthread_mutex_unlock(&drp->lock);
 }
 
 /*
@@ -869,11 +872,14 @@ OSErr FindAddress(connectionIndex *cp, ConstStr255Param hostname)
 		{
 			connections[--cpi].dnrrp = (DNRRecordPtr)NewPtr(sizeof(DNRRecord));
 			err = MemError();
-			
+			if(pthread_mutex_init(&connections[cpi].dnrrp->lock, NULL) != 0)
+				err = -1;
 			if(!err)
 			{
+				pthread_mutex_lock(&connections[cpi].dnrrp->lock);
 				connections[cpi].dnrrp->ioResult = inProgress;
 				pstrcpy(hostname, connections[cpi].dnrrp->name);
+				pthread_mutex_unlock(&connections[cpi].dnrrp->lock);
 				connections[cpi].timeout = TickCount() + TO_FindAddress;
 				connections[cpi].status = CS_Searching;
 				
@@ -995,6 +1001,7 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 			 * Until dnrrp->ioResult is set by the applicable thread,
 			 * it is set to inProgress.
 			 */
+			pthread_mutex_lock(&c->dnrrp->lock);
 			if(c->dnrrp->ioResult == noErr)
 			{
 				cer->event = C_Found;
@@ -1023,6 +1030,7 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 				cer->value = 1;
 				cer->timedout = true;
 			}
+			pthread_mutex_unlock(&c->dnrrp->lock);
 			/*
 			 * If we earlier set the event to indicate an error,
 			 * we now clean up the associated data structures
