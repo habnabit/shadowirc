@@ -21,13 +21,6 @@
 
 #include <Carbon/Carbon.r>
 
-resource 'STR#' (128, "About Box Strings", locked, preload)
-{
-	{
-		"version "
-	};
-};
-
 resource 'STR#' (130, "Files", locked, preload)
 {
 	{

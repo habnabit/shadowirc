@@ -30,7 +30,6 @@ typedef struct STRnList {
 extern STRnPtr spFiles, spCM, spError, spInfo, spDCC, spTopic, spAppleURL, spServices, spSOCKS, spServer, spFile, spWhois;
 
 enum stringResources {
-	srAboutBox = 128,
 	srPreferencesItems = 129,
 	srFiles = 130,
 	
