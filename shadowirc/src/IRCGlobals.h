@@ -205,7 +205,6 @@ linkPrefs[10] size = linkPrefsSize
 */
 
 enum menuList {
-	menuBar = 256,
 	appleMenu = 256,
 	FileMenu = 257,
 	EditMenu = 258,
