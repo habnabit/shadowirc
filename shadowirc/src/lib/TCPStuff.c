@@ -299,6 +299,7 @@ pascal OSErr TCPReceiveUpTo(TCPConnectionPtr conn, char term, long timeout, Ptr 
 
 	while(!err && *readPos < readSize && !*gotterm)
 	{
+		//Copy from the buffer into the output
 		if(conn->incomingSize > 0)
 		{
 			*gotterm = (term == (readPtr[(*readPos)++] = *conn->incomingPtr));
@@ -306,7 +307,8 @@ pascal OSErr TCPReceiveUpTo(TCPConnectionPtr conn, char term, long timeout, Ptr 
 			conn->incomingSize--;
 			continue;
 		}
-
+		
+		//Fill the buffer
 		if(conn->incomingSize == 0)
 		{
 			if(timeout == 0 && TCPCharsAvailable(conn) == 0)
