@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -28,22 +28,15 @@
 #include "ServerList.h"
 #include "AppearanceHelp.h"
 
-#define enableinline 1
-#if enableinline
-	#define INLINE inline
-#else
-	#define INLINE pascal
-#endif
-
 static SLNetsHand netsRes = 0;
 static SLNetsPtr netsR = 0;
 
 static void HiliteButtons(DialogPtr d, short net, short serv);
-INLINE void SetupPrefsFile(void);
+inline void SetupPrefsFile(void);
 static void ServerOpenPrefs(void);
 
-INLINE short findServer(SLServHand sv, Str255 s);
-INLINE short findNetworkType(long type);
+inline short findServer(SLServHand sv, Str255 s);
+inline short findNetworkType(long type);
 static void fillNetsList(ListHandle nets);
 pascal void SetOneServer(ListHandle servs, short curNet, short curServ, SLServHand servers[]);
 pascal void fillServsList(ListHandle servs, short curNet, SLServHand servers[]);
@@ -52,11 +45,11 @@ pascal void ReleaseServers(SLServHand servers[], char save);
 
 pascal void WriteString(short ref, StringPtr s);
 static void ExportServers(SLServHand servers[], short ref);
-INLINE void DoExport(SLServHand servers[]);
+inline void DoExport(SLServHand servers[]);
 pascal char AddServer(SLServHand servers[], short curNet, short curServ);
-INLINE char EditServer(SLServHand servers[], short curNet, short curServ);
-INLINE void DeleteServer(SLServHand servers[], short curNet, short curServ);
-INLINE char DoDefaults(ListHandle nets, ListHandle servs, SLServHand *servers[]);
+inline char EditServer(SLServHand servers[], short curNet, short curServ);
+inline void DeleteServer(SLServHand servers[], short curNet, short curServ);
+inline char DoDefaults(ListHandle nets, ListHandle servs, SLServHand *servers[]);
 static unsigned char ServerDialogFilter(DialogPtr d, EventRecord *e, short *item);
 pascal void DoServerSelect(ServerListServiceData *p);
 
@@ -81,7 +74,7 @@ static void HiliteButtons(DialogPtr d, short net, short serv)
 	setButtonEnable(d, 8, a);
 }
 
-INLINE void SetupPrefsFile(void)
+inline void SetupPrefsFile(void)
 {
 	int n, x;
 	Handle h;
@@ -129,7 +122,7 @@ static void ServerOpenPrefs(void)
 
 #pragma mark -
 
-INLINE short findServer(SLServHand sv, Str255 s)
+inline short findServer(SLServHand sv, Str255 s)
 {
 	SLServPtr sp;
 	int x;
@@ -150,7 +143,7 @@ stop:
 	return x;
 }
 
-INLINE short findNetworkType(long type)
+inline short findNetworkType(long type)
 {
 	int x;
 	
@@ -320,7 +313,7 @@ static void ExportServers(SLServHand servers[], short ref)
 	WriteString(ref, "\p\nEND-LIST\n");
 }
 
-INLINE void DoExport(SLServHand servers[])
+inline void DoExport(SLServHand servers[])
 {
 	FSSpec fs;
 	short refNum;
@@ -376,7 +369,7 @@ INLINE void DoExport(SLServHand servers[])
 	}
 }
 
-INLINE char DoDefaults(ListHandle nets, ListHandle servs, SLServHand *servers[])
+inline char DoDefaults(ListHandle nets, ListHandle servs, SLServHand *servers[])
 {
 	Point c;
 	DialogPtr d;
@@ -417,7 +410,7 @@ INLINE char DoDefaults(ListHandle nets, ListHandle servs, SLServHand *servers[])
 		return false;
 }
 
-INLINE void DeleteServer(SLServHand servers[], short curNet, short curServ)
+inline void DeleteServer(SLServHand servers[], short curNet, short curServ)
 {
 	SLServHand s = servers[curNet];
 	
@@ -493,7 +486,7 @@ pascal char AddServer(SLServHand servers[], short curNet, short curServ)
 	return 0;
 }
 
-INLINE char EditServer(SLServHand servers[], short curNet, short curServ)
+inline char EditServer(SLServHand servers[], short curNet, short curServ)
 {
 	if(servers[curNet])
 	{
