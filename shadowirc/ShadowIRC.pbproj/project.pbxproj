@@ -271,7 +271,7 @@
 	<key>CFBundleExecutable</key>
 	<string>ShadowIRC</string>
 	<key>CFBundleGetInfoString</key>
-	<string>2.0a9, © 1996-2003 John Bafford</string>
+	<string>2.0a8, © 1996-2003 John Bafford</string>
 	<key>CFBundleHelpBookFolder</key>
 	<string>ShadowIRC Help</string>
 	<key>CFBundleHelpBookName</key>
@@ -287,11 +287,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0a9</string>
+	<string>2.0a8</string>
 	<key>CFBundleSignature</key>
 	<string>SIRC</string>
 	<key>CFBundleVersion</key>
-	<string>2.0a9</string>
+	<string>2.0a8</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 </dict>
