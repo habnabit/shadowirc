@@ -249,7 +249,7 @@ static void CreateIdentdConn(linkPtr link)
 				identConn->refCon = NewPString(conn->link->linkPrefs->user);
 			
 			//Allow for a 10 connection backlog. This is more than enough.
-			ConnNewListen(AF_UNSPEC, identConn, 10);
+			ConnNewListen(identConn, AF_UNSPEC, 10);
 		}
 	}
 }

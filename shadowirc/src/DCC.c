@@ -845,7 +845,7 @@ pascal void DCCOpen(connectionPtr *x)
 	}
 	else if(d->dccFlags == closed)
 	{
-		if(ConnNewListen(AF_UNSPEC, cc, 10))
+		if(ConnNewListen(cc, AF_UNSPEC, 10))
 		{
 			cc->port=ConnGetLocalPort(cc);
                         /*
