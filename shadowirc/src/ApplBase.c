@@ -741,8 +741,6 @@ static OSStatus DoResumeEvent(EventHandlerCallRef handlerCallRef, EventRef event
 	if(!noFloatingInput)
 		WEActivate(ILGetWE());
 	
-	ShowFloatingWindows();
-	
 	NotifyRemove(); //Clear notification manager requests.
 
 	p.inBackground=inBackground;
@@ -760,8 +758,6 @@ static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef even
 	if(!noFloatingInput)
 		WEDeactivate(ILGetWE());
 	
-	HideFloatingWindows();
-
 	p.inBackground=inBackground;
 	runPlugins(pContextSwitchMessage, &p);
 	
