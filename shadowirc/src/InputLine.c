@@ -326,10 +326,9 @@ void OpenInputLine()
 			offscreen=!RectInRgn(&mainPrefs->inputLoc, GetGrayRgn());
 			if(zeroPosition || offscreen)
 			{
-				BitMap screenBits;
 				short h,v;
-				GetQDGlobalsScreenBits(&screenBits);
-				sb = screenBits.bounds;
+				
+				GetAvailableWindowPositioningBounds(GetGDevice(), &sb);
 				if(zeroPosition)
 				{
 					h=80* inputLine.fi.widMax+16;
