@@ -78,7 +78,7 @@ pascal void Message(const LongString *msg);
 pascal long ShadowIRCVersion(StringPtr);
 pascal long ShadowIRCVersion2(StringPtr, StringPtr);
 
-FSSpec pluginsFolderFSSpec, pluginPrefsFSSpec;
+FSSpec pluginPrefsFSSpec;
 
 hmiListHand hmiList;
 
