@@ -579,29 +579,6 @@ inline char IsWS(char c)
 		return 0;
 }
 
-/*
-static char Punc(char c)
-{
-	if(	  c=='!'
-				|| c=='@'
-				|| c=='('
-				|| c==')'
-				|| c=='.'
-				|| c==','
-				|| c==':'
-				|| c=='+'
-				|| c=='"'
-				|| c=='\''
-				|| c=='?'
-				|| c=='<'
-				|| c=='>'
-				|| c=='*')
-		return 1;
-	else
-		return 0;
-}
-*/
-
 static char IsPunc(char c)
 {
 	switch(c)
