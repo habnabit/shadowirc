@@ -5,6 +5,8 @@
 "NoLogFolder" = "The currently specified log folder is invalid. Please choose another in the preferences dialog.";
 "NoDCCFolder" = "The currently specified DCC folder is invalid. Please choose another in the preferences dialog.";
 
+"UsingICFolder" = "Using Internet download folder instead.";
+
 "DirSelMessage" = "Please choose a folder.";
 
 "DCCSelectSaveLocation" = "Select a location to save to.";
