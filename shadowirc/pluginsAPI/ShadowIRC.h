@@ -2854,10 +2854,10 @@ pascal char ConnNewActive(connectionPtr conn);
 		Output:	return value: true if the attempt to open was successful, false if the attempt failed for one reason or another.
 */
 
-char ConnNewListen(int af, connectionPtr conn, int backlog);
+char ConnNewListen(connectionPtr conn, int af, int backlog);
 /*	Attempts to open a passive (incoming) TCP/IP connection. Uses the ip and port values in the connection.
-		Input:	af - address family (AF_INET/AF_INET6)
-			conn - connection to open
+		Input:	conn - connection to open
+			af - address family (PF_INET / PF_INET6)
 			backlog - maximum length the queue of pending connections may grow to
 		Output:	return value: true if the attempt to open was successful, false if the attempt failed for one reason or another.
 		Note:	¥ Set conn->ip to a specific IP to listen for connection attempts from a specific IP, or set it to zero to

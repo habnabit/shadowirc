@@ -68,7 +68,7 @@ typedef struct connectionEventRecord {
 //TCPConnections
 // XXX landonf: These will be reworked for TCP sockets
 // First long * argument is a connectionIndex
-OSErr NewListenConnection (int af, long * cp, u_short localport, int backlog);
+OSErr NewListenConnection (long * cp, int af, u_short localport, int backlog);
 pascal OSErr NewActiveConnection (long * cp, struct in_addr remotehost, u_short remoteport);
 
 pascal OSErr InitConnections(void);

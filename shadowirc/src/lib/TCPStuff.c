@@ -563,7 +563,7 @@ int TCPLocalIP(int sockfd, struct in_addr *ip)
     return (0);
 }
 
-int TCPRemoteIP(int sockfd, struct sockaddr *ip)
+int TCPRemoteIP(int sockfd, struct sockaddr *sa)
 {
     struct sockaddr_storage sas;
     int len;
@@ -572,7 +572,7 @@ int TCPRemoteIP(int sockfd, struct sockaddr *ip)
     if(getpeername(sockfd, (SA *) &sas, &len) < 0)
         return (-1);
     
-    memcpy(ip, &sas, sizeof(ip));
+    memcpy(sa, &sas, sizeof(struct sockaddr_storage));
     return (0);
 }
 
@@ -912,7 +912,7 @@ OSErr FindAddress(connectionIndex *cp, ConstStr255Param hostname)
  * NewListenConnection
  * Create a new listen socket, once listening set state to T_Listening
  */
-OSErr NewListenConnection(int af, connectionIndex *cp, u_short localport, int backlog)
+OSErr NewListenConnection(connectionIndex *cp, int af, u_short localport, int backlog)
 {
         int err;
 	connectionIndex cpi;

@@ -461,9 +461,9 @@ pascal char ConnNewActive(connectionPtr c)
 	return NewActiveConnection(&c->private_socket, c->ip, c->port)==0;
 }
 
-char ConnNewListen(int af, connectionPtr c, int backlog)
+char ConnNewListen(connectionPtr c, int af, int backlog)
 {
-	return NewListenConnection(af, &c->private_socket, c->port, backlog)==0;
+	return NewListenConnection(&c->private_socket, af, c->port, backlog)==0;
 }
 
 size_t ConnGetData(connectionPtr conn, Ptr d, size_t len)
