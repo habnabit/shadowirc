@@ -113,12 +113,12 @@ struct Connection {
 	Str255 name;
 	unsigned long lastData;
 
-	char UNUSED;
-	char tryingToConnect;
 	char textOrBinary;
 	char lineTerm;
 	
 	//Not in API
+	CONST short realConnType;
+	
 	CONST ConnInputFuncPtr InputFunc;
 	struct plugsRec* pluginRef;
 	
@@ -133,8 +133,6 @@ struct Connection {
 		short stage;
 		struct in_addr ip;
 	} socks;
-	
-	CONST short realConnType;
 };
 
 enum maxLinks {

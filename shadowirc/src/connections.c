@@ -281,7 +281,6 @@ pascal connectionPtr newConnection(short connType)
 		c->localip.s_addr=0;
 		c->name[0]=0;
 		c->port=0;
-		c->tryingToConnect=0;
 		c->lastData=now;
 		c->dcc=0;
 		c->pluginRef=0;
@@ -309,7 +308,6 @@ pascal void newIRCConnection(linkPtr link)
 	if(c)
 	{
 		link->connectStage=csStartingToConnect;
-		c->tryingToConnect=true;
 		c->link=link;
 		link->conn=c;
 	}

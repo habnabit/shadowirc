@@ -463,20 +463,23 @@ inline void checkConnections(void)
 		conn2=conn->next;
 		if(conn->connType == connSTALE && now >= conn->closeTime)
 			processStale(0, conn);
-		else if(conn->connType == connIRC && !conn->tryingToConnect)
+		else if(conn->connType == connIRC)
 		{
-			//Test and kill stale irc connections
-			if(conn->link && conn->link->conn != conn) //stale connection!
+			if(conn->link && conn->link->connectStage == csOnline)
 			{
-				LSConcatStrAndStr("\pStale connection deleted for link \"", conn->link->linkPrefs->linkName, &ls);
-				SMPrefixIrcleColor(&ls, dsConsole, '2');
-				deleteConnection(&conn);
-			}
-			else if(conn->lastData<(now-300))
-			{
-				LSConcatStrAndStr("\pPING ", conn->link->CurrentNick, &ls);
-				conn->lastData+=60;
-				ConnPutLS(&conn, &ls);
+				//Test and kill stale irc connections
+				if(conn->link->conn != conn) //stale connection!
+				{
+					LSConcatStrAndStr("\pStale connection deleted for link \"", conn->link->linkPrefs->linkName, &ls);
+					SMPrefixIrcleColor(&ls, dsConsole, '2');
+					deleteConnection(&conn);
+				}
+				else if(conn->lastData<(now-300))
+				{
+					LSConcatStrAndStr("\pPING ", conn->link->CurrentNick, &ls);
+					conn->lastData+=60;
+					ConnPutLS(&conn, &ls);
+				}
 			}
 		}
 		conn=conn2;
@@ -972,22 +975,18 @@ static void doTCPEvent(CEPtr c)
 	if(!conn) //dunno how we're supposed to process this...
 		return;
 
-	if(conn->tryingToConnect)
+	switch(c->event)
 	{
-		switch(c->event)
-		{
-			case C_Found:
-				memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
-				DisplayLookupResult(conn);
-				if(!conn->socks.secondLookup)
-					connection2(conn);
-				break;
-			
-			case C_Established:
-				memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
-				conn->tryingToConnect = false;
-				break;
-		}
+		case C_Found:
+			memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
+			DisplayLookupResult(conn);
+			if(!conn->socks.secondLookup)
+				connection2(conn);
+			break;
+		
+		case C_Established:
+			memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
+			break;
 	}
 	
 	conn->InputFunc(c, conn);

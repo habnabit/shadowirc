@@ -913,14 +913,10 @@ pascal void DCCOpen(connectionPtr *x)
 		NumToString(cc->port, args);
 		ConnSetup(cc, des, cc->port);
 		if(cc->connType == connSOCKS)
-		{
 			ConnFindAddress(cc, cc->name);
-			cc->tryingToConnect = true;
-		}
 		else
-		{
 			ConnNewActive(cc);
-		}
+		
 		if(1)
 		{
 			d->dccFlags=opening;
