@@ -81,6 +81,21 @@
 			settings = {
 			};
 		};
+		1452304306B90D730041B2E3 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.plist.xml;
+			name = ServerList.plist;
+			path = rsrc/ServerList.plist;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		1452304406B90D730041B2E3 = {
+			fileRef = 1452304306B90D730041B2E3;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		14886206068971DA00FEB302 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -652,6 +667,7 @@
 				F5059DA802A5C0C70132A983,
 				F552BF300211030901A80061,
 				F552BF480211030901A80061,
+				1452304306B90D730041B2E3,
 				F552BF490211030901A80061,
 				F552BF4F0211030901A80061,
 				F5059DA302A5C0930132A983,
@@ -1184,6 +1200,7 @@
 				14B760010688B95F0069164D,
 				14EB08CD0689648200B74698,
 				1401A78D069294AF0002FDCB,
+				1452304406B90D730041B2E3,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
