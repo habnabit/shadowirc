@@ -58,7 +58,6 @@ static void CreateNewPrefsMain(void);
 static void CreateNewPrefsLinks(void);
 static void CreateNewPrefs(void);
 static void AllocateNewPrefs(void);
-static void FolderErrorToConsole(CFStringRef errorKey);
 
 static pascal void DirSelRefNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
 
