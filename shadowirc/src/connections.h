@@ -113,7 +113,7 @@ struct Connection {
 	Str255 name;
 	unsigned long lastData;
 
-	char outgoing;
+	char UNUSED;
 	char tryingToConnect;
 	char textOrBinary;
 	char lineTerm;

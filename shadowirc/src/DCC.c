@@ -916,7 +916,6 @@ pascal void DCCOpen(connectionPtr *x)
 		{
 			ConnFindAddress(cc, cc->name);
 			cc->tryingToConnect = true;
-			cc->outgoing = true;
 		}
 		else
 		{
@@ -1831,7 +1830,8 @@ static pascal void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255P
 		i=des[0]+2;
 		pstrcpy(st, &des[i]);
 		des[0]+=des[i]+3;
-		*(short*)&des[i-1]=' (';
+		des[i-1] = ' ';
+		des[i] = '(';
 		des[des[0]]=')';
 	}
 	else
@@ -1839,7 +1839,8 @@ static pascal void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255P
 	
 	pstrcpy(des, &des[2]);
 	des[0]+=3;
-	*(short*)&des[1]=' [';
+	des[1] = ' ';
+	des[2] = '[';
 	des[des[0]]=']';
 	
 	dccTypeStr = dccTypToStr(t);

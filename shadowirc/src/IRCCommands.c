@@ -472,8 +472,7 @@ pascal void DoONotice(channelPtr ch, const LongString *text)
 	//display
 	
 	//output
-	LSConcatStrAndStr("\p[WALLOPS/", ch->chName, &wallopstext);
-	LSAppend2(wallopstext, '] ');
+	LSConcatStrAndStrAndStr("\p[WALLOPS/", ch->chName, "\p] ", &wallopstext);
 	LSConcatLSAndLS(&wallopstext, text, &wallopstext);
 	switch(link->linkPrefs->onoticeMethod)
 	{

@@ -1200,7 +1200,8 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 			Str255 temp;
 			
 			TimeString(now, mainPrefs->timestampSeconds, temp, 0);
-			SAppend2(temp, ': ');
+			SAppend1(temp, ':');
+			SAppend1(temp, ' ');
 			DoAddRGBColorHunk(sty, 0, &nsty, &shadowircColors[sicTimestampColor], 0);
 			i=temp[0]+1;
 			DoAddRGBColorHunk(sty, i, &nsty, &shadowircColors[sicStandard], 0);

@@ -271,7 +271,6 @@ pascal connectionPtr newConnection(short connType)
 
 		c->link=0;
 		c->private_socket=0;
-		c->outgoing=0;
 		if(mainPrefs->firewallType && (connType < connDNSIP || connType > connDNSNAME))
 		{
 			c->connType=connSOCKS;
@@ -309,7 +308,6 @@ pascal void newIRCConnection(linkPtr link)
 	connectionPtr c=newConnection(connIRC);
 	if(c)
 	{
-		c->outgoing=true;
 		link->connectStage=csStartingToConnect;
 		c->tryingToConnect=true;
 		c->link=link;
@@ -324,7 +322,6 @@ pascal connectionPtr ConnNewDNS(ConstStr255Param name, short type)
 	if(c)
 	{
 		pstrcpy(name, c->name);
-		c->outgoing = 1;
 		FindAddress(&c->private_socket, c->name);
 	}
 	
