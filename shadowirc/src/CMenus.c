@@ -324,7 +324,7 @@ static pascal void CMMWMake(cmmwData *d)
 		}
 	}
 	
-	if(d->noSelection && d->pane->creator == mwShadowIRCPane)
+	if(d->noSelection && d->pane->creator == kApplicationSignature)
 	{
 		CMILAdd(d, GetIntStringPtr(spCM, sCloseWindow), mcCloseWindow, 0);
 		CMILAdd(d, "\p-", mcNull, 0);
@@ -358,7 +358,7 @@ static pascal void CMMWMake(cmmwData *d)
 	}
 	else //selection
 	{
-		if(d->pane->creator == mwShadowIRCPane)
+		if(d->pane->creator == kApplicationSignature)
 		{
 			CMILAdd(d, GetIntStringPtr(spCM, sCopySelection), mcCopy, 0);
 			CMILAdd(d, GetIntStringPtr(spCM, sCopyToInputline), mcCopyIL, 0);
@@ -368,7 +368,7 @@ static pascal void CMMWMake(cmmwData *d)
 		}
 	}
 
-	if(!cmWindowIsText && !cmWindowIsHelp && d->pane->creator == mwShadowIRCPane)
+	if(!cmWindowIsText && !cmWindowIsHelp && d->pane->creator == kApplicationSignature)
 	{
 		ConstStringPtr s;
 		
@@ -395,7 +395,7 @@ static pascal void CMMWMake(cmmwData *d)
 		}
 	}
 	
-	if(d->noSelection && d->pane->creator == mwShadowIRCPane)
+	if(d->noSelection && d->pane->creator == kApplicationSignature)
 	{
 		if(mw->winType == conWin)
 		{

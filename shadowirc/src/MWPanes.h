@@ -30,7 +30,6 @@ enum mwAlign {
 };
 
 enum mwDefaultWidgets {
-	mwShadowIRCWidget = 'SIRC',
 	mwPluginWidget = 'PLUG',
 	
 	mwTopicWidget = 'topc',
@@ -47,7 +46,6 @@ typedef struct mwModesWidgetData {
 
 
 enum mwDefaultPanes {
-	mwShadowIRCPane = 'SIRC',
 	mwPluginPane = 'PLUG',
 	
 	mwTextPane = 'text',

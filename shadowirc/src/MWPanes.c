@@ -206,7 +206,7 @@ pascal void MWDestroyAllPanes(MWPtr mw)
 	while(o)
 	{
 		o2=o->next;
-		if(o->creator == mwShadowIRCPane && !o->pluginRef)
+		if(o->creator == kApplicationSignature && !o->pluginRef)
 		{
 			if(o->type==mwTextPane)
 			{
@@ -247,7 +247,7 @@ pascal void MWPaneActivate(MWPtr mw, char activate)
 	SetPortWindowPort(mw->w);
 	
 	linkfor(o, mw->paneList)
-		if(o->creator == mwShadowIRCPane && !o->pluginRef)
+		if(o->creator == kApplicationSignature && !o->pluginRef)
 		{
 			if(o->type==mwTextPane)
 			{
@@ -301,7 +301,7 @@ pascal void MWPaneClick(MWPtr mw, EventRecord *e)
 	o=MWFindPanePoint(mw,e->where);
 	if(o)
 	{
-		if(o->creator == mwShadowIRCPane && !o->pluginRef)
+		if(o->creator == kApplicationSignature && !o->pluginRef)
 		{
 			if(o->type == mwTextPane)
 			{
@@ -342,7 +342,7 @@ pascal void MWPaneUpdate(MWPtr mw)
 	SetPortWindowPort(mw->w);
 	
 	linkfor(o, mw->paneList)
-		if(o->creator == mwShadowIRCPane && !o->pluginRef)
+		if(o->creator == kApplicationSignature && !o->pluginRef)
 		{
 			if(o->type == mwTextPane)
 			{
@@ -438,7 +438,7 @@ pascal void MWPaneResize(MWPtr mw)
 	GetPortBounds(GetWindowPort(mw->w), &portRect);
 	InvalWindowRect(mw->w, &portRect);
 	linkfor(o, mw->paneList)
-		if(o->creator == mwShadowIRCPane && !o->pluginRef)
+		if(o->creator == kApplicationSignature && !o->pluginRef)
 		{
 			if(o->type == mwTextPane)
 				UpdateTextRegion(o);
@@ -603,7 +603,7 @@ pascal mwPanePtr MWNewPane(MWPtr mw, long type, short align, short height, short
 	}
 	else
 	{
-		o->creator=mwShadowIRCPane;
+		o->creator = kApplicationSignature;
 		o->pluginRef = 0;
 	}
 	o->type = type;
@@ -662,7 +662,7 @@ pascal void MWRecalculateRects(MWPtr mw)
 				lRight += o->askedWidth;
 			if(lRight > rLeft) //Houston, we have a problem
 			{
-				if(o->creator==mwShadowIRCWidget && o->type == mwTopicWidget)
+				if(o->creator== kApplicationSignature && o->type == mwTopicWidget)
 					lRight = rLeft - 2;
 				else // it's a plugin. Give 'em 16 pixels.
 					lRight = t + 15;
@@ -713,7 +713,7 @@ pascal mwWidgetPtr MWNewWidget(MWPtr mw, long type, short align, short width)
 	if(sidr.yourInfo)
 		creator=mwPluginWidget;
 	else
-		creator=mwShadowIRCWidget;
+		creator= kApplicationSignature;
 	
 	prev = 0;
 	p = mw->widgetList;
@@ -807,7 +807,7 @@ static pascal void MWDestroyWidget2(mwWidgetPtr w)
 {
 	pMWWidgetDestroyData p;
 	
-	if(w->creator == mwShadowIRCWidget && !w->pluginRef)
+	if(w->creator == kApplicationSignature && !w->pluginRef)
 	{
 		if(w->type == mwModesWidget)
 		{

@@ -862,7 +862,7 @@ void MWStatusClick(MWPtr mw, Point p)
 	linkfor(o, mw->widgetList)
 		if(PtInRect(p, &o->drawArea))
 		{
-			if(o->creator==mwShadowIRCWidget && !o->pluginRef)
+			if(o->creator== kApplicationSignature && !o->pluginRef)
 				MWStatusLineClickInternal(o, p);
 			else
 			{
@@ -1378,7 +1378,7 @@ restart:
 		SetTextColor(themeTextColor);
 		MoveTo(o->drawArea.left, o->drawArea.bottom-3);
 		
-		if(o->creator==mwShadowIRCWidget && !o->pluginRef)
+		if(o->creator== kApplicationSignature && !o->pluginRef)
 		{
 			MWWidgetInternalDraw(o, winActive);
 		}
