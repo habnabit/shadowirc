@@ -766,8 +766,6 @@ pascal void MenuConnectionList(short item)
 	
 	if(item)
 	{
-		ConnStartNetworking();
-		
 		link = firstLink;
 		while(--item)
 			link = link->next;

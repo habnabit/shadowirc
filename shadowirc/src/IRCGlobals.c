@@ -28,7 +28,6 @@ char inBackground=0;
 char anyAway;
 char QuitRequest=0;
 char debugOn;
-char allowConnections;
 
 unsigned long launchTime;
 unsigned long idleTime;

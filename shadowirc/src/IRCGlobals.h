@@ -262,7 +262,6 @@ extern short fontsBegin;
 extern Str63 CL_VERSION, cdt, shadowIRCDefaultSignoff;
 extern char debugOn;
 extern char QuitRequest;
-extern char allowConnections;
 extern unsigned long idleTime;
 extern char anyAway;
 extern char inBackground;

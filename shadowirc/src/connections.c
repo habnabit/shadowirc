@@ -339,24 +339,15 @@ pascal char IsLinkValid(linkPtr link)
 
 pascal char ConnStartNetworking()
 {
-	short i;
-	Str255 s;
+	static char inited = 0;
 	
-	if(!allowConnections)
+	if(!inited)
 	{
-		i=InitConnections();
-		if(!i)
-			allowConnections=1;
-		else
-		{
-			NumToString(i, s);
-			ParamText(s, "\p", "\p", "\p");
-			Alert(129, 0);
-			allowConnections = 0;
-		}
+		InitConnections();
+		inited = 1;
 	}
 	
-	return allowConnections;
+	return true;
 }
 
 static pascal void ConnFinishStaleConnections(void)
@@ -434,11 +425,8 @@ static pascal void ConnFinishStaleConnections(void)
 
 pascal void ConnStopNetworking()
 {
-	if(allowConnections)
-	{
-		ConnFinishStaleConnections();
-		FinishEverything();
-	}
+	ConnFinishStaleConnections();
+	FinishEverything();
 }
 
 pascal void ConnStale(connectionPtr conn)

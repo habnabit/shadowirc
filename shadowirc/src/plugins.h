@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -17,10 +17,6 @@
 	You should have received a copy of the GNU General Public License
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
-
-/*
-	ShadowIRC requires Mac OS 8.1. This means the Appearance Manager must always be available.
 */
 
 #ifndef _Plugins
@@ -282,7 +278,6 @@ typedef struct ShadowIRCDataRecord {
 	messageBufferPtr *messageBuffers;	//Pointer to a time ordered list of 10 messageBuffers.
 #endif
 	connectionPtr *connections;					//Pointer to the list of connections.
-	char *allowConnections;						//True if TCP/IP connections are allowed. False if couldn't init TCP/IP.
 	long *curUserNum;								//The userNum given to the most recently created user. Anything larger than this is invalid.
 
 	unsigned long *idleTime;						//Time when last command sent. (GetDateTime() based)

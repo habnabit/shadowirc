@@ -62,7 +62,7 @@ int main(void)
 	UseResFile(gApplResFork);
 	
 	CurrentTarget.link=firstLink;
-	if(allowConnections && !(e.modifiers & shiftKey))
+	if(!(e.modifiers & shiftKey))
 		RunStartupConnections();
 	
 	InitCursor();

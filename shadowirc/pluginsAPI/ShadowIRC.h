@@ -987,7 +987,6 @@ typedef struct ShadowIRCDataRecord {
 	ignorePtr *const ignores;								//Pointer to ignore list
 	messageBufferPtr *const messageBuffers;	//Pointer to a time ordered list of 10 messageBuffers.
 	connectionPtr *const connections;					//Pointer to the list of connections.
-	const char *const allowConnections;				//True if TCP/IP connections are allowed. False if couldn't init TCP/IP.
 	const long *const curUserNum;						//The userNum given to the most recently created user. Anything larger than this is invalid.
 
 	const long *const idleTime;					//Time when last command sent. (GetDateTime())

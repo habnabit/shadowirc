@@ -828,7 +828,6 @@ inline void initSIDR(void)
 	sidr.lastInput=&lastInput;
 	sidr.lastKey=&lastKey;
 	sidr.connections=&fConn;
-	sidr.allowConnections=&allowConnections;
 	sidr.curUserNum=&userNum;
 
 	sidr.CurrentTarget=&CurrentTarget;
