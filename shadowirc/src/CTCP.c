@@ -217,12 +217,12 @@ static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param 
 	channelPtr targChan;
 	StringPtr sp;
 	
-	if(pstrcmp6(co, 'ACT', 'IO', 'N'))
+	if(pstrcmp(co, "\pACTION"))
 	{
 		DisplayAction(link, ta, 0, fr, re);
 		return 0;
 	}
-	else if(pstrcmp7(co, 'CRE', 'ATOR'))
+	else if(pstrcmp(co, "\pCREATOR"))
 	{
 		LSStrLS("\pJohn Bafford (DShadow), dshadow@shadowirc.com", &ls);
 		SendCTCPReply(link, fr, co, &ls);
@@ -232,12 +232,12 @@ static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param 
 		LSStrLS("\pACTION CREATOR CLIENTINFO DCC FINGER PING SOURCE TIME USERINFO VERSION", &ls);
 		SendCTCPReply(link, fr, co, &ls);
 	}
-	else if(pstrcmp3(co, 'DCC'))
+	else if(pstrcmp(co, "\pDCC"))
 	{
 		DCCRequest(link, fr, uah, re);
 		return 0;
 	}
-	else if(pstrcmp6(co, 'FIN', 'GE', 'R'))
+	else if(pstrcmp(co, "\pFINGER"))
 	{
 		NumToString(now-idleTime, st);
 		if(link->linkPrefs->fingerMessage[0])
@@ -247,18 +247,18 @@ static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param 
 		LSStrCat(6, &ls, re, "\p :", sp, "\p :idle ", st, "\p seconds");
 		SendCTCPReply(link, fr, co, &ls);
 	}
-	else if(pstrcmp4(co, 'PIN', 'G'))
+	else if(pstrcmp(co, "\pPING"))
 	{
 		LSStrLS(re, &ls);
 		SendCTCPReply(link, fr, co, &ls);
 		SoundService(sndGotPing, 0);
 	}
-	else if(pstrcmp6(co, 'SOU', 'RC', 'E'))
+	else if(pstrcmp(co, "\pSOURCE"))
 	{
 		LSStrLS("\pShadowIRC can be downloaded from http://www.shadowirc.com/", &ls);
 		SendCTCPReply(link, fr, co, &ls);
 	}
-	else if(pstrcmp4(co, 'TIM', 'E'))
+	else if(pstrcmp(co, "\pTIME"))
 	{
 		DateString(now, longDate, ls.data, 0);
 		ls.len = ls.data[0];
@@ -267,7 +267,7 @@ static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param 
 		LSConcatLSAndStr(&ls, st, &ls);
 		SendCTCPReply(link, fr, co, &ls);
 	}
-	else if(pstrcmp8(co, 'USE', 'RINF', 'O'))
+	else if(pstrcmp(co, "\pUSERINFO"))
 	{
 		if(link->linkPrefs->userinfoMessage[0])
 			LSStrLS(link->linkPrefs->userinfoMessage, &ls);
@@ -275,7 +275,7 @@ static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param 
 			LSStrLS(shadowIRCDefaultSignoff, &ls);
 		SendCTCPReply(link, fr, co, &ls);
 	}
-	else if(pstrcmp7(co, 'VER', 'SION'))
+	else if(pstrcmp(co, "\pVERSION"))
 	{
 		LSConcatStrAndStrAndStr("\pShadowIRC ", CL_VERSION, "\p © John Bafford 1996-2002 (", &ls);
 		LSConcatLSAndStrAndStr(&ls, cdt, "\p), ", &ls);
@@ -320,7 +320,7 @@ static pascal void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param
 {
 	LongString ls;
 	
-	if(pstrcmp4(co, 'PIN', 'G'))
+	if(pstrcmp(co, "\pPING"))
 	{
 		unsigned long l1, l2, lo;
 		Str255 st;
@@ -375,12 +375,12 @@ pascal char DCCCTCP(connectionPtr conn, LongString *s)
 	unquote(rest);
 
 	ucase(comm);
-	if(pstrcmp6(comm, 'ACT', 'IO', 'N'))
+	if(pstrcmp(comm, "\pACTION"))
 	{
 		DisplayAction(0, 0, conn->dcc, conn->dcc->dccUserName, rest);
 		return 1;
 	}
-	else if(pstrcmp3(comm, 'DCC'))
+	else if(pstrcmp(comm, "\pDCC"))
 	{
 		DCCRequest(conn->link, conn->dcc->dccUserName, conn->name, rest);
 		return 1;
