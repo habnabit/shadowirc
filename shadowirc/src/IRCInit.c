@@ -190,17 +190,6 @@ static void Gestalts(void)
 
 void ToolboxInit(void)
 {
-	MoreMasters();
-	MoreMasters();
-	MoreMasters();
-	MoreMasters();
-	MoreMasters();
-	MoreMasters();
-	MoreMasters();
-	MoreMasters();
-	MoreMasters();
-	MoreMasters();
-	
 	gApplResFork = CurResFile();
 	
 	GetCurrentProcess(&gPSN);
