@@ -272,6 +272,21 @@ static pascal void DirSelRefNavHook(NavEventCallbackMessage callBackSelector, Na
 
 	switch (callBackSelector)
 	{
+		case kNavCBStart:
+		{
+			OSStatus err = noErr;
+			AEDesc theLocation = {typeNull, NULL};
+			FSRef localRef;
+			
+			if(FSRefValid(dsRecP->ref))
+			{
+				BlockMoveData(dsRecP->ref, &localRef, sizeof(FSRef));
+				err = AECreateDesc(typeFSRef, &localRef, sizeof(FSRef), &theLocation);
+				if (err == noErr)
+					err = NavCustomControl(callBackParms->context, kNavCtlSetLocation, (void*)&theLocation);
+			}
+			break;
+		}
 		case kNavCBUserAction:
 		{
 			NavReplyRecord reply;
