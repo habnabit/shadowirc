@@ -600,28 +600,6 @@ resource 'DITL' (-300) {
 	}
 };
 
-resource 'DITL' (128, "About") {
-	{	/* array DITLarray: 5 elements */
-		/* [1] */
-		{185, 151, 204, 209},
-		Button {
-			enabled,
-			"OK"
-		},
-		/* [2] */
-		{0, 0, 144, 360},
-		Picture {
-			disabled,
-			128
-		},
-		/* [3] */
-		{66, 147, 80, 307},
-		UserItem {
-			disabled
-		}
-	}
-};
-
 resource 'DITL' (129) {
 	{	/* array DITLarray: 3 elements */
 		/* [1] */
@@ -1072,22 +1050,6 @@ resource 'DITL' (601, "DCCSendNav") {
 		RadioButton {
 			enabled,
 			"MacBinary"
-		}
-	}
-};
-
-resource 'DITL' (1000, "Splash") {
-	{	/* array DITLarray: 2 elements */
-		/* [1] */
-		{0, 0, 144, 360},
-		Picture {
-			disabled,
-			128
-		},
-		/* [2] */
-		{66, 144, 80, 304},
-		UserItem {
-			disabled
 		}
 	}
 };
@@ -2318,17 +2280,6 @@ resource 'DLOG' (-300) {
 	noAutoCenter
 };
 
-resource 'DLOG' (128, "About") {
-	{73, 53, 282, 413},
-	movableDBoxProc,
-	invisible,
-	goAway,
-	0x0,
-	128,
-	"About ShadowIRC",
-	alertPositionMainScreen
-};
-
 data 'DLOG' (130, "Err") {
 	$"0036 0028 009C 01AF 0001 0100 0100 0000"            /* .6.(.œ.¯........ */
 	$"0000 0082 00"                                       /* ...‚. */
@@ -2475,17 +2426,6 @@ resource 'DLOG' (502, "EditServer") {
 	502,
 	"Edit Server",
 	centerParentWindow
-};
-
-resource 'DLOG' (1000, "Splash") {
-	{107, 141, 251, 501},
-	dBoxProc,
-	visible,
-	noGoAway,
-	0x0,
-	1000,
-	"ShadowIRC",
-	alertPositionMainScreen
 };
 
 resource 'DLOG' (1003, "Shortcuts") {
@@ -6310,12 +6250,6 @@ resource 'dlgx' (-3010) {
 };
 
 resource 'dlgx' (-3000) {
-	versionZero {
-		15
-	}
-};
-
-resource 'dlgx' (128) {
 	versionZero {
 		15
 	}

@@ -25,7 +25,6 @@ enum menuCommands
 	kCommandNextWin = 'NWIN'
 };
 
-extern UserItemUPP AboutDlgVersionFilter;
 extern MenuHandle gAppleMenu, gFileMenu, gShortcutsMenu, gWindowMenu, gHelpMenu;
 
 void HitAppleURLMenu(short item);

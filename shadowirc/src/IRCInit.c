@@ -62,6 +62,12 @@ void setVers(void);
 
 STRnPtr spFiles, spCM, spError, spInfo, spDCC, spHelp, spTopic, spAppleURL, spServices, spSOCKS, spServer, spFile, spWhois;
 
+enum {
+    kSIRCVersionInfoID = 3
+};
+
+#define GetStrN(sr) *(STRnHand)Get1Resource('STR#', sr)
+
 inline void CheckPreferences(void)
 {
 	LongString ls;
@@ -73,41 +79,15 @@ inline void CheckPreferences(void)
 	}
 }
 
-static void AboutDlgVersion(DialogPtr d, short i)
-{
-	Str255 s;
-	Rect r;
-	short type;
-	Handle item;
-		
-	switch (i)
-	{
-		case 2: // version in splash screen
-		case 3: // version in about box
-			GetDialogItem(d, i, &type, &item, &r);
-			MoveTo(r.left, r.bottom-5);
-			GetIndString(s, 128, 1);
-			DrawString(s);
-			DrawString(CL_VERSION);
-			break;
-
-		default:
-			break;
-	}
-}
-
 inline void SetupUPPs(void)
 {
 	StdDlgFilter = NewModalFilterUPP(StandardDialogFilter);
-	AboutDlgVersionFilter = NewUserItemUPP(AboutDlgVersion);
 	StdNavFilter = NewNavEventUPP(NavDialogFilter);
 }
 
-#define GetStrN(sr) *(STRnHand)Get1Resource('STR#', sr)
-
 void ApplicationInit(void)
 {
-    WindowRef splashWindow = NULL;
+	WindowRef splashWindow = NULL;
 	LongString ls;
 	
 	spFiles = GetStrN(srFiles);
@@ -138,8 +118,24 @@ void ApplicationInit(void)
 
 		if((CreateNibReference(CFSTR("main"), &mainNibRef) == noErr) && (CreateWindowFromNib(mainNibRef, CFSTR("Splash"), &splashWindow) == noErr))
 		{
+			CFBundleRef appBundle;
+			CFStringRef text;
+			ControlID versionInfoID = { kApplicationSignature, kSIRCVersionInfoID };
+			ControlRef versionControl;
+			ControlFontStyleRec controlStyle;
+			
 			DisposeNibReference(mainNibRef);
-			ShowWindow(splashWindow);
+			
+			appBundle = CFBundleGetMainBundle();
+			text = (CFStringRef) CFBundleGetValueForInfoDictionaryKey(appBundle, CFSTR("CFBundleGetInfoString"));
+			GetControlByID(splashWindow, &versionInfoID, &versionControl);
+			SetControlData(versionControl, kControlLabelPart, kControlStaticTextCFStringTag, sizeof(CFStringRef), &text);
+			controlStyle.flags = kControlUseJustMask | kControlUseSizeMask;
+			controlStyle.just = teCenter;
+			controlStyle.size = 12;
+			SetControlFontStyle(versionControl, &controlStyle);
+ 			ShowWindow(splashWindow);
+			SelectWindow(splashWindow);
 		}
 	}
 	

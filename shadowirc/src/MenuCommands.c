@@ -49,8 +49,6 @@ MenuHandle gAppleMenu, gFileMenu, gEditMenu, gShortcutsMenu, gWindowMenu;
 static MenuHandle gFontsMenu;
 static short gFontSizeOtherItem;
 
-UserItemUPP AboutDlgVersionFilter;
-
 static pascal void DoFind2(void);
 static pascal void DoFind(char again);
 

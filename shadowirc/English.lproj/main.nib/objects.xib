@@ -4,30 +4,7 @@
   <object name="rootObject" class="NSCustomObject" id="1">
     <string name="customClass">NSApplication</string>
   </object>
-  <array count="91" name="allObjects">
-    <object class="IBCarbonWindow" id="166">
-      <string name="windowRect">188 219 332 579 </string>
-      <string name="title">Splash Screen</string>
-      <object name="rootControl" class="IBCarbonRootControl" id="167">
-        <string name="bounds">0 0 144 360 </string>
-        <array count="1" name="subviews">
-          <object class="IBCarbonPicture" id="180">
-            <string name="bounds">0 0 144 360 </string>
-            <int name="contentResID">128</int>
-          </object>
-        </array>
-      </object>
-      <boolean name="hasCloseBox">FALSE</boolean>
-      <boolean name="hasCollapseBox">FALSE</boolean>
-      <boolean name="hasHorizontalZoom">FALSE</boolean>
-      <boolean name="isResizable">FALSE</boolean>
-      <boolean name="hasVerticalZoom">FALSE</boolean>
-      <int name="carbonWindowClass">3</int>
-      <int name="themeBrush">1</int>
-      <int name="windowPosition">7</int>
-    </object>
-    <reference idRef="167"/>
-    <reference idRef="180"/>
+  <array count="98" name="allObjects">
     <object class="IBCarbonWindow" id="181">
       <string name="windowRect">83 108 187 502 </string>
       <string name="title">Save Preferences</string>
@@ -555,11 +532,85 @@
     <reference idRef="355"/>
     <reference idRef="356"/>
     <reference idRef="357"/>
+    <object class="IBCarbonPicture" id="359">
+      <string name="bounds">0 0 144 360 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">4</int>
+      <int name="contentResID">128</int>
+    </object>
+    <object class="IBCarbonRootControl" id="360">
+      <string name="bounds">0 0 188 360 </string>
+      <array count="2" name="subviews">
+        <reference idRef="359"/>
+        <object class="IBCarbonStaticText" id="361">
+          <string name="bounds">152 20 168 340 </string>
+          <ostype name="controlSignature">SIRC</ostype>
+          <int name="controlID">3</int>
+        </object>
+      </array>
+    </object>
+    <reference idRef="361"/>
+    <object class="IBCarbonWindow" id="362">
+      <string name="windowRect">243 250 431 610 </string>
+      <string name="title">Splash Screen</string>
+      <reference name="rootControl" idRef="360"/>
+      <boolean name="hasCloseBox">FALSE</boolean>
+      <boolean name="hasCollapseBox">FALSE</boolean>
+      <boolean name="hasHorizontalZoom">FALSE</boolean>
+      <boolean name="isResizable">FALSE</boolean>
+      <boolean name="hasVerticalZoom">FALSE</boolean>
+      <int name="carbonWindowClass">3</int>
+      <int name="themeBrush">1</int>
+      <int name="windowPosition">7</int>
+    </object>
+    <object class="IBCarbonPicture" id="363">
+      <string name="bounds">0 0 144 360 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">131</int>
+      <int name="contentResID">128</int>
+    </object>
+    <object class="IBCarbonStaticText" id="364">
+      <string name="bounds">152 20 184 340 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">130</int>
+    </object>
+    <object class="IBCarbonStaticText" id="365">
+      <string name="bounds">192 20 208 340 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">132</int>
+    </object>
+    <object class="IBCarbonWindow" id="366">
+      <string name="windowRect">56 156 324 516 </string>
+      <string name="title">About ShadowIRC</string>
+      <object name="rootControl" class="IBCarbonRootControl" id="367">
+        <string name="bounds">0 0 268 360 </string>
+        <array count="4" name="subviews">
+          <reference idRef="363"/>
+          <reference idRef="365"/>
+          <object class="IBCarbonButton" id="368">
+            <string name="bounds">228 145 248 215 </string>
+            <ostype name="controlSignature">SIRC</ostype>
+            <int name="controlID">128</int>
+            <string name="title">OK</string>
+            <ostype name="command">ok  </ostype>
+            <int name="buttonType">1</int>
+          </object>
+          <reference idRef="364"/>
+        </array>
+      </object>
+      <boolean name="hasCloseBox">FALSE</boolean>
+      <boolean name="hasCollapseBox">FALSE</boolean>
+      <boolean name="hasHorizontalZoom">FALSE</boolean>
+      <boolean name="isResizable">FALSE</boolean>
+      <boolean name="hasVerticalZoom">FALSE</boolean>
+      <int name="carbonWindowClass">3</int>
+      <int name="themeBrush">1</int>
+      <int name="windowPosition">7</int>
+    </object>
+    <reference idRef="367"/>
+    <reference idRef="368"/>
   </array>
-  <array count="91" name="allParents">
-    <reference idRef="1"/>
-    <reference idRef="166"/>
-    <reference idRef="167"/>
+  <array count="98" name="allParents">
     <reference idRef="1"/>
     <reference idRef="181"/>
     <reference idRef="182"/>
@@ -648,8 +699,20 @@
     <reference idRef="342"/>
     <reference idRef="203"/>
     <reference idRef="356"/>
+    <reference idRef="360"/>
+    <reference idRef="362"/>
+    <reference idRef="360"/>
+    <reference idRef="1"/>
+    <reference idRef="367"/>
+    <reference idRef="367"/>
+    <reference idRef="367"/>
+    <reference idRef="1"/>
+    <reference idRef="366"/>
+    <reference idRef="367"/>
   </array>
-  <dictionary count="4" name="nameTable">
+  <dictionary count="5" name="nameTable">
+    <string>AboutWindow</string>
+    <reference idRef="366"/>
     <string>File&apos;s Owner</string>
     <reference idRef="1"/>
     <string>MenuBar</string>
@@ -657,7 +720,7 @@
     <string>SavePrefs</string>
     <reference idRef="181"/>
     <string>Splash</string>
-    <reference idRef="166"/>
+    <reference idRef="362"/>
   </dictionary>
-  <unsigned_int name="nextObjectID">359</unsigned_int>
+  <unsigned_int name="nextObjectID">369</unsigned_int>
 </object>

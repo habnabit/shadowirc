@@ -42,6 +42,12 @@ static void DoCascadeWindows(void);
 static void DoTileWindows(void);
 static void DoCycleCommand(char next);
 
+enum {
+	kSIRCBundleNameID = 130,
+	kSIRCVersionInfoID = 132
+};
+
+
 /*
 * Carbon Event Handlers
 */
@@ -106,31 +112,90 @@ static void CloseFrontWindow(void)
 
 #pragma mark -
 
+static pascal OSStatus AboutWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+ {
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	WindowRef aboutWindow;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	aboutWindow = (WindowRef)userData;
+	
+	switch(eventClass)
+	{
+		case kEventClassControl:
+		{
+			ControlRef theControl = NULL;
+			UInt32 cmd;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &theControl);
+			GetControlCommandID(theControl, &cmd);
+			
+			switch(cmd)
+			{
+				case kHICommandOK:
+					QuitAppModalLoopForWindow(aboutWindow);
+					HideWindow(aboutWindow);
+					DisposeWindow(aboutWindow);
+					result = noErr;
+					break;
+			}
+			break;
+		}
+	}
+	
+	return result;
+}
+ 
 static void DoAbout(void)
 {
-	DialogPtr d;
-	short i;
-	Rect itemRect;
-	Handle itemHandle;
-	short itemType;
+	IBNibRef mainNibRef;
+	WindowRef aboutWindow = NULL;
+	static EventHandlerUPP awUPP = NULL;
+	const EventTypeSpec awSpec = { kEventClassControl, kEventControlHit };
+	OSStatus status;
 	
-	d = GetNewDialog(128, 0, (WindowPtr)-1);
-	SetDialogDefaultItem(d, 1);
-	SetDlogFont(d);
-	EnterModalDialog();
-	ShowWindow(GetDialogWindow(d));
-
-	GetDialogItem(d, 3, &itemType, &itemHandle, &itemRect);
-	SetDialogItem(d, 3, itemType, (Handle)AboutDlgVersionFilter, &itemRect);
-
-	do {
-		ModalDialog(StdDlgFilter, &i);
-	} while(!i);
-
-	DisposeDialog(d);
-	ExitModalDialog();
-}
-
+	if(!awUPP)
+		awUPP = NewEventHandlerUPP(AboutWindowEventHandler);
+	
+	if((CreateNibReference(CFSTR("main"), &mainNibRef) == noErr) && (CreateWindowFromNib(mainNibRef, CFSTR("AboutWindow"), &aboutWindow) == noErr))
+	{
+		CFBundleRef appBundle;
+		CFStringRef text;
+		ControlID bundleNameID = { kApplicationSignature, kSIRCBundleNameID };
+		ControlID versionInfoID = { kApplicationSignature, kSIRCVersionInfoID };
+		ControlRef theControl = NULL;
+		ControlFontStyleRec controlStyle;
+		
+		DisposeNibReference(mainNibRef);
+		
+		appBundle = CFBundleGetMainBundle();
+		
+		text = (CFStringRef) CFBundleGetValueForInfoDictionaryKey(appBundle, CFSTR("CFBundleName"));
+		GetControlByID(aboutWindow, &bundleNameID, &theControl);
+		SetControlData(theControl, kControlLabelPart, kControlStaticTextCFStringTag, sizeof(CFStringRef), &text);
+		controlStyle.flags = kControlUseJustMask | kControlUseSizeMask;
+		controlStyle.just = teCenter;
+		controlStyle.size = 24;
+		SetControlFontStyle(theControl, &controlStyle);
+		
+		text = (CFStringRef) CFBundleGetValueForInfoDictionaryKey(appBundle, CFSTR("CFBundleGetInfoString"));
+		GetControlByID(aboutWindow, &versionInfoID, &theControl);
+		SetControlData(theControl, kControlLabelPart, kControlStaticTextCFStringTag, sizeof(CFStringRef), &text);
+		controlStyle.size = 12;
+		SetControlFontStyle(theControl, &controlStyle);
+		
+		status = InstallWindowEventHandler(aboutWindow, awUPP, 1, &awSpec,(void *)aboutWindow, NULL);
+		
+		ShowWindow(aboutWindow);
+		SelectWindow(aboutWindow);
+		
+		status = RunAppModalLoopForWindow(aboutWindow);
+	}
+ }
+ 
 #pragma mark -
 
 static void DoCycleCommand(char next)
