@@ -6,8 +6,6 @@
 	objectVersion = 39;
 	objects = {
 		05952DFCFFF02D1B11CA0E50 = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = YES;
@@ -31,8 +29,6 @@
 			name = Development;
 		};
 		05952DFDFFF02D1B11CA0E50 = {
-			buildRules = (
-			);
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
 				DEPLOYMENT_LOCATION = YES;
@@ -84,7 +80,7 @@
 		1452304306B90D730041B2E3 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.xml;
 			name = ServerList.plist;
 			path = rsrc/ServerList.plist;
 			refType = 2;
@@ -99,7 +95,7 @@
 		14886206068971DA00FEB302 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.xml;
 			path = "Info-Highlight.plist";
 			refType = 4;
 			sourceTree = "<group>";
@@ -107,7 +103,7 @@
 		14886209068971EC00FEB302 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.xml;
 			name = "Info-Userlist.plist";
 			path = "src/plugins/userlist/Info-Userlist.plist";
 			refType = 2;
@@ -146,12 +142,6 @@
 			path = src/ShadowIRC_Prefix.pch;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
-		};
-		14B760010688B95F0069164D = {
-			fileRef = 14B760000688B95F0069164D;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		14B760990688BB3E0069164D = {
 			fileRef = 14B760000688B95F0069164D;
@@ -825,7 +815,7 @@
 		F424EAA705A5345400B68878 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.xml;
 			name = English;
 			path = English.lproj/ApplicationMenuURLs.plist;
 			refType = 4;
@@ -1292,7 +1282,6 @@
 				F4BBC2AE056EE75900BD6D17,
 				F4BBC2AF056EE75900BD6D17,
 				F424EAA805A5345400B68878,
-				14B760010688B95F0069164D,
 				14EB08CD0689648200B74698,
 				1401A78D069294AF0002FDCB,
 				1452304406B90D730041B2E3,
@@ -1884,7 +1873,7 @@
 		};
 		F4BBC2FF056EE75A00BD6D17 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist.xml;
+			lastKnownFileType = text.xml;
 			path = "Info-ShadowIRC.plist";
 			refType = 4;
 			sourceTree = "<group>";
