@@ -555,14 +555,14 @@ int TCPLocalIP(int sockfd, struct in_addr *ip)
 
 int TCPRemoteIP(int sockfd, struct sockaddr *ip)
 {
-    struct sockaddr_storage ss;
+    struct sockaddr_storage sas;
     int len;
     
-    len = sizeof(ss);
-    if(getpeername(sockfd, (struct sockaddr *) &ss, &len) < 0)
+    len = sizeof(sas);
+    if(getpeername(sockfd, (SA *) &sas, &len) < 0)
         return (-1);
     
-    memcpy(ip, &ss, sizeof(struct sockaddr));
+    memcpy(ip, &sas, sizeof(ip));
     return (0);
 }
 
