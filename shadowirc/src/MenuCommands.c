@@ -199,25 +199,6 @@ static pascal void DoFind(char again)
 
 #pragma mark -
 
-pascal void WindowClose(WindowPtr wp)
-{
-	long i;
-	
-	if(wp)
-	{
-		i=GetWRefCon(wp);
-		if(i)
-		{
-			if(((MWPtr)i)->magic==MW_MAGIC)
-				MWPart((MWPtr)i);
-			else if(((pluginDlgInfoPtr)i)->magic==PLUGIN_MAGIC)
-				pluginCloseWindow((WindowPtr)wp, (pluginDlgInfoPtr)i);
-		}
-	}
-}
-
-#pragma mark -
-
 pascal void HitEditMenu(short item)
 {
 	char mwFront, otherFront;

@@ -2610,7 +2610,7 @@ pascal void MWPart(MWPtr mw);
 		Output:	none
 */
 
-pascal void WindowClose(WindowPtr w);
+void WindowClose(WindowPtr w);
 /*	Closes any window. Same as hitting cmd-w on a window.
 		Input:	w - The window to close
 		Output:	none

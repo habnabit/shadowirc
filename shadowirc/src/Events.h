@@ -24,3 +24,6 @@
 
 void MWInstallMouseWheelHandlers(MWPtr mw);
 void InitEventHandlers();
+
+
+void WindowClose(WindowPtr wp);

@@ -23,9 +23,13 @@
 #include "Events.h"
 #include "IRCPreferences.h" // OpenPreferencesWindow()
 #include "IRCGlobals.h"
+#include "LongStrings.h"
+#include "plugins.h"
 #include "filesMan.h"
 #include "ApplBase.h"
 #include "utils.h"
+#include "MsgWindows.h"
+#include "IRCChannels.h"
 
 #include "Floaters.h"
 #include "MenuCommands.h"
@@ -74,6 +78,25 @@ void MWInstallMouseWheelHandlers(MWPtr mw)
 	EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
 	
 	InstallWindowEventHandler(mw->w, NewEventHandlerUPP(MWDoMouseWheelEvent), 1, &wheelType, mw, NULL);
+}
+
+#pragma mark -
+
+void WindowClose(WindowPtr wp)
+{
+	long i;
+	
+	if(wp)
+	{
+		i=GetWRefCon(wp);
+		if(i)
+		{
+			if(((MWPtr)i)->magic==MW_MAGIC)
+				MWPart((MWPtr)i);
+			else if(((pluginDlgInfoPtr)i)->magic==PLUGIN_MAGIC)
+				pluginCloseWindow((WindowPtr)wp, (pluginDlgInfoPtr)i);
+		}
+	}
 }
 
 static void CloseFrontWindow(void)

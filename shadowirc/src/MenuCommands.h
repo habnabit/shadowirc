@@ -32,4 +32,4 @@ pascal void MenuBarClick(const EventRecord *e);
 
 pascal void MenuInit(void);
 
-pascal void WindowClose(WindowPtr wp);
+void WindowClose(WindowPtr wp);
