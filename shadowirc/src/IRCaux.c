@@ -303,38 +303,6 @@ pascal void connection2(connectionPtr conn)
 	}
 }
 
-inline long IPStrtoHost(ConstStr255Param s);
-inline long IPStrtoHost(ConstStr255Param s)
-{
-	unsigned char ip[20];
-	short p;
-	long l, l2;
-	char *out = (char*)&l;
-	int n;
-	
-	if(s[0] > 15) //if not real IP string, die.
-		return -1;
-	
-	pstrcpy(s, ip);
-	for(n = 3;n>=0;n--)
-	{
-		p=revPos('.', ip);
-		if(p)
-		{
-			ip[p] = ip[0] - p;
-			ip[0] = p-1;
-		}
-		
-		StringToNum(&ip[p], &l2);
-	
-		if(l2 > 255)
-			return -1;
-		out[n] = l2;
-	}
-	
-	return l;
-}
-
 pascal void startConnection(linkPtr link)
 {
 	linkPrefsPtr lp=link->linkPrefs;

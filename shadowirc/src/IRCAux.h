@@ -32,9 +32,7 @@ pascal char OpenConnection(linkPtr link);
 pascal void ConnPut(connectionPtr *conn, const void* p, long len);
 pascal void ConnPutText(connectionPtr *conn, void* p, long len);
 pascal void ConnPutLS(connectionPtr *conn, LongString *ls);
-#endif
 
-#ifdef _connections
 pascal void StatusMsg(linkPtr link, short n);
 pascal char ValidPrefs(linkPtr link);
 pascal void ServerOK(short status, linkPtr link);
