@@ -408,6 +408,50 @@ static char MaximizeNick(Str255 nick, simpleListPtr sl)
 	return ret;
 }
 
+//OK, so i've duplicated this three times now...
+static char IsWS(char c)
+{
+	if(c==' ' || c== 10 || c==13 || c=='\t')
+		return 1;
+	else
+		return 0;
+}
+
+
+static void _HNCFindWord(long cStart, long *wStart, long *wEnd, Ptr text, long textLen)
+{
+	int curPos = cStart;
+	
+	//Start at the position cStart in text, and find the next word.
+	*wStart = 0;
+	*wEnd = 0;
+	
+	if(curPos > textLen || curPos < 0)
+		return;
+	
+	//First, we'll work backwards and find the first whitespace, then move forward one character.
+	while(curPos > 0)
+	{
+		if(!IsWS(text[curPos]))
+			curPos--;
+		else
+			break;
+	}
+	
+	*wStart = curPos++;
+	
+	//Now we find the end of the word
+	while(curPos <= textLen)
+	{
+		if(!IsWS(text[curPos]))
+			curPos++;
+		else
+			break;
+	}
+	
+	*wEnd = curPos - 1;
+}
+
 static void HandleNickComplete(inputAreaDataPtr iad)
 {
 	if(!CurrentTarget.inactive && CurrentTarget.type == targChannel)
@@ -416,14 +460,12 @@ static void HandleNickComplete(inputAreaDataPtr iad)
 		long cStart, cEnd;
 		long wStart, wEnd;
 		long sel;
-		WEReference il;
 		
 		IADGetText(iad, &ls);
 		IADGetCursorSelection(iad, &cStart, &cEnd);
 		
 		//Get the word that the cursor is currently in...
-		il = IADGetWE(iad);
-		WEFindWord(cStart, kTrailingEdge, &wStart, &wEnd, il);
+		_HNCFindWord(cStart, &wStart, &wEnd, &ls.data[1], ls.len);
 		
 		if(wStart != wEnd)
 		{
