@@ -292,11 +292,6 @@ typedef struct ShadowIRCDataRecord {
 #else
 	targetPtr CurrentTarget;						//The active target
 #endif
-#ifndef _MsgWindows_
-	Ptr *MWActive;
-#else
-	MWPtr *MWActive;								//Pointer to active MWPtr.
-#endif
 #ifndef _InputLine_
 	Ptr inputLine;
 #else

@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x02000002
+#define _ShadowIRC_API_Version_ 0x02000003
 
 #include <Carbon/Carbon.h>
 
@@ -976,7 +976,6 @@ typedef struct ShadowIRCDataRecord {
 	const long *const lastKeyTime;				//The time the user last input any text to the inputline. (GetDateTime())
 
 	targetPtr CurrentTarget;						//The active target
-	const MWPtr *const MWActive;			//Pointer to active MWPtr.
 	inputLinePtr inputLine;							//Pointer to the inputline data.
 
 	const MWPtr *const consoleWin;			//A pointer to the console.
@@ -2832,6 +2831,18 @@ pascal connectionPtr MWGetDCC(MWPtr mw);
 /*	Gets the DCC connection of a message window, or returns nil if no DCC.
 		Input:	mw - the window
 		Output:	return value: dcc connection of window, or nil
+*/
+
+MWPtr GetActiveMW(void);
+/*	Gets the active message window
+		Input:	none
+		Output:	return value: the active message window, or nil if no active message window.
+*/
+
+MWPtr GetFrontMW(void);
+/*	Gets the frontmost message window.
+		Input:	none
+		Output:	return value: the frontmost message weindow.
 */
 
 #pragma mark ¥ Channels

@@ -143,7 +143,7 @@ MWPtr GetFrontMW(void)
 	If the front window is a message window, it returns that MWPtr.
 	Otherwise, it returns nil.
 */
-MWPtr GetActiveMW()
+MWPtr GetActiveMW(void)
 {
 	WindowPtr w;
 

@@ -820,7 +820,6 @@ inline void initSIDR(void)
 
 	sidr.firstLink = &firstLink;
 
-	sidr.MWActive=&MWActive;
 	sidr.inputLine=&inputLine;
 	sidr.consoleWin = &consoleWin;
 	sidr.mwList = &mwl;
