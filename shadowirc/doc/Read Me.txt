@@ -1,5 +1,5 @@
 ShadowIRC v2.0
-© 1996-2002 John Bafford
+© 1996-2003 John Bafford
 All Rights Reserved
 
 This program is free software; you can redistribute it and/or
@@ -16,7 +16,7 @@ What is ShadowIRC?
 	ShadowIRC is a new MacOS IRC client, written specifically with speed, extensibility, and ease-of-use in mind.
 
 System Requirements
-	ShadowIRC 2.0 requires Mac OS X 10.1 or later.
+	ShadowIRC 2.0 requires Mac OS X 10.2 or later.
 
 Where can I download ShadowIRC?
 	The ShadowIRC web page is at <http://www.shadowirc.com/>.
@@ -35,7 +35,7 @@ Where can I download ShadowIRC plugins?
 	The ShadowIRC plugins page is at <http://www.shadowirc.com/plugins.html>. This list of plugins is provided only for your convienence, and in no way implies that I have used, tested, or support them. Plugin authors are responsible for supporting their plugins.
 
 Contextual Menus
-	ShadowIRC uses contextual menus for several options, including logging channel text. You can bring them up by control-clicking on a window. You do not need to be using Mac OS 8 to use the contextual menus.
+	ShadowIRC uses contextual menus for several options, including logging channel text. You can bring them up by control-clicking on a window.
 
 Sample Plugins
 	There are several plugins in the "Sample Plugins" folder that are not part of the default configuration. You may wish to install them. For more information, read the "Read Me" file in the "Sample Plugins" folder. Several plugins are also installed in the plugins folder by default. These are the serverlist, popups (option-click on a word in a channel), and the userlist.
