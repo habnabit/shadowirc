@@ -194,21 +194,6 @@ pascal void ClosePrefs(void)
 
 #pragma mark -
 
-pascal OSErr FindAppSpec(FSSpec *appSpec)
-{
-	ProcessSerialNumber thisProcess = {0, kCurrentProcess};
-	ProcessInfoRec processInfo;
-	
-	bzero(&processInfo, sizeof(ProcessInfoRec));
-	
-	processInfo.processInfoLength = sizeof(ProcessInfoRec);
-	processInfo.processName = NULL;
-	processInfo.processNumber = thisProcess;
-	processInfo.processAppSpec = appSpec;
-	
-	return GetProcessInformation(&thisProcess, &processInfo);
-}
-
 pascal short CreateUniqueFile(FSSpec *file, OSType creator, OSType type)
 {
 	OSErr err;
@@ -977,7 +962,7 @@ static void AllocateNewPrefs(void)
 	shadowircColors=(RGBColor*)NewPtr(sizeof(RGBColor)*(numSIColors)); //don't clear this because ALL of it is being set
 }
 
-static void FolderErrorToConsole(CFStringRef errorKey)
+void FolderErrorToConsole(CFStringRef errorKey)
 {
 	CFStringRef string;
 	Str255 pstring;

@@ -77,6 +77,8 @@ OSStatus UnpackFSRefFromNavReply(const NavReplyRecord *reply, FSRef *ref);
 OSStatus GetFSRefForResourcesFolder(FSRef *ref);
 PicHandle LoadAppLogoFromResources(void);
 
+void FolderErrorToConsole(CFStringRef errorKey);
+
 pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileName, long type, long creator, long navFlags, FSSpec *f, char allowReplace);
 
 OSStatus DirectorySelectButtonRef(FSRef *ref);
@@ -86,7 +88,6 @@ pascal void FileAdd(short fref, char res);
 pascal OSErr FileClose(short fref);
 OSStatus FileCloseFork(short fref);
 pascal short CreateUniqueFile(FSSpec *file, OSType creator, OSType type);
-pascal OSErr FindAppSpec(FSSpec *appSpec);
 
 pascal void OpenPrefs(void);
 pascal void ClosePrefs(void);
