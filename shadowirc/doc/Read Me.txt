@@ -1,5 +1,5 @@
-ShadowIRC v1.1
-© 1996-2000 John Bafford
+ShadowIRC v2.0
+© 1996-2002 John Bafford
 All Rights Reserved
 
 This program is free software; you can redistribute it and/or
@@ -16,10 +16,11 @@ What is ShadowIRC?
 	ShadowIRC is a new MacOS IRC client, written specifically with speed, extensibility, and ease-of-use in mind.
 
 System Requirements
-	ShadowIRC 1.1 requires Mac OS 7.1 or later and the Appearance Manager.
+	ShadowIRC 2.0 requires Mac OS X 10.1 or later.
 
 Where can I download ShadowIRC?
 	The ShadowIRC web page is at <http://www.shadowirc.com/>.
+	The ShadowIRC SourceForge project page is at <http://www.sf.net/projects/shadowirc/>
 
 Where can I go for more information
 	This file is not intended to explain the operation of ShadowIRC. For more information, you can read the "ShadowIRC Manual" file, which contains instructions on how to use ShadowIRC. For a list of recent changes in ShadowIRC, read the "Version History" file. There is also a command reference in the Help menu in ShadowIRC.
@@ -27,12 +28,8 @@ Where can I go for more information
 How much does ShadowIRC cost?
 	ShadowIRC is is free software, and costs nothing. For more information, please see the "LICENSE" file.
 
-Updating from earlier versions of ShadowIRC
-	* Replace the old ShadowIRC application.
-  * Replace the Popups, Serverlist, and Userlist plugins.
-
-ShadowIRC is extensible. How? Can I use my Ircle scripts?
-	ShadowIRC is extensible with C-coded plugins, compiled with CodeWarrior. This makes ShadowIRC plugins much faster and much more flexible than Ircle's AppleScript-based scripts. However, it also requires knowledge of C and a copy of CodeWarrior to write plugins. ShadowIRC plugins are fundamentally different from Ircle scripts, and are NOT compatible. You can't use Ircle scripts in ShadowIRC, and you can't use ShadowIRC plugins with Ircle. For more information about plugins, look at the plugins page at <http://www.shadowirc.com/plugins.html>.
+ShadowIRC is extensible. How?
+>>> Explain Plugins <<<
 
 Where can I download ShadowIRC plugins?
 	The ShadowIRC plugins page is at <http://www.shadowirc.com/plugins.html>. This list of plugins is provided only for your convienence, and in no way implies that I have used, tested, or support them. Plugin authors are responsible for supporting their plugins.
@@ -44,10 +41,10 @@ Sample Plugins
 	There are several plugins in the "Sample Plugins" folder that are not part of the default configuration. You may wish to install them. For more information, read the "Read Me" file in the "Sample Plugins" folder. Several plugins are also installed in the plugins folder by default. These are the serverlist, popups (option-click on a word in a channel), and the userlist.
 
 How can I be notified when new versions of ShadowIRC are available for download?
-	The ShadowIRC Announcments mailing list is a read-only mailing list that will contain announcments of ShadowIRC releases. To subscribe, send an email to majordomo@undermac.org containing "subscribe shadowirc-announce" (no quotes). If you subscribe to this list, you will be notified as new versions of ShadowIRC are released.
+>>> Add SF.net mailing list instructions <<<
 
 Contacting the author
-	My email address is <dshadow@shadowirc.com>. I'm usually on IRC as DShadow on #macintosh, and #macdev on the Undernet (try newbrunswick.nj.us.undernet.org).
+	My email address is <dshadow@shadowirc.com>. I'm usually on IRC as DShadow on #macintosh, and #macdev on the Undernet (try washington.dc.us.undernet.org).
 
 The Fine Print
 	ShadowIRC is provided as-is with no warranty whatsoever. Plugin authors are responsible for their plugins. I in no way support, or am responsible for, any problems that may arise from the use of plugins.

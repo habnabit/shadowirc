@@ -1,10 +1,10 @@
 ShadowIRC Version History
-© 1996-2000 John Bafford
+© 1996-2002 John Bafford
 All Rights Reserved
 
 Changes to the ShadowIRC Plugins SDK are listed in the Version History file in the SDK package.
 
-Changes in 1.1b2 - November 25, 2000
+Changes in 2.0 - 2002¥ ShadowIRC now requires Mac OS X.¥ Carbonization and networking rewrite contributed by Chris Campbell and Landon Fuller.¥ Carbon Events support provided in part by Sean McGovern.¥ Help and miscelaneous bug fixes provided by Michael Ledford.New Features:¥ Actions with initial text starting with a single quote mark doesn't display the space between nick and text. e.g. "/me 's joking" => " * DShadow's joking".¥ Kill window is no longer modal. Updated so that it's easier to read.¥ Shortcuts window is no longer modal.Bug Fixes:¥ Fixed color-related freeze. [SF #509083]¥ DCC auto-save wasn't being honored if DCC auto-get option was disabled.¥ Fixed a bug that caused windows to resize improperly with some multiple monitor configurations.¥ Fixed a bug that could cause a crash on server disconnection.Miscelaneous:¥ Compiled using Project Builder and gcc 3 as a mach-o binary on Mac OS X 10.2.2.¥ Replaced many user interface elements with .nib packages. This better supports localization.¥ Use HTML help for the somewhat small amount of documentation provided.¥ Significant code cleanups.Changes in 1.1 - November 20, 2001¥ Fixed a potential crash when dealing with out-of-range color codes. This could manifest itself as a crash on entering a channel with certain color codes set as the topic.¥ Other... item in the font menu to allow choosing font sizes not listed.¥ Minor code cleanup.¥ Moved more strings into the resource fork now.Changes in 1.1b2 - November 25, 2000
 Bug Fixes:
 ¥ Connection Actions prefs pane now changes when you select different connections.
 ¥ Worked around a compiler bug causing crashes drawing icon-based widgets in message windows.
