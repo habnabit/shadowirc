@@ -309,14 +309,40 @@ pascal char connection3(linkPtr link, char reg)
 	}
 }
 
+static pascal void CreateIdentdConn(connectionPtr conn)
+{
+	if(mainPrefs->firewallType != fwSOCKS5) //Why?
+	{
+		LongString ls;
+		connectionPtr identConn;
+		linkPtr link = conn->link;
+		
+		link->identConn = identConn = newConnection(connIDENTD);
+		if(identConn)
+		{
+			LSGetIntString(&ls, spError, sOpeningIdentd);
+			SMPrefixLink(link, &ls, 1);
+			
+			identConn->ip = conn->ip;
+			identConn->port = 113;
+			identConn->link=link;
+			if(mainPrefs->firewallType == fwSOCKS4A || mainPrefs->firewallType == fwSOCKS4)
+				identConn->refCon = NewPString(mainPrefs->socksUser);
+			else
+				identConn->refCon = NewPString(conn->link->linkPrefs->user);
+			
+			ConnNewPassive(identConn);
+		}
+	}
+}
+
 pascal void connection2(connectionPtr conn)
 {
-	LongString ls;
-	Str255 s;
-	pServiceCWLinkStateChangeData p;
-	
 	if(conn->ip!=-1)
 	{
+		LongString ls;
+		Str255 s;
+		pServiceCWLinkStateChangeData p;
 		linkPtr link = conn->link;
 	
 		hostToIPStr(conn->ip, s);
@@ -330,29 +356,7 @@ pascal void connection2(connectionPtr conn)
 
 		if(ConnNewActive(conn)) //this makes the connection to the (socks) server
 		{
-			connectionPtr identConn;
-			if(mainPrefs->firewallType != fwSOCKS5)
-			{
-				link->identConn = identConn=newConnection(connIDENTD);
-				if(identConn)
-				{
-					LSGetIntString(&ls, spError, sOpeningIdentd);
-					SMPrefixLink(link, &ls, 1);
-					
-					identConn->outgoing=false;
-					identConn->ip = conn->ip;
-					if(mainPrefs->firewallType == fwSOCKS4A || mainPrefs->firewallType == fwSOCKS4)
-						identConn->refCon = NewPString(mainPrefs->socksUser);
-					else
-						identConn->refCon = NewPString(conn->link->linkPrefs->user);
-					
-					identConn->port = 113;
-					ConnNewPassive(identConn);
-					identConn->tryingToConnect=false;
-					identConn->connectStage=csNil;
-					identConn->link=link;
-				}
-			}
+			CreateIdentdConn(conn);
 			
 			conn->connectStage=csOpeningConnection;
 			if(conn->socksType == connIRC)
