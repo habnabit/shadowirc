@@ -640,7 +640,7 @@ pascal void MenuSignoffConnectionList(short item)
 
 #pragma mark -
 
-static void DoMenuEvent(long menuitem, const EventRecord *e)
+static void DoMenuEvent(long menuitem)
 {
 	int menuNum, itemNum;
 	
@@ -713,7 +713,7 @@ pascal void MenuBarClick(const EventRecord *e)
 	}
 	
 	CheckMenuItem(gWindowMenu, wConsoleItem, IsWindowVisible(consoleWin->w));
-	DoMenuEvent(MenuSelect(e->where), e);
+	DoMenuEvent(MenuSelect(e->where));
 }
 
 #pragma mark -
