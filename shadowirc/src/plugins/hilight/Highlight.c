@@ -132,7 +132,7 @@ static char IsPunc(char c)
 static char ValidPosition(LongString *text, int start, int end)
 {
 	return(		(start == 1 || IsWS(text->data[start-1]) || IsPunc(text->data[start-1])) //begin ok
-		&& (end == text->len || IsWS(text->data[end+1]) || IsPunc(text->data[end+1]))); //end ok
+		&& (end > text->len || IsWS(text->data[end+1]) || IsPunc(text->data[end+1]))); //end ok
 }
 
 static const unsigned char setstyle[] = {5, 8, sicSaveStyle, 2,  8, sicPrivmsg};
@@ -144,7 +144,7 @@ static char DoSearch(LongString *text, WordPrefPtr wp)
 	int x = wp->word[0];
 	Str255 string;
 	
-	max = text->len - x;
+	max = text->len - x + 1;
 	// Search that text
 	for(i = 1; i <= max; i++)
 	{
@@ -156,7 +156,7 @@ static char DoSearch(LongString *text, WordPrefPtr wp)
 			if(prefs.boldToken)
 			{
 				LSInsertStr(setstyle, i-1, text);
-				LSInsertStr(restoreStyle, i+x+setstyle[0], text);
+				LSInsertStr(restoreStyle, i+x+setstyle[0]-1, text);
 			}
 			
 			return true;
