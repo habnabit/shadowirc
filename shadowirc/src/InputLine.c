@@ -59,8 +59,6 @@ char noFloatingInput = 0;
 
 inline void IWInternalDraw(iwWidgetPtr o);
 
-static char _ILInsertLine(WEReference il, LongString *ls, char select);
-
 pascal void IWRecalculateRects(void)
 {
 	short lRight, rLeft;
@@ -823,7 +821,6 @@ static void RecallLine(inputAreaDataPtr iad, int p)
 	int i;
 	LongString ls;
 		
-	//On 68k ShadowIRC, the il is getting trashed here.
 	iad->hpos = p;
 	i=0;
 	do
@@ -924,41 +921,24 @@ void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish)
 	WEGetSelection(start, finish, iad->il);
 }
 
-static char _ILInsertLine(WEReference il, LongString *ls, char select)
-{
-	short i;
-	long sl, el;
-	
-	if(il)
-	{
-		while((i = LSPosChar(13, ls)) != 0)
-			LSDelete(ls, i, i);
-		
-		if(ls->len)
-		{
-			WEGetSelection(&sl, &el, il);
-			WEInsert(&ls->data[1], ls->len, 0, 0, il);
-			if(select)
-				WESetSelection(sl, sl+ls->len, il);
-			WESelView(il);
-		}
-		return true;
-	}
-	else
-		return false;
-}
-
 char IADSetText(inputAreaDataPtr iad, LongString *ls)
 {
 	if(iad)
 	{
 		WEReference il = iad->il;
+		short i;
+		
+		while((i = LSPosChar(13, ls)) != 0)
+			LSDelete(ls, i, i);
 		
 		WEDeactivate(il);
-		WESetSelection(0,0x7FFFFFFF, il);
+		WESetSelection(0, 0x7FFFFFFF, il);
 		WEDelete(il);
-		_ILInsertLine(il, ls,false);
-		WESetSelection(0x7FFFFFFF,0x7FFFFFFF,il);
+
+		if(ls->len)
+			WEInsert(&ls->data[1], ls->len, 0, 0, il);
+
+		WESetSelection(0x7FFFFFFF, 0x7FFFFFFF, il);
 		WESelView(il);
 		WEActivate(il);
 		return true;
