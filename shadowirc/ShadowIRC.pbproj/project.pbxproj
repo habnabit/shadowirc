@@ -104,7 +104,6 @@
 //194
 		195DF8C9FE9D4F0611CA2CBB = {
 			children = (
-				F50FA70E0358BD880132A983,
 				0249A665FF388DC511CA2CEA,
 			);
 			isa = PBXGroup;
@@ -130,9 +129,9 @@
 			mainGroup = 20286C29FDCF999611CA2CEA;
 			projectDirPath = "";
 			targets = (
+				F59209370317839001A80166,
 				F50FA70D0358BD880132A983,
 				20286C34FDCF999611CA2CEA,
-				F59209370317839001A80166,
 			);
 		};
 		20286C29FDCF999611CA2CEA = {
@@ -141,6 +140,7 @@
 				F510A8AB021CB6B10132A983,
 				20286C2AFDCF999611CA2CEA,
 				20286C2CFDCF999611CA2CEA,
+				F5B0C91E0358F6820132A983,
 				20286C32FDCF999611CA2CEA,
 				F552BFD60211060D01A80061,
 				195DF8C9FE9D4F0611CA2CBB,
@@ -265,6 +265,7 @@
 			};
 			dependencies = (
 				F57375420317F4930132A983,
+				F5B0C9200358F9DE0132A983,
 			);
 			isa = PBXApplicationTarget;
 			name = ShadowIRC;
@@ -398,6 +399,7 @@
 				F57375F303205FE90132A983,
 				F5A6AF20032111060132A983,
 				F5D4BE910323C8880132A983,
+				F5B0C91F0358F6B40132A983,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -595,8 +597,7 @@
 			);
 			buildSettings = {
 				OPTIMIZATION_CFLAGS = "-O0";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
+				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = Userlist;
 				SECTORDER_FLAGS = "";
@@ -643,9 +644,8 @@
 		};
 		F50FA70E0358BD880132A983 = {
 			isa = PBXBundleReference;
-			name = Userlist.bundle;
-			path = "/Users/dshadow/The Factory/ShadowIRC/cvs/shadowirc/build/Userlist.bundle";
-			refType = 0;
+			path = Userlist.bundle;
+			refType = 3;
 		};
 		F50FA7100358BE450132A983 = {
 			fileRef = F552BFC8021103B901A80061;
@@ -2356,6 +2356,25 @@
 			isa = PBXBuildFile;
 			settings = {
 			};
+		};
+		F5B0C91E0358F6820132A983 = {
+			children = (
+				F50FA70E0358BD880132A983,
+			);
+			isa = PBXGroup;
+			name = Plugins;
+			path = "";
+			refType = 4;
+		};
+		F5B0C91F0358F6B40132A983 = {
+			fileRef = F50FA70E0358BD880132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5B0C9200358F9DE0132A983 = {
+			isa = PBXTargetDependency;
+			target = F50FA70D0358BD880132A983;
 		};
 		F5B67A94033CA8700132A983 = {
 			isa = PBXFileReference;

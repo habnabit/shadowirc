@@ -344,22 +344,25 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 		}
 	}
 	
-	if(activate) //activatechannels
+	if(!WIsFloater(window)) //don't change the target if it's a floater
 	{
-		if(p && IsWindowActive(p->w))
-			SetTarget(p, &CurrentTarget);
-		else
-			InvalTarget(&CurrentTarget);
-
-		UpdateStatusLine();
-		DrawMWinStatus(consoleWin);
-	}
+		if(activate) //activatechannels
+		{
+			if(p && IsWindowActive(p->w))
+				SetTarget(p, &CurrentTarget);
+			else
+				InvalTarget(&CurrentTarget);
 	
-	ps.ch = ch;
-	ps.activate=activate;
-	ps.w = window;
-	ps.mw = p;
-	runService(pServiceActivateWin, &ps);
+			UpdateStatusLine();
+			DrawMWinStatus(consoleWin);
+		}
+		
+		ps.ch = ch;
+		ps.activate=activate;
+		ps.w = window;
+		ps.mw = p;
+		runService(pServiceActivateWin, &ps);
+	}
 }
 
 pascal void UpdateWindowPosition(WindowPtr win)

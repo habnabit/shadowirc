@@ -1913,6 +1913,7 @@ INLINE void ULCloseWindow(pUIWindowCloseDataRec *p)
 	{
 		HideWindow(ul->uwin);
 		mainPrefs->userListOpen = false;
+		CheckMenuItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType), mainPrefs->userListOpen);
 	}
 }
 
