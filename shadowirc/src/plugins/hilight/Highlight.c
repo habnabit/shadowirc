@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -19,49 +19,34 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-/*	ChangeLog
-	2000-10-04	JB	Fixed prefs code. & has lower precedence than !=. Doh!
-	2000-09-16	JB	Merged in CJB's (Chris Behm) modifications.
-									Strict Matching
-									Auto-hilight current nick
-*/
-
-#include <Sound.h>
 #include "ShadowIRC.h"
 
-#define linkfor(list, init) for((list) = (init); (list); (list)=(list)->next)
-
 static ShadowIRCDataRecord* sidr;
-
-typedef struct strN
-{
-	short count;
-	unsigned char strs[0];
-} strN, *strnPtr, **strnHand;
 
 typedef struct WordPref
 {
 	Str63 word;	//Size should to match length of nick
 	char matchStrict;
-} WordPref, *WordPrefPtr;
+	char unused[3];
+} WordPref, *WordPrefPtr, **WordPrefHand;
 
-typedef struct GPrefs
+typedef struct WordPrefs
 {
-	long version;
-	
-	char boldToken, boldNick;
-	char autoHilightCurNick;
-	char reserved;
-} GPrefs;
-
-typedef struct Prefs
-{
-	GPrefs prefs;
-	
 	long numWords;
-	WordPref p[];
-} Prefs, *PrefsPtr, **PrefsHand;
+	WordPrefHand words;
+} WordPrefs;
 
+//Prefs keys
+#define kHighlightPrefsDictName CFSTR("highlight")
+
+#define kHighlightPrefsSubDict CFSTR("prefs")
+#define kPrefBoldToken CFSTR("boldToken")
+#define kPrefBoldNick CFSTR("boldNick")
+#define kPrefAutoHilightCurNick CFSTR("autoHilightCurNick")
+
+#define kHighlightPrefsWordsArr CFSTR("words")
+#define kPrefWord CFSTR("word")
+#define kPrefWordMatchStrict CFSTR("matchStrict")
 
 // Prototypes
 static WordPrefPtr SearchLS(LongString *text, ConstStr63Param curNick);
@@ -74,25 +59,7 @@ static void AddThisItem(ListHandle listHdl, ConstStr255Param theString);
 static void ReadPrefs(void);
 
 // Constants
-#define kPrefsFileName "\pHighlight Preferences"
 #define preferencesDitl 4242
-
-#define kCurrentVersion			0x01010001	//aa bb cc dd (major, minor, debug, prefs)
-#define kPrefVersionMask			0x000000FF
-#define kCurrentPrefsVersion	(kCurrentVersion & kPrefVersionMask)
-
-// Prefs Struct
-/*
-typedef struct PrefsRec
-{
-	Boolean	boldToken;
-	Boolean boldNick;
-	Boolean playSnd;
-	Boolean colorCode;
-	short	color;
-	FSSpec	sndFile;
-} PrefsRec, **PrefsHandle;
-*/
 
 // DITL Item Constants
 enum
@@ -105,17 +72,24 @@ enum
 	iAliasText,
 	iBoldText,
 	iBoldNick,
-	iSelectSnd,
-	iSoundCheck,
 	iNickHilight,
-	iStrictMatch,
-	iColorPopup
+	iStrictMatch
 };
 
 // Globals
 static short prefPanel;
 static ListHandle aliasList;
-static PrefsHand prefs;
+
+static WordPrefs wordPrefs;
+
+static struct {
+	char boldToken, boldNick;
+	char autoHilightCurNick;
+} prefs = {
+	1, 1,
+	0
+};
+
 
 /* ** ****************************************************** ** */
 
@@ -170,19 +144,19 @@ static char DoSearch(LongString *text, WordPrefPtr wp)
 	int x = wp->word[0];
 	Str255 string;
 	
-	max = text->len - x + 1;
+	max = text->len - x;
 	// Search that text
 	for(i = 1; i <= max; i++)
 	{
 		LSCopyString(text, i, x, string);
 		
-		if(pstrcasecmp(wp->word, string) && (!wp->matchStrict || ValidPosition(text, i, i + x - 1)))
+		if(pstrcasecmp(wp->word, string) && (!wp->matchStrict || ValidPosition(text, i, i + x)))
 		{
 //if(wp->boldToken)
-			if((**prefs).prefs.boldToken)
+			if(prefs.boldToken)
 			{
 				LSInsertStr(setstyle, i-1, text);
-				LSInsertStr(restoreStyle, i+x+setstyle[0]-1, text);
+				LSInsertStr(restoreStyle, i+x+setstyle[0], text);
 			}
 			
 			return true;
@@ -196,15 +170,15 @@ static char DoSearch(LongString *text, WordPrefPtr wp)
 static WordPrefPtr SearchLS(LongString *text, ConstStr63Param curNick)
 {
 	static WordPref CurrentNick = {"\p", 0};
-	PrefsPtr pp = *prefs;
-	int num = pp->numWords;
+	WordPrefPtr pp = *wordPrefs.words;
+	int num = wordPrefs.numWords;
 	int x;
 	
 	for(x=0; x < num; x++)
-		if(DoSearch(text, &pp->p[x]))
-			return &pp->p[x];
+		if(DoSearch(text, &pp[x]))
+			return &pp[x];
 	
-	if(pp->prefs.autoHilightCurNick)
+	if(prefs.autoHilightCurNick)
 	{
 		pstrcpy(curNick, CurrentNick.word);
 		if(DoSearch(text, &CurrentNick))
@@ -225,7 +199,7 @@ static void HandleChanMsg(pServerPRIVMSGDataRec *p)
 		if(wp)
 		{
 //if(wp->boldNick)
-			if((**prefs).prefs.boldNick)
+			if(prefs.boldNick)
 				*(long *)p->nickStyle = 0x03020802;
 			
 /*
@@ -277,15 +251,14 @@ static void PrefsWindowSet(pPWSetWindowDataPtr p)
 	{
 		aliasList = BuildTheList(p->PrefsDlg);
 
-		setCheckBox(p->PrefsDlg, iBoldText, (**prefs).prefs.boldToken);
-		setCheckBox(p->PrefsDlg, iBoldNick, (**prefs).prefs.boldNick);
+		setCheckBox(p->PrefsDlg, iBoldText, prefs.boldToken);
+		setCheckBox(p->PrefsDlg, iBoldNick, prefs.boldNick);
 		//setCheckBox(p->PrefsDlg, iSoundCheck, (*prefs)->playSnd);
-		setCheckBox(p->PrefsDlg, iNickHilight, (**prefs).prefs.autoHilightCurNick);
+		setCheckBox(p->PrefsDlg, iNickHilight, prefs.autoHilightCurNick);
 		
 		setButtonEnable(p->PrefsDlg, iAddButton, false);
 		setButtonEnable(p->PrefsDlg, iRemoveButton, (**aliasList).dataBounds.bottom >= 1);
 		setButtonEnable(p->PrefsDlg, iStrictMatch, false);
-		// SetDialogItemValue(p->PrefsDlg, iColorPopup, (*prefs)->color + 1);
 	}
 }
 
@@ -294,11 +267,10 @@ static void PrefsWindowGet(pPWGetWindowDataPtr p)
 {
 	if(p->id == prefPanel)
 	{
-		(**prefs).prefs.boldToken = getCheckBox(p->PrefsDlg, iBoldText);
-		(**prefs).prefs.boldNick = getCheckBox(p->PrefsDlg, iBoldNick);
-		(**prefs).prefs.autoHilightCurNick = getCheckBox(p->PrefsDlg, iNickHilight);
-		//(**prefs).prefs.playSnd = getCheckBox(p->PrefsDlg, iSoundCheck);
-		// (*prefs)->color = GetDialogItemValue(p->PrefsDlg, iColorPopup) - 1;
+		prefs.boldToken = getCheckBox(p->PrefsDlg, iBoldText);
+		prefs.boldNick = getCheckBox(p->PrefsDlg, iBoldNick);
+		prefs.autoHilightCurNick = getCheckBox(p->PrefsDlg, iNickHilight);
+		//prefs.playSnd = getCheckBox(p->PrefsDlg, iSoundCheck);
 	}
 }
 
@@ -309,23 +281,23 @@ static void PrefWinRedraw(pPWRedrawDataPtr p)
 	ThemeDrawingState ts;
 	
 	GetThemeDrawingState(&ts);
-	NormalizeDrawingState();
+	NormalizeThemeDrawingState();
 	
-	SetThemeDrawingState(ts);
+	SetThemeDrawingState(ts, true);
 }
 
 static void ResizePrefs(void)
 {
-	SetHandleSize((Handle)prefs, (**prefs).numWords * sizeof(WordPref) + sizeof(long) + sizeof(GPrefs));
+	SetHandleSize((Handle)wordPrefs.words, wordPrefs.numWords * sizeof(WordPref));
 }
 
 static int PFindWord(ConstStr255Param st)
 {
-	int max = (**prefs).numWords;
+	int max = wordPrefs.numWords;
 	int x;
 	
 	for(x = 0; x < max; x++)
-		if(pstrcasecmp(st, (**prefs).p[x].word))
+		if(pstrcasecmp(st, (*wordPrefs.words)[x].word))
 			return x;
 	
 	return -1;
@@ -336,7 +308,7 @@ static char DoWordMatchOnWord(ConstStr255Param inWord)
 	int w = PFindWord(inWord);
 	
 	if(w != -1)
-		return (**prefs).p[w].matchStrict;
+		return (*wordPrefs.words)[w].matchStrict;
 	else
 		return false;
 }
@@ -348,11 +320,11 @@ static char AddWord(ConstStr255Param st)
 	if(w == -1)
 	{
 		WordPrefPtr p;
-		int x = (**prefs).numWords++;
+		int x = wordPrefs.numWords++;
 		
 		ResizePrefs();
 		
-		p = &(**prefs).p[x];
+		p = &(*wordPrefs.words)[x];
 		
 		pstrcpy(st, p->word);
 	//	p->boldToken = 
@@ -374,16 +346,16 @@ static void DeleteWord(ConstStr255Param st)
 		WordPrefPtr a;
 		int siz;
 		
-		HLock((Handle)prefs);
+		HLock((Handle)wordPrefs.words);
 		
 		//Move everything above down
-		a = (**prefs).p;
-		siz = (**prefs).numWords - delWord - 1;
+		a = *wordPrefs.words;
+		siz = wordPrefs.numWords - delWord - 1;
 		BlockMoveData(&a[delWord+1], &a[delWord], siz);
 		
-		HUnlock((Handle)prefs);
+		HUnlock((Handle)wordPrefs.words);
 		
-		(**prefs).numWords--;
+		wordPrefs.numWords--;
 		ResizePrefs();
 	}
 }
@@ -396,10 +368,10 @@ static void PrefWinHit(pPWItemHitDataPtr p)
 		Str255 st;
 		ThemeDrawingState ts;
 		
-		SetPort(p->PrefsDlg);
+		SetPortWindowPort(GetDialogWindow(p->PrefsDlg));
 		
 		GetThemeDrawingState(&ts);
-		NormalizeDrawingState();
+		NormalizeThemeDrawingState();
 		
 		switch (p->itemNum)
 		{
@@ -488,7 +460,7 @@ static void PrefWinHit(pPWItemHitDataPtr p)
 					st[0] = (SInt8)dataLen;
 					w = PFindWord(st);
 					if(w != -1)
-						(**prefs).p[w].matchStrict = getCheckBox(p->PrefsDlg, p->itemNum);
+						(*wordPrefs.words)[w].matchStrict = getCheckBox(p->PrefsDlg, p->itemNum);
 				}
 				break;
 			}
@@ -507,7 +479,7 @@ static void PrefWinHit(pPWItemHitDataPtr p)
 */
 		}
 			
-		SetThemeDrawingState(ts);
+		SetThemeDrawingState(ts, true);
 	}
 }
 	
@@ -518,25 +490,25 @@ static ListHandle BuildTheList(DialogPtr dlog)
 	ThemeDrawingState ts;
 	StringPtr	theString;
 	Cell cell;
-	PrefsPtr p;
+	WordPrefPtr p;
 	int x, max;
 	
 	GetThemeDrawingState(&ts);
-	NormalizeDrawingState();
+	NormalizeThemeDrawingState();
 
 	textListHdl = GetAppearanceListBoxHandle(dlog, iAliasList);
 	(**textListHdl).selFlags = lOnlyOne + lNoNilHilite;
 
-	HLock((Handle)prefs);
-	p = *prefs;
-	max = p->numWords;
+	HLock((Handle)wordPrefs.words);
+	p = *wordPrefs.words;
+	max = wordPrefs.numWords;
 	
 	LAddRow(max, (**textListHdl).dataBounds.bottom, textListHdl);
 	
 	SetPt(&cell,0,0);
 	for(x = 0; x < max; x++)
 	{
-		theString = p->p[x].word;
+		theString = p[x].word;
 		LSetCell(&theString[1], theString[0], cell, textListHdl);
 		cell.v++;
 	}
@@ -545,7 +517,7 @@ static ListHandle BuildTheList(DialogPtr dlog)
 	LSetSelect(true, cell, textListHdl);
 	LSetDrawingMode(true, textListHdl);
 	
-	SetThemeDrawingState(ts);
+	SetThemeDrawingState(ts, true);
 	
 	return textListHdl;
 }
@@ -562,72 +534,144 @@ static void AddThisItem(ListHandle listHdl, ConstStr255Param theString)
 	selectOneCell(listHdl, cell);
 }
 
+static CFBooleanRef MakeCFBoolean(Boolean b)
+{
+	if(b)
+		return kCFBooleanTrue;
+	else
+		return kCFBooleanFalse;
+}
+
+static Boolean ReadDictBoolean(CFDictionaryRef dict, CFStringRef key, Boolean *outValue)
+{
+	Boolean exists;
+	CFBooleanRef value;
+	
+	value = CFDictionaryGetValue(dict, key);
+	if(value)
+		*outValue = CFBooleanGetValue(value);
+	
+	return exists;
+}
+
+static Boolean ReadDictStr(CFDictionaryRef dict, CFStringRef key, StringPtr outStr, int outLen)
+{
+	Boolean exists;
+	CFStringRef value;
+	
+	value = CFDictionaryGetValue(dict, key);
+	if(value)
+		CFStringGetPascalString(value, outStr, outLen, kCFStringEncodingMacRoman);
+	
+	return exists;
+}
+
+static CFMutableArrayRef CreateWordsArr(void)
+{
+	CFMutableArrayRef wordsArr = CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
+	CFMutableDictionaryRef word;
+	CFStringRef str;
+	WordPrefPtr p;
+	int x, max;
+	
+	HLock((Handle)wordPrefs.words);
+	p = *wordPrefs.words;
+	max = wordPrefs.numWords;
+	
+	for(x = 0; x < max; x++)
+	{
+		word = CFDictionaryCreateMutable(NULL, 2, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+		
+		str = CFStringCreateWithPascalString(NULL, p[x].word, kCFStringEncodingMacRoman);
+		CFDictionarySetValue(word, kPrefWord, str);
+		CFDictionarySetValue(word, kPrefWordMatchStrict, MakeCFBoolean(p[x].matchStrict));
+		
+		CFArrayAppendValue(wordsArr, word);
+		CFRelease(word);
+		CFRelease(str);
+	}
+	
+	HUnlock((Handle)wordPrefs.words);
+	
+	return wordsArr;
+}
+
+static void ReadWordsArr(CFArrayRef wordsArr)
+{
+	CFDictionaryRef word;
+	int numWords = CFArrayGetCount(wordsArr);
+	int x;
+	WordPrefPtr p;
+	
+	wordPrefs.words = (WordPrefHand)NewHandleClear(numWords * sizeof(WordPref));
+	
+	HLock((Handle)wordPrefs.words);
+	p = *wordPrefs.words;
+	
+	for(x = 0; x < numWords; x++)
+	{
+		word = CFArrayGetValueAtIndex(wordsArr, x);
+		
+		ReadDictStr(word, kPrefWord, p[x].word, 64);
+		ReadDictBoolean(word, kPrefWordMatchStrict, &p[x].matchStrict);
+	}
+	
+	wordPrefs.numWords = numWords;
+}
+
 static void WritePrefs(void)
 {
-	short refNum;
-	long siz;
-	OSErr err;
+	CFMutableDictionaryRef highlightPrefsDict = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+	CFMutableDictionaryRef prefsDict = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+	CFMutableArrayRef wordsArr;
 	
-	if(!PFExists(kPrefsFileName)) //create it
-		err = PFCreate(kPrefsFileName, 'pref', 'sirc', false);
-		
-	err = PFOpen(kPrefsFileName, false, &refNum, 0);
-	if(!err)
-	{
-		siz = GetHandleSize((Handle)prefs);
-		SetEOF(refNum, siz);
-		SetFPos(refNum, fsFromStart, 0);
-		HLock((Handle)prefs);
-		
-		(**prefs).prefs.version = kCurrentVersion;
-		
-		FSWrite(refNum, &siz, *prefs);
-		HUnlock((Handle)prefs);
-		PFClose(refNum);
-	}
+	//Set the prefs values
+	CFDictionarySetValue(prefsDict, kPrefBoldToken, MakeCFBoolean(prefs.boldToken));
+	CFDictionarySetValue(prefsDict, kPrefBoldNick, MakeCFBoolean(prefs.boldNick));
+	CFDictionarySetValue(prefsDict, kPrefAutoHilightCurNick, MakeCFBoolean(prefs.autoHilightCurNick));
+	
+	CFDictionarySetValue(highlightPrefsDict, kHighlightPrefsSubDict, prefsDict);
+	
+	//Set the words values
+	wordsArr = CreateWordsArr();
+	CFDictionarySetValue(highlightPrefsDict, kHighlightPrefsWordsArr, wordsArr);
+	
+	CFPreferencesSetAppValue(kHighlightPrefsDictName, highlightPrefsDict, kCFPreferencesCurrentApplication);
+	
+	CFRelease(highlightPrefsDict);
+	CFRelease(prefsDict);
+	CFRelease(wordsArr);
 }
 
 //Open the prefs file and read in the prefs
 static void ReadPrefs(void)
 {
-	short refNum;
-	OSErr err;
-	long siz;
-	char ok;
+	Boolean ok = false;
+	CFDictionaryRef highlightPrefsDict = CFPreferencesCopyAppValue(kHighlightPrefsDictName, kCFPreferencesCurrentApplication);
 	
-	if(PFExists(kPrefsFileName))
-	{	
-		err = PFOpen(kPrefsFileName, false, &refNum, 0);
-		if(!err)
+	if(highlightPrefsDict)
+	{
+		CFDictionaryRef prefsDict = CFDictionaryGetValue(highlightPrefsDict, kHighlightPrefsSubDict);
+		CFArrayRef wordsArr = CFDictionaryGetValue(highlightPrefsDict, kHighlightPrefsWordsArr);
+		
+		if(prefsDict)
 		{
-			err = GetEOF(refNum, &siz);
-			
-			if(siz >= sizeof(long) + sizeof(GPrefs)) //valid size
-			{
-				prefs = (PrefsHand)NewHandle(siz);
-				HLock((Handle)prefs);
-				FSRead(refNum, &siz, *prefs);
-				HUnlock((Handle)prefs);
-				PFClose(refNum);
-
-				if(((**prefs).prefs.version & kPrefVersionMask) != kCurrentPrefsVersion) //version bad
-				{
-					DisposeHandle((Handle)prefs);
-					ok = false;
-				}
-				else
-					ok = true;
-			}
+			ReadDictBoolean(prefsDict, kPrefBoldToken, &prefs.boldToken);
+			ReadDictBoolean(prefsDict, kPrefBoldNick, &prefs.boldNick);
+			ReadDictBoolean(prefsDict, kPrefAutoHilightCurNick, &prefs.autoHilightCurNick);
 		}
 		
-		if(ok)
-			return;
+		if(wordsArr)
+		{
+			ReadWordsArr(wordsArr);
+			ok = true;
+		}
+		
+		CFRelease(highlightPrefsDict);
 	}
-
-	prefs = (PrefsHand)NewHandleClear(sizeof(GPrefs) + sizeof(long));
-	(**prefs).prefs.boldToken = 
-	(**prefs).prefs.boldNick = 1;
-	WritePrefs();
+	
+	if(!ok)
+		wordPrefs.words = (WordPrefHand)NewHandleClear(0);
 }
 
 // Turn on the messages we need
@@ -638,18 +682,18 @@ static void SetupMessages(char captureMessages[numMessages])
 	captureMessages[pSavePreferencesMessage] = 1;
 }
 
-static pascal void displayOldVersionMsg(void)
+static void displayOldVersionMsg(void)
 {
 	LongString ls;
 	
-	LSStrLS("\pThe highlight plugin requires ShadowIRC 1.1 or later.", &ls);
-	if(!WIsVisible((*sidr->consoleWin)->w))
+	LSStrLS("\pThe highlight plugin requires ShadowIRC 2.0 or later.", &ls);
+	if(!IsWindowVisible((*sidr->consoleWin)->w))
 		ShowWindow((*sidr->consoleWin)->w);
 	SMPrefixIrcleColor(&ls, dsConsole, '2');
 }
 
 // Entry point of our code
-pascal void main(ShadowIRCDataRecord* sidrIN)
+void pluginMain(ShadowIRCDataRecord* sidrIN)
 {
 	unsigned long l;
 	
@@ -658,7 +702,7 @@ pascal void main(ShadowIRCDataRecord* sidrIN)
 		case pVersionCheckMessage:
 			sidr=sidrIN;
 			l=((pVersionCheckDataPtr)sidrIN->messageData)->version;
-			if(l<0x01010042) //we must have ShadowIRC 1.1d66 or later.
+			if(l<0x02000008) //we must have ShadowIRC 2.0d8 or later.
 			{
 				((pVersionCheckDataPtr)sidrIN->messageData)->version = pVersionShadowIRCTooOld;
 				displayOldVersionMsg();

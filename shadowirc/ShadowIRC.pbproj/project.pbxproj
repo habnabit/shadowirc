@@ -105,6 +105,7 @@
 		195DF8C9FE9D4F0611CA2CBB = {
 			children = (
 				F50FA70E0358BD880132A983,
+				F580515A03905D880132A983,
 				0249A665FF388DC511CA2CEA,
 			);
 			isa = PBXGroup;
@@ -133,6 +134,7 @@
 				20286C34FDCF999611CA2CEA,
 				F59209370317839001A80166,
 				F50FA70D0358BD880132A983,
+				F580514D03905D880132A983,
 			);
 		};
 		20286C29FDCF999611CA2CEA = {
@@ -267,6 +269,7 @@
 			dependencies = (
 				F57375420317F4930132A983,
 				F5B0C9200358F9DE0132A983,
+				F57AE3A6039099840132A983,
 			);
 			isa = PBXApplicationTarget;
 			name = ShadowIRC;
@@ -845,6 +848,12 @@
 		};
 		F53198A2033827A00132A983 = {
 			fileRef = F53198A1033827A00132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F54E8C8803908C940132A983 = {
+			fileRef = 20286C33FDCF999611CA2CEA;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -1830,7 +1839,7 @@
 		F552BFC1021103B901A80061 = {
 			children = (
 				F552BFC2021103B901A80061,
-				F552BFC3021103B901A80061,
+				F5755EBC03907F110132A983,
 			);
 			isa = PBXGroup;
 			name = hilight;
@@ -1840,11 +1849,6 @@
 		F552BFC2021103B901A80061 = {
 			isa = PBXFileReference;
 			path = Highlight.c;
-			refType = 4;
-		};
-		F552BFC3021103B901A80061 = {
-			isa = PBXFileReference;
-			path = Highlight.rsrc;
 			refType = 4;
 		};
 		F552BFC4021103B901A80061 = {
@@ -2227,6 +2231,138 @@
 			settings = {
 			};
 		};
+		F5755EBC03907F110132A983 = {
+			isa = PBXFileReference;
+			path = Highlight.r;
+			refType = 4;
+		};
+		F5755EBD03907F110132A983 = {
+			fileRef = F5755EBC03907F110132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F57AE3A6039099840132A983 = {
+			isa = PBXTargetDependency;
+			target = F580514D03905D880132A983;
+		};
+		F580514D03905D880132A983 = {
+			buildPhases = (
+				F580514E03905D880132A983,
+				F580515203905D880132A983,
+				F580515303905D880132A983,
+				F580515603905D880132A983,
+				F580515803905D880132A983,
+			);
+			buildSettings = {
+				OPTIMIZATION_CFLAGS = "-O0";
+				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Highlight;
+				SECTORDER_FLAGS = "";
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = bundle;
+			};
+			dependencies = (
+			);
+			isa = PBXBundleTarget;
+			name = Highlight;
+			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
+			productName = Userlist;
+			productReference = F580515A03905D880132A983;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>Highlight</string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleIconFile</key>
+	<string></string>
+	<key>CFBundleIdentifier</key>
+	<string>com.shadowirc.plugins.highlight</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string></string>
+	<key>CFBundlePackageType</key>
+	<string>PLUG</string>
+	<key>CFBundleShortVersionString</key>
+	<string></string>
+	<key>CFBundleSignature</key>
+	<string>SIRC</string>
+	<key>CFBundleVersion</key>
+	<string>2.0a8</string>
+</dict>
+</plist>
+";
+			shouldUseHeadermap = 0;
+		};
+		F580514E03905D880132A983 = {
+			buildActionMask = 2147483647;
+			files = (
+				F580515103905D880132A983,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F580515103905D880132A983 = {
+			fileRef = F50FA7160358BEB70132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F580515203905D880132A983 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F580515303905D880132A983 = {
+			buildActionMask = 2147483647;
+			files = (
+				F580515D03905DF40132A983,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F580515603905D880132A983 = {
+			buildActionMask = 2147483647;
+			files = (
+				F54E8C8803908C940132A983,
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F580515803905D880132A983 = {
+			buildActionMask = 2147483647;
+			files = (
+				F5755EBD03907F110132A983,
+			);
+			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F580515A03905D880132A983 = {
+			isa = PBXBundleReference;
+			path = Highlight.bundle;
+			refType = 3;
+		};
+		F580515D03905DF40132A983 = {
+			fileRef = F552BFC2021103B901A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5805165039060780132A983 = {
+			fileRef = F580515A03905D880132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F59209330317839001A80166 = {
 			buildActionMask = 2147483647;
 			files = (
@@ -2438,6 +2574,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				F5BE65870359099E0132A983,
+				F5805165039060780132A983,
 			);
 			isa = PBXCopyFilesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
