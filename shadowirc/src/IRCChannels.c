@@ -84,7 +84,7 @@ enum {
 	kSIRCTopicCancelControlID,
 	kSIRCTopicTextControlID = 4,
 	kSIRCTopicSetControlID,
-kSIRCTopicOpsControlID
+	kSIRCTopicOpsControlID
 };
 
 enum {
@@ -371,6 +371,13 @@ static void DeleteTopicWindowInfo(WindowPtr win)
 	DisposePtr((void*)twi);
 }
 
+void CloseTopicWindow(WindowPtr win)
+{
+	HideSheetWindow(win);
+	DeleteTopicWindowInfo(win);
+	DisposeWindow(win);
+}
+
 #pragma mark -
 
 static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
@@ -514,12 +521,10 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 			}
 
 		case kHICommandCancel:
-			HideSheetWindow(sheet);
-			DeleteTopicWindowInfo(sheet);
-			DisposeWindow(sheet);
+			CloseTopicWindow(sheet);
 			break;
 	}
-		
+	
 	return(result);
 }
 
