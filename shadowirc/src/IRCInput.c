@@ -989,26 +989,27 @@ pascal void processStale(CEPtr c, connectionPtr conn)
 	}
 	else
 	{
-		long nn;
+		long nn, read;
 		long fm = FreeMem();
 		Ptr getbuf;
 		Str255 s2;
 		
 		if(c->event==C_CharsAvailable)
 		{
+			nn = c->value;
 			do {
-				nn = c->value;
 				if(!nn)
 					return;
 				if(nn > fm - 10000)
 					nn = fm-10000;
 				getbuf = NewPtr(nn);
-				ConnGetData(conn, getbuf, nn);
+				read = ConnGetData(conn, getbuf, nn);
+				nn -= read;
 				DisposePtr(getbuf);
 				if(debugOn)
 				{
 					NumToString(conn->realConnType, s);
-					NumToString(nn, s2);
+					NumToString(read, s2);
 					SAppend1(s2, ' ');
 					LSConcatStrAndStrAndStr("\p¥Data received for stale connection: ", s2, s, &ls);
 					LineMsg(&ls);
