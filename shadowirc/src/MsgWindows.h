@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -186,7 +186,7 @@ enum{
 
 pascal char MWValid(MWPtr mw);
 pascal MWPtr NewPluginMWindow(ConstStr255Param title);
-pascal void MWSetDimen(MWPtr win, short left, short top, short width, short height);
+void MWSetDimen(MWPtr win, short left, short top, short width, short height);
 pascal void MWSetFontSize(MWPtr win, short font, short size);
 pascal void MWDelete(MWPtr w);
 

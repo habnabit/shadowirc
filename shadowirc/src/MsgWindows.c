@@ -693,16 +693,13 @@ pascal void MWReposition(MWPtr mw)
 	}
 }
 
-pascal void MWSetDimen(MWPtr win, short left, short top, short width, short height)
+void MWSetDimen(MWPtr win, short left, short top, short width, short height)
 {
 	GrafPtr gp;
 	Rect portRect;
 	
 	if(win)
 	{
-		if(left+width<10)
-			left=10-width;
-		
 		MoveWindow(win->w, left, top, false);
 		SizeWindow(win->w, width, height, false);
 		GetPort(&gp);

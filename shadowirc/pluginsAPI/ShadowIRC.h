@@ -2689,7 +2689,7 @@ pascal MWPtr NewPluginMWindow(ConstStr255Param title);
 					¥ Don't EVER change the window's refCon, since it contains the MWPtr for the window.
 */
 
-pascal void MWSetDimen(MWPtr window, short left, short top, short width, short height);
+void MWSetDimen(MWPtr window, short left, short top, short width, short height);
 /*	Sets a message window's size and position.
 		Input:	window - the message window
 					left - left coord
