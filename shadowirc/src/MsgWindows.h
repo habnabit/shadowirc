@@ -169,7 +169,7 @@ struct MessageWindow {
 	short hpos;
 	
 	char inactive;
-	CONST char channelWindowNumber;
+	CONST unsigned char channelWindowNumber;
 	CONST char protect;
 	unsigned char drawingStatus;
 };

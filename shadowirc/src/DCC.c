@@ -333,7 +333,7 @@ pascal char DCCCreate(linkPtr link, short typ, ConstStr255Param fr, connectionPt
 	dccPtr d;
 	pDCCCreateData p;
 	
-	if(!link || ((*c=DCCFind(link, typ, fr)) != 0) && typ == dccCHAT || !link->conn)
+	if(!link || (((*c=DCCFind(link, typ, fr)) != 0) && typ == dccCHAT) || !link->conn)
 		return 0;
 	else
 	{
@@ -1770,7 +1770,7 @@ static pascal void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255
 	}
 	
 	SMPrefixLinkColor(link, &ls, dsFrontWin, sicCTCP);
-	if(autoopen || mainPrefs->autoAcceptDCCChat && (!link->isAway || !mainPrefs->autoAcceptDCCChatWhenNotAway))
+	if(autoopen || (mainPrefs->autoAcceptDCCChat && (!link->isAway || !mainPrefs->autoAcceptDCCChatWhenNotAway)))
 		DCCOpen(&x);
 }
 

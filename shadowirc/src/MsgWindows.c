@@ -1170,7 +1170,7 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 	myStScrpHandle sty;
 	short colorMethod, colorMethod_saved, cm;
 	char dontLog;
-	char noCR;
+	unsigned char noCR;
 	pMWTextDataRec p;
 
 	if(msg->len && win)
