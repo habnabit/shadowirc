@@ -111,6 +111,7 @@ enum
 	weFDrawOffscreen	=	11,		/* draw text offscreen for smoother visual results */
 	weFInhibitRedraw	=	12,		/* don't redraw text */
 	weFMonoStyled		=	13,		/* disallow style changes */
+	weFAutoBlink		= 30,		// install Carbon Event timer to automatically handle blinking [JKB]
 	weFInhibitColor		=	31		/* draw in black & white only */
 };
 
@@ -129,6 +130,7 @@ enum
 	weDoDrawOffscreen	=	1L << weFDrawOffscreen,
 	weDoInhibitRedraw	=	1L << weFInhibitRedraw,
 	weDoMonoStyled		=	1L << weFMonoStyled,
+	weDoAutoBlink		=	1L << weFAutoBlink,
 	weDoInhibitColor	=	1L << weFInhibitColor
 };
 

@@ -380,6 +380,7 @@ enum
 enum
 {
 	weFInhibitColor		=	31,		// draw in black & white only; ignore color
+	weFAutoBlink		= 30,		// install Carbon Event timer to automatically handle blinking [JKB]
 	weFMonoStyled		=	13,		// disallow style changes
 	weFInhibitRedraw	=	12,		// don't redraw text
 	weFDrawOffscreen	=	11,		// draw text offscreen for smoother visual results
@@ -1174,6 +1175,7 @@ typedef struct WERec
 	WEOHTableHandle hObjectHandlerTable;	// handle to object handler table for this instance
 	SInt32 translucencyThreshold;			// use translucent drags unless selection area exceeds this
 	StringHandle hURLHint;					// hint string for slack URLs
+	EventLoopTimerRef autoBlinkTimer;		// timer for auto-blinking [JKB]
 } WERec;
 
 struct SLDrawData
@@ -1364,6 +1366,7 @@ pascal Boolean WEIsActive(WEHandle hWE);
 pascal void WEScroll(SInt32 hOffset, SInt32 vOffset, WEHandle hWE);
 pascal void WEPinScroll(SInt32 hOffset, SInt32 vOffset, WEHandle hWE);
 pascal void WESelView(WEHandle hWE);
+void _WEStopAutoBlink(WEHandle hWE);
 
 //	WESelectors.c (public)
 pascal OSErr WEGetInfo(WESelector selector, void *info, WEHandle hWE);

@@ -790,7 +790,9 @@ pascal void WEDispose(WEHandle hWE)
 	_WEForgetHandle((Handle *) &pWE->hRuns);
 	_WEForgetHandle(&pWE->hUserInfo);
 	DisposeRgn(pWE->viewRgn);
-
+	
+	_WEStopAutoBlink(hWE);
+	
 	// dispose of the WE record
 	DisposeHandle((Handle) hWE);
 }

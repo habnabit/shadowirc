@@ -929,7 +929,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 
 					dr.left= dr.top = dr.right = dr.bottom = 0;
 					
-					WENew(&dr,&dr, weDoUndo + weDoAutoScroll + weDoMonoStyled + weDoDragAndDrop,&h->il);
+					WENew(&dr, &dr, weDoUndo | weDoAutoScroll | weDoMonoStyled | weDoDragAndDrop | weDoAutoBlink, &h->il);
 					WESetInfo(weRefCon, &h, h->il);
 					WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, h->il);
 					WESetUserInfo(kInputField, kInputField, h->il);

@@ -1956,6 +1956,39 @@ pascal void WEIdle(UInt32 *maxSleep, WEHandle hWE)
 	_WESetHandleLock((Handle) hWE, saveWELock);
 }
 
+//Auto-blink timer by jbafford [JKB]
+
+static void _WEAutoBlinkTimer(EventLoopTimerRef timer, void* data)
+{
+	WEHandle hWE = (WEHandle)data;
+	
+	WEIdle(0, hWE);
+}
+
+void _WEStartAutoBlink(WEHandle hWE)
+{
+	static EventLoopTimerUPP abUPP = NULL;
+	float ticks;
+	
+	if(!(**hWE).autoBlinkTimer)
+	{
+		if(!abUPP)
+			abUPP = NewEventLoopTimerUPP(_WEAutoBlinkTimer);
+		
+		ticks = TicksToEventTime(GetCaretTime());
+		InstallEventLoopTimer(GetMainEventLoop(), ticks, ticks, abUPP, hWE, &(**hWE).autoBlinkTimer);
+	}
+}
+
+void _WEStopAutoBlink(WEHandle hWE)
+{
+	if((**hWE).autoBlinkTimer)
+	{
+		RemoveEventLoopTimer((**hWE).autoBlinkTimer);
+		(**hWE).autoBlinkTimer = NULL;
+	}
+}
+
 pascal void WEUpdate(RgnHandle updateRgn, WEHandle hWE)
 {
 	WEPtr pWE;
@@ -2077,6 +2110,9 @@ pascal void WEDeactivate(WEHandle hWE)
 		}
 #endif
 	}
+	
+	if(BTST((**hWE).features, weFAutoBlink))
+		_WEStopAutoBlink(hWE);
 
 	// unlock the WE record
 	_WESetHandleLock((Handle) hWE, saveWELock);
@@ -2109,7 +2145,10 @@ pascal void WEActivate(WEHandle hWE)
 		ActivateTSMDocument(pWE->tsmReference);
 	}
 #endif
-
+	
+	if(BTST((**hWE).features, weFAutoBlink))
+		_WEStartAutoBlink(hWE);
+	
 	// unlock the WE record
 	_WESetHandleLock((Handle) hWE, saveWELock);
 }

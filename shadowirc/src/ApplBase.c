@@ -431,17 +431,6 @@ static void Timer1(EventLoopTimerRef timer, void* data)
 
 static void TimerTick(EventLoopTimerRef timer, void* data)
 {
-	//Stuff we need to do periodically when we're in the foreground
-	if(!inBackground)
-	{
-		if(!inputLine.lock)
-		{
-			WEReference ilWE = ILGetWE();
-			if(ilWE)
-				WEIdle(0, ilWE);
-		}
-	}
-	
 	RetryConnections();
 }
 

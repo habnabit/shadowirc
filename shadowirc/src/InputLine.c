@@ -313,11 +313,13 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 			{
 				//For now, we do nothing as it is consistent with what we used to do. This will need to be fixed, however...
 				case kEventWindowActivated:
+				case kEventWindowShown:
 					WEActivate(inputLine._il);
 					result = noErr;
 					break;
 					
 				case kEventWindowDeactivated:
+				case kEventWindowHidden:
 					WEDeactivate(inputLine._il);
 					result = noErr;
 					break;
@@ -396,6 +398,8 @@ void OpenInputLine()
 			{kEventClassWindow, kEventWindowBoundsChanged},
 			{kEventClassWindow, kEventWindowActivated},
 			{kEventClassWindow, kEventWindowDeactivated},
+			{kEventClassWindow, kEventWindowShown},
+			{kEventClassWindow, kEventWindowHidden},
 			{kEventClassKeyboard, kEventRawKeyDown},
 			{kEventClassKeyboard, kEventRawKeyRepeat},
 		};
@@ -452,7 +456,7 @@ void OpenInputLine()
 				SizeWindow(inputLine.w, h, v, 1);
 				GetPortBounds(GetWindowPort(inputLine.w), &wr);
 				MoveWindow(inputLine.w, (sb.right-sb.left-wr.right+2)/2 -1, sb.bottom - wr.bottom-5, false);
-                WGetBBox(inputLine.w, &mainPrefs->inputLoc);
+				WGetBBox(inputLine.w, &mainPrefs->inputLoc);
 				mainPrefs->inputLoc.right=mainPrefs->inputLoc.left+h;
 				mainPrefs->inputLoc.bottom=mainPrefs->inputLoc.top+v;
 			}
@@ -476,7 +480,7 @@ void OpenInputLine()
 			
 			// switched off DrawOffscreen, as Aqua does that anyways
 			// (prevent triple-buffering) [smcgovern]
-			WENew(&dr,&dr, weDoUndo + weDoAutoScroll + weDoMonoStyled + weDoDragAndDrop,&inputLine._il);
+			WENew(&dr, &dr, weDoUndo | weDoAutoScroll | weDoMonoStyled | weDoDragAndDrop | weDoAutoBlink, &inputLine._il);
 			WESetInfo(weRefCon, &inputLine.w, inputLine._il);
 			WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, inputLine._il);
 			WESetUserInfo(kInputField, kInputField, inputLine._il);
