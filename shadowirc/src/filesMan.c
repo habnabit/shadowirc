@@ -574,69 +574,6 @@ pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileNam
 
 #pragma mark -
 
-pascal OSErr PFOpen(ConstStr255Param name, char resFork, short *refNum, FSSpec *fss)
-{
-	FSSpec temp=pluginPrefsFSSpec;
-	short err;
-	
-	pstrcpy(name, temp.name);
-	if(resFork)
-	{
-		*refNum=FSpOpenResFile(&temp, fsRdWrPerm);
-		err=ResError();
-	}
-	else
-		err=FSpOpenDF(&temp, fsRdWrPerm, refNum);
-	
-	FileAdd(*refNum, resFork);
-
-	if(fss)
-		*fss = temp;
-	
-	return err;
-}
-
-pascal char PFExists(ConstStr255Param name)
-{
-	FSSpec temp=pluginPrefsFSSpec;
-	FInfo f;
-	
-	pstrcpy(name, temp.name);
-	return !FSpGetFInfo(&temp, &f);
-	
-}
-
-pascal OSErr PFCreate(ConstStr255Param name, FourCharCode type, FourCharCode creator, char resFork)
-{
-	FSSpec temp=pluginPrefsFSSpec;
-	
-	pstrcpy(name, temp.name);
-	if(resFork)
-	{
-		FSpCreateResFile(&temp, creator, type, 0);
-		return ResError();	
-	}
-	else
-	{
-		return FSpCreate(&temp, creator, type, 0);
-	}
-}
-
-pascal OSErr PFClose(short refNum)
-{
-	return FileClose(refNum);
-}
-
-pascal OSErr PFDelete(ConstStr255Param name)
-{
-	FSSpec temp=pluginPrefsFSSpec;
-
-	pstrcpy(name, temp.name);
-	return FSpDelete(&temp);
-}
-
-#pragma mark -
-
 enum PrefsData {
 	kShadowIRC10PreferencesVersion = 1,
 	kShadowIRC11OldPreferencesVersion = 2,

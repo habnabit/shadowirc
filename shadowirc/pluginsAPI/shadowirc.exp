@@ -172,11 +172,6 @@ _DCCSendCookie
 _DCCSendCookieReply
 _PMLAdd
 _OpenPreferencesWindow
-_PFOpen
-_PFExists
-_PFCreate
-_PFClose
-_PFDelete
 _FileAdd
 _FileClose
 _MBIdle

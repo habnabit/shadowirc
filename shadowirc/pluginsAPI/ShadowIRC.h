@@ -3109,58 +3109,6 @@ pascal void OpenPreferencesWindow(short panelID);
 */
 
 
-#pragma mark ¥ Preferences Files
-/*	------------------------------------------------------------------------------------------
-		Preferences Files
-		
-		Use these functions to manipulate plugin prefs files. They go in the 'Preferences' folder in the plugins
-		folder.
-		
-		Most of these functions are simple abstractions of file manager calls. These are noted in the
-		descriptions of the functions. If you're comfortable with the File Manager, you may wish to use the
-		File Manager directly.
-		------------------------------------------------------------------------------------------
-*/
-
-pascal OSErr PFOpen(ConstStr255Param name, char resFork, short *refNum, FSSpec *fsp);
-/*	Opens a preferences file.
-		Input:	name - the name of the prefs file
-					resFork - true if you want to open the resource fork, false if you want the data fork
-		Output:	refNum - a reference number for the file
-					fsp - if not nil, and the file was opened, the FSSpec to the file.
-					return value: File Manager/Resource Manager error code
-*/
-
-pascal char PFExists(ConstStr255Param name);
-/*	Checks to see if a file with a given name exists in the plugins preferences folder.
-		Input:	name - the name of the prefs file
-		Output:	return value - true if the file exists, false if not
-*/
-
-pascal OSErr PFCreate(ConstStr255Param name, FourCharCode type, FourCharCode creator, char resFork);
-/*	Creates a preferences file in the plugins preferences folder
-		Input:	name - name of the prefs file
-					type - file type of file
-					creator - creator of file
-					resFork - true if you want to create a resource fork, false if you want a data fork
-		Output:	return value: File Manager/Resource Manager error code
-*/
-
-pascal OSErr PFClose(short refNum);
-/*	Closes a file.
-		Input:	refNum - file reference number
-		Output:	return value: File Manager error code
-		Notes:	¥ Equivilant to err = FSClose(refNum);
-					¥ Don't use on resource files.
-					¥ You probably don't need this function. Use FileClose() instead.
-*/
-
-pascal OSErr PFDelete(ConstStr255Param name);
-/*	Deletes a plugin preferences file
-		Input:	name - name of prefs file to delete
-		Output:	return value: File Manager error code
-*/
-
 #pragma mark ¥ File Managment
 /*	------------------------------------------------------------------------------------------
 		File Managment

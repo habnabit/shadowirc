@@ -79,14 +79,7 @@ PicHandle LoadAppLogoFromResources(void);
 
 pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileName, long type, long creator, long navFlags, FSSpec *f, char allowReplace);
 
-pascal OSErr PFOpen(ConstStr255Param name, char resFork, short *refNum, FSSpec *fss);
-pascal char PFExists(ConstStr255Param name);
-pascal OSErr PFCreate(ConstStr255Param name, FourCharCode type, FourCharCode creator, char resFork);
-pascal OSErr PFClose(short refNum);
-pascal OSErr PFDelete(ConstStr255Param name);
-
 OSStatus DirectorySelectButtonRef(FSRef *ref);
-pascal char DirectorySelectButton(FSSpec *fss);
 pascal void CleanFolderFSp(FSSpec *fss);
 
 pascal void FileAdd(short fref, char res);
