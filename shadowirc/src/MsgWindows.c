@@ -1355,7 +1355,7 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 							SysBeep(0);
 						if(ls.len+1 < maxLSlen)
 						{
-							BlockMoveData(&ls.data[i+1], &ls.data[i+2], ls.len-i+1);
+							BlockMoveData(&ls.data[i+1], &ls.data[i+2], (ls.len - i) + 1);
 							ls.data[i]='^';
 							ls.data[i+1]='G';
 							ls.len++;
@@ -1643,13 +1643,14 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 		if(win==MWActive)
 			WEActivate(we);
 		
+		//If noCR, then we don't want to output ls.data[0].
 		if(win->logRefNum && !dontLog)
 		{
-			len=ls.len+1;
+			len = ls.len + !noCR;
 			GetEOF(win->logRefNum, &nl);
-			SetEOF(win->logRefNum, nl+len);
+			SetEOF(win->logRefNum, nl + len);
 			SetFPos(win->logRefNum, fsFromStart, nl);
-			FSWrite(win->logRefNum, &len, &ls.data[0]);
+			FSWrite(win->logRefNum, &len, &ls.data[noCR]);
 		}
 	}
 }
