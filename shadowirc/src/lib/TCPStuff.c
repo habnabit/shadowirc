@@ -783,7 +783,8 @@ OSErr NewListenConnection(connectionIndex *cp, u_short localport, int backlog)
 		cpi = *cp;
 		if(ValidConnection(&cpi))
 		{
-			connections[cpi].state = doTCPListenOpen(&connections[--cpi].sockfd, localport, backlog);
+			cpi--;
+			connections[cpi].state = doTCPListenOpen(&connections[cpi].sockfd, localport, backlog);
 			connections[cpi].timeout = TickCount() + TO_ListenOpen;
 			connections[cpi].status = CS_Opening;
                         /*
@@ -817,7 +818,8 @@ OSErr NewActiveConnection(connectionIndex *cp, struct in_addr remotehost, u_shor
 		cpi = *cp;
 		if(ValidConnection(&cpi))
 		{
-			connections[cpi].state = doTCPActiveOpen(&connections[--cpi].sockfd, remotehost, remoteport);
+			cpi--;
+			connections[cpi].state = doTCPActiveOpen(&connections[cpi].sockfd, remotehost, remoteport);
 			connections[cpi].timeout = TickCount() + TO_ActiveOpen;
 			connections[cpi].status = CS_Opening;
                         /*
