@@ -57,6 +57,7 @@
 			);
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				OPTIMIZATION_CFLAGS = "-Os";
 			};
 			isa = PBXBuildStyle;
 			name = Deployment;
@@ -268,7 +269,6 @@
 				F5BE65840359094B0132A983,
 			);
 			buildSettings = {
-				EXPORTED_SYMBOLS_FILE = pluginsAPI/shadowirc.exp;
 				FRAMEWORK_SEARCH_PATHS = "";
 				HEADER_SEARCH_PATHS = "";
 				INSTALL_PATH = /Applications;
