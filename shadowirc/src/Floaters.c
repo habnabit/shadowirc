@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -24,11 +24,9 @@
 
 Rect *WGetBBox(WindowPtr w, Rect *rr)
 {
-    RgnHandle r = NewRgn();
-    GetWindowRegion(w, kWindowContentRgn, r);
-    GetRegionBounds(r, rr);
-    DisposeRgn(r);
-    return rr;
+	GetWindowBounds(w, kWindowContentRgn, rr);
+	
+	return rr;
 }
 
 pascal char WIsFloater(WindowPtr w)
