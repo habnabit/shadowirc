@@ -29,6 +29,8 @@
 #include "LongStrings.h"
 #include "inline.h"
 
+#define USE_SHADOWIRC_ASSEMBLY 0
+
 pascal void LSDupe(const LongString * const l1, LongString *l2)
 {
 	int len;
@@ -42,7 +44,7 @@ pascal void LSDupe(const LongString * const l1, LongString *l2)
 	BlockMoveData(l1, l2, len);
 }
 
-#if !__POWERPC__
+#if !USE_SHADOWIRC_ASSEMBLY
 pascal char LSCmp(const LongString *ls1, const LongString *ls2)
 {
 	int x, y;
@@ -217,7 +219,7 @@ inline char inupc(char c)
 }
 */
 
-#if !__POWERPC__
+#if !USE_SHADOWIRC_ASSEMBLY
 pascal char LSCaseCmp(const LongString *ls1, const LongString *ls2)
 {
 	int x, y;
@@ -478,7 +480,7 @@ pascal void LSNextArgND(LongString *ls, StringPtr arg)
 		LSCopyString(ls,1,ls->len, arg);
 }
 
-#if !__POWERPC__
+#if !USE_SHADOWIRC_ASSEMBLY
 pascal short LSPosChar(short c, const LongString *ls)
 {
 	int i=1;

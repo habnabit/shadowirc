@@ -28,6 +28,7 @@
 #include "utils.h"
 #include "ApplBase.h"
 
+#define USE_SHADOWIRC_ASSEMBLY 0
 
 /* CPC - Not defined
 static pascal void FlashDialogItem(DialogPtr theDialog, short item);
@@ -433,7 +434,7 @@ pascal void pdelete(StringPtr s, short start, short len)
 	}
 }
 
-#if !__POWERPC__
+#if !USE_SHADOWIRC_ASSEMBLY
 pascal char pstrcmp(ConstStr255Param s1, ConstStr255Param s2)
 {
 	int x=s1[0];
@@ -554,7 +555,7 @@ asm pascal char pstrcmp(register ConstStr255Param s1, register ConstStr255Param 
 }
 #endif
 
-#if !__POWERPC__
+#if !USE_SHADOWIRC_ASSEMBLY
 pascal char pstrcasecmp(ConstStr255Param s1, ConstStr255Param s2)
 {
 	int x;
@@ -613,7 +614,7 @@ asm pascal char pstrcasecmp(register ConstStr255Param s1, register ConstStr255Pa
 }
 #endif
 
-#if !__POWERPC__
+#if !USE_SHADOWIRC_ASSEMBLY
 pascal char pstrcasecmp2(ConstStr255Param s1, ConstStr255Param s2)
 {
 	int x=s1[0];
@@ -861,7 +862,7 @@ pascal void ucase(StringPtr str)
 			str[x]-=32;
 }
 
-#if !__POWERPC__
+#if !USE_SHADOWIRC_ASSEMBLY
 pascal void pstrcpyucase(ConstStr255Param src, Str255 dest)
 {
 	int x;
@@ -920,7 +921,7 @@ pascal unsigned short countChar(short c, const ConstStr255Param s)
 	return count;
 }
 
-#if !__POWERPC__
+#if !USE_SHADOWIRC_ASSEMBLY
 pascal unsigned short revPos(short c, ConstStr255Param s)
 {
 	int x=s[0];
@@ -961,7 +962,7 @@ asm pascal unsigned short revPos(register short c, register ConstStr255Param s)
 }
 #endif
 
-#if !__POWERPC__
+#if !USE_SHADOWIRC_ASSEMBLY
 pascal char isNumber(ConstStr255Param s)
 {
 	int n=s[0], x;
@@ -1049,7 +1050,7 @@ pascal char isIPNumber(ConstStr255Param s)
 	return((n>=7)&&(n<=15));
 }
 
-#if !__POWERPC__
+#if !USE_SHADOWIRC_ASSEMBLY
 pascal unsigned short pos(short c, ConstStr255Param s)
 {
 	int x;
