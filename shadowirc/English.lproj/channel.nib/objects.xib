@@ -4,7 +4,7 @@
   <object name="rootObject" class="NSCustomObject" id="1">
     <string name="customClass">NSApplication</string>
   </object>
-  <array count="8" name="allObjects">
+  <array count="26" name="allObjects">
     <object class="IBCarbonEditText" id="180">
       <string name="bounds">46 23 111 337 </string>
       <ostype name="controlSignature">SIRC</ostype>
@@ -66,11 +66,143 @@
       <boolean name="hasVerticalZoom">FALSE</boolean>
       <int name="carbonWindowClass">11</int>
       <int name="themeBrush">50</int>
-      <int name="windowPosition">0</int>
     </object>
     <reference idRef="187"/>
+    <object class="IBCarbonRootControl" id="188">
+      <string name="bounds">0 0 87 190 </string>
+      <array count="4" name="subviews">
+        <object class="IBCarbonButton" id="192">
+          <string name="bounds">62 115 82 183 </string>
+          <ostype name="controlSignature">SIRC</ostype>
+          <int name="controlID">1</int>
+          <string name="title">OK</string>
+          <ostype name="command">ok  </ostype>
+          <int name="buttonType">1</int>
+        </object>
+        <object class="IBCarbonButton" id="189">
+          <string name="bounds">62 7 82 75 </string>
+          <ostype name="controlSignature">SIRC</ostype>
+          <int name="controlID">2</int>
+          <string name="title">Cancel</string>
+          <ostype name="command">not!</ostype>
+          <int name="buttonType">2</int>
+        </object>
+        <object class="IBCarbonStaticText" id="191">
+          <string name="bounds">3 2 22 187 </string>
+          <int name="controlID">3</int>
+          <string name="title">Set font size to:</string>
+        </object>
+        <object class="IBCarbonEditText" id="190">
+          <string name="bounds">34 66 48 125 </string>
+          <ostype name="controlSignature">SIRC</ostype>
+          <int name="controlID">4</int>
+        </object>
+      </array>
+    </object>
+    <reference idRef="189"/>
+    <reference idRef="190"/>
+    <reference idRef="191"/>
+    <reference idRef="192"/>
+    <object class="IBCarbonWindow" id="193">
+      <string name="windowRect">180 266 267 456 </string>
+      <string name="title">Font Size</string>
+      <reference name="rootControl" idRef="188"/>
+      <boolean name="hasHorizontalZoom">FALSE</boolean>
+      <boolean name="isResizable">FALSE</boolean>
+      <boolean name="hasVerticalZoom">FALSE</boolean>
+      <int name="carbonWindowClass">4</int>
+      <int name="themeBrush">49</int>
+    </object>
+    <object class="IBCarbonStaticText" id="194">
+      <string name="bounds">3 2 28 187 </string>
+      <int name="controlID">3</int>
+      <string name="title">Set channel key for ^0 to:</string>
+    </object>
+    <object class="IBCarbonButton" id="195">
+      <string name="bounds">62 115 82 183 </string>
+      <int name="controlID">1</int>
+      <string name="title">OK</string>
+      <ostype name="command">ok  </ostype>
+      <int name="buttonType">1</int>
+    </object>
+    <object class="IBCarbonButton" id="196">
+      <string name="bounds">62 7 82 75 </string>
+      <int name="controlID">2</int>
+      <string name="title">Cancel</string>
+      <ostype name="command">not!</ostype>
+      <int name="buttonType">2</int>
+    </object>
+    <object class="IBCarbonStaticText" id="197">
+      <string name="bounds">3 2 33 187 </string>
+      <int name="controlID">3</int>
+      <string name="title">Set user limit on ^0 to:</string>
+    </object>
+    <object class="IBCarbonEditText" id="198">
+      <string name="bounds">33 45 47 145 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">4</int>
+    </object>
+    <object class="IBCarbonRootControl" id="199">
+      <string name="bounds">0 0 87 190 </string>
+      <array count="4" name="subviews">
+        <reference idRef="195"/>
+        <object class="IBCarbonButton" id="204">
+          <string name="bounds">62 7 82 75 </string>
+          <int name="controlID">2</int>
+          <string name="title">Cancel</string>
+          <ostype name="command">not!</ostype>
+          <int name="buttonType">2</int>
+        </object>
+        <reference idRef="194"/>
+        <reference idRef="198"/>
+      </array>
+    </object>
+    <object class="IBCarbonRootControl" id="200">
+      <string name="bounds">0 0 87 190 </string>
+      <array count="4" name="subviews">
+        <object class="IBCarbonButton" id="205">
+          <string name="bounds">62 115 82 183 </string>
+          <int name="controlID">1</int>
+          <string name="title">OK</string>
+          <ostype name="command">ok  </ostype>
+          <int name="buttonType">1</int>
+        </object>
+        <reference idRef="196"/>
+        <reference idRef="197"/>
+        <object class="IBCarbonEditText" id="202">
+          <string name="bounds">33 66 47 125 </string>
+          <ostype name="controlSignature">SIRC</ostype>
+          <int name="controlID">4</int>
+        </object>
+      </array>
+    </object>
+    <object class="IBCarbonWindow" id="201">
+      <string name="windowRect">173 161 260 351 </string>
+      <string name="title">Channel Key</string>
+      <reference name="rootControl" idRef="199"/>
+      <boolean name="hasHorizontalZoom">FALSE</boolean>
+      <boolean name="isResizable">FALSE</boolean>
+      <boolean name="hasVerticalZoom">FALSE</boolean>
+      <int name="carbonWindowClass">4</int>
+      <int name="themeBrush">49</int>
+      <int name="windowPosition">7</int>
+    </object>
+    <reference idRef="202"/>
+    <object class="IBCarbonWindow" id="203">
+      <string name="windowRect">46 164 133 354 </string>
+      <string name="title">Channel Limit</string>
+      <reference name="rootControl" idRef="200"/>
+      <boolean name="hasHorizontalZoom">FALSE</boolean>
+      <boolean name="isResizable">FALSE</boolean>
+      <boolean name="hasVerticalZoom">FALSE</boolean>
+      <int name="carbonWindowClass">4</int>
+      <int name="themeBrush">49</int>
+      <int name="windowPosition">7</int>
+    </object>
+    <reference idRef="204"/>
+    <reference idRef="205"/>
   </array>
-  <array count="8" name="allParents">
+  <array count="26" name="allParents">
     <reference idRef="187"/>
     <reference idRef="187"/>
     <reference idRef="187"/>
@@ -79,12 +211,36 @@
     <reference idRef="187"/>
     <reference idRef="1"/>
     <reference idRef="186"/>
+    <reference idRef="193"/>
+    <reference idRef="188"/>
+    <reference idRef="188"/>
+    <reference idRef="188"/>
+    <reference idRef="188"/>
+    <reference idRef="1"/>
+    <reference idRef="199"/>
+    <reference idRef="199"/>
+    <reference idRef="200"/>
+    <reference idRef="200"/>
+    <reference idRef="199"/>
+    <reference idRef="201"/>
+    <reference idRef="203"/>
+    <reference idRef="1"/>
+    <reference idRef="200"/>
+    <reference idRef="1"/>
+    <reference idRef="199"/>
+    <reference idRef="200"/>
   </array>
-  <dictionary count="2" name="nameTable">
+  <dictionary count="5" name="nameTable">
     <string>Channel Topic</string>
     <reference idRef="186"/>
     <string>File&apos;s Owner</string>
     <reference idRef="1"/>
+    <string>Font Size</string>
+    <reference idRef="193"/>
+    <string>modeK</string>
+    <reference idRef="201"/>
+    <string>modeL</string>
+    <reference idRef="203"/>
   </dictionary>
-  <unsigned_int name="nextObjectID">188</unsigned_int>
+  <unsigned_int name="nextObjectID">206</unsigned_int>
 </object>
