@@ -112,7 +112,7 @@ const RGBColor mircColors[kMaxMircColors]=	{	{pct1000,	pct1000,	pct1000},
 
 static pascal Style DoAddHunk(Style s, myStScrpHandle sty, int i, int *nsty);
 static pascal Style DoAddColorHunk(Style s, myStScrpHandle sty, int i, int *nsty, int colornum, short colorMethod);
-inline void DoAddRGBColorHunk(myStScrpHandle sty, int i, int *nsty, const RGBColor *front, const RGBColor *back);
+static pascal void DoAddRGBColorHunk(myStScrpHandle sty, int i, int *nsty, const RGBColor *front, const RGBColor *back);
 
 
 static WEScrollUPP sScrollerUPP = 0;
@@ -1229,7 +1229,7 @@ static pascal Style DoAddColorHunk(Style s, myStScrpHandle sty, int i, int *nsty
 	return s;
 }
 
-inline void DoAddRGBColorHunk(myStScrpHandle sty, int i, int *nsty, const RGBColor *front, const RGBColor *back)
+static pascal void DoAddRGBColorHunk(myStScrpHandle sty, int i, int *nsty, const RGBColor *front, const RGBColor *back)
 {
 	myScrpSTElement *q;
 
@@ -1379,9 +1379,7 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 						
 						if(i>=ls.len)
 						{
-							if(ls.data[i] == C_COLOR)
-								LSDelete(&ls, i, i);
-							i = ls.len + 1;
+							LSDelete(&ls, i, i);
 							break;
 						}
 						
@@ -1477,11 +1475,11 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 						if(i >= ls.len)
 						{
 							//DebugStr("\p!colorErr!;g");
-							//LSDelete(&ls, i, i+1);
+							LSDelete(&ls, i, i+1);
 							i = ls.len + 1;
 							break;
 						}
-						c=ls.data[i+1];
+						c = ls.data[i+1];
 						LSDelete(&ls, i, i+1); //Delete the 0x08 and the character immediately folowing it.
 						if((c>=0) && (c<numSIColors))
 						{
