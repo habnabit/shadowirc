@@ -279,7 +279,7 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 	
 	if(activate) //activatechannels
 	{
-		if(p && !inBackground && IsWindowActive(p->w))
+		if(p && IsWindowActive(p->w))
 			SetTarget(p, &CurrentTarget);
 		else
 			InvalTarget(&CurrentTarget);
