@@ -181,4 +181,5 @@ pascal void DCCSSayQuiet(connectionPtr *x, LongString *ls);
 
 pascal void DCCTypeInit(void);
 
+OSStatus SetupDCCFolder(FSRef *ref);
 #endif

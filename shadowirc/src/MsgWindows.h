@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -235,6 +235,7 @@ pascal void MWUnquote(MWPtr mw);
 pascal void MWQuote(MWPtr mw);
 
 pascal OSErr MWLogToFSp(MWPtr mw, const FSSpec *fs, long s0, long s1);
+OSStatus SetupLogFolder(FSRef *ref);
 pascal void MWLogToFile(MWPtr mw, long s0, long s1);
 pascal void MWStopLogging(MWPtr mw);
 pascal void MWStartLogging(MWPtr w);

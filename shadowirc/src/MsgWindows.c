@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -43,6 +43,12 @@
 #include "MWPanes.h"
 #include "InputLine.h"
 #include "Events.h"
+#include "MoreFilesX.h"
+#include "IRCCFPrefs.h"
+#include "StringKeys.h"
+
+#define kLogFolderNameKey CFSTR("LogFolderName")
+#define kPrefLogFolder CFSTR("LogFolder")
 
 MWPtr mwl = 0;
 
@@ -450,6 +456,45 @@ pascal void MWLogToFile(MWPtr mw, long s0, long s1)
 	
 	if(MyStandardPutFile(0, s, 'TEXT', 'SIRC', kNDefault, &f, true) <= 0)
 		MWLogToFSp(mw, &f, s0, s1);
+}
+
+OSStatus SetupLogFolder(FSRef *ref)
+{
+	OSStatus err = noErr;
+	FSRef parentRef, localRef;
+	CFStringRef string;
+	
+	err = ReadDirURLRef(kPrefLogFolder, &localRef);
+	if(err != noErr)
+	{
+		err = FSFindFolder(kUserDomain, kDomainLibraryFolderType, kCreateFolder, &parentRef);
+		if(err == noErr)
+		{
+			string = CFCopyLocalizedString(kLogFolderNameKey, NULL);
+			err = UseDirFSRef(&parentRef, string, TRUE, &localRef);
+			CFRelease(string);
+			
+			if((err == noErr) && (FSRefValid(&localRef)))
+				BlockMoveData(&localRef, &parentRef, sizeof(FSRef));
+			else
+				return paramErr;
+			
+			string = (CFStringRef) CFBundleGetValueForInfoDictionaryKey(CFBundleGetMainBundle(), CFSTR("CFBundleName"));
+			err = UseDirFSRef(&parentRef, string, TRUE, &localRef);
+			
+			if((err == noErr) && (FSRefValid(&localRef)))
+			{
+				BlockMoveData(&localRef, ref, sizeof(FSRef));
+				err = WriteDirURLRef(kPrefLogFolder, ref);
+			}
+			else
+				err = paramErr;
+		}
+	}
+	else
+		BlockMoveData(&localRef, ref, sizeof(FSRef));
+	
+ 	return err;
 }
 
 pascal void MWStopLogging(MWPtr mw)

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -34,16 +34,9 @@
 #include "IRCCFPrefs.h"
 
 #include "MoreFiles.h"
-
-/*
-	Best way to get fsspec of something in the app's dir:
-	GetProcessInformation() to get a spec to your application, then replace the name field of that spec with the other file name.
-*/
-
-enum aliases {
-	logAlias = 128,
-	dccAlias = 129
-};
+#include "StringKeys.h"
+#include "MsgWindows.h"
+#include "DCC.h"
 
 short mainRefNum = 0, mainResNum = 0;
 static FSSpec mainPrefsLoc;
@@ -64,9 +57,7 @@ static void CreateNewPrefsMain(void);
 static void CreateNewPrefsLinks(void);
 static void CreateNewPrefs(void);
 static void AllocateNewPrefs(void);
-
-static void WriteAlias(const FSSpec *fs, short id);
-static void ReadAlias(FSSpec *fs, short id);
+static void FolderErrorToConsole(CFStringRef errorKey);
 
 static fileListPtr FileFind(short fref)
 {
@@ -494,67 +485,6 @@ enum PrefsData {
 	SizeOfPrefs = sizeof(prefsStruct) + SizeOfPrefsDataArea
 };
 
-static void WriteAlias(const FSSpec *fs, short id)
-{
-	AliasHandle alias;
-	Handle rh;
-	short err;
-	long siz;
-
-	if(mainResNum)
-	{
-		err = NewAlias(0, fs, &alias);
-		if(!err)
-		{
-			rh = Get1Resource('alis', id);
-			if(rh)
-			{
-				siz =GetHandleSize((Handle)alias);
-				SetHandleSize(rh, siz);
-				BlockMoveData(*alias, *rh, siz);
-				ChangedResource(rh);
-				DisposeHandle((Handle)alias);
-			}
-			else
-			{
-				AddResource((Handle)alias, 'alis', id, 0);
-				rh = (Handle)alias;
-			}
-			if(rh)
-			{
-				WriteResource(rh);
-				ReleaseResource(rh);
-				UpdateResFile(mainResNum);
-			}
-		}
-	}
-}
-
-static void ReadAlias(FSSpec *fs, short id)
-{
-	AliasHandle alias;
-	short err;
-	Boolean b;
-	
-	if(mainResNum)
-	{
-		alias = (AliasHandle)Get1Resource('alis', id);
-		
-		if(alias)
-		{
-			err = ResolveAlias(0, alias, fs, &b);
-			CleanFolderFSp(fs);
-			if(b)
-			{
-				ChangedResource((Handle)alias);
-				WriteResource((Handle)alias);
-			}
-			if(!err)
-				ReleaseResource((Handle)alias);
-		}
-	}
-}
-
 pascal void writeMainPrefs(void)
 {
 	long l;
@@ -583,9 +513,6 @@ pascal void writeMainPrefs(void)
 	l=sizeof(linkPrefsRec) * 10;
 	FSWrite(mainRefNum, &l, (Ptr)linkPrefsArray);
 	
-	//Make aliases for the fsspecs and save them
-	WriteAlias(&logFolderFSp, logAlias);
-	WriteAlias(&dccFolderFSp, dccAlias);
 	ClosePrefs();
         
 
@@ -611,7 +538,6 @@ static void ReadInPrefs(void)
 	int x;
 	char valid;
 	linkPtr lp;
-	short resNum;
 	
 	FSRead(mainRefNum, &l, &p);
 	if(p.version==kShadowIRC10PreferencesVersion)
@@ -719,11 +645,45 @@ static void ReadInPrefs(void)
 	SetFPos(mainRefNum, fsFromStart, 0);
 	l=sizeof(p);
 	FSWrite(mainRefNum, &l, &p);
-	resNum = CurResFile();
-	UseResFile(mainResNum);
-	ReadAlias(&logFolderFSp, logAlias);
-	ReadAlias(&dccFolderFSp, dccAlias);
-	UseResFile(resNum);
+}
+
+OSStatus UseDirFSRef(const FSRef *parentRef, CFStringRef string, Boolean create, FSRef *ref)
+{
+	OSStatus err = noErr;
+	FSCatalogInfo catalogInfo;
+	UniChar *nameBuf = NULL;
+	UniCharCount bufLen = 0;
+	
+	bufLen = (UniCharCount)CFStringGetLength(string);
+	
+	if(bufLen)
+	{
+		nameBuf = (UniChar *)NewPtr(bufLen * sizeof(UniChar));
+		err = MemError();
+		if(err != noErr)
+			return err;
+		
+		CFStringGetCharacters(string, CFRangeMake(0, bufLen), &nameBuf[0]);
+		
+		if(nameBuf != NULL)
+		{
+			// To be a good directory creation citizen on OS X,
+			// Apple recommends setting the text encoding hint (if nothing else)
+			catalogInfo.textEncodingHint = kTextEncodingUnicodeDefault;
+			
+			err = FSMakeFSRefUnicode(parentRef, bufLen, nameBuf, kTextEncodingUnicodeDefault, ref);
+			if((err == fnfErr) && (create == TRUE))
+				err = FSCreateDirectoryUnicode(parentRef, bufLen, nameBuf, kFSCatInfoTextEncoding, &catalogInfo, ref, NULL, NULL);
+			
+			DisposePtr((Ptr)nameBuf);
+		}
+		else
+			err = paramErr;
+	}
+	else
+		err = paramErr;
+	
+	return err;
 }
 
 static void CreateNewPrefsMain(void)
@@ -917,6 +877,20 @@ static void AllocateNewPrefs(void)
 	shadowircColors=(RGBColor*)NewPtr(sizeof(RGBColor)*(numSIColors)); //don't clear this because ALL of it is being set
 }
 
+static void FolderErrorToConsole(CFStringRef errorKey)
+{
+	CFStringRef string;
+	Str255 pstring;
+	LongString ls;
+	
+	string = CFCopyLocalizedString(errorKey, NULL);
+	CFStringGetPascalString(string, pstring, sizeof(Str255), CFStringGetSystemEncoding());
+	CFRelease(string);
+	
+	LSStrLS(pstring, &ls);
+	LineMsg(&ls);
+}
+
 pascal char readMainPrefs(void)
 {
 	short vref;
@@ -925,6 +899,7 @@ pascal char readMainPrefs(void)
 	Boolean isDir;
 	FSSpec f2;
 	FSSpec ShadowIRCFolder;
+	FSRef localRef;
 	long ShadowIRCFolderDirID, PreferencesFolderDirID;
 	
 	err = FindFolder(kUserDomain, kPreferencesFolderType, kDontCreateFolder, &vref, &PreferencesFolderDirID);
@@ -989,6 +964,24 @@ pascal char readMainPrefs(void)
 	}
 	
 	ReadShortCutDataCFPrefs(mainPrefs->shortcuts); // This will go somewhere else.
+	
+	err = SetupDCCFolder(&localRef);
+	if(err == noErr)
+		err = FSGetCatalogInfo(&localRef, kFSCatInfoNone, NULL, NULL, &dccFolderFSp, NULL);
+	else if(err == paramErr)
+	{
+		FolderErrorToConsole(kNoDCCFolderKey);
+		err = noErr;
+	}
+	
+	err = SetupLogFolder(&localRef);
+	if(err == noErr)
+		err = FSGetCatalogInfo(&localRef, kFSCatInfoNone, NULL, NULL, &logFolderFSp, NULL);
+	else if(err == paramErr)
+	{
+		FolderErrorToConsole(kNoLogFolderKey);
+		err = noErr;
+	}
         
 	ClosePrefs();
 	

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -69,6 +69,8 @@ enum openRsrcs {
 pascal void writeMainPrefs(void);
 pascal void writeAllFiles(void);
 pascal char readMainPrefs(void); //Return true if the prefs were just created
+
+OSStatus UseDirFSRef(const FSRef *parentRef, CFStringRef string, Boolean create, FSRef *ref);
 
 OSStatus GetFSRefForResourcesFolder(FSRef *ref);
 PicHandle LoadAppLogoFromResources(void);

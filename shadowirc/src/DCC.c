@@ -45,10 +45,14 @@
 #include "TextManip.h"
 #include "WindowList.h"
 #include "InetConfig.h"
+#include "IRCCFPrefs.h"
 
 pascal long ShadowIRCVersion(StringPtr str);
 
 #define kShadowIRCChatCookie "\pcHaT"
+
+#define kDCCFolderNameKey CFSTR("DCCFolderName")
+#define kPrefDCCFolder CFSTR("DCCFolder")
 
 enum ShadowIRCCookies {
 	kShadowIRCChatCookie2 = 0xFDCBFDCB,
@@ -2155,4 +2159,29 @@ pascal ConstStringPtr dccFlagTypToStr(short d)
 		default:
 			return "\pUNKNOWN";
 	}
+}
+
+#pragma mark -
+
+OSStatus SetupDCCFolder(FSRef *ref)
+{
+	OSStatus err = noErr;
+	FSRef localRef;
+	
+	err = ReadDirURLRef(kPrefDCCFolder, &localRef);
+	if(err != noErr)
+	{
+		err = GetFSRefForDownloadsFolder(&localRef);
+		if(err == noErr)
+		{
+			BlockMoveData(&localRef, ref, sizeof(FSRef));
+			err = WriteDirURLRef(kPrefDCCFolder, ref);
+		}
+		else
+			err = paramErr;
+	}
+	else
+		BlockMoveData(&localRef, ref, sizeof(FSRef));
+	
+	return err;
 }
