@@ -522,7 +522,7 @@ typedef union {
         struct sockaddr sa;
         struct sockaddr_in sin;
         struct sockaddr_in6 sin6;
-    } sockaddr_union;
+} sockaddr_union;
 
 /*
  * TCPLocalPort
