@@ -338,36 +338,6 @@ pascal short IPCRegister(FourCharCode IPCType, long version, long data)
 
 #pragma mark -
 
-pascal short HMIAdd(ConstStr63Param name)
-{
-/*
-	int i;
-	
-	if(name[0])
-	{
-		i=(**hmiList).num++;
-		SetHandleSize((Handle)hmiList, sizeof(long)+((**hmiList).num*sizeof(hmItem)));
-		(**hmiList).list[i].pluginRef=sidr.yourInfo;
-		pstrcpy(name, (**hmiList).list[i].name);
-		
-		i=CountMenuItems(gHelpMenu);
-		if(i<normHelpMenuItems)
-		{
-			AppendMenu(gHelpMenu, "\p-");
-			AppendMenu(menuHelpWidget, "\p-");
-		}
-		
-		AppendMenu(gHelpMenu, name);
-		AppendMenu(menuHelpWidget, name);
-		return i;
-	}
-	else
-*/
-		return -1;
-}
-
-#pragma mark -
-
 #define SavePluginState() \
 	plugsPtr prevInfo = sidr.yourInfo; \
 	void* prevMsgD = sidr.messageData; \

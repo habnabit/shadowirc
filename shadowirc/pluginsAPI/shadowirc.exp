@@ -34,7 +34,6 @@ _LSParamString
 _LSParamLS
 _NewService
 _ExistsService
-_HMIAdd
 _WMSGetMenuItemNum
 _WMSListAdd
 _RegisterAETE

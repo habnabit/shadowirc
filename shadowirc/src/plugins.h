@@ -1104,7 +1104,6 @@ pascal void SoundService(long sound, long data);
 
 pascal short WMSGetMenuItemNum(FourCharCode serviceType);
 
-pascal short HMIAdd(ConstStr63Param name);
 WindowPtr pluginNewWindow(const Rect *boundsRect, ConstStr255Param title, WindowAttributes flags, char isFloater);
 pascal void pluginDisposeWindow(WindowPtr d);
 pascal plugsPtr GetPluginWindowOwner(WindowPtr w);
