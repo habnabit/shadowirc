@@ -746,7 +746,7 @@ static void ProcessPluginsInDirectory(CFURLRef pluginURL)
 	CFArrayRef pluginRefs;
 	int i;
 	
-	pluginRefs = CFBundleCreateBundlesFromDirectory(NULL, pluginURL, CFSTR("bundle"));
+	pluginRefs = CFBundleCreateBundlesFromDirectory(NULL, pluginURL, CFSTR("plugin"));
 	if(pluginRefs != NULL)
 	{
 		CFStringRef pluginName;

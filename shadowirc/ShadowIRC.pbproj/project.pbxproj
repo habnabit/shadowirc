@@ -619,7 +619,7 @@
 				PRODUCT_NAME = Userlist;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
-				WRAPPER_EXTENSION = bundle;
+				WRAPPER_EXTENSION = plugin;
 			};
 			dependencies = (
 			);
@@ -660,7 +660,7 @@
 		};
 		F50FA70E0358BD880132A983 = {
 			isa = PBXBundleReference;
-			path = Userlist.bundle;
+			path = Userlist.plugin;
 			refType = 3;
 		};
 		F50FA7100358BE450132A983 = {
@@ -2369,7 +2369,7 @@
 				PRODUCT_NAME = Highlight;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
-				WRAPPER_EXTENSION = bundle;
+				WRAPPER_EXTENSION = plugin;
 			};
 			dependencies = (
 			);
@@ -2455,7 +2455,7 @@
 		};
 		F580515A03905D880132A983 = {
 			isa = PBXBundleReference;
-			path = Highlight.bundle;
+			path = Highlight.plugin;
 			refType = 3;
 		};
 		F580515D03905DF40132A983 = {
