@@ -452,17 +452,6 @@ resource 'CNTL' (10720) {
 	"Show"
 };
 
-resource 'CNTL' (10909) {
-	{36, 251, 51, 471},
-	0,
-	visible,
-	1,
-	0,
-	checkBoxProcUseWFont,
-	0,
-	"Use Fast(er) DCC Sends"
-};
-
 resource 'DITL' (-301) {
 	{	/* array DITLarray: 11 elements */
 		/* [1] */
@@ -1288,9 +1277,9 @@ resource 'DITL' (1005, "Prefs.DCC") {
 		},
 		/* [9] */
 		{36, 251, 51, 471},
-		Control {
+		CheckBox {
 			enabled,
-			10909
+			"Use Fast(er) DCC Sends"
 		},
 		/* [10] */
 		{56, 251, 77, 510},
