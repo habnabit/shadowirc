@@ -53,9 +53,9 @@ TXNObject IADGetTXN(inputAreaDataPtr iad)
 		return 0;
 }
 
-void IADSetFieldBounds(inputAreaDataPtr iad, Rect r)
+void IADSetFieldBounds(inputAreaDataPtr iad, Rect *r)
 {
-	SetControlBounds(iad->inputControl, &r);
+	SetControlBounds(iad->inputControl, r);
 }
 
 #pragma mark Text Actions

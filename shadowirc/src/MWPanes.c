@@ -56,7 +56,7 @@ static void UpdateInputRegion(mwPanePtr w)
 	r.bottom = w->drawArea.bottom - 6;
 	r.right = w->drawArea.right-6;
 	
-	IADSetFieldBounds(mw->inputData, r);
+	IADSetFieldBounds(mw->inputData, &r);
 }
 
 static void MWInputPaneClick(mwPanePtr o, Point where, float time, UInt32 modifiers)

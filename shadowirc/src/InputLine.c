@@ -950,7 +950,7 @@ static void IWGrow(WindowRef window, Rect r)
 	textRect.left = 0;
 	textRect.bottom = r.bottom - r.top;
 	textRect.right = r.right - r.left - 10;
-	IADSetFieldBounds(inputLine.inputData, textRect);
+	IADSetFieldBounds(inputLine.inputData, &textRect);
 	
 	textRect.bottom = textRect.top;
 	textRect.top = 0;

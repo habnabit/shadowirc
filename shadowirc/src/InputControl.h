@@ -28,7 +28,7 @@ typedef OSStatus (*InputControlTextProc)(inputAreaDataPtr iad, EventRef event);
 #pragma mark Accessors
 WindowPtr IADGetWindow(inputAreaDataPtr iad);
 TXNObject IADGetTXN(inputAreaDataPtr iad);
-void IADSetFieldBounds(inputAreaDataPtr iad, Rect r);
+void IADSetFieldBounds(inputAreaDataPtr iad, Rect *r);
 
 #pragma mark Text Actions
 void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish);
