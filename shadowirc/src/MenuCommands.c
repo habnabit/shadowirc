@@ -41,7 +41,6 @@
 #include "IRCCommands.h"
 #include "InetConfig.h"
 #include "Shortcuts.h"
-#include "CommandsMenu.h"
 #include "CMenus.h"
 #include "MenuCommands.h"
 
@@ -533,9 +532,6 @@ pascal void DoMenuEvent(long menuitem, const EventRecord *e)
 				break;
 			case windowMenu:
 				HitWindowMenu(itemNum);
-				break;
-			case commandsMenu:
-				HitCommandsMenu(itemNum, e->modifiers);
 				break;
 			case fontsMenu:
 				HitFontsMenu(itemNum);

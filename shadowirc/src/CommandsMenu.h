@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -22,6 +22,6 @@
 #ifndef _CommandsMenu
 #define _CommandsMenu
 
-pascal void HitCommandsMenu(short item, short modifiers);
+void HitCommandsMenu(short item);
 
 #endif

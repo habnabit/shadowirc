@@ -34,6 +34,7 @@
 #include "Floaters.h"
 #include "MenuCommands.h"
 #include "TextWindows.h"
+#include "CommandsMenu.h"
 
 static void DoAbout(void);
 
@@ -418,6 +419,11 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 		
 		case 'CONX':
 			HitSelectConnectionMenu(hiCommand.menu.menuItemIndex);
+			return noErr;
+		
+		//Command Menu
+		case 'COMD':
+			HitCommandsMenu(hiCommand.menu.menuItemIndex);
 			return noErr;
 		
 		//Window Menu

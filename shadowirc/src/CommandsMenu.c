@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -31,13 +31,14 @@
 #include "inline.h"
 #include "CommandsMenu.h"
 
-pascal void HitCommandsMenu(short item, short modifiers)
+void HitCommandsMenu(short item)
 {
 	LongString ls, il;
 	Str255 targ;
 	int tack;
 	short len;
 	Str255 s2;
+	short modifiers = 0;
 	
 	GetInputLine(&il);
 	len = il.len;

@@ -186,26 +186,32 @@
               <object class="IBCarbonMenuItem" id="287">
                 <string name="title">Join</string>
                 <string name="keyEquivalent">j</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="286">
                 <string name="title">Part</string>
                 <string name="keyEquivalent">p</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="288">
                 <string name="title">Kick</string>
                 <string name="keyEquivalent">k</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="289">
                 <string name="title">Mode</string>
                 <string name="keyEquivalent">l</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="290">
                 <string name="title">Topic</string>
                 <string name="keyEquivalent">t</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="291">
                 <string name="title">Invite</string>
                 <string name="keyEquivalent">i</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="292">
                 <boolean name="separator">TRUE</boolean>
@@ -213,10 +219,12 @@
               <object class="IBCarbonMenuItem" id="293">
                 <string name="title">Who</string>
                 <string name="keyEquivalent">r</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="294">
                 <string name="title">Whois</string>
                 <string name="keyEquivalent">b</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="295">
                 <boolean name="separator">TRUE</boolean>
@@ -224,10 +232,12 @@
               <object class="IBCarbonMenuItem" id="296">
                 <string name="title">Nick</string>
                 <string name="keyEquivalent">n</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="297">
                 <string name="title">Away</string>
                 <string name="keyEquivalent">y</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="298">
                 <boolean name="separator">TRUE</boolean>
@@ -235,10 +245,12 @@
               <object class="IBCarbonMenuItem" id="299">
                 <string name="title">Message</string>
                 <string name="keyEquivalent">m</string>
+                <ostype name="command">COMD</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="300">
                 <string name="title">Query</string>
                 <string name="keyEquivalent">e</string>
+                <ostype name="command">COMD</ostype>
               </object>
             </array>
           </object>

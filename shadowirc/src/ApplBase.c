@@ -967,14 +967,7 @@ static pascal void ApplEvents(EventRecord *e)
 		case autoKey:
 			if(!(e->modifiers & cmdKey))
 		case keyDown:
-			{
-				long l = MenuEvent(e);
-		
-				if(!l)
-					Key(e, !!(e->modifiers & cmdKey));
-				else
-					DoMenuEvent(l, e);
-			}
+				Key(e, !!(e->modifiers & cmdKey));
 			break;
 			
 		case mouseDown:
