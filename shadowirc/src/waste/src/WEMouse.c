@@ -1321,78 +1321,15 @@ pascal Boolean WEDraggedToTrash(DragReference drag)
 {
 #if WASTE_DRAG_AND_DROP
 	// return true if the drop location of the specified drag is the trash
+	// This function rewritten to use new Jaguar APIs. -JKB
+	
+	StandardDropLocation dropLocation;
+	
+	if(GetStandardDropLocation(drag, &dropLocation) == noErr)
+		return dropLocation == kDragStandardDropLocationTrash;
+	else
+		return false;
 
-	const int bDirectoryAttr = 4;
-
-	AEDesc dropLocation, coercedDropLocation;
-	CInfoPBRec pb;
-	FSSpecPtr pSpec;
-	SInt16 trashVRefNum;
-	SInt32 trashDirID;
-	Boolean draggedToTrash;
-
-	draggedToTrash = false;
-	dropLocation.dataHandle = nil;
-	coercedDropLocation.dataHandle = nil;
-
-	// get drop location
-	if (GetDropLocation(drag, &dropLocation) != noErr)
-	{
-		goto cleanup;
-	}
-
-	// do nothing if dropLocation is a null descriptor
-	if (dropLocation.descriptorType == typeNull)
-	{
-		goto cleanup;
-	}
-
-	// try to coerce the descriptor to a file system specification record
-	if (AECoerceDesc(&dropLocation, typeFSS, &coercedDropLocation) != noErr)
-	{
-		goto cleanup;
-	}
-
-	// lock the data handle of the coerced descriptor
-	if (AEGetDescData(&coercedDropLocation, &pSpec, sizeof(pSpec)))
-	{
-		goto cleanup;
-	}
-
-	// determine the directory ID of the drop location (assuming it's a folder!)
-	BLOCK_CLR(pb);
-	pb.hFileInfo.ioVRefNum = pSpec->vRefNum;
-	pb.hFileInfo.ioDirID = pSpec->parID;
-	pb.hFileInfo.ioNamePtr = pSpec->name;
-	if (PBGetCatInfoSync(&pb) != noErr)
-	{
-		goto cleanup;
-	}
-
-	// make sure the specified file system object is really a directory
-	if (!BTST(pb.hFileInfo.ioFlAttrib, bDirectoryAttr))
-	{
-		goto cleanup;
-	}
-
-	// find the directory ID of the trash folder
-	if (FindFolder(pSpec->vRefNum, kTrashFolderType, kDontCreateFolder, &trashVRefNum, &trashDirID) != noErr)
-	{
-		goto cleanup;
-	}
-
-	// compare the two directory IDs: if they're the same, the drop location is the trash
-	if (pb.dirInfo.ioDrDirID == trashDirID)
-	{
-		draggedToTrash = true;
-	}
-
-cleanup:
-	// clean up
-	AEDisposeDesc(&dropLocation);
-	AEDisposeDesc(&coercedDropLocation);
-
-	return draggedToTrash;
 #else
 	#pragma unused(drag)
 	return false ;
