@@ -161,7 +161,9 @@ pascal void deleteConnection(connectionPtr *c)
 	
 	if(cc->private_socket)
 	{
-		AbortConnection(cc->private_socket);
+		//If it's a DNS connection, we don't zap it.
+		if(cc->connType != connDNSIP && cc->connType != connDNSNAME)
+			AbortConnection(cc->private_socket);
 		cc->private_socket = 0;
 	}
 	

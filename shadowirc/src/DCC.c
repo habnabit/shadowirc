@@ -73,9 +73,10 @@ static pascal void DCCSendReposition(connectionPtr conn, long newpos);
 
 static pascal char DCCPutFile(connectionPtr x, char forceSave);
 static pascal void DCCSendFileChunk(connectionPtr *cn);
+//¥NOTE: chat is the only one still usint tcpc because there's no func available. When it is, zap tcpc from the def'n
 static pascal void DCCGetLineChat(connectionPtr conn, TCPConnectionPtr tcpc);
-static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr tcpc);
-static pascal void DCCGetLineSend(connectionPtr conn, TCPConnectionPtr tcpc);
+static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr);
+static pascal void DCCGetLineSend(connectionPtr conn, TCPConnectionPtr);
 static pascal void StartDCCGet(connectionPtr x, char autoSave);
 
 static pascal short DCCSendFileHook(short item, DialogPtr d, dccsendbitPtr info);
@@ -1040,11 +1041,7 @@ pascal void DCCClose(connectionPtr *cn, char silent)
 	
 		d=conn->dcc;
 		
-		if(conn->private_socket)
-		{
-			CloseTCPConnection(conn->private_socket);
-			conn->private_socket=0; //is this a good thing?
-		}
+		ConnClose(conn);
 		//Don't abort the connection...let deleteConnection() do it.
 		
 		if(!silent)
@@ -1505,7 +1502,7 @@ static pascal void DCCGetLineChat(connectionPtr conn, TCPConnectionPtr tcpc)
 	}
 }
 
-static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr tcpc)
+static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr)
 {
 	long nn;
 	short pt;
@@ -1521,7 +1518,7 @@ static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr tcpc)
 
 	while(conn)
 	 {
-		nn=TCPCharsAvailable(tcpc);
+		nn = ConnCharsAvail(conn);
 		if(nn<1)
 			break;
 			
@@ -1532,7 +1529,7 @@ static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr tcpc)
 		if(!nn)
 			return;
 		getbuf = NewPtr(nn);
-		if(!TCPReceiveChars(tcpc, getbuf, nn))
+		if(!ConnGetData(conn, getbuf, nn))
 		{
 			if(!dd->macB) //if this isn't a MacB file, or we haven't gotten the entire header yet...
 			{
@@ -1666,7 +1663,7 @@ static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr tcpc)
 					}
 				}
 				
-				if(TCPSendAsync(tcpc, (Ptr)&dd->gotten, sizeof(long), true))
+				if(ConnSend(conn, (Ptr)&dd->gotten, sizeof(long), true))
 					DCCFailed(&conn, GetIntStringPtr(spDCC, sLostAckErr));
 			}
 			else
@@ -1683,20 +1680,20 @@ static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr tcpc)
 	};
 }
 
-static pascal void DCCGetLineSend(connectionPtr conn, TCPConnectionPtr tcpc)
+static pascal void DCCGetLineSend(connectionPtr conn, TCPConnectionPtr)
 {
 	long nn, ack;
 	dccSENDDataPtr dd = (dccSENDDataPtr)conn->dcc->dccData;
 	
 	while(conn)
 	 {
-		nn=TCPCharsAvailable(tcpc);
+	 	nn = ConnCharsAvail(conn);
 		if(nn<sizeof(long))
 			break;
 		if(nn>sizeof(long))
 			nn=sizeof(long);
 		
-		if(!TCPReceiveChars(tcpc, (Ptr)&ack, nn))
+		if(!ConnGetData(conn, (Ptr)&ack, nn))
 		{
 			dd->acked = ack;
 			
@@ -1724,7 +1721,7 @@ static pascal void DCCGetLineSend(connectionPtr conn, TCPConnectionPtr tcpc)
 		{
 			DCCFailed(&conn, GetIntStringPtr(spDCC, sLostRecieveErr));
 		}
-	};
+	}
 }
 
 pascal void dccEvent(CEPtr c, connectionPtr conn)

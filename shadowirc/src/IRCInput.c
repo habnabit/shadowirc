@@ -957,7 +957,6 @@ pascal void dnsEvent(CEPtr c, connectionPtr conn)
 		}
 		SMPrefix(&ls, dsFrontWin);
 	}
-	conn->private_socket = 0; //DNS connections are automatically deleted.
 	deleteConnection(&conn);
 }
 
