@@ -539,36 +539,8 @@ static void Timer5(EventLoopTimerRef timer, void* data)
 	UpdateStatusLine();
 }
 
-static void InitTimers()
+static void TimerTick(EventLoopTimerRef timer, void* data)
 {
-	EventLoopRef mainLoop = GetMainEventLoop();
-	EventLoopTimerUPP mtu, t20u, t5u, AsyncSoundTimerProc;
-	EventLoopTimerRef timer;
-	
-	mtu = NewEventLoopTimerUPP(MinuteTimer);
-	t20u = NewEventLoopTimerUPP(Timer20);
-	t5u = NewEventLoopTimerUPP(Timer5);
-	
-	InstallEventLoopTimer(mainLoop, 60 * kEventDurationSecond, 60 * kEventDurationSecond, mtu, NULL, &timer);
-	InstallEventLoopTimer(mainLoop, 20 * kEventDurationSecond, 20 * kEventDurationSecond, t20u, NULL, &timer);
-	InstallEventLoopTimer(mainLoop, 5 * kEventDurationSecond, 5 * kEventDurationSecond, t5u, NULL, &timer);
-	
-	AsyncSoundTimerProc = NewEventLoopTimerUPP(AsyncSoundCleanup);
-	InstallEventLoopTimer(mainLoop, kEventDurationForever, kEventDurationForever, AsyncSoundTimerProc, NULL, &AsyncSoundTimer);
-}
-
-static pascal void IdleTasks(EventRecord *e)
-{
-	connectionEventRecord connEvt;
-	int x = -8;
-	
-	while(GetConnectionEvent(&connEvt))
-	{
-		doTCPEvent(&connEvt);
-		if(!++x)
-			break;
-	}
-	
 	//Stuff we need to do periodically when we're in the foreground
 	if(!inBackground)
 	{
@@ -586,7 +558,48 @@ static pascal void IdleTasks(EventRecord *e)
 	}
 	
 	RetryConnections();
+}
+
+EventLoopTimerRef NetworkTimer;
+
+static void NetworkProcess(EventLoopTimerRef timer, void* data)
+{
+	connectionEventRecord connEvt;
+	int x = -8;
 	
+	while(GetConnectionEvent(&connEvt))
+	{
+		doTCPEvent(&connEvt);
+		if(!++x)
+			break;
+	}
+}
+
+static void InitTimers()
+{
+	EventLoopRef mainLoop = GetMainEventLoop();
+	EventLoopTimerUPP mtu, t20u, t5u, AsyncSoundTimerProc, tick, net;
+	EventLoopTimerRef timer;
+	
+	mtu = NewEventLoopTimerUPP(MinuteTimer);
+	t20u = NewEventLoopTimerUPP(Timer20);
+	t5u = NewEventLoopTimerUPP(Timer5);
+	tick = NewEventLoopTimerUPP(TimerTick);
+	
+	InstallEventLoopTimer(mainLoop, 60 * kEventDurationSecond, 60 * kEventDurationSecond, mtu, NULL, &timer);
+	InstallEventLoopTimer(mainLoop, 20 * kEventDurationSecond, 20 * kEventDurationSecond, t20u, NULL, &timer);
+	InstallEventLoopTimer(mainLoop, 5 * kEventDurationSecond, 5 * kEventDurationSecond, t5u, NULL, &timer);
+	InstallEventLoopTimer(mainLoop, TicksToEventTime(1), TicksToEventTime(1), tick, NULL, &timer);
+	
+	AsyncSoundTimerProc = NewEventLoopTimerUPP(AsyncSoundCleanup);
+	InstallEventLoopTimer(mainLoop, kEventDurationForever, kEventDurationForever, AsyncSoundTimerProc, NULL, &AsyncSoundTimer);
+
+	net = NewEventLoopTimerUPP(NetworkProcess);
+	InstallEventLoopTimer(mainLoop, TicksToEventTime(1), TicksToEventTime(1), net, NULL, &NetworkTimer);
+}
+
+static pascal void IdleTasks(EventRecord *e)
+{
 	idlePlugins(e);
 }
 
@@ -1012,7 +1025,7 @@ pascal void ApplRun(void)
 	
 	while(!QuitRequest)
 	{
-		WaitNextEvent(-1, &e, 1, mouseRgn);
+		WaitNextEvent(everyEvent, &e, 60, mouseRgn);
 		GetDateTime(&now);
 		ApplEvents(&e);
 	}
