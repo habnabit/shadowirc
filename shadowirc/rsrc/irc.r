@@ -1900,18 +1900,6 @@ resource 'DLOG' (1004, "Prefs MAIN") {
 	"ShadowIRC Preferences",
 	centerMainScreen
 };
-
-resource 'DLOG' (10001, "mode +l") {
-	{-666, -666, -579, -476},
-	movableDBoxProc,
-	invisible,
-	goAway,
-	0x0,
-	10001,
-	"Channel Limit",
-	alertPositionParentWindow
-};
-
 resource 'DLOG' (10002, "mode +k") {
 	{-666, -666, -579, -476},
 	movableDBoxProc,
@@ -4267,53 +4255,6 @@ resource 'dftb' (1013) {
 	}
 };
 
-resource 'dftb' (10001) {
-	versionZero {
-		{	/* array FontStyle: 4 elements */
-			/* [1] */
-			skipItem {
-
-			}			,
-			/* [2] */
-			skipItem {
-
-			}			,
-			/* [3] */
-			dataItem {
-				1,
-				-2,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				""
-			},
-			/* [4] */
-			dataItem {
-				1,
-				-2,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				""
-			}
-		}
-	}
-};
-
 resource 'dftb' (10002) {
 	versionZero {
 		{	/* array FontStyle: 4 elements */
@@ -4821,12 +4762,6 @@ resource 'dlgx' (502) {
 };
 
 resource 'dlgx' (1004) {
-	versionZero {
-		15
-	}
-};
-
-resource 'dlgx' (10001) {
 	versionZero {
 		15
 	}
