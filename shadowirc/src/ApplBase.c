@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -66,7 +66,6 @@ inline void inProxyHandler(EventRecord *e);
 static pascal void inContentHandler(EventRecord *e);
 inline void inGoAwayHandler(const EventRecord *e);
 static pascal void inGrowHandler(const EventRecord *e);
-static pascal void DoMouseMovedEvent(const EventRecord *e);
 static pascal void doMouseUp(EventRecord *e);
 static pascal void doMouseDown(EventRecord *e);
 static pascal void doTCPEvent(CEPtr message);
@@ -797,38 +796,36 @@ inline void inGoAwayHandler(const EventRecord *e)
 	}
 }
 
-pascal void DoSuspendResumeEvent(EventRecord *e)
+static void DoResumeEvent(EventLoopTimerRef timer, void* data)
 {
 	pContextSwitchDataRec p;
 	
-	if(e->message & resumeFlag)
-	{
-		inBackground=0;
-		TEFromScrap();
-		InitCursor();
-		
-		if(!noFloatingInput)
-			WEActivate(ILGetWE());
-		WResume();
-		
-		NotifyRemove(); //Clear notification manager requests.
-	}
-	else
-	{
-		inBackground=1;
-		
-		if(!noFloatingInput)
-			WEDeactivate(ILGetWE());
-		WSuspend();
-	}
+	inBackground=0;
+	TEFromScrap();
+	InitCursor();
 	
+	if(!noFloatingInput)
+		WEActivate(ILGetWE());
+	WResume();
+	
+	NotifyRemove(); //Clear notification manager requests.
+
 	p.inBackground=inBackground;
 	runPlugins(pContextSwitchMessage, &p);
 }
 
-static pascal void DoMouseMovedEvent(const EventRecord *e)
+static void DoSuspendEvent(EventLoopTimerRef timer, void* data)
 {
-	#pragma unused(e)
+	pContextSwitchDataRec p;
+	
+	inBackground=1;
+	
+	if(!noFloatingInput)
+		WEDeactivate(ILGetWE());
+	WSuspend();
+
+	p.inBackground=inBackground;
+	runPlugins(pContextSwitchMessage, &p);
 }
 
 pascal void doUpdateEvent(EventRecord *e)
@@ -1148,13 +1145,6 @@ static pascal void ApplEvents(EventRecord *e)
 			WindowActivate((WindowPtr)e->message, e->modifiers & 1);
 			break;
 		
-		case osEvt:
-			if(*(char*)&e->message == suspendResumeMessage)
-				DoSuspendResumeEvent(e);
-			else if(*(char*)&e->message == mouseMovedMessage)
-				DoMouseMovedEvent(e);
-			break;
-		
 		case kHighLevelEvent:
 			AEProcessAppleEvent(e);
 			break;
@@ -1208,6 +1198,20 @@ pascal void ApplRun(void)
 	ApplExit();
 }
 
+typedef void(*eventHandlerProc)(EventLoopTimerRef timer, void* data);
+static void MyIAEH(long class, long type, eventHandlerProc handlerFunc)
+{
+	EventTypeSpec eventType = {class, type};
+	
+	InstallApplicationEventHandler(NewEventHandlerUPP(handlerFunc), 1, &eventType, NULL, NULL);
+}
+
+static void InitLocalEventHandlers()
+{
+	MyIAEH(kEventClassApplication, kEventAppActivated, DoResumeEvent);
+	MyIAEH(kEventClassApplication, kEventAppDeactivated, DoSuspendEvent);
+}
+
 pascal void ApplInit(void)
 {
 	mouseRgn=NewRgn();
@@ -1215,6 +1219,7 @@ pascal void ApplInit(void)
 	
 	MenuInit();
 	InitEventHandlers();
+	InitLocalEventHandlers();
 
 	FlushEvents(everyEvent, 0);
 	
