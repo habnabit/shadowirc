@@ -1446,10 +1446,7 @@ void Message(const LongString *msg)
 	MWPtr m;
 	WindowPtr w;
 	
-	if(MWActive)
-		m=MWActive;
-	else
-		m=MWLast;
+	m = GetFrontMW();
 	
 	if(m && m->protect)
 	{

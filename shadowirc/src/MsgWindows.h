@@ -184,6 +184,8 @@ enum{
 	C_SIColor=8
 };
 
+
+MWPtr GetFrontMW(void);
 pascal char MWValid(MWPtr mw);
 pascal MWPtr NewPluginMWindow(ConstStr255Param title);
 void MWSetDimen(MWPtr win, short left, short top, short width, short height);
@@ -208,7 +210,7 @@ pascal char MWSetChannel(MWPtr mw, struct Channel* ch);
 pascal char MWSetDCC(MWPtr mw, connectionPtr dcc, Str255 name);
 pascal void MWSetNameQuery(MWPtr mw, ConstStr255Param from, linkPtr link);
 
-extern MWPtr MWActive, consoleWin, MWLast;
+extern MWPtr MWActive, consoleWin;
 extern Rect cornerstone;
 
 enum {

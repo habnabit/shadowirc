@@ -46,7 +46,7 @@
 
 MWPtr mwl = 0;
 
-MWPtr consoleWin=0, MWActive=0, MWLast=0;
+MWPtr consoleWin=0, MWActive=0;
 Rect cornerstone;
 
 enum colorRamp {
@@ -117,6 +117,28 @@ static pascal void TextScrolled(WEReference we);
 static pascal void ScrollBarChanged(WEReference we, long val);
 
 pascal OSErr FSpGetDirectoryID(FSSpec*, long*, char*); //for MWStartLogging
+
+MWPtr GetFrontMW(void)
+{
+	MWPtr m;
+	WindowPtr w;
+	
+	if(MWActive)
+		return MWActive;
+	else
+	{
+		w = FrontNonFloatingWindow();
+		while(w)
+		{
+			m = MWFromWindow(w);
+			if(m)
+				return m;
+			w = GetNextWindow(w);
+		}
+		
+		return 0;
+	}
+}
 
 pascal char MWValid(MWPtr mw)
 {
@@ -1122,8 +1144,7 @@ pascal void MWDelete(MWPtr w)
 	w->magic = 0; //clear magic so we aren't screwed by stray message window pointers
 	w->winType = invalWin;
 	DisposePtr((Ptr)w);
-	if(MWLast == MWActive || MWLast == w)
-		MWLast=0;
+	
 	MWActive=MWFromWindow(ActiveNonFloatingWindow());
 }
 

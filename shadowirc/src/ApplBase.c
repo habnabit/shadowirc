@@ -255,9 +255,6 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 	if(window==inputLine.w)
 		return;
 
-	if(MWActive)
-		MWLast = MWActive;
-	
 	p=MWFromWindow(window);
 	if(p)
 	{
