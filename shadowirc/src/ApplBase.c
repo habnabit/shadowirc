@@ -723,6 +723,7 @@ static pascal void inContentHandler(EventRecord *e)
 	WindowPtr w;
 	
 	GetPort(&gp);
+	w = (WindowPtr)e->message;
 	SetPortWindowPort(w);
 	
 	mw = MWFromWindow(w);
