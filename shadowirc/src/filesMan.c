@@ -741,6 +741,7 @@ static pascal void ReadInPrefs(void)
 	int x;
 	char valid;
 	linkPtr lp;
+	short resNum;
 	
 	FSRead(mainRefNum, &l, &p);
 	if(p.version==kShadowIRC10PreferencesVersion)
@@ -845,9 +846,11 @@ static pascal void ReadInPrefs(void)
 	SetFPos(mainRefNum, fsFromStart, 0);
 	l=sizeof(p);
 	FSWrite(mainRefNum, &l, &p);
+	resNum = CurResFile();
 	UseResFile(mainResNum);
 	ReadAlias(&logFolderFSp, logAlias);
 	ReadAlias(&dccFolderFSp, dccAlias);
+	UseResFile(resNum);
 }
 
 static pascal void CreateNewPrefsMain(void)

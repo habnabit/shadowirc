@@ -94,8 +94,7 @@ inline void ProcessUserHosts(linkPtr link)
 	channelPtr ch;
 	
 	ts.len=0;
-	i=0;
-	ii=0;
+	i = ii = 0;
 	if(link->needUserHosts)
 	{
 		linkfor(ch, link->channelList)
@@ -162,11 +161,9 @@ void main(void)
 	
 	while(!QuitRequest)
 	{
-		UseResFile(gApplResFork);
 		GetDateTime(&now);
 		
 		linkfor(curLink, firstLink)
-		{
 			if(curLink->serverStatus==S_OFFLINE && !curLink->neverConnected)
 			{
 				if(curLink->waitingToRetry)
@@ -183,26 +180,26 @@ void main(void)
 				else if(curLink->linkPrefs->reconnect)
 					curLink->waitingToRetry = true;
 			}
-		}
 		
 		//Periodic tasks
 		if(now-periodicTasksTimer>5)
 		{
 			periodicTasksTimer=now;
 			checkConnections();
+			
 			if(now-userhostsTimer>20)
 			{
 				userhostsTimer = now;
 				linkfor(curLink, firstLink)
 					if(curLink->serverStatus==S_CONN)
 						ProcessUserHosts(curLink);
-			}
-			
-			if(now-minuteTimer>60)
-			{
-				minuteTimer = now;
-				MBIdle();
-				RunNotify();
+
+				if(now-minuteTimer>60)
+				{
+					minuteTimer = now;
+					MBIdle();
+					RunNotify();
+				}
 			}
 			
 			UpdateStatusLine();

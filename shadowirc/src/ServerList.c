@@ -642,8 +642,6 @@ pascal void DoServerSelect(ServerListServiceData *p)
 
 	w = GetDialogWindow(d);
 	
-	//Set up networks list
-	UseResFile(gApplResFork);
 	//nets = GetAppearanceListBoxHandle(d, 3);
 	GetDialogItem(d, 3, &dType, &dItem, &netsRect);
 	SetRect(&db, 0, 0, 1, 0);
