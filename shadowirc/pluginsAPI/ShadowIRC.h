@@ -3633,12 +3633,6 @@ pascal void LightenColor(RGBColor *rgb);
 		Output:	rgb - lightened color
 */
 
-pascal void CleanFolderFSp(FSSpec *fss);
-/*	"Cleans" up a folder FSSpec
-		Input:	fss - FSSpec for a folder, with it's name in the name field and it's parent directory in the parID field.
-		Output:	fss - FSSpec for folder with it's id in the parID field and the name field blank.
-*/
-
 OSStatus DirectorySelectButtonRef(FSRef *ref);
 /*	Asks the user to select a directory.
 		Input:	ref - FSRef to write to

@@ -82,7 +82,6 @@ void FolderErrorToConsole(CFStringRef errorKey);
 pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileName, long type, long creator, long navFlags, FSSpec *f, char allowReplace);
 
 OSStatus DirectorySelectButtonRef(FSRef *ref);
-pascal void CleanFolderFSp(FSSpec *fss);
 
 pascal void FileAdd(short fref, char res);
 pascal OSErr FileClose(short fref);

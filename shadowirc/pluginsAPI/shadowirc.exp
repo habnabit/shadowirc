@@ -238,6 +238,5 @@ _SetDlogFont
 _CopyResource
 _AsyncSoundPlay
 _LightenColor
-_CleanFolderFSp
 _DirectorySelectButtonRef
 __UndocumentedAPI

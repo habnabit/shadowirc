@@ -230,21 +230,6 @@ pascal short CreateUniqueFile(FSSpec *file, OSType creator, OSType type)
 
 #pragma mark -
 
-pascal void CleanFolderFSp(FSSpec *fss)
-{
-	CInfoPBRec pb;
-
-	pb.dirInfo.ioCompletion=0;
-	pb.dirInfo.ioNamePtr=fss->name;
-	pb.dirInfo.ioVRefNum=fss->vRefNum;
-	pb.hFileInfo.ioDirID=fss->parID;
-	pb.dirInfo.ioFDirIndex=0;
-	PBGetCatInfoSync(&pb);
-	
-	fss->parID = pb.hFileInfo.ioDirID;
-	fss->name[0] = 0;
-}
-
 typedef struct DirSelRec {
 	FSRef *ref;
 	Boolean cancel;
