@@ -391,6 +391,8 @@ static void ConnFinishStaleConnections(void)
 		{
 			connectionEventRecord connEvt;
 			
+			connEvt.sas = safe_malloc(sizeof(struct sockaddr_storage));
+			
 			if(GetConnectionEvent(&connEvt))
 			{
 				conn=findConnectionSock(connEvt.connection);
@@ -415,6 +417,8 @@ static void ConnFinishStaleConnections(void)
 			
 			if(now - time > 2) //too long. ditch.
 				break;
+			
+			free(connEvt.sas);
 		}
 	}
 }
