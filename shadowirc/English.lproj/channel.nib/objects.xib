@@ -1,0 +1,90 @@
+<?xml version="1.0" standalone="yes"?>
+<object class="NSIBObjectData">
+  <string name="targetFramework">IBCarbonFramework</string>
+  <object name="rootObject" class="NSCustomObject" id="1">
+    <string name="customClass">NSApplication</string>
+  </object>
+  <array count="8" name="allObjects">
+    <object class="IBCarbonEditText" id="180">
+      <string name="bounds">46 23 111 337 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">4</int>
+      <boolean name="small">TRUE</boolean>
+      <ostype name="command">Topc</ostype>
+    </object>
+    <object class="IBCarbonButton" id="181">
+      <string name="bounds">199 189 219 259 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">2</int>
+      <string name="title">Cancel</string>
+      <ostype name="command">not!</ostype>
+      <int name="buttonType">1</int>
+    </object>
+    <object class="IBCarbonStaticText" id="182">
+      <string name="bounds">20 20 35 340 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">3</int>
+      <boolean name="small">TRUE</boolean>
+      <string name="title">Topic for ^0:</string>
+    </object>
+    <object class="IBCarbonButton" id="183">
+      <string name="bounds">199 271 219 341 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">1</int>
+      <string name="title">OK</string>
+      <ostype name="command">ok  </ostype>
+    </object>
+    <object class="IBCarbonStaticText" id="184">
+      <string name="bounds">163 20 179 341 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">6</int>
+      <boolean name="small">TRUE</boolean>
+    </object>
+    <object class="IBCarbonStaticText" id="185">
+      <string name="bounds">122 20 155 341 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">5</int>
+      <boolean name="small">TRUE</boolean>
+      <string name="title">Topic set by ^1 on ^2 at ^3.</string>
+    </object>
+    <object class="IBCarbonWindow" id="186">
+      <string name="windowRect">311 144 550 505 </string>
+      <string name="title">Channel Topic</string>
+      <object name="rootControl" class="IBCarbonRootControl" id="187">
+        <string name="bounds">0 0 239 361 </string>
+        <array count="6" name="subviews">
+          <reference idRef="183"/>
+          <reference idRef="181"/>
+          <reference idRef="182"/>
+          <reference idRef="180"/>
+          <reference idRef="185"/>
+          <reference idRef="184"/>
+        </array>
+      </object>
+      <boolean name="hasHorizontalZoom">FALSE</boolean>
+      <boolean name="isResizable">FALSE</boolean>
+      <boolean name="hasVerticalZoom">FALSE</boolean>
+      <int name="carbonWindowClass">11</int>
+      <int name="themeBrush">50</int>
+      <int name="windowPosition">0</int>
+    </object>
+    <reference idRef="187"/>
+  </array>
+  <array count="8" name="allParents">
+    <reference idRef="187"/>
+    <reference idRef="187"/>
+    <reference idRef="187"/>
+    <reference idRef="187"/>
+    <reference idRef="187"/>
+    <reference idRef="187"/>
+    <reference idRef="1"/>
+    <reference idRef="186"/>
+  </array>
+  <dictionary count="2" name="nameTable">
+    <string>Channel Topic</string>
+    <reference idRef="186"/>
+    <string>File&apos;s Owner</string>
+    <reference idRef="1"/>
+  </dictionary>
+  <unsigned_int name="nextObjectID">188</unsigned_int>
+</object>
