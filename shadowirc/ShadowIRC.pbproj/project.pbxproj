@@ -243,7 +243,7 @@
 				F552BF4F0211030901A80061,
 				0867D6AAFE840B52C02AAC07,
 				F54C279D02152A0001A80061,
-				F573F87E021878C501A80061,
+				F5059D9402A3470A0132A983,
 				F5F61A2F02A02E380132A988,
 			);
 			isa = PBXGroup;
@@ -419,9 +419,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0867D6ACFE840B52C02AAC07,
-				F573F87F021878C601A80061,
 				F526526D0227D84B0132A983,
 				F5F61A3102A02E390132A988,
+				F5059D9602A3470A0132A983,
 			);
 			isa = PBXResourcesBuildPhase;
 		};
@@ -519,6 +519,27 @@
 //F52
 //F53
 //F54
+		F5059D9402A3470A0132A983 = {
+			children = (
+				F5059D9502A3470A0132A983,
+			);
+			isa = PBXVariantGroup;
+			name = main.nib;
+			path = "";
+			refType = 4;
+		};
+		F5059D9502A3470A0132A983 = {
+			isa = PBXFileReference;
+			name = English;
+			path = English.lproj/main.nib;
+			refType = 4;
+		};
+		F5059D9602A3470A0132A983 = {
+			fileRef = F5059D9402A3470A0132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F510A8AA021CB5B90132A983 = {
 			fileRef = F552BEF60211030901A80061;
 			isa = PBXBuildFile;
@@ -2059,17 +2080,6 @@
 		};
 		F5732707021B6A3E01A82AF3 = {
 			fileRef = F5DB41490213AAFA01A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F573F87E021878C501A80061 = {
-			isa = PBXFileReference;
-			path = main.nib;
-			refType = 4;
-		};
-		F573F87F021878C601A80061 = {
-			fileRef = F573F87E021878C501A80061;
 			isa = PBXBuildFile;
 			settings = {
 			};
