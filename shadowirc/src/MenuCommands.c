@@ -647,18 +647,9 @@ static void DoMenuEvent(long menuitem, const EventRecord *e)
 	menuNum = menuitem >> 16;
 	itemNum = menuitem & 0x0000FFFF;
 	
-	if(menuNum)
-	{
-		switch(menuNum)
-		{
-			case EditMenu:
-				HitEditMenu(itemNum);
-				break;
-			case fontsMenu:
-				HitFontsMenu(itemNum);
-				break;
-		}
-	}
+	if(menuNum == fontsMenu)
+		HitFontsMenu(itemNum);
+	
 	HiliteMenu(0);
 }
 
