@@ -148,6 +148,34 @@ static OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler, Event
 	
 	switch(eventClass)
 	{
+		case kEventClassWindow:
+		{
+			WindowRef theWindow = NULL;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeWindowRef, NULL, sizeof(WindowRef), NULL, &theWindow);
+			
+			switch(eventKind)
+			{
+				case kEventWindowActivated:
+					if (!noFloatingInput)
+					{
+						WEDeactivate(ILGetWE());
+						HideFloatingWindows();
+					}
+					result = noErr;
+					break;
+				case kEventWindowDeactivated:
+				case kEventWindowClosed:
+					if (!noFloatingInput)
+					{
+						WEActivate(ILGetWE());
+						ShowFloatingWindows();
+					}
+					result = noErr;
+					break;
+			}
+		}
+		
 		case kEventClassControl:
 		{
 			ControlRef theControl = NULL;
@@ -223,6 +251,9 @@ void DoShortcutsEditor(void)
 	OSStatus status;
 	
 	const EventTypeSpec ctSpec[] = {
+		{ kEventClassWindow, kEventWindowActivated },
+		{ kEventClassWindow, kEventWindowDeactivated },
+		{ kEventClassWindow, kEventWindowClosed },
 		{ kEventClassControl, kEventControlHit },
 		{ kEventClassCommand, kEventProcessCommand }
 	};
