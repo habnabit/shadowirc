@@ -436,6 +436,8 @@ pascal void ConnStale(connectionPtr conn)
 {
 	conn->realConnType = conn->connType;
 	conn->connType = connSTALE;
+	conn->closeTime = now + 15;
+	
 	ConnSetInputFunc(conn);
 }
 

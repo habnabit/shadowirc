@@ -232,7 +232,6 @@ pascal void DoSignoff(linkPtr link, const LongString *reason)
 		else
 		{
 			ConnStale(link->conn);
-			link->conn->closeTime = now + 15;
 			link->conn = 0; //detach the connection, but don't delete it
 		}
 		
