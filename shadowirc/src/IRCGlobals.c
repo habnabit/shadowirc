@@ -22,7 +22,6 @@
 #include "IRCGlobals.h"
 
 Str63 cdt;
-Str63 CL_VERSION;
 Str63 shadowIRCDefaultSignoff;
 char inBackground=0;
 char anyAway;

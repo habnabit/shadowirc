@@ -19,41 +19,24 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-const unsigned char myVersion[] = "\p2.0a2";
+const unsigned char CL_VERSION[] = "\p2.0a2";
 #define SIVersion 0x02000002
 
 #include "IRCGlobals.h"
 #include "utils.h"
 #include "Inline.h"
 
-extern Str63 shadowIRCDefaultSignoff;
-
 pascal long ShadowIRCVersion(StringPtr str);
 pascal long ShadowIRCVersion2(StringPtr v, StringPtr date);
 pascal long ShadowIRCVersion(StringPtr str){if(str)pstrcpy(CL_VERSION, str);return SIVersion;}
-pascal long ShadowIRCVersion2(StringPtr v, StringPtr date){if(v) pstrcpy(myVersion,v); if(date) pstrcpy(cdt,date);return SIVersion;}
+pascal long ShadowIRCVersion2(StringPtr v, StringPtr date){if(v) pstrcpy(CL_VERSION,v); if(date) pstrcpy(cdt,date);return SIVersion;}
 
 pascal void setVers(void);
 pascal void setVers(void)
 {
-	short i;
-	char date[]=__DATE__;
-	char time[]=__TIME__;
-
-	pstrcpy(myVersion, CL_VERSION);
+	//compile date & time
+	CopyCStringToPascal(__DATE__  " " __TIME__, cdt);
 	
-	//expdate
-	strc2p(date);
-	strc2p(time);
-	pstrcpy((unsigned char*)date, cdt);
-	i=cdt[0]+1;
-	pstrcpy((unsigned char*)time, &cdt[i]);
-	cdt[0]+=cdt[i]+1;
-	cdt[i]=' ';
 	//shadowIRCDefaultSignoff
-	pstrcpy("\pShadowIRC ", shadowIRCDefaultSignoff);
-	i=CL_VERSION[0];
-	pstrcpy(CL_VERSION, &shadowIRCDefaultSignoff[shadowIRCDefaultSignoff[0]]);
-	shadowIRCDefaultSignoff[shadowIRCDefaultSignoff[0]]=' ';
-	shadowIRCDefaultSignoff[0]+=i;
+	pstrcat("\pShadowIRC ", CL_VERSION, shadowIRCDefaultSignoff);
 }

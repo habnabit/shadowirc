@@ -252,10 +252,10 @@ extern FSSpec logFolderFSp, dccFolderFSp;
 extern short gApplResFork;
 
 extern unsigned long now, launchTime;
-enum {readTimeout = 20};
 extern short fontsBegin;
 
-extern Str63 CL_VERSION, cdt, shadowIRCDefaultSignoff;
+extern const unsigned char CL_VERSION[];
+extern Str63 cdt, shadowIRCDefaultSignoff;
 extern char debugOn;
 extern char QuitRequest;
 extern unsigned long idleTime;
