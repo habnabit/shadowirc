@@ -72,9 +72,9 @@ static pascal void DCCSendReposition(connectionPtr conn, long newpos);
 
 static pascal char DCCPutFile(connectionPtr x, char forceSave);
 static pascal void DCCSendFileChunk(connectionPtr *cn);
-static pascal void DCCGetLineChat(connectionPtr conn, CEPtr c);
-static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c);
-static pascal void DCCGetLineSend(connectionPtr conn, CEPtr c);
+static void DCCGetLineChat(connectionPtr conn, CEPtr c);
+static void DCCGetLineGet(connectionPtr conn, CEPtr c);
+static void DCCGetLineSend(connectionPtr conn, CEPtr c);
 static pascal void StartDCCGet(connectionPtr x);
 
 static void DCCSendFileNavHookMouseDown(NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
@@ -93,6 +93,7 @@ char IsDCCName(ConstStringPtr s)
 	else
 		return false;
 }
+
 pascal void DCCTypeInit(void)
 {
 	dccTypeListPtr p;
