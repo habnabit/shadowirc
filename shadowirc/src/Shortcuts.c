@@ -48,6 +48,7 @@ enum {
 };
 
 static int gShortcutsWindowCount = 0;
+static WindowRef gShortcutsWin = 0;
 
 typedef struct ShortcutWindowData {
 	int curSet;
@@ -162,6 +163,7 @@ static pascal OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler
 					SaveShortcutWindow(shortcutsWin);
 					
 				case kHICommandCancel:
+					gShortcutsWin = 0;
 					sdp = GetShortcutWindowData(shortcutsWin);
 					DisposePtr((Ptr)sdp);
 					DisposeWindow(shortcutsWin);
@@ -180,7 +182,7 @@ static pascal OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler
 void DoShortcutsEditor(void)
 {
 	static EventHandlerUPP swUPP = NULL;
-	static WindowRef shortcutsWin = 0;
+	WindowRef shortcutsWin;
 	ShortcutWindowDataPtr sdp;
 	IBNibRef shortcutsNib;
 	OSStatus status;
@@ -191,8 +193,10 @@ void DoShortcutsEditor(void)
 	
 	if(++gShortcutsWindowCount > 1)
 	{
-		if(shortcutsWin)
-			SelectWindow(shortcutsWin);
+		//Undo the change to the count and select the shortcuts window.
+		gShortcutsWindowCount--;
+		if(gShortcutsWin)
+			SelectWindow(gShortcutsWin);
 		return;
 	}
 	
@@ -219,6 +223,7 @@ void DoShortcutsEditor(void)
 	ShowWindow(shortcutsWin);
 	SelectWindow(shortcutsWin);
 	
+	gShortcutsWin = shortcutsWin;
 	
 CantFindDialogNib:
 CantCreateDialogWindow:
