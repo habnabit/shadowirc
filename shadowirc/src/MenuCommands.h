@@ -19,40 +19,25 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#ifndef _ApplBase_
-#define _ApplBase_
-
-#if TARGET_CARBON
-#include <Dialogs.h>
-#endif
-
-#ifndef _LongStrings
-#include "LongStrings.h"
-#endif
-
 #pragma internal on
 
-extern WindowPtr ContextWindow;
+extern UserItemUPP AboutDlgVersionFilter;
+extern MenuHandle gAppleMenu, gFileMenu, gShortcutsMenu, gWindowMenu;
 
-extern long sScrollStep;
+pascal void MenuConnectionList(short item);
+pascal void MenuSignoffConnectionList(short item);
+pascal void HitWindowMenu(short item);
+pascal void HitEditMenu(short item);
 
-pascal void ApplRun(void);
-pascal void ApplInit(void);
-pascal void ApplExit(void);
-pascal char doQuit(LongString *reason);
+pascal void DoMenuEvent(long menuitem, const EventRecord *e);
+pascal void MenuBarClick(const EventRecord *e);
 
-pascal void doUpdateEvent(EventRecord *e);
-pascal void DoSuspendResumeEvent(EventRecord *e);
-pascal void doNetworkCheck(void);
-
-pascal void UpdateWindowPosition(WindowPtr win);
+pascal void MenuInit(void);
 
 #pragma internal reset
 
 #pragma lib_export on
 #pragma export on
-pascal OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel);
+pascal void WindowClose(WindowPtr wp);
 #pragma export reset
 #pragma lib_export reset
-
-#endif

@@ -26,7 +26,7 @@
 #include "MsgWindows.h"
 #include "WindowList.h"
 #include "utils.h"
-#include "ApplBase.h"
+#include "MenuCommands.h"
 #include "inline.h"
 #include "channels.h"
 

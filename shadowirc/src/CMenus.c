@@ -39,6 +39,7 @@
 #include "AppearanceHelp.h"
 #include "Floaters.h"
 #include "IRCInput.h"
+#include "MenuCommands.h"
 
 typedef enum menuCommand {
 	mcNull,
@@ -772,7 +773,7 @@ static pascal char CMMW(MWPtr mw, Point where, char optCM)
 					case mcCopyIL:
 						WECopy(mw->we);
 						WESetSelection(d.s0, d.s0, mw->we);
-						menuEdit(5);
+						HitEditMenu(5);
 						break;
 					
 					case mcClear:
@@ -941,7 +942,7 @@ static pascal char CMIW(Point where)
 						break;
 						
 					case mcILPaste:
-						menuEdit(5);
+						HitEditMenu(5);
 						break;
 						
 					case mcILClear:

@@ -23,7 +23,7 @@
 #define _CommandsMenu
 
 #pragma internal on
-pascal void menuCommands(short item, short modifiers);
+pascal void HitCommandsMenu(short item, short modifiers);
 #pragma internal reset
 
 #endif

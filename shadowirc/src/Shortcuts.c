@@ -28,7 +28,7 @@
 #include "plugins.h"
 #include "IRCChannels.h"
 #include "Inputline.h"
-#include "ApplBase.h"
+#include "MenuCommands.h"
 #include "IRCInput.h"
 #include "utils.h"
 #include "inline.h"

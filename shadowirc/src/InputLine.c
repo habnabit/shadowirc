@@ -42,7 +42,7 @@
 #include "IRCInput.h"
 #include "Inline.h"
 #include "DragDrop.h"
-#include "ApplBase.h"
+#include "MenuCommands.h"
 #include "TextManip.h"
 
 inputLineRec inputLine;
@@ -1054,7 +1054,6 @@ restart:
 }
 
 #pragma internal on
-pascal void wmenu(short);
 static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers);
 static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers)
 {
@@ -1205,11 +1204,11 @@ static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short mod
 		{
 			case 1001: //channel liust
 				if(i==1) //console
-					wmenu(1);
+					HitWindowMenu(1);
 				else if(i<dashPoint) //channel window
-					wmenu(i - 2 + windowsStart);
+					HitWindowMenu(i - 2 + windowsStart);
 				else //other window
-					wmenu(windowsStart2+i-dashPoint);
+					HitWindowMenu(windowsStart2+i-dashPoint);
 				break;
 			
 			case 100: //recent channels

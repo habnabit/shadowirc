@@ -31,7 +31,7 @@
 #include "inline.h"
 #include "CommandsMenu.h"
 
-pascal void menuCommands(short item, short modifiers)
+pascal void HitCommandsMenu(short item, short modifiers)
 {
 	LongString ls, il;
 	Str255 targ;

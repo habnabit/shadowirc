@@ -63,6 +63,7 @@
 #include "IRCInput.h"
 #include "InetConfig.h"
 #include "DragDrop.h"
+#include "MenuCommands.h"
 #include "ApplBase.h"
 
 #if !__POWERPC__

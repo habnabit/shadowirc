@@ -50,6 +50,7 @@
 #include "TextManip.h"
 #include "CalcCRC.h"
 #include "IRCPreferences.h"
+#include "MenuCommands.h"
 
 #pragma internal on
 inline void AppleMenuURLInit(void);
