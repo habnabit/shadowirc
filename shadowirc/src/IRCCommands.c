@@ -1231,7 +1231,7 @@ static void _ucMsg(linkPtr link, ConstStr255Param com, LongString *rest, LongStr
 static void _ucNotice(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
 	Str255 s1;
-	char quiet = com[0] != 7;
+	char quiet = com[0] == 7;
 	
 	LSNextArg(rest, s1);
 	FormatNick(s1, s, 0, kNickNotice + kNickSend);
