@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -852,7 +852,7 @@ pascal char readMainPrefs(void)
 	FSSpec ShadowIRCFolder;
 	long ShadowIRCFolderDirID, PreferencesFolderDirID;
 	
-	err = FindFolder(kOnSystemDisk, kPreferencesFolderType, kDontCreateFolder, &vref, &PreferencesFolderDirID);
+	err = FindFolder(kUserDomain, kPreferencesFolderType, kDontCreateFolder, &vref, &PreferencesFolderDirID);
 	err = FSMakeFSSpec(vref, PreferencesFolderDirID, GetIntStringPtr(spFiles, sPreferencesFolder), &ShadowIRCFolder);
 
 	if(err) //this means that there's no preferences folder
