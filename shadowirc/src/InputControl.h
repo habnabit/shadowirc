@@ -39,6 +39,7 @@ void IADSetText(inputAreaDataPtr iad, LongString *ls);
 long IADGetTextHandleRange(inputAreaDataPtr iad, Handle *text, int start, int end);
 long IADGetTextHandle(inputAreaDataPtr iad, Handle *text);
 long IADGetText(inputAreaDataPtr iad, LongString *ls);
+OSStatus IADHandleTextEvent(inputAreaDataPtr iad, EventRef event);
 
 #pragma mark History
 void ILAddHistory(inputAreaDataPtr iad, LongString *line);

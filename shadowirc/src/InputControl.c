@@ -229,6 +229,11 @@ static OSStatus InputLineControlTextEventHandler(EventHandlerCallRef handlerCall
 	return result;
 }
 
+OSStatus IADHandleTextEvent(inputAreaDataPtr iad, EventRef event)
+{
+	return SendEventToControl(event, iad->inputControl);
+}
+
 static OSStatus InputLineControlEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
 #pragma unused(handlerCallRef)

@@ -410,10 +410,23 @@ static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef even
 	return result;
 }
 
+static const EventTypeSpec mwTextEvents[] = {
+	{kEventClassTextInput, kEventUnicodeForKeyEvent},
+};
+
+static OSStatus MWTextEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
+{
+#pragma unused(handlerCallRef)
+	MWPtr mw = userData;
+	
+	return IADHandleTextEvent(ILGetInputDataFromMW(mw), event);
+}
+
 void MWInstallEventHandlers(MWPtr mw)
 {
 	static EventHandlerUPP uiCommandHandler = NULL;
 	static EventHandlerUPP mwEventHandler = NULL;
+	static EventHandlerUPP mwTextEventHandler = NULL;
 	const EventTypeSpec commandType[] = {
 			{kEventClassService, kEventServiceGetTypes},
 			{kEventClassService, kEventServiceCopy}, 
@@ -435,10 +448,12 @@ void MWInstallEventHandlers(MWPtr mw)
 	{
 		uiCommandHandler = NewEventHandlerUPP(MWUICommandHandler);
 		mwEventHandler = NewEventHandlerUPP(MWEventHandler);
+		mwTextEventHandler = NewEventHandlerUPP(MWTextEventHandler);
 	}
 	
 	InstallWindowEventHandler(mw->w, uiCommandHandler, GetEventTypeCount(commandType), commandType, mw, NULL);
 	InstallWindowEventHandler(mw->w, mwEventHandler, GetEventTypeCount(mwEvents), mwEvents, mw, NULL);
+	InstallWindowEventHandler(mw->w, mwTextEventHandler, GetEventTypeCount(mwTextEvents), mwTextEvents, mw, NULL);
 	
 	if(mw->winType == conWin)
 	{
