@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -1121,6 +1121,13 @@ _Skip:
 			
 		case 368: //channel ban list
 		case 369: //whowas
+			break;
+		
+		case 396: //hidden host (undernet)
+			LSNextArgIRC(rest, s1);
+			SAppend1(s1, ' ');
+			LSConcatStrAndLS(s1, rest, rest);
+			SMPrefixLink(link, rest, dsFrontWin);
 			break;
 		
 		default:
