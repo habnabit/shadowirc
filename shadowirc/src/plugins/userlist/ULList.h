@@ -32,7 +32,7 @@ void ListDrawUser(ULI ul, int num, short po);
 void ListDrawOne(ULI ul, UserListPtr u);
 void ListDrawOneUser(ULI ul, UserListPtr u);
 void ListGenerate(ULI ul, channelPtr ch);
-void ListSort(ULI ul);
+void ListRefresh(ULI ul);
 void ListTrash(ULI ul);
 void ListAdd(ULI ul, UserListPtr u);
 void ListDel(ULI ul, UserListPtr u);

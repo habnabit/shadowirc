@@ -165,7 +165,7 @@ void ListResortInd(ULI ul, UserListPtr u)
 	UpdateDataBrowserItems(ul->browser, kDataBrowserNoItem, 1, &items, kDataBrowserItemNoProperty, kDataBrowserItemNoProperty);
 }
 
-void ListSort(ULI ul)
+void ListRefresh(ULI ul)
 {
 	ListResortInd(ul, kDataBrowserNoItem); //refresh everything
 }

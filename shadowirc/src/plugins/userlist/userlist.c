@@ -458,11 +458,7 @@ INLINE void SULUserHosts(pServiceULUserhostsData *p)
 {
 	if(globalUserlist)
 	{
-		if((gUserlist->ch) && gUserlist->ch->link == p->link)
-		{
-			if(gUserlist->sort == kSortUserhost)
-				ListSort(gUserlist);
-		}
+		ListRefresh(gUserlist);
 	}
 	else
 	{
@@ -473,10 +469,7 @@ INLINE void SULUserHosts(pServiceULUserhostsData *p)
 		{
 			ul = ULIFromChannel(ch);
 			if(ul)
-			{
-				if(ul->sort == kSortUserhost)
-					ListSort(ul);
-			}
+				ListRefresh(ul);
 			ch=ch->next;
 		}
 	}
@@ -895,6 +888,89 @@ static void DBItemNotify(ControlRef browser, DataBrowserItemID item, DataBrowser
 	}
 }
 
+#define SAppend1(s,ch){(s)[++((s)[0])]=ch;}
+
+void DBCustomDrawItem(ControlRef browser, DataBrowserItemID item, DataBrowserPropertyID property, DataBrowserItemState itemState, const Rect* theRect, SInt16 gdDepth, Boolean colorDevice)
+{
+	UserListPtr user = (UserListPtr)item;
+	
+	if(property == 'name')
+	{
+		Str255 s;
+		Style face = 0;
+		RGBColor *color = 0;
+		RGBColor hilite, oColor;
+		CFStringRef cfStr;
+		Rect hackDBRect = *theRect;
+		int width;
+		
+		hackDBRect.left -= 7;
+		hackDBRect.right += 7;
+		
+		width = theRect->right - theRect->left;
+		
+		if(user->isOper)
+		{
+			face |= italic;
+			if(!user->isOp)
+				color = &shadowircColors[sicUserOper];
+		}
+		if(user->isOp)
+		{
+			face |= bold;
+			color = &shadowircColors[sicUserChannelOp];
+		}
+		else if((user->hasVoice || user->isHalfOp) && !user->isOper)
+		{
+			face |= underline;
+			color = &shadowircColors[sicUserVoice];
+		}
+	//	else if(user->isIgored)
+	//		RGBForeColor(&shadowircColors[sicUserIgnored]);
+		else
+			if(!color)
+				color = &shadowircColors[sicUserRegular];
+		
+		if(user->isAway)
+		{
+			pstrcpy(user->nick, &s[1]);
+			s[0] = s[1] +1;
+			s[1] = '(';
+			TruncString(width, s, truncEnd);
+			SAppend1(s, ')');
+		}
+		else
+		{
+			pstrcpy(user->nick, s);
+			TruncString(width, s, truncEnd);
+		}
+		
+		GetForeColor(&oColor);
+		if(itemState == kDataBrowserItemIsSelected)
+		{
+			Rect tr = hackDBRect;
+			
+			tr.bottom += 1;
+			tr.right += 5;
+			tr.left -= 5;
+			
+			GetPortHiliteColor(GetWindowPort(GetControlOwner(browser)), &hilite);
+			RGBForeColor(&hilite);
+			PaintRect(&tr);
+		}
+		
+		RGBForeColor(color);
+		TextFace(face);
+		cfStr = CFStringCreateWithPascalString(NULL, s, kCFStringEncodingMacRoman);
+		DrawThemeTextBox(cfStr, kThemeCurrentPortFont, kThemeStateActive, true, &hackDBRect, teFlushDefault, NULL);
+		TextFace(0);
+		
+		RGBForeColor(&oColor);
+		
+//		if(user->userlistIsSelected)
+	}
+}
+
 static ULI ULINew(WindowPtr w, long type)
 {
 	ULI ul = (ULI)NewPtrClear(sizeof(UserListInstance));
@@ -977,6 +1053,8 @@ static ULI ULINew(WindowPtr w, long type)
 		static DataBrowserItemDataUPP dbIDUPP = NULL;
 		static DataBrowserItemCompareUPP dbICUPP = NULL;
 		static DataBrowserItemNotificationUPP dbINUPP = NULL;
+		DataBrowserCustomCallbacks dccb;
+		static DataBrowserDrawItemUPP dbCDIUPP = NULL;
 		static ControlFontStyleRec controlFontStyleStruc;
 		
 		controlFontStyleStruc.flags = kControlUseSizeMask | kControlUseFaceMask;
@@ -984,7 +1062,7 @@ static ULI ULINew(WindowPtr w, long type)
 		controlFontStyleStruc.style = normal;
 		
 		dbColumn.propertyDesc.propertyID = 'name';
-		dbColumn.propertyDesc.propertyType = kDataBrowserTextType;
+		dbColumn.propertyDesc.propertyType = kDataBrowserCustomType;
 		dbColumn.propertyDesc.propertyFlags = kDataBrowserDefaultPropertyFlags | kDataBrowserListViewSortableColumn | kDataBrowserListViewSelectionColumn;
 		dbColumn.headerBtnDesc.version= kDataBrowserListViewLatestHeaderDesc,
 		dbColumn.headerBtnDesc.minimumWidth = 55;
@@ -1003,7 +1081,7 @@ static ULI ULINew(WindowPtr w, long type)
 		dbColumn.headerBtnDesc.version= kDataBrowserListViewLatestHeaderDesc,
 		dbColumn.headerBtnDesc.minimumWidth = 55;
 		dbColumn.headerBtnDesc.maximumWidth = 500;
-		dbColumn.headerBtnDesc.titleOffset = 0;
+		dbColumn.headerBtnDesc.titleOffset = -7;
 		dbColumn.headerBtnDesc.titleString = CFSTR("Hostname");
 		dbColumn.headerBtnDesc.initialOrder = kDataBrowserOrderIncreasing;
 		dbColumn.headerBtnDesc.btnFontStyle = controlFontStyleStruc;
@@ -1039,6 +1117,12 @@ static ULI ULINew(WindowPtr w, long type)
 		SetControlFontStyle(ul->browser, &controlFontStyleStruc);
 		SetControlProperty(ul->browser, kUserlistSignature, kUserlistSignature, sizeof(ULI), &ul);
 		SetDataBrowserTableViewRowHeight(ul->browser, 12);
+		
+		InitializeDataBrowserCustomCallbacks(&dccb, kDataBrowserLatestCustomCallbacks);
+		if(!dbCDIUPP)
+			dbCDIUPP = NewDataBrowserDrawItemUPP(DBCustomDrawItem);
+		dccb.u.v1.drawItemCallback = dbCDIUPP;
+		SetDataBrowserCustomCallbacks(ul->browser, &dccb);
 	}
 	
 	GetPort(&gp);
