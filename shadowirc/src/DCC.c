@@ -143,7 +143,7 @@ pascal short DCCTypeFind(ConstStr255Param s)
 		Str255 s1;
 		dccTypeListPtr p;
 		int x;
-		short out;
+		short out = dccNIL;
 		char found = false;
 
 		HLock((Handle)dccTypeList);
@@ -158,8 +158,6 @@ pascal short DCCTypeFind(ConstStr255Param s)
 				break;
 			}
 		
-		if(!found)
-			out = dccNIL;
 		HUnlock((Handle)dccTypeList);
 		
 		return out;
