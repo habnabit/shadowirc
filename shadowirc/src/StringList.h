@@ -62,22 +62,24 @@ enum errorStrings {
 	sPrefsVersionError, 
 	sCChangingServers,
 	sCRegistering,
-	
-	sOpeningIdentd = 14,
+	sServerRefusesConnection,
+	sOpeningIdentd,
 	sCIdentdCalled,
-	
-	sLogsFolderInvalid = 21,
+	sPrefNoServerSpecified,
+	sPrefNoServerPort,
+	sPrefNoNick,
+	sPrefNoUsername,
+	sPrefNoRealname,
+	sLogsFolderInvalid,
 	sErrorLoadingPrefs,
 	sPrefsError,
 	sNoColonInLinkName,
-	
-	spCantCreatPluginPrefsFldr=25,
+	spCantCreatPluginPrefsFldr,
 	sPlugsPrefsFolderIsFile,
 	sNoPluginsFolder,
 	sPlugsFolderEmpty,
 	sRegistrationFailed,
-	
-	sPlugsFldrIsFile = 31,
+	sPlugsFldrIsFile,
 	sCantMakeLogFolderThisConn,
 	sLogFolderThisConnIsFile,
 	sShadowIRCLowMem,
@@ -106,8 +108,9 @@ enum InfoStrings {
 	
 	sOnoticeRequiresChannel = 9,
 	sCantMakeQuery,
-	
-	sAlreadyOnNotify = 13,
+	sAddedToSilence,
+	sRemovedFromSilence,
+	sAlreadyOnNotify,
 	sNotifyList,
 	spNooneOnNotify,
 	sUsersOnNotify,
@@ -117,8 +120,8 @@ enum InfoStrings {
 	sLookup,
 	sOpening,
 	sClosing,
-	
-	sNoTopicSet = 24,
+	sAway,
+	sNoTopicSet,
 	sTopicStr,
 	sTopicSetBy,
 	sInactiveChannel,
@@ -171,7 +174,11 @@ enum serverStrings {
 	sNickJoinedChannel,
 	sModeChange,
 	sGotPongFor,
-	sInvitesYouToChannel
+	sInvitesYouToChannel,
+	sReceivedChannelCTCP,
+	sReceivedCTCP,
+	sCPINGTime,
+	sCTCPReply
 };
 
 enum fileStrings {

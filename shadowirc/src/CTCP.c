@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -19,6 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+#include "StringList.h"
 #include "LongStrings.h"
 #include "IRCGlobals.h"
 #include "MsgWindows.h"
@@ -131,15 +132,18 @@ static pascal void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255P
 	LongString ls;
 	channelPtr targChan;
 	short targ;
+	ConstStringPtr sp;
 	
 	if(!mainPrefs->disableCTCPMessages)
 	{
 		targChan = ChFind(target, link);
 		LSMakeStr(*ctcp);
 		if(targChan)
-			LSStrCat(6, &ls, "\pReceived channel CTCP \"", ctcp->data, "\p\" for ", target, "\p from ", from);
+			sp = GetIntStringPtr(spServer, sReceivedChannelCTCP);
 		else
-			LSStrCat4(&ls, "\pReceived CTCP \"", ctcp->data, "\p\" from ", from);
+			sp = GetIntStringPtr(spServer, sReceivedCTCP);
+		
+		LSParamString(&ls, sp, ctcp->data, from, target, 0);
 		
 		if(mainPrefs->showUserHostsWithMsgs)
 		{
@@ -279,7 +283,7 @@ static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param 
 	}
 	else if(pstrcmp7(co, 'VER', 'SION'))
 	{
-		LSConcatStrAndStrAndStr("\pShadowIRC ", CL_VERSION, "\p © John Bafford 1996-2000 (", &ls);
+		LSConcatStrAndStrAndStr("\pShadowIRC ", CL_VERSION, "\p © John Bafford 1996-2001 (", &ls);
 		LSConcatLSAndStrAndStr(&ls, cdt, "\p), ", &ls);
 		SendCTCPReply(link, fr, co, &ls);
 	}
@@ -347,15 +351,12 @@ static pascal void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param
 			re[1]='0';
 		if(re[2]==' ')
 			re[2]='0';
-		LSStrCat(6, &ls, "\pCPING time for ", fr, "\p: ", st, re, "\p seconds");
-		if(l1 == 1 && l2 == 0)
-			ls.len--;
+		
+		LSParamString(&ls, GetIntStringPtr(spServer, sCPINGTime), fr, st, re, 0);
 		SoundService(sndCPing, lo);
 	}
 	else
-	{
-		LSStrCat(6, &ls, "\pCTCP ", co, "\p reply from ", fr, "\p: ", re);
-	}
+		LSParamString(&ls, GetIntStringPtr(spServer, sCTCPReply), co, fr, re, 0);
 
 	SMPrefixLinkColor(link, &ls, dsFrontWin, sicCTCP);
 }

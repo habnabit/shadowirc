@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -908,7 +908,7 @@ _Skip:
 		
 		case 463: //server refuses connection
 		case 466:
-			LSConcatStrAndStr(from, "\p refuses connection ", &ls);
+			LSParamString(&ls, GetIntStringPtr(spError, sServerRefusesConnection), from, 0, 0, 0);
 			LSConcatLSAndLS(&ls, rest, &ls);
 			SMPrefixLink(link, &ls, dsConsole);
 			break;

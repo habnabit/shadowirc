@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -1660,7 +1660,7 @@ pascal void InitMsgWindows(void)
 
 	SetRect(&cornerstone, 5, GetMBarHeight() + 16, 425, 340);
 	
-	MWActive = consoleWin=MWNew("\pConsole", conWin, 0, 0);
+	MWActive = consoleWin=MWNew(GetIntStringPtr(spTopic, sConsole), conWin, 0, 0);
 	MWNewWidget(consoleWin, mwLinkWidget, mwForceLeft, 17);
 	if(mainPrefs->consoleOpen)
 		WSelect(consoleWin->w);

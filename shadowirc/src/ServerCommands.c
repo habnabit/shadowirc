@@ -1010,7 +1010,7 @@ static pascal void nSilence(linkPtr link, LongString *ls)
 	runPlugins(pServerSILENCEMessage, &p);
 	if(!p.completelyProcessed)
 	{
-		LSParamString(ls, GetIntStringPtr(spInfo, 11 + (!p.add)), silence, 0, 0, 0);
+		LSParamString(ls, GetIntStringPtr(spInfo, sAddedToSilence + (!p.add)), silence, 0, 0, 0);
 			SMPrefixLink(link, ls, dsFrontWin);
 	}
 	

@@ -1,6 +1,6 @@
 	/*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -1025,7 +1025,7 @@ static pascal void DrawTopicWidget(mwWidgetPtr o, char winActive)
 						DrawString(link->CurrentNick);
 						TextFace(0);
 						if(link->awayString)
-							DrawString("\p (Away)");
+							DrawString(GetIntStringPtr(spInfo, sAway));
 						DrawString("\p on ");
 					}
 				

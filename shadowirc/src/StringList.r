@@ -96,6 +96,10 @@ resource 'STR#' (253, "Server Messages", locked, preload)
 		"Mode change \"^0\" on ^1 by ^2",
 		"Got PONG from ^0",
 		"^0 invites you to channel ^1",
+		"Received channel CTCP \"^0\" for ^2 from ^1",
+		"Received CTCP \"^0\" from ^1",
+		"CPING time for ^0: ^1^2 seconds",
+		"CTCP ^0 reply from ^1: ^2"
 	};
 };
 
@@ -135,7 +139,7 @@ resource 'STR#' (256, "Error Strings", locked, preload)
 		"The preferences file is from ShadowIRC 1.2 or later, and can not be used with this version of ShadowIRC.",
 		"Changing Servers",
 		"Registering with server...",
-		"Connection Successful",
+		"^0 refuses connection",
 		"Opening Identd",
 		"Identd called",
 		"No server specified in Servers window",
@@ -152,7 +156,6 @@ resource 'STR#' (256, "Error Strings", locked, preload)
 		"ERROR: No Plugins Folder",
 		"Plugins folder is empty",
 		"Registration failed, trying again...",
-		"ERROR: Unable to create plugins folder!",
 		"ERROR: Plugins folder is a file!",
 		"ERROR: Can't create log folder for this connection!",
 		"ERROR: The log folder for this connection is a file!",
@@ -265,7 +268,8 @@ resource 'STR#' (258, "DCC Strings", locked, preload)
 		"Unsupported DCC ^0 request from ^1",
 		"Unsupported reverse DCC ^0 request from ^1",
 		"You are receiving a DCC file request from ^0 (\"^1\").",
-		"You are receiving a DCC file request from ^0 for a file that currently exists (\"^1\"). Please choose ShadowIRC from the Applications menu and save the file under a different name."
+		"You are receiving a DCC file request from ^0 for a file that currently exists (\"^1\"). Please choose ShadowIRC from the Applications menu and save the file under a different name.",
+		"DCC ^0 request from ^1. Ignoring."
 	};
 };
 

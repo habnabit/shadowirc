@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -277,22 +277,22 @@ pascal void StatusMsg(linkPtr link, short n)
 	SMPrefixLink(link, &ls, 1);
 }
 
-#define myvp(x) do{StatusMsg(link, 16+x);c=0;}while(0)
+#define myvp(x) do{StatusMsg(link, x);c=0;}while(0)
 pascal char ValidPrefs(linkPtr link)
 {
 	char c=1;
 	linkPrefsPtr lp=link->linkPrefs;
 	
 	if(!lp->serverName[0])
-		myvp(0);
+		myvp(sPrefNoServerSpecified);
 	if(lp->serverPort<1)
-		myvp(1);
+		myvp(sPrefNoServerPort);
 	if(!lp->nick[0])
-		myvp(2);
+		myvp(sPrefNoNick);
 	if(!lp->user[0])
-		myvp(3);
+		myvp(sPrefNoUsername);
 	if(!lp->real[0])
-		myvp(4);
+		myvp(sPrefNoRealname);
 	
 	return c;
 }

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -2083,7 +2083,7 @@ pascal void DCCRequest(linkPtr link,ConstStr255Param fr, ConstStr255Param uah, S
 	}
 	else
 	{
-		LSStrCat(5, &ls, "\pDCC ", c, "\p request from ", fr, "\p. Ignoring.");
+		LSParamString(&ls, GetIntStringPtr(spDCC, sDCCRequestIgnore), c, fr, 0, 0);
 		SMPrefixLinkColor(link, &ls, dsFrontWin, sicCTCP);
 	}
 }
