@@ -81,9 +81,7 @@ enum pVersionCheckMessageReply {
 	pVersionShadowIRCTooOld = -1,
 	pVersionPluginTooOld = -2,
 	
-	pVersion6MessageReply = 3,
-	pVersion10MessageReply = 4,
-	pVersion11MessageReply = 5,
+	pVersion20MessageReply = 5,
 	pVersionCheckMessageReply = 5
 };
 

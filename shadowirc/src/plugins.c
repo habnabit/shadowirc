@@ -661,7 +661,7 @@ static void InitPlugins(void)
 			
 			CFStringGetPascalString(p->pluginName, pluginName, 256, kCFStringEncodingMacRoman);
 			
-			if(version <= pVersion11MessageReply)
+			if(version <= pVersion20MessageReply)
 				LSConcatStrAndStrAndStr("\p\"", pluginName, "\p\" is too old, and is incompatible with this version of ShadowIRC.", &ls);
 			else if(version > pVersionCheckMessageReply)
 				LSConcatStrAndStrAndStr("\p\"", pluginName, "\p\" can not run because it is too new for this version of ShadowIRC.", &ls);
