@@ -35,7 +35,7 @@ OSErr IPGetMyIPAddr(unsigned long*);
 
 OSErr TCPSendAsync(connectionPtr conn, const void* writePtr, short writeCount, char push);
 
-short TCPLocalPort(TCPConnectionPtr conn);
+int TCPLocalPort(int sockfd);
 long TCPRemoteIP(TCPConnectionPtr conn);
 
 #endif

@@ -528,15 +528,23 @@ static size_t TCPCharsAvailable(int sockfd)
         return(nbytes);
 }
 
-short TCPLocalPort(TCPConnectionPtr conn)
-{
     /*
-	short state, localport;
-	
-	TCPRawState(conn, &state, &localport);
-	return localport;
+ * TCPLocalPort
+ * Return local port for sockfd, else return -1 on failure
      */
-    return 0;
+int TCPLocalPort(int sockfd)
+{
+    union {
+        struct sockaddr sa;
+        struct sockaddr_in sin;
+        struct sockaddr_in6 sin6;
+    } sockaddr_union;
+    int len;
+    
+    len = sizeof(sockaddr_union);
+    if (getsockname(sockfd, (SA *) &sockaddr_union.sa, &len) < 0)
+        return (-1);
+    return (ntohs(sockaddr_union.sin.sin_port));
 }
 
 /*

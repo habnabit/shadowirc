@@ -491,7 +491,7 @@ size_t ConnGetUntil(connectionPtr conn, Ptr d, char c, size_t len)
         return TCPReceiveUntil(GetConnectionSocket(conn->private_socket), d, c, len);
 }
 
-pascal unsigned short ConnGetLocalPort(connectionPtr conn)
+int ConnGetLocalPort(connectionPtr conn)
 {
 	return TCPLocalPort(GetConnectionSocket(conn->private_socket));
 }

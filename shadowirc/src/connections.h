@@ -223,7 +223,7 @@ pascal char ConnNewActive(connectionPtr c);
 pascal char ConnNewListen(connectionPtr c, int backlog);
 size_t ConnGetData(connectionPtr conn, Ptr d, size_t len);
 size_t ConnGetUntil(connectionPtr conn, Ptr d, char c, size_t len);
-pascal unsigned short ConnGetLocalPort(connectionPtr conn);
+int ConnGetLocalPort(connectionPtr conn);
 
 pascal OSErr NetGetLocalIP(unsigned long *ip);
 
