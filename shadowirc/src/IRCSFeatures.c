@@ -22,23 +22,36 @@
 #include "IRCSFeatures.h"
 #include "utils.h"
 
-#define FEATURE(name, type, var) {name, type, sizeof(_defaultFeatures.var), (void*)&_defaultFeatures.var, (void*)&_defaultFeatures.var - (void*)&_defaultFeatures}
+#define FEATURE(name, type, var, varFunc) {name, type, sizeof(_defaultFeatures.var), (void*)&_defaultFeatures.var, (void*)&_defaultFeatures.var - (void*)&_defaultFeatures, varFunc}
+
+#define FEATUREINT(name, var) FEATURE(name, featureInt, var, NULL)
+#define FEATURESTR(name, var) FEATURE(name, featureStr, var, NULL)
+#define FEATUREBOOL(name, var) FEATURE(name, featureBool, var, NULL)
+#define FEATURESPECIAL(name, var, varFunc) FEATURE(name, featureSpecial, var, varFunc)
+
 #define FEATUREEND {NULL, 0, 0, NULL}
 
-typedef enum _featureType {
+typedef enum featureType {
 	featureBool,
 	featureInt,
 	featureStr,
 	featureSpecial,
-} _featureType;
+} featureType;
 
-typedef struct _knownFeatures {
+typedef enum featureAction {
+	kFeatureSet,
+	kFeatureDelete,
+	kFeatureDispose,
+} featureAction;
+
+struct featureDesc {
 	StringPtr name;
-	const _featureType type;
+	const featureType type;
 	const int storageSize;
-	const void* def;
+	void* def;
 	int offset;
-} _knownFeatures;
+	void (*specialVarFunc)(const struct featureDesc *kf, featureAction action, void* data);
+};
 
 static IRCSFeatures _defaultFeatures = {
 	0, //topicLength
@@ -54,18 +67,18 @@ static IRCSFeatures _defaultFeatures = {
 	0, //hasWallchops
 };
 
-static const _knownFeatures knownFeatures[] = {
-	FEATURE("\pTOPICLEN", featureInt, topicLength),
-	FEATURE("\pKICKLEN", featureInt, kickLength),
-	FEATURE("\pAWAYLEN", featureInt, awayLength),
-	FEATURE("\pNICKLEN", featureInt, nickLength),
-	FEATURE("\pMODES", featureInt, numModes),
-	FEATURE("\pMAXCHANNELS", featureInt, maxChannels),
-	FEATURE("\pMAXBANS", featureInt, maxBans),
+static const struct featureDesc knownFeatures[] = {
+	FEATUREINT("\pTOPICLEN", topicLength),
+	FEATUREINT("\pKICKLEN", kickLength),
+	FEATUREINT("\pAWAYLEN", awayLength),
+	FEATUREINT("\pNICKLEN", nickLength),
+	FEATUREINT("\pMODES", numModes),
+	FEATUREINT("\pMAXCHANNELS", maxChannels),
+	FEATUREINT("\pMAXBANS", maxBans),
 	
-	FEATURE("\pCHANTPES", featureStr, chanTypes),
+	FEATURESTR("\pCHANTPES", chanTypes),
 	
-	FEATURE("\pWALLCHOPS", featureBool, hasWallchops),
+	FEATUREBOOL("\pWALLCHOPS", hasWallchops),
 	
 	FEATUREEND
 };
@@ -74,13 +87,15 @@ void SFDestroy(IRCSFeaturesPtr sf)
 {
 	if(sf)
 	{
-		const _knownFeatures* kf = knownFeatures;
+		const struct featureDesc *kf = knownFeatures;
 		
 		//Step through and delete all of the featureStrs
 		while(kf->name)
 		{
 			if(kf->type == featureStr)
 				DisposePtr((char*)(((char*)sf) + kf->offset));
+			else if(kf->type == featureSpecial)
+				kf->specialVarFunc(kf, kFeatureDispose, NULL);
 			
 			kf++;
 		}
@@ -91,7 +106,7 @@ void SFDestroy(IRCSFeaturesPtr sf)
 
 IRCSFeaturesPtr SFNew(void)
 {
-	const _knownFeatures* kf = knownFeatures;
+	const struct featureDesc *kf = knownFeatures;
 	IRCSFeaturesPtr sf = calloc(1, sizeof(IRCSFeatures));
 	
 	while(kf->name)
@@ -104,9 +119,9 @@ IRCSFeaturesPtr SFNew(void)
 	return sf;
 }
 
-static const _knownFeatures* _SFFindFeature(StringPtr name)
+static const struct featureDesc* _SFFindFeature(StringPtr name)
 {
-	const _knownFeatures* kf = knownFeatures;
+	const struct featureDesc *kf = knownFeatures;
 	
 	while(kf->name)
 	{
@@ -121,20 +136,16 @@ static const _knownFeatures* _SFFindFeature(StringPtr name)
 
 char SFSetFeature(IRCSFeaturesPtr sf, StringPtr name, void* data)
 {
-	const _knownFeatures *kf = _SFFindFeature(name);
+	const struct featureDesc *kf = _SFFindFeature(name);
 	
 	if(kf)
 	{
 		void* targetLoc = (((char*)sf) + kf->offset);
 		
 		if(kf->type == featureBool)
-		{
 			*(char*)targetLoc = !!data;
-		}
 		else if(kf->type == featureInt)
-		{
 			*(int*)targetLoc = (int)data;
-		}
 		else if(kf->type == featureStr)
 		{
 			if(*(StringPtr*)targetLoc)
@@ -142,6 +153,8 @@ char SFSetFeature(IRCSFeaturesPtr sf, StringPtr name, void* data)
 			
 			*(StringPtr*)targetLoc = NewPString((StringPtr)data);
 		}
+		else if(kf->type == featureSpecial)
+			kf->specialVarFunc(kf, kFeatureSet, data);
 		
 		return true;
 	}
@@ -152,27 +165,21 @@ char SFSetFeature(IRCSFeaturesPtr sf, StringPtr name, void* data)
 char SFDeleteFeature(IRCSFeaturesPtr sf, StringPtr name)
 {
 	//Get the feature from the _defaultFeatures, then set it.
-	const _knownFeatures *kf = _SFFindFeature(name);
+	const struct featureDesc *kf = _SFFindFeature(name);
 	
 	if(kf)
 	{
 		void* data;
-		//void* srcLoc = (((char*)&_defaultFeatures) + kf->offset);
 		void* srcLoc = kf->def;
 		
 		if(kf->type == featureBool)
-		{
-			int d = *(char*)srcLoc;
-			data = (void*)d;
-		}
+			data = (void*)((int)*(char*)srcLoc);
 		else if(kf->type == featureInt)
-		{
 			data = (void*)*(int*)srcLoc;
-		}
 		else if(kf->type == featureStr)
-		{
 			data = (void*)*(StringPtr*)srcLoc;
-		}
+		else if(kf->type == featureSpecial)
+			kf->specialVarFunc(kf, kFeatureDelete, NULL);
 		else
 			return false;
 		
