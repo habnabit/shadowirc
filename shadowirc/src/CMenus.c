@@ -399,7 +399,7 @@ static void CMMWMake(cmmwData *d)
 			else
 				sp = GetIntStringPtr(spCM, sStartLogging);
 			
-			CMILAdd(d, s, mcLog, 0);
+			CMILAdd(d, sp, mcLog, 0);
 		}
 		
 		if(!d->oneWord)
