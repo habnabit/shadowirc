@@ -293,11 +293,7 @@ pascal void MWPaneClick(MWPtr mw, EventRecord *e)
 	mwPanePtr o;
 	Rect textRect;
 	pMWPaneClickData p;
-	GrafPtr g;
 	
-	GetPort(&g);
-	SetPortWindowPort(mw->w);
-
 	o=MWFindPanePoint(mw,e->where);
 	if(o)
 	{
@@ -325,8 +321,6 @@ pascal void MWPaneClick(MWPtr mw, EventRecord *e)
 			runIndPlugin(o->pluginRef, pMWPaneClickMessage, &p);
 		}
 	}
-	
-	SetPort(g);
 }
 
 pascal void MWPaneUpdate(MWPtr mw)
