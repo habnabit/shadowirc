@@ -10,18 +10,6 @@
 			path = ShadowIRC.app;
 			refType = 3;
 		};
-		0249A669FF388E3911CA2CEA = {
-			isa = PBXFileReference;
-			name = "libstdc++.a";
-			path = "/usr/lib/libstdc++.a";
-			refType = 0;
-		};
-		0249A66AFF388E3911CA2CEA = {
-			fileRef = 0249A669FF388E3911CA2CEA;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 //020
 //021
 //022
@@ -78,28 +66,6 @@
 //052
 //053
 //054
-//060
-//061
-//062
-//063
-//064
-		0640BAA4FFF0323A11CA0E50 = {
-			isa = PBXFrameworkReference;
-			name = ApplicationServices.framework;
-			path = /System/Library/Frameworks/ApplicationServices.framework;
-			refType = 0;
-		};
-		0640BAA5FFF0323A11CA0E50 = {
-			isa = PBXFrameworkReference;
-			name = CoreServices.framework;
-			path = /System/Library/Frameworks/CoreServices.framework;
-			refType = 0;
-		};
-//060
-//061
-//062
-//063
-//064
 //080
 //081
 //082
@@ -254,9 +220,6 @@
 		20286C32FDCF999611CA2CEA = {
 			children = (
 				20286C33FDCF999611CA2CEA,
-				0249A669FF388E3911CA2CEA,
-				0640BAA4FFF0323A11CA0E50,
-				0640BAA5FFF0323A11CA0E50,
 			);
 			isa = PBXGroup;
 			name = "External Frameworks and Libraries";
@@ -338,6 +301,8 @@
 	<string>2.0a2, © 1996-2002 John Bafford</string>
 	<key>CFBundleIconFile</key>
 	<string>ShadowIRC.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.shadowirc.ShadowIRC</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -499,7 +464,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				20286C3CFDCF999611CA2CEA,
-				0249A66AFF388E3911CA2CEA,
 			);
 			isa = PBXFrameworksBuildPhase;
 		};
