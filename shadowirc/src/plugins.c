@@ -700,7 +700,6 @@ static int LoadPluginFromBundle(CFBundleRef pluginBundle, CFStringRef pluginName
 		} while(x<numMessages);
 
 		thisPlug->pluginName = CFStringCreateCopy(NULL, pluginName);
-		thisPlug->idleThreshold=0;
 		thisPlug->xpluginRef=(long)&thisPlug;
 		thisPlug->timesCalled=0;
 

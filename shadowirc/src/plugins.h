@@ -231,7 +231,6 @@ struct plugsRec {
 	CFStringRef pluginName;				//The name of your plugin's file
 	long timesCalled;					//The number of times your plugin has been called.
 	short resFileRefNum;			//The File Manager refnum of your resource fork.
-	short idleThreshold;				//If you're recieving idle messages, how often to get them (minimally), in ticks.
 	CMArray captureMessages;	//The messages your plugin listens for.
 	CFBundleRef bundle;
 	
