@@ -57,7 +57,6 @@ enum serviceStrings {
 };
 
 inline void callIndPlugin(plugsPtr ref, void* msgD, short msg);
-inline char parsePlugFile(const FSSpec * spec);
 inline void initSIDR(void);
 static pascal void AddService(FourCharCode serviceType, plugsPtr ref);
 static pascal void InitPlugins(void);
@@ -503,27 +502,6 @@ pascal void runAllPlugins(short message, void* messageData)
 	UseResFile(rf);
 }
 
-pascal void idlePlugins(EventRecord *e)
-{
-	plugsPtr plug;
-	long curTime;
-	pIdleMessageData p;
-
-	SavePluginState();
-	
-	curTime=TickCount();
-	p.e = e;
-	linkfor(plug, firstPlugin)
-		if(plug->captureMessages[pIdleMessage])
-			if((curTime-plug->lastIdleCall)>plug->idleThreshold)
-			{
-				callIndPlugin(plug, &p, pIdleMessage);
-				plug->lastIdleCall=curTime;
-			}
-
-	RestorePluginState();
-}
-
 enum {
 	pUndocumentedAPIReply = 'BAD!'
 };
@@ -720,7 +698,6 @@ static int LoadPluginFromBundle(CFBundleRef pluginBundle, CFStringRef pluginName
 
 		// pstrcpy(spec->name, thisPlug->pluginName);
 		thisPlug->idleThreshold=0;
-		thisPlug->lastIdleCall=0;
 		thisPlug->xpluginRef=(long)&thisPlug;
 		thisPlug->timesCalled=0;
 
@@ -767,56 +744,6 @@ static int LoadPluginFromBundle(CFBundleRef pluginBundle, CFStringRef pluginName
 		LineMsg(&ls);
 		return -1;
 	}
-}
-
-inline char parsePlugFile(const FSSpec *spec)
-{
-	LongString ls;
-	int x;
-	plugsPtr thisPlug;
-	
-	CFragConnectionID cID; //save this in case 
-	Ptr cfgUPP;
-	Str255 errMsg;
-
-	if(!GetDiskFragment(spec, 0, 0, "\p", kLoadCFrag, &cID, &cfgUPP, errMsg))
-	{
-		thisPlug = (plugsPtr)NewPtr(sizeof(plugsRec));
-		thisPlug->proc = (pluginMain)cfgUPP;
-		thisPlug->captureMessages[pInitMessage]=1;
-		thisPlug->captureMessages[pQuitMessage]=1;
-		x=2;
-		do {
-			thisPlug->captureMessages[x++]=0;
-		} while(x<numMessages);
-		
-		pstrcpy(spec->name, thisPlug->pluginName);
-		thisPlug->idleThreshold=0;
-		thisPlug->lastIdleCall=0;
-		thisPlug->xpluginRef=(long)&thisPlug;
-		thisPlug->timesCalled=0;
-		thisPlug->resFileRefNum=FSpOpenResFile(spec, fsRdPerm);
-		
-		if(!firstPlugin)
-		{
-			firstPlugin = lastPlugin = thisPlug;
-			thisPlug->next = 0;
-		}
-		else
-		{
-			lastPlugin->next = thisPlug;
-			lastPlugin = thisPlug;
-			thisPlug->next = 0;
-		}
-	}
-	else
-	{
-		LSConcatStrAndStrAndStr("\pError loading PowerPC plugin \"", spec->name, "\p\": ", &ls);
-		LSConcatLSAndStr(&ls, errMsg, &ls);
-		LineMsg(&ls);
-	}
-	
-	return true;
 }
 
 /*

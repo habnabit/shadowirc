@@ -49,7 +49,6 @@ enum messagesList
 	pInitMessage							=0,	//Init time message. You always get this. This is the first message your plugin receives.
 	pQuitMessage						=1,	//Exit time message. You always get this. This is the last message your plugin receives.
 	pUserCommandMessage			=2,	//User entered a command. You get this message before ShadowIRC checks it.
-	pIdleMessage							=3,	//Idle message.
 	pInputMessage						=4,	//User hit return after inputting text.
 	pKeyDownMessage				=5,	//User pressed a key.
 	pNumericCommandMessage	=6,	//Numeric server command.
@@ -232,7 +231,6 @@ typedef struct plugsRec {
 	long pluginRef;							//A reference to your plugin.
 	const Str31 pluginName;			//The name of your plugin's file
 	const long timesCalled;				//The number of times your plugin has been called.
-	long lastIdleCall;						//The last time your plugin was called at idle time.
 	const short resFileRefNum;		//The File Manager refnum of your resource fork.
 	short idleThreshold;					//If you're recieving idle messages, how often to get them (minimally), in ticks.
 	CMArray captureMessages;		//The messages your plugin listens for.
@@ -1008,12 +1006,6 @@ typedef struct pCommandDataRec {
 	LongString *outgoing;	//Text you want HandleCommand() to send to the server.
 	char dontProcess;			//Set to true if you don't want ShadowIRC to process the command.
 } pCommandDataRec, *pCommandDataPtr;
-
-/*	pIdleMessageData
-*/
-typedef struct pIdleMessageData {
-	EventRecord *e;			//The event record
-} pIdleMessageData, *pIdleMessageDataPtr;
 
 /*	pInputMessageRec
 */

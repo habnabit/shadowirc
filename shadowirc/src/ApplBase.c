@@ -651,11 +651,6 @@ static void InitTimers()
 	InstallEventLoopTimer(mainLoop, TicksToEventTime(1), TicksToEventTime(1), net, NULL, &NetworkTimer);
 }
 
-static pascal void IdleTasks(EventRecord *e)
-{
-	idlePlugins(e);
-}
-
 #pragma mark -
 
 static pascal void inZoomInOutHandler(const EventRecord *e, short part)
@@ -999,7 +994,6 @@ static pascal void ApplEvents(EventRecord *e)
 	switch(e->what)
 	{
 		case nullEvent:
-			IdleTasks(e);
 			break;
 		
 		case updateEvt:
