@@ -65,23 +65,26 @@ inline void n433nickInUse(linkPtr link, LongString *rest);
 /*
 	Unet options:
 	
-	Gather for future use
-		WHOX WALLCHOPS USERIP CPRIVMSG CNOTICE MAP
-	
-	Use now:
+	Used now:
 		TOPICLEN=160
 		MODES=6
 	
 	Use later:
-		SILENCE=15 MAXCHANNELS=10 MAXBANS=30 NICKLEN=9 KICKLEN=160
+		WHOX WALLCHOPS USERIP CPRIVMSG CNOTICE MAP
+		SILENCE=15
+		MAXCHANNELS=10
+		MAXBANS=30
+		NICKLEN=9
+		KICKLEN=160
+		CHANTYPES=+#&
+		PREFIX=(ov)@+
+		CHANMODES=b,k,l,imnpst
+		CHARSET=rfc1459
+		NETWORK=Undernet
 	
 	Dalnet:
 		WATCH=128 - serverside notify
 		SAFELIST - does /list in chunks
-
-
-//need to parse: PREFIX=(ov)@+ CHANMODES=b,k,l,imnpst CHARSET=rfc1459 NETWORK=Undernet :are supported by this server
-
 */
 
 static void n005ServerFeatures(linkPtr link, LongString *ls)
