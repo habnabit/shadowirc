@@ -58,6 +58,7 @@ static pascal void HitFontsMenu(short item);
 static pascal void MenuAppleURL(short item);
 
 void FontsMenuInit(void);
+static void HelpMenuInit(void);
 
 static pascal char _strncmp(const char *s1, const char *s2, unsigned long len)
 {
@@ -545,9 +546,6 @@ pascal void DoMenuEvent(long menuitem, const EventRecord *e)
 			case windowMenu:
 				HitWindowMenu(itemNum);
 				break;
-			case shortcutsMenu:
-				ShortcutsMenu(itemNum);
-				break;
 			case commandsMenu:
 				HitCommandsMenu(itemNum, e->modifiers);
 				break;
@@ -565,12 +563,6 @@ pascal void DoMenuEvent(long menuitem, const EventRecord *e)
 			case AppleURLMenu:
 				MenuAppleURL(itemNum);
 				break;
-			
-		#if !TARGET_CARBON
-			case kHMHelpMenuID:
-				ShowHelp(itemNum - defaultHelpItems);
-				break;
-		#endif
 		}
 	}
 	HiliteMenu(0);
@@ -673,6 +665,31 @@ void FontsMenuInit(void)
 	}
 }
 
+static void HelpMenuInit(void)
+{
+	OSErr err;
+	short x, num;
+	ConstStringPtr s;
+	
+	menuHelpWidget = NewMenu(mHelpWidget, "\p");
+	if(!err)
+	{
+		defaultHelpItems = CountMenuItems(gHelpMenu);
+		num = *(short*)spHelp;
+		if(num>0)
+			for(x=1;x<=num;x++)
+			{
+				s = GetIntStringPtr(spHelp, x);
+				AppendMenu(gHelpMenu, s);
+				SetMenuItemCommandID(gHelpMenu, x, 'HWIN');
+				AppendMenu(menuHelpWidget, s);
+			}
+	}
+	
+	normHelpMenuItems = CountMenuItems(gHelpMenu)+2;
+	InsertMenu(menuHelpWidget, -1);
+}
+
 pascal void MenuInit(void)
 {
 	IBNibRef mainNibRef;
@@ -695,6 +712,9 @@ pascal void MenuInit(void)
 	gShortcutsMenu = GetMenuHandle(shortcutsMenu);
 	ShortcutsMenuInit(gShortcutsMenu);
 	gWindowMenu = GetMenuHandle(windowMenu);
+	
+	gHelpMenu = GetMenuHandle(helpMenu);
+	HelpMenuInit();
 
 	if(hasAquaMenuMgr)
 	{

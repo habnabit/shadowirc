@@ -1207,7 +1207,6 @@ pascal void ApplInit(void)
 	mouseRgn=NewRgn();
 	SetRectRgn(mouseRgn, -32767, -32767, 32766, 32766);
 	
-	MenuInit();
 	InitEventHandlers();
 	InitLocalEventHandlers();
 

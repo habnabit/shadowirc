@@ -59,7 +59,6 @@ inline void SetupUPPs(void);
 
 pascal void ApplInit();
 pascal void setVers(void);
-inline void SetupHelpMenu(void);
 
 STRnPtr spFiles, spCM, spError, spInfo, spDCC, spHelp, spTopic, spAppleURL, spServices, spSOCKS, spServer, spFile, spWhois;
 
@@ -129,36 +128,6 @@ inline void SetupUPPs(void)
 	StdNavFilter = NewNavEventUPP(NavDialogFilter);
 }
 
-#if !TARGET_CARBON
-inline void SetupHelpMenu(void)
-{
-	OSErr err;
-	short x, num;
-	ConstStringPtr s;
-	
-	menuHelpWidget = NewMenu(mHelpWidget, "\p");
-	err=HMGetHelpMenuHandle(&helpMenu);
-	if(!err)
-	{
-		if(helpMenu)
-		{
-			defaultHelpItems = CountMenuItems(helpMenu);
-			num = *(short*)spHelp;
-			if(num>0)
-				for(x=1;x<=num;x++)
-				{
-					s = GetIntStringPtr(spHelp, x);
-					AppendMenu(helpMenu, s);
-					AppendMenu(menuHelpWidget, s);
-				}
-		}
-	}
-	
-	normHelpMenuItems = CountMenuItems(helpMenu)+2;
-	InsertMenu(menuHelpWidget, -1);
-}
-#endif
-
 #define GetStrN(sr) *(STRnHand)Get1Resource('STR#', sr)
 
 pascal void ApplicationInit(void)
@@ -199,10 +168,8 @@ pascal void ApplicationInit(void)
 		}
 	}
 	
+	MenuInit();
 	ApplInit();
-#if !TARGET_CARBON
-	SetupHelpMenu();
-#endif
 	GetIcons();
 	wmItemsInit();
 	InitPrefs();

@@ -20,7 +20,7 @@
 */
 
 extern UserItemUPP AboutDlgVersionFilter;
-extern MenuHandle gAppleMenu, gFileMenu, gShortcutsMenu, gWindowMenu;
+extern MenuHandle gAppleMenu, gFileMenu, gShortcutsMenu, gWindowMenu, gHelpMenu;
 
 pascal void MenuConnectionList(short item);
 pascal void MenuSignoffConnectionList(short item);

@@ -385,6 +385,11 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 		case 'SHOR':
 			ShortcutsMenu(hiCommand.menu.menuItemIndex);
 			return noErr;
+		
+		//Help Menu
+		case 'HWIN':
+			ShowHelp(hiCommand.menu.menuItemIndex - defaultHelpItems);
+			return noErr;
 	}
 	
 	return myErr;

@@ -357,14 +357,14 @@ pascal short HMIAdd(ConstStr63Param name)
 		(**hmiList).list[i].pluginRef=sidr.yourInfo;
 		pstrcpy(name, (**hmiList).list[i].name);
 		
-		i=CountMenuItems(helpMenu);
+		i=CountMenuItems(gHelpMenu);
 		if(i<normHelpMenuItems)
 		{
-			AppendMenu(helpMenu, "\p-");
+			AppendMenu(gHelpMenu, "\p-");
 			AppendMenu(menuHelpWidget, "\p-");
 		}
 		
-		AppendMenu(helpMenu, name);
+		AppendMenu(gHelpMenu, name);
 		AppendMenu(menuHelpWidget, name);
 		return i;
 	}

@@ -4,7 +4,7 @@
   <object name="rootObject" class="NSCustomObject" id="1">
     <string name="customClass">NSApplication</string>
   </object>
-  <array count="89" name="allObjects">
+  <array count="91" name="allObjects">
     <object class="IBCarbonWindow" id="166">
       <string name="windowRect">188 219 332 579 </string>
       <string name="title">Splash Screen</string>
@@ -123,7 +123,7 @@
     <object class="IBCarbonMenu" id="203">
       <string name="title">main</string>
       <int name="menuID">256</int>
-      <array count="7" name="items">
+      <array count="8" name="items">
         <object class="IBCarbonMenuItem" id="208">
           <string name="title">ShadowIRC</string>
           <reference name="submenu" idRef="202"/>
@@ -137,7 +137,6 @@
               <object class="IBCarbonMenuItem" id="217">
                 <boolean name="dynamic">TRUE</boolean>
                 <string name="title">Open Connection</string>
-                <ostype name="command">open</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="231">
                 <string name="title">New Text Window</string>
@@ -387,6 +386,13 @@
             </array>
           </object>
         </object>
+        <object class="IBCarbonMenuItem" id="356">
+          <string name="title">Help</string>
+          <object name="submenu" class="IBCarbonMenu" id="357">
+            <string name="title">Help</string>
+            <int name="menuID">264</int>
+          </object>
+        </object>
       </array>
       <string name="name">_NSMainMenu</string>
     </object>
@@ -547,8 +553,10 @@
     <reference idRef="352"/>
     <reference idRef="353"/>
     <reference idRef="355"/>
+    <reference idRef="356"/>
+    <reference idRef="357"/>
   </array>
-  <array count="89" name="allParents">
+  <array count="91" name="allParents">
     <reference idRef="1"/>
     <reference idRef="166"/>
     <reference idRef="167"/>
@@ -638,6 +646,8 @@
     <reference idRef="342"/>
     <reference idRef="342"/>
     <reference idRef="342"/>
+    <reference idRef="203"/>
+    <reference idRef="356"/>
   </array>
   <dictionary count="4" name="nameTable">
     <string>File&apos;s Owner</string>
@@ -649,5 +659,5 @@
     <string>Splash</string>
     <reference idRef="166"/>
   </dictionary>
-  <unsigned_int name="nextObjectID">356</unsigned_int>
+  <unsigned_int name="nextObjectID">359</unsigned_int>
 </object>
