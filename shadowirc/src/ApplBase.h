@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -28,10 +28,10 @@
 #include "LongStrings.h"
 #endif
 
-pascal void ApplRun(void);
-pascal void ApplInit(void);
-pascal char doQuit(LongString *reason);
+void ApplRun(void);
+void ApplInit(void);
+char doQuit(LongString *reason);
 
-pascal OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel);
+OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel);
 
 #endif

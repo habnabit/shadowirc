@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -19,49 +19,15 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include "IRCGlobals.h"
-#include "utils.h"
-#include "MsgWindows.h"
-#include "connections.h"
-#include "Inline.h"
-#include "plugins.h"
-#include "IRCAux.h"
 #include "ApplBase.h"
-#include "IRCChannels.h"
 
 int main(void);
 
-void ToolboxInit(void);
 void ApplicationInit(void);
-
-static void RunStartupConnections(void)
-{
-	linkPtr curLink;
-
-	linkfor(curLink, firstLink)
-		if(curLink->linkPrefs->autoConnect)
-			OpenConnection(curLink);
-}
 
 int main(void)
 {
-	EventRecord e;
-	
-	ToolboxInit();
-	
-	EventAvail(everyEvent, &e);
-	if(e.modifiers & controlKey)
-		return 0;
-	
-	GetDateTime(&now);
 	ApplicationInit();
-
-	makePlugsDB();
-	UseResFile(gApplResFork);
-	
-	CurrentTarget.link=firstLink;
-	if(!(e.modifiers & shiftKey))
-		RunStartupConnections();
 	
 	InitCursor();
 	DrawMenuBar();

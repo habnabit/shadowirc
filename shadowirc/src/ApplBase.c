@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -116,7 +116,7 @@ static void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRe
 	SetEventLoopTimerNextFireTime(AsyncSoundTimer, kEventDurationNoWait);
 }
 
-pascal OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel)
+OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel)
 {
 	SndChannelPtr soundChannel=0;
 	OSErr err;
@@ -226,7 +226,7 @@ static OSStatus ConfirmQuitEventHandler(EventHandlerCallRef myHandler, EventRef 
 	return result;
 }
 
-pascal char doQuit(LongString *reason)
+char doQuit(LongString *reason)
 {
 	linkPtr link;
 	sqData sq;
@@ -625,8 +625,18 @@ static void doTCPEvent(CEPtr c)
 	conn->InputFunc(c, conn);
 }
 
-pascal void ApplRun(void)
+static void RunStartupConnections(void)
 {
+	linkPtr curLink;
+
+	linkfor(curLink, firstLink)
+		if(curLink->linkPrefs->autoConnect)
+			OpenConnection(curLink);
+}
+
+void ApplRun(void)
+{
+	RunStartupConnections();
 	RunApplicationEventLoop();
 	ApplExit();
 }

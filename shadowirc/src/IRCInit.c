@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -50,10 +50,12 @@
 #include "IRCPreferences.h"
 #include "MenuCommands.h"
 #include "IRCChannels.h"
+#include "plugins.h"
+
 
 inline void AppleMenuURLInit(void);
 inline void CheckPreferences(void);
-void ToolboxInit(void);
+static void ToolboxInit(void);
 void ApplicationInit(void);
 inline void SetupUPPs(void);
 
@@ -114,6 +116,8 @@ void ApplicationInit(void)
 	ControlRef theControl;
 	ControlButtonContentInfo content;
 	
+	ToolboxInit();
+	
 	spFiles = GetStrN(srFiles);
 	spCM=GetStrN(srCM);
 	spError=GetStrN(srError);
@@ -126,6 +130,8 @@ void ApplicationInit(void)
 	spServer=GetStrN(srServer);
 	spFile=GetStrN(srFile);
 	spWhois=GetStrN(srWhois);
+	
+	GetDateTime(&now);
 	
 	setVers();
 	
@@ -210,6 +216,11 @@ void ApplicationInit(void)
 		
 		DisposeWindow(splashWindow);
 	}
+
+	makePlugsDB();
+	UseResFile(gApplResFork);
+	
+	CurrentTarget.link=firstLink;
 }
 
 static void Gestalts(void)
@@ -225,7 +236,7 @@ static void Gestalts(void)
 	}
 }
 
-void ToolboxInit(void)
+static void ToolboxInit(void)
 {
 	gApplResFork = CurResFile();
 	
