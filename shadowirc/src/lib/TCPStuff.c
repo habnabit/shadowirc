@@ -513,16 +513,13 @@ static void TCPFinish(void)
 
 TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short remoteport)
 {
-        int flags, n;
+        int n;
         struct sockaddr_in servaddr;
         
         if((*sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
                 return (T_Failed);
                 
-        if((flags = fcntl(*sockfd, F_GETFL, 0)) == -1)
-                return (T_Failed);
-        if((fcntl(*sockfd, F_SETFL, flags | O_NONBLOCK)) == -1)
-                return (T_Failed);
+        set_nblk(*sockfd);
                 
         bzero(&servaddr, sizeof(servaddr));
         servaddr.sin_family = AF_INET;
@@ -531,11 +528,10 @@ TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short rem
         
         fd_add(*sockfd);
         n = connect(*sockfd, (SA *) &servaddr, sizeof(servaddr));
-        /*
-         * Restore socket flags
-         */
-        if((fcntl(*sockfd, F_SETFL, flags)) == -1)
+
+        if((set_blk(*sockfd)) == -1)
                 return(T_Failed);
+
         if (n == -1) {
                 if(errno != EINPROGRESS)
                         return (T_Failed);
