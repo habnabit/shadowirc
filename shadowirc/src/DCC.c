@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -361,14 +361,17 @@ pascal char DCCCreate(linkPtr link, short typ, ConstStr255Param fr, connectionPt
 		switch(typ)
 		{
 			case dccCHAT:
-				(*c)->DCCInputFunc = DCCGetLineChat;
+				d->DCCInputFunc = DCCGetLineChat;
 				break;
 			case dccGET:
-				(*c)->DCCInputFunc = DCCGetLineGet;
+				d->DCCInputFunc = DCCGetLineGet;
 				break;
 			case dccSEND:
-				(*c)->DCCInputFunc = DCCGetLineSend;
+				d->DCCInputFunc = DCCGetLineSend;
 				break;
+			
+			default:
+				d->DCCInputFunc = 0;
 		}
 		
 		p.connection = *c;
@@ -1038,6 +1041,8 @@ pascal void DCCClose(connectionPtr *cn, char silent)
 			d->dccData = 0;
 		}
 		
+		d->DCCInputFunc = 0;
+		
 		DisposePtr((Ptr)d);
 		conn->dcc = 0;
 		deleteConnection(cn); //and set to nil
@@ -1688,7 +1693,7 @@ pascal void dccEvent(CEPtr c, connectionPtr conn)
 			break;
 		
 		case C_CharsAvailable:
-			conn->DCCInputFunc(conn, c);
+			conn->dcc->DCCInputFunc(conn, c);
 			break;
 			
 		case C_Found:

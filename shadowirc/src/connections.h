@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -87,8 +87,6 @@ typedef pascal void (*ConnInputFuncPtr)(void*, connectionPtr conn);
 typedef pascal void (*ConnInputFuncPtr)(CEPtr, connectionPtr conn);
 #endif
 
-typedef pascal void (*DCCInputFuncPtr)(connectionPtr conn, CEPtr c);
-
 struct Connection {
 	CONST connectionPtr next;
 	CONST long private_socket;
@@ -122,7 +120,6 @@ struct Connection {
 	
 	//Not in API
 	CONST ConnInputFuncPtr InputFunc;
-	DCCInputFuncPtr DCCInputFunc; //Should be CONST...
 	struct plugsRec* pluginRef;
 	
 	unsigned long closeTime;

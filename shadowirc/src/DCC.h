@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -124,9 +124,16 @@ typedef struct dccSENDData {
 	long bufSiz;
 } dccSENDData, *dccSENDDataPtr;
 
+#ifdef _TCP
+typedef void (*DCCInputFuncPtr)(connectionPtr conn, CEPtr c);
+#else
+typedef void* DCCInputFuncPtr;
+#endif
+
 typedef struct dccRec {
 	short dccType; //dccTypeRec
 	short dccFlags; //dccFlagsRec
+	DCCInputFuncPtr DCCInputFunc;
 	Str255 dccUserName;
 	void* dccData;
 	long timeOpened;

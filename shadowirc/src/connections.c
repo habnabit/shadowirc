@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -182,7 +182,6 @@ pascal void deleteConnection(connectionPtr *c)
 	cc->next = 0;
 	cc->connType = connNIL;
 	cc->InputFunc = 0;
-	cc->DCCInputFunc = 0;
 	DisposePtr((Ptr)cc);
 	*c=0;
 }
