@@ -72,7 +72,6 @@ static pascal void DCCSendReposition(connectionPtr conn, long newpos);
 
 static pascal char DCCPutFile(connectionPtr x, char forceSave);
 static pascal void DCCSendFileChunk(connectionPtr *cn);
-//¥NOTE: chat is the only one still usint tcpc because there's no func available. When it is, zap tcpc from the def'n
 static pascal void DCCGetLineChat(connectionPtr conn);
 static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c);
 static pascal void DCCGetLineSend(connectionPtr conn);
