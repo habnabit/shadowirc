@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -25,10 +25,6 @@
 #include <Carbon/Carbon.h>
 
 typedef char Table[256], *TableChars;
-
-enum stdgrey {
-	kStandardGrey = 57097
-};
 
 enum {
 	S_CONN,
