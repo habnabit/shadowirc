@@ -60,7 +60,7 @@
 
 enum {
 	TCPMAGIC = 'TCPC',
-	INCOMINGBUFSIZE = 512,
+	INCOMINGBUFSIZE = 4096,
 };
 
 /*
