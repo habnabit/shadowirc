@@ -516,52 +516,125 @@ int HitWindowSelectWindowMenu(const short item)
 	return 1;
 }
 
+#define kNibChannel CFSTR("channel")
+#define kNibWinFontSize CFSTR("Font Size")
+
+typedef struct sqData {
+	WindowRef win;
+	long size;
+} sqData;
+
+static pascal OSStatus FontSizeEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+{
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	WindowRef aboutWindow;
+	sqData *data = (sqData*)userData;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	aboutWindow = (WindowRef)userData;
+	
+	switch(eventClass)
+	{
+		case kEventClassControl:
+		{
+			ControlRef theControl = NULL;
+			UInt32 cmd;
+			ControlRef itemCtrl;
+			const ControlID item = {'SIRC', 4};
+			CFStringRef theStr;
+			Str255 s;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &theControl);
+			GetControlCommandID(theControl, &cmd);
+			
+			switch(cmd)
+			{
+				case kHICommandOK:
+					GetControlByID(data->win, &item, &itemCtrl);
+					
+					GetControlData(itemCtrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theStr, NULL);
+					CFStringGetPascalString(theStr, s, sizeof(Str255), CFStringGetSystemEncoding());
+					StringToNum(s, &data->size);
+				
+				case kHICommandCancel:
+					QuitAppModalLoopForWindow(data->win);
+					result = noErr;
+					break;
+			}
+			break;
+		}
+	}
+	
+	return result;
+}
+
 void DoFontSizeWindow(void)
 {
-	Str255 s;
-	long l;
-	short i;
-	DialogPtr d;
-	char b;
 	MWPtr mw = GetActiveMW();
+	static EventHandlerUPP swUPP = NULL;
+	WindowRef fsWin;
+	IBNibRef channelsNib;
+	OSStatus status;
+	sqData sq;
+	ControlRef itemCtrl;
+	const ControlID item = {'SIRC', 4};
+	CFStringRef theStr;
+	Str255 s;
+	
+	const EventTypeSpec ctSpec[] = {
+		{ kEventClassControl, kEventControlHit }
+	};
 	
 	//We don't do anything if there's no active mw
 	if(!mw)
 		return;
 	
+	if(!swUPP)
+		swUPP = NewEventHandlerUPP(FontSizeEventHandler);
+	
+	status = CreateNibReference(kNibChannel, &channelsNib);
+	require_noerr(status, CantFindDialogNib);
+	
+	status = CreateWindowFromNib(channelsNib, kNibWinFontSize, &fsWin);
+	require_noerr(status, CantCreateDialogWindow);
+	
+	DisposeNibReference(channelsNib);
+	
+	status = InstallWindowEventHandler(fsWin, swUPP, GetEventTypeCount(ctSpec), ctSpec, (void *)&sq, NULL);
+	require_noerr(status, CantInstallDialogHandler);
+	
+	//Put the current font size here.
 	s[0] = 0;
-	EnterModalDialog();
-	d = GetNewDialog(141, 0, (WindowPtr)-1);
 	
-	SetText(d, 4,"\p");
-	SetupModalDialog(d, 1, 2);
-	b = 0;
-	do {
-		ModalDialog(StdDlgFilter, &i);
-		
-		switch(i)
-		{
-			case 1:
-				GetText(d, 4, s);
-				
-			case 2:
-				b = i;
-				break;
-		}
-	} while(!b);
+	sq.win = fsWin;
+	sq.size = 0;
 	
-	DisposeDialog(d);
-	FinishModalDialog();
+	GetControlByID(fsWin, &item, &itemCtrl);
+	theStr = CFStringCreateWithPascalString(NULL, s, kCFStringEncodingMacRoman);
+	SetControlData(itemCtrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theStr);
+	CFRelease(theStr);
 	
-	if(s[0])
+	ShowWindow(fsWin);
+	SelectWindow(fsWin);
+	
+	SetKeyboardFocus(fsWin, itemCtrl, kControlFocusNextPart);
+	
+	status = RunAppModalLoopForWindow(fsWin);
+	
+	DisposeWindow(fsWin);
+	
+	if(sq.size >= 4 && sq.size < 32767)
 	{
-		StringToNum(s, &l);
-		if(l >= 4 && l < 32767)
-		{
-			MWSetFontSize(mw, -1, l);
-			WEActivate(mw->we);
-		}
+		MWSetFontSize(mw, -1, sq.size);
+		WEActivate(mw->we);
 	}
+CantFindDialogNib:
+CantCreateDialogWindow:
+CantInstallDialogHandler:
+	;
 }
 
 static pascal void HitFontsMenu(short item)
