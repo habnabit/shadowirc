@@ -820,6 +820,7 @@ _Skip:
 		case 308: //whois server admin
 		case 309: //whois services admin
 		case 295: //whois server admin (chaos.njquake.com)
+		case 320: //whois is an identified user (ircd-dancer - OPN)
 			LSNextArgIRC(rest, s1);
 			LSStrLS(s1, &ls);
 			LSAppend1(ls, ' ');
