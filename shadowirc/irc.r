@@ -2296,55 +2296,6 @@ resource 'DITL' (10002, "+k") {
 	}
 };
 
-resource 'DITL' (10003, "topic") {
-	{	/* array DITLarray: 7 elements */
-		/* [1] */
-		{155, 273, 175, 331},
-		Button {
-			enabled,
-			"OK"
-		},
-		/* [2] */
-		{155, 6, 175, 64},
-		Button {
-			enabled,
-			"Cancel"
-		},
-		/* [3] */
-		{4, 6, 19, 330},
-		StaticText {
-			disabled,
-			"Topic for ^0:"
-		},
-		/* [4] */
-		{26, 28, 91, 309},
-		EditText {
-			enabled,
-			""
-		},
-		/* [5] */
-		{100, 8, 133, 329},
-		StaticText {
-			disabled,
-			"Topic set by ^1 on ^2 at ^3."
-		},
-		/* [6] */
-		{135, 8, 151, 329},
-		StaticText {
-			disabled,
-			""
-		},
-		/* [7] */
-		{0, 0, 0, 0},
-		HelpItem {
-			enabled,
-			HMScanhdlg {
-				10003
-			}
-		}
-	}
-};
-
 resource 'DLOG' (-301) {
 	{0, 0, 188, 344},
 	dBoxProc,
@@ -2578,17 +2529,6 @@ resource 'DLOG' (10002, "mode +k") {
 	0x0,
 	10002,
 	"Channel Key",
-	alertPositionParentWindow
-};
-
-resource 'DLOG' (10003, "topic") {
-	{58, 41, 238, 378},
-	movableDBoxProc,
-	invisible,
-	noGoAway,
-	0x0,
-	10003,
-	"Channel Topic",
 	alertPositionParentWindow
 };
 
@@ -5934,85 +5874,6 @@ resource 'dftb' (10002) {
 	}
 };
 
-resource 'dftb' (10003) {
-	versionZero {
-		{	/* array FontStyle: 6 elements */
-			/* [1] */
-			skipItem {
-
-			}			,
-			/* [2] */
-			skipItem {
-
-			}			,
-			/* [3] */
-			dataItem {
-				1,
-				-2,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				""
-			},
-			/* [4] */
-			dataItem {
-				1,
-				-2,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				""
-			},
-			/* [5] */
-			dataItem {
-				1,
-				-2,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				""
-			},
-			/* [6] */
-			dataItem {
-				1,
-				-2,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				""
-			}
-		}
-	}
-};
-
 resource 'dftb' (10004) {
 	versionZero {
 		{	/* array FontStyle: 6 elements */
@@ -6545,12 +6406,6 @@ resource 'dlgx' (10001) {
 };
 
 resource 'dlgx' (10002) {
-	versionZero {
-		15
-	}
-};
-
-resource 'dlgx' (10003) {
 	versionZero {
 		15
 	}
