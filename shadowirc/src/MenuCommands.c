@@ -67,8 +67,10 @@ static pascal long FindText(Handle t, long start, Str255 searchFor, char caseSen
 	char* p;
 	long mag;
 	int (*compareFunc)(const char *s1, const char *s2, size_t count);
+	SInt8 hstate;
 	
 	max = GetHandleSize(t);
+	hstate = HGetState(t);
 	HLock(t);
 	p = *t;
 	
@@ -92,9 +94,12 @@ static pascal long FindText(Handle t, long start, Str255 searchFor, char caseSen
 		b = compareFunc(&p[x], (char*)&searchFor[1], searchFor[0]);
 		
 		if(!b)
+		{
+			HSetState(t, hstate);
 			return x;
+		}
 	}
-	HUnlock(t);
+	HSetState(t, hstate);
 
 	return -1;
 }
