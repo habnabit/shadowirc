@@ -538,16 +538,16 @@ inline char inupc(char c)
 
 pascal char pstrcasecmp(ConstStr255Param s1, ConstStr255Param s2)
 {
-	int x;
-	int z;
+	int x, z;
 	
-	x=s1[0];
-	for(z=0;;z++)
-		if(inupc(s1[z])!=inupc(s2[z]))
+	if((x = s1[0]) != s2[0])
+		return 0;
+	
+	for(z = 1; z <= x; z++)
+		if(inupc(s1[z]) != inupc(s2[z]))
 			return 0;
-		else if(z==x)
-			return 1;
-	return 0;
+	
+	return 1;
 }
 #else
 asm pascal char pstrcasecmp(register ConstStr255Param s1, register ConstStr255Param s2)
@@ -597,15 +597,16 @@ asm pascal char pstrcasecmp(register ConstStr255Param s1, register ConstStr255Pa
 #if !USE_SHADOWIRC_ASSEMBLY
 pascal char pstrcasecmp2(ConstStr255Param s1, ConstStr255Param s2)
 {
-	int x=s1[0];
-	int z;
+	int x, z;
 	
-	for(z=0;;z++)
-		if(s1[z]!=inupc(s2[z]))
+	if((x = s1[0]) != s2[0])
+		return 0;
+	
+	for(z = 1; z <= x; z++)
+		if(s1[z] != inupc(s2[z]))
 			return 0;
-		else if(z==x)
-			return 1;
-	return 0;
+	
+	return 1;
 }
 #else
 asm pascal char pstrcasecmp2(register ConstStr255Param s1, register ConstStr255Param s2)
