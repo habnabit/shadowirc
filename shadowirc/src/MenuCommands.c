@@ -877,6 +877,6 @@ pascal void MenuInit(void)
 		EnableMenuCommand(NULL, kHICommandPreferences);
 
 		GetIndMenuItemWithCommandID(NULL, kHICommandPreferences, 1, &menu, &index);
-		SetMenuItemCommandKey(menu, index, false, '=');
+		SetMenuItemCommandKey(menu, index, false, ',');
 	}
 }
