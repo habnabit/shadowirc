@@ -435,21 +435,27 @@ static void _HNCFindWord(long cStart, long *wStart, long *wEnd, Ptr text, long t
 		if(!IsWS(text[curPos]))
 			curPos--;
 		else
+		{
+			curPos++;
 			break;
+		}
 	}
 	
-	*wStart = curPos++;
+	*wStart = curPos;
 	
 	//Now we find the end of the word
-	while(curPos <= textLen)
+	while(curPos < textLen)
 	{
 		if(!IsWS(text[curPos]))
 			curPos++;
 		else
+		{
+			curPos--;
 			break;
+		}
 	}
 	
-	*wEnd = curPos - 1;
+	*wEnd = curPos;
 }
 
 static void HandleNickComplete(inputAreaDataPtr iad)
@@ -474,9 +480,9 @@ static void HandleNickComplete(inputAreaDataPtr iad)
 			simpleListPtr sl;
 			int x;
 			
-			wStart++;
 			sel = wEnd - wStart;
-		
+			wStart++;
+			
 			LSCopyString(&ls, wStart, sel + 1, nick);
 			
 			if(nick[0] == 0)
