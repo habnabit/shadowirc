@@ -643,8 +643,8 @@ static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef even
 static pascal void doMouseDown(EventRecord *e)
 {
 	short i;
-	MWPtr mw;
 	WindowPtr p;
+	char ich = 1;
 	
 	i=FindWindow(e->where, &p);
 	switch(i)
@@ -653,39 +653,25 @@ static pascal void doMouseDown(EventRecord *e)
 			MenuBarClick(e);
 			break;
 		
-		default:
-			if((i==inContent) && (p!=ActiveNonFloatingWindow())) // || i==inDrag
+		case inContent:
+			e->message=(long)p;
+			if(p!=ActiveNonFloatingWindow())
 			{
 				if(!WIsFloater(p))
-				{
 					WSelect(p);
-					mw = MWFromWindow(p);
-				}
 				
-				if(!CMClick(p, e))
-				{
-					if(WIsFloater(p))
-						floatingWindowClick(e);
-					else
-						iwFront=0;
-				}
+				ich = 0;
 			}
-			else
+			
+			if(!CMClick(p, e))
 			{
-				e->message=(long)p;
-				switch(i)
+				if(WIsFloater(p))
+					floatingWindowClick(e);
+				else
 				{
-					case inContent:
-						if(CMClick(p, e))
-							;
-						else if(WIsFloater(p))
-							floatingWindowClick(e);
-						else
-						{
-							iwFront=0;
-							inContentHandler(e);
-						}
-						break;
+					iwFront=0;
+					if(ich)
+						inContentHandler(e);
 				}
 			}
 	}
