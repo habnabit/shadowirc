@@ -59,28 +59,6 @@ static pascal void HitFontsMenu(short item);
 void FontsMenuInit(void);
 static void HelpMenuInit(void);
 
-static pascal char _strncmp(const char *s1, const char *s2, unsigned long len)
-{
-	int x;
-	
-	for(x=0; x < len; x++, s1++, s2++)
-		if(*s1 != *s2)
-			return 0;
-	
-	return 1;
-}
-
-static pascal char _strncmpcase(const char *s1, const char *s2, unsigned long len)
-{
-	int x;
-	
-	for(x=0; x < len; x++, s1++, s2++)
-		if(inupc(*s1) != inupc(*s2))
-			return 0;
-	
-	return 1;
-}
-
 static pascal long FindText(Handle t, long start, Str255 searchFor, char caseSen, char reverse)
 {
 	long x;
@@ -88,6 +66,7 @@ static pascal long FindText(Handle t, long start, Str255 searchFor, char caseSen
 	long max;
 	char* p;
 	long mag;
+	int (*compareFunc)(const char *s1, const char *s2, size_t count);
 	
 	max = GetHandleSize(t);
 	HLock(t);
@@ -103,14 +82,16 @@ static pascal long FindText(Handle t, long start, Str255 searchFor, char caseSen
 	else
 		x = start;
 	
+	if(caseSen)
+		compareFunc = strncmp;
+	else
+		compareFunc = strncasecmp;
+	
 	for(; x>=0 && x < max; x += mag)
 	{
-		if(caseSen)
-			b = _strncmp(&p[x], (char*)&searchFor[1], searchFor[0]);
-		else
-			b = _strncmpcase(&p[x], (char*)&searchFor[1], searchFor[0]);
+		b = compareFunc(&p[x], (char*)&searchFor[1], searchFor[0]);
 		
-		if(b)
+		if(!b)
 			return x;
 	}
 	HUnlock(t);
