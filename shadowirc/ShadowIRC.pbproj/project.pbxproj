@@ -56,6 +56,15 @@
 //142
 //143
 //144
+		1471C35F0692758C00DD6226 = {
+			children = (
+				F4BBC2FF056EE75A00BD6D17,
+			);
+			isa = PBXVariantGroup;
+			name = "Info-ShadowIRC.plist";
+			refType = 4;
+			sourceTree = "<group>";
+		};
 		14886206068971DA00FEB302 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -560,7 +569,6 @@
 				20286C32FDCF999611CA2CEA,
 				F552BFD60211060D01A80061,
 				195DF8C9FE9D4F0611CA2CBB,
-				F4BBC2FF056EE75A00BD6D17,
 			);
 			isa = PBXGroup;
 			name = "¬´PROJECTNAME¬ª";
@@ -631,6 +639,7 @@
 				F552BF490211030901A80061,
 				F552BF4F0211030901A80061,
 				F5059DA302A5C0930132A983,
+				1471C35F0692758C00DD6226,
 				F424EAA605A5345400B68878,
 				14EEACA8044D95C800A80001,
 				F5D4BE900323C8880132A983,
@@ -740,7 +749,7 @@
 				GCC_PREFIX_HEADER = src/ShadowIRC_Prefix.pch;
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				HEADER_SEARCH_PATHS = "src src/lib src/waste/public-inc src/waste/private-inc";
-				INFOPLIST_FILE = "Info-ShadowIRC.plist";
+				INFOPLIST_FILE = "English.lproj/Info-ShadowIRC.plist";
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "-Wall";
@@ -1742,8 +1751,9 @@
 		};
 		F4BBC2FF056EE75A00BD6D17 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text.plist;
-			path = "Info-ShadowIRC.plist";
+			lastKnownFileType = text.plist.xml;
+			name = English;
+			path = "English.lproj/Info-ShadowIRC.plist";
 			refType = 4;
 			sourceTree = "<group>";
 		};
