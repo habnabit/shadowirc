@@ -165,11 +165,7 @@ void inet_ntoa_str(struct in_addr addr, StringPtr string)
 {
     char *cstr;
     
-    if((cstr = inet_ntoa(addr)) == NULL)
-    {
-            
-            /* XXX do nothing, but this is bad! */
-    }
+    cstr = inet_ntoa(addr);
     CopyCStringToPascal(cstr, string);
 }
 
