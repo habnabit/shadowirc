@@ -755,7 +755,8 @@ static pascal void CreateNewPrefsLinks(void)
 			lp->linkName[12]='1'+x;
 		else
 		{
-			*(short*)&lp->linkName[12]='10';
+			lp->linkName[12] = '1';
+			lp->linkName[13] = '0';
 			lp->linkName[0]=13;
 		}
 		pstrcpy("\pNewUser", lp->nick);
