@@ -20,6 +20,8 @@
 */
 
 /*	ChangeLog
+		2000-11-10 JB	Added enum PrefsWindowID
+		2000-11-09 JB	Fixed one prefs crash
 		2000-10-16	JB	Various code cleanup.
 */
 
@@ -46,9 +48,25 @@
 #include "ServerList.h"
 #include "MoreFiles.h"
 
+enum PrefsWindowID {
+	kwPrefConn = 1001,
+	kwPrefMisc = 1002,
+	kwShortcuts = 1003,
+	kwPrefMain = 1004,
+	kwPrefDCC = 1005,
+	kwPrefCTCP = 1006,
+	kwPrefText = 1007,
+	kwPrefColor = 1008,
+	kwPrefLogging = 1009,
+	kwPrefFirewall = 1010,
+	kwPrefMessages = 1011,
+	kwPrefWindows = 1012,
+	kwPrefStartup = 1013
+};
+
 static DialogPtr PrefsDlg;
 
-ListHandle connPrefsList = 0;
+static ListHandle connPrefsList = 0;
 static short connPrefsRowNum = 0;
 
 #pragma internal on
@@ -112,7 +130,7 @@ pascal short PMLAdd(ConstStr63Param name)
 {
 	if(name[0])
 	{
-		int i;
+		long i;
 		PreferencesMenuItemPtr pp;
 		
 		i = (**pmlList).num++;
@@ -131,7 +149,7 @@ pascal short PMLAdd(ConstStr63Param name)
 
 static pascal void _PMLAdd(ConstStr63Param name, short id)
 {
-	short i = PMLAdd(name);
+	long i = PMLAdd(name);
 	if(i>=0)
 	{
 		if(id < 0)
@@ -504,7 +522,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 	else
 		switch(pp->dlgID)
 		{
-			case 1001:
+			case kwPrefConn:
 				lp = &linkPrefsArray[connPrefsRowNum];
 				SetText(PrefsDlg, 4, lp->linkName);
 				SetText(PrefsDlg, 5, lp->serverName);
@@ -533,7 +551,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				connectionsItemSetup(lp->reconnect);
 				break;
 			
-			case 1013:
+			case kwPrefStartup:
 				lp = &linkPrefsArray[connPrefsRowNum];
 				setCheckBox(PrefsDlg, 4, lp->useConnectMacro);
 				setButtonEnable(PrefsDlg, 5, lp->useConnectMacro);
@@ -576,7 +594,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 */
 				break;
 			
-			case 1011:
+			case kwPrefMessages:
 				lp = &linkPrefsArray[connPrefsRowNum];
 				SetText(PrefsDlg, 4, lp->signoffMessage);
 				SetText(PrefsDlg, 5, lp->fingerMessage);
@@ -584,7 +602,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				SetText(PrefsDlg, 11, lp->kickMessage);
 				break;
 
-			case 1007:
+			case kwPrefText:
 				setCheckBox(PrefsDlg, 4, mp->showEndMessages);
 				setCheckBox(PrefsDlg, 5, mp->showUserHostsWithMsgs);
 				setCheckBox(PrefsDlg, 6, mp->timestamp);
@@ -626,14 +644,14 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				SelectDialogItemText(PrefsDlg, 13, 0, 255);
 				break;
 			
-			case 1006:
+			case kwPrefCTCP:
 				setCheckBox(PrefsDlg, 4, mp->disableCTCP);
 				setCheckBox(PrefsDlg, 5, mp->disableCTCPMessages);
 				setCheckBox(PrefsDlg, 6, mp->noCTCPUnknownErrMsg);
 				setCheckBox(PrefsDlg, 7, mp->ctcpToConsole);
 				break;
 			
-			case 1005:
+			case kwPrefDCC:
 				setCheckBox(PrefsDlg, 4, mp->autoAcceptDCCChat);
 				setCheckBox(PrefsDlg, 5, mp->autoAcceptDCCChatWhenNotAway);
 				setCheckBox(PrefsDlg, 6, mp->enableDCC);
@@ -659,7 +677,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				setCheckBox(PrefsDlg, 15, mp->dccWindowAutoOpen);
 				break;
 			
-			case 1012:
+			case kwPrefWindows:
 				setCheckBox(PrefsDlg, 4,  mp->autoQuery);
 				setButtonEnable(PrefsDlg, 5, mp->autoQuery);
 				setButtonEnable(PrefsDlg, 6, mp->autoQuery);
@@ -674,7 +692,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				setCheckBox(PrefsDlg, 13, mp->dontActivateNewWindowsIfInputlineText);
 				break;
 			
-			case 1002:
+			case kwPrefMisc:
 				setCheckBox(PrefsDlg, 5+mp->quitAction, 1);
 				setCheckBox(PrefsDlg, 8,  mp->beepOnPrivmsgs);
 				setCheckBox(PrefsDlg, 9,  mp->autoRejoinAfterKick);
@@ -692,11 +710,11 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				SetControlValue(GetControlHandle(PrefsDlg, 20), linkPrefsArray[0].onoticeMethod);
 				break;
 			
-			case 1008:
+			case kwPrefColor:
 				SetColorsPanel();
 				break;
 			
-			case 1009:
+			case kwPrefLogging:
 				setCheckBox(PrefsDlg, 4,  mp->autoLogging);
 				setCheckBox(PrefsDlg, 8,  mp->autoLogQueries);
 				setCheckBox(PrefsDlg, 9,  mp->autoLogDCCChat);
@@ -711,7 +729,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				SetText(PrefsDlg, 7, s);
 				break;
 			
-			case 1010:
+			case kwPrefFirewall:
 				SetControlValue(GetControlHandle(PrefsDlg, 4), mainPrefs->firewallType + 1);
 				firewallItemSetup(mainPrefs->firewallType);
 				SetText(PrefsDlg, 7, mp->socksHost);
@@ -770,7 +788,7 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 	
 	switch(pp->dlgID)
 	{
-		case 1001:
+		case kwPrefConn:
 			lp = &linkPrefsArray[connListNum];
 			GetText(PrefsDlg, 4, s);
 			if(s[0]>31)
@@ -827,13 +845,13 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			ConnectionMenuSetup();
 			break;
 		
-		case 1013:
+		case kwPrefStartup:
 			lp = &linkPrefsArray[connPrefsRowNum];
 			lp->useConnectMacro = getCheckBox(PrefsDlg, 4);
 			GetText(PrefsDlg, 5, lp->connectMacro);
 			break;
 		
-		case 1011:
+		case kwPrefMessages:
 			lp = &linkPrefsArray[connListNum];
 			GetText(PrefsDlg, 4, lp->signoffMessage);
 			GetText(PrefsDlg, 5, lp->fingerMessage);
@@ -841,7 +859,7 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			GetText(PrefsDlg, 11, lp->kickMessage);
 			break;
 			
-		case 1007:
+		case kwPrefText:
 			mp->showEndMessages=getCheckBox(PrefsDlg, 4);
 			mp->showUserHostsWithMsgs=getCheckBox(PrefsDlg, 5);
 			mp->timestamp=getCheckBox(PrefsDlg, 6);
@@ -871,14 +889,14 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			mainPrefs->displayInvites=getCheckBox(PrefsDlg, 30);
 			break;
 		
-		case 1006:
+		case kwPrefCTCP:
 			mp->disableCTCP=getCheckBox(PrefsDlg, 4);
 			mp->disableCTCPMessages=getCheckBox(PrefsDlg, 5);
 			mp->noCTCPUnknownErrMsg=getCheckBox(PrefsDlg, 6);
 			mp->ctcpToConsole=getCheckBox(PrefsDlg, 7);
 			break;
 		
-		case 1005:
+		case kwPrefDCC:
 			mp->autoAcceptDCCChat=getCheckBox(PrefsDlg, 4);
 			mp->autoAcceptDCCChatWhenNotAway=getCheckBox(PrefsDlg, 5);
 			mp->enableDCC=getCheckBox(PrefsDlg, 6);
@@ -890,7 +908,7 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			mp->dccWindowAutoOpen=getCheckBox(PrefsDlg, 15);
 			break;
 		
-		case 1012:
+		case kwPrefWindows:
 			mp->autoQuery=getCheckBox(PrefsDlg, 4);
 			b = getCheckBox(PrefsDlg, 6);
 			if(!b)
@@ -906,7 +924,7 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			mp->dontActivateNewWindowsIfInputlineText=getCheckBox(PrefsDlg, 13);
 			break;
 		
-		case 1002:
+		case kwPrefMisc:
 			b = getCheckBox(PrefsDlg, 6);
 			if(!b)
 				b = 2 * getCheckBox(PrefsDlg, 7);
@@ -930,16 +948,16 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 				ll->linkPrefs->onoticeMethod = b;
 			break;
 		
-		case 1008:
+		case kwPrefColor:
 			break;
 	
-		case 1009:
+		case kwPrefLogging:
 			mp->autoLogging=getCheckBox(PrefsDlg, 4);
 			mp->autoLogQueries=getCheckBox(PrefsDlg, 8);
 			mp->autoLogDCCChat=getCheckBox(PrefsDlg, 9);
 			break;
 		
-		case 1010:
+		case kwPrefFirewall:
 			mp->firewallType = GetControlValue(GetControlHandle(PrefsDlg, 4)) - 1;
 			GetText(PrefsDlg, 7, s);
 			if(s[0]>63)
@@ -1017,7 +1035,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 	else
 		switch(pp->dlgID)
 		{
-			case 1001:
+			case kwPrefConn:
 				switch(item)
 				{
 					case 13:
@@ -1069,7 +1087,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 				}
 				break;
 			
-			case 1013:
+			case kwPrefStartup:
 				switch(item)
 				{
 					case 13:
@@ -1085,7 +1103,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 				}
 				break;
 			
-			case 1011:
+			case kwPrefMessages:
 				switch(item)
 				{
 					case 13:
@@ -1094,7 +1112,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 				}
 				break;
 					
-			case 1007:
+			case kwPrefText:
 				switch(item)
 				{
 					case 4:
@@ -1127,7 +1145,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 				}
 				break;
 			
-			case 1006:
+			case kwPrefCTCP:
 				switch(item)
 				{
 					case 4:
@@ -1139,7 +1157,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 				}
 				break;
 			
-			case 1005:
+			case kwPrefDCC:
 				switch(item)
 				{
 					case 4:
@@ -1164,7 +1182,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 				}
 				break;
 			
-			case 1012:
+			case kwPrefWindows:
 				switch(item)
 				{
 					case 4:
@@ -1203,7 +1221,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 				}
 				break;
 			
-			case 1002:
+			case kwPrefMisc:
 				switch(item)
 				{
 					case 5:
@@ -1240,7 +1258,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 				}
 				break;
 			
-			case 1008:
+			case kwPrefColor:
 				if((item>=4) && (item<=3+numSIColors))
 				{
 					pt.h=100;
@@ -1264,7 +1282,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 				}
 				break;
 			
-			case 1009:
+			case kwPrefLogging:
 				switch(item)
 				{
 					case 4:
@@ -1279,7 +1297,7 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 				}
 				break;
 			
-			case 1010:
+			case kwPrefFirewall:
 				switch(item)
 				{
 					case 4:
@@ -1477,7 +1495,7 @@ pascal void OpenPreferencesWindow(short panelID)
 	
 	UseResFile(gApplResFork);
 	GetPort(&gp);
-	PrefsDlg=GetNewDialog(1004, 0, (WindowPtr)-1);
+	PrefsDlg=GetNewDialog(kwPrefMain, 0, (WindowPtr)-1);
 	SetPortDialogPort(PrefsDlg);
 	
 	//Create the menu and add the items to the menu
