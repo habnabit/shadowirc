@@ -2162,36 +2162,24 @@ resource 'DITL' (1012, "Prefs.Windows") {
 			"only for incoming messages"
 		},
 		/* [5] */
-		{103, 15, 119, 229},
-		CheckBox {
-			enabled,
-			"Cursor Focusing"
-		},
-		/* [6] */
-		{120, 25, 136, 239},
-		CheckBox {
-			enabled,
-			"but don't activate the window"
-		},
-		/* [7] */
 		{137, 15, 153, 229},
 		CheckBox {
 			enabled,
 			"Don't show channel modes display"
 		},
-		/* [8] */
+		/* [6] */
 		{154, 15, 170, 229},
 		CheckBox {
 			enabled,
 			"Allow Drag and Drop to same window"
 		},
-		/* [9] */
+		/* [7] */
 		{171, 15, 187, 229},
 		CheckBox {
 			enabled,
 			"Put inputline in message windows"
 		},
-		/* [10] */
+		/* [8] */
 		{188, 15, 204, 300},
 		CheckBox {
 			enabled,
@@ -5788,38 +5776,6 @@ resource 'dftb' (1012) {
 				""
 			},
 			/* [8] */
-			dataItem {
-				1,
-				-2,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				""
-			},
-			/* [9] */
-			dataItem {
-				1,
-				-2,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				0,
-				""
-			},
-			/* [10] */
 			dataItem {
 				1,
 				-2,

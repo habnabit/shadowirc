@@ -407,48 +407,6 @@ static pascal void floatingWindowClick(EventRecord *e) //this also takes care of
 
 #pragma mark -
 
-inline pascal void checkCursorFocus(EventRecord *e)
-{
-	static Point prevLoc = {0,0};
-	MWPtr mw;
-	WindowPtr p;
-	
-	//If we're doing cursor focus, the command key isn't down, and the mouse has moved
-	if(mainPrefs->cursorFocus &&!(e->modifiers & cmdKey) && (*(long*)&prevLoc != *(long*)&e->where))
-	{
-		prevLoc = e->where;
-		
-		FindWindow(e->where, &p);
-		if(p && !WIsFloater(p))
-		{
-			if(!mainPrefs->cursorFocusDontActivate) //autoraise
-			{
-				if(ActiveNonFloatingWindow()!=p)
-					WSelect(p);
-			}
-			else //autoraise disabled
-			{
-				if(p==consoleWin->w)
-				{
-					if(!CurrentTarget.bad)
-					{
-						InvalTarget(&CurrentTarget);
-						UpdateStatusLine();
-					}
-				}
-				else if((mw=MWFromWindow(p)) != nil)
-				{
-					if(mw != CurrentTarget.mw)
-					{
-						SetTarget(mw, &CurrentTarget);
-						UpdateStatusLine();
-					}
-				}
-			}
-		}
-	}
-}
-
 inline void checkConnections(void)
 {
 	connectionPtr conn, conn2;
@@ -624,7 +582,6 @@ static pascal void IdleTasks(EventRecord *e)
 					WEIdle(0, ilWE);
 			}
 
-		checkCursorFocus(e); //perhaps this should be in a mouse moved event?
 		CMSetCursor();
 	}
 	

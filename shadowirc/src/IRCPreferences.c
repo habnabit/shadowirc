@@ -620,13 +620,10 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				setButtonEnable(PrefsDlg, 6, mp->autoQuery);
 				setButtonEnable(PrefsDlg, 7, mp->autoQuery);
 				setCheckBox(PrefsDlg, 5+mp->autoQueryOpen, 1);
-				setCheckBox(PrefsDlg, 8,  mp->cursorFocus);
-				setButtonEnable(PrefsDlg, 9, mp->cursorFocus);
-				setCheckBox(PrefsDlg, 9,  mp->cursorFocusDontActivate);
-				setCheckBox(PrefsDlg, 10, mp->noModesWidget);
-				setCheckBox(PrefsDlg, 11, mp->ddToSameWin);
-				setCheckBox(PrefsDlg, 12, mp->nonGlobalInput);
-				setCheckBox(PrefsDlg, 13, mp->dontActivateNewWindowsIfInputlineText);
+				setCheckBox(PrefsDlg, 8, mp->noModesWidget);
+				setCheckBox(PrefsDlg, 9, mp->ddToSameWin);
+				setCheckBox(PrefsDlg, 10, mp->nonGlobalInput);
+				setCheckBox(PrefsDlg, 11, mp->dontActivateNewWindowsIfInputlineText);
 				break;
 			
 			case kwPrefMisc:
@@ -852,12 +849,10 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			
 			mp->autoQueryOpen = b;
 			
-			mp->cursorFocus=getCheckBox(PrefsDlg, 8);
-			mp->cursorFocusDontActivate=getCheckBox(PrefsDlg, 9);
-			mp->noModesWidget = getCheckBox(PrefsDlg, 10);
-			mp->ddToSameWin = getCheckBox(PrefsDlg, 11);
-			mp->nonGlobalInput = getCheckBox(PrefsDlg, 12);
-			mp->dontActivateNewWindowsIfInputlineText=getCheckBox(PrefsDlg, 13);
+			mp->noModesWidget = getCheckBox(PrefsDlg, 8);
+			mp->ddToSameWin = getCheckBox(PrefsDlg, 9);
+			mp->nonGlobalInput = getCheckBox(PrefsDlg, 10);
+			mp->dontActivateNewWindowsIfInputlineText=getCheckBox(PrefsDlg, 11);
 			break;
 		
 		case kwPrefMisc:
@@ -1141,16 +1136,9 @@ static pascal void HitPreferencesWindow(short windowNum, short item)
 						break;
 						
 					case 8:
-						b=!getCheckBox(PrefsDlg, item);
-						setCheckBox(PrefsDlg, item, b);
-						setButtonEnable(PrefsDlg, 9, b);
-						break;
-					
 					case 9:
 					case 10:
 					case 11:
-					case 12:
-					case 13:
 						setCheckBox(PrefsDlg, item, !getCheckBox(PrefsDlg, item));
 						break;
 				}

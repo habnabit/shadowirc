@@ -123,8 +123,7 @@ short unusedIW;
 	char timestampSeconds;			//Include seconds in timstamps
 	char timestampWhenAway;		//Only display the timestamp when away
 	char escClearsInputline;			//Hitting the esc key clears the inputline
-	char cursorFocus;
-	char cursorFocusDontActivate;
+short unused5;
 	char showEndMessages;			//Show end of command messages from server
 	char showUserHostsWithMsgs;	//Show userhosts with messages
 	char beepOnPrivmsgs;				//Do a system beep on private messages. **WILL go away with sound support.
