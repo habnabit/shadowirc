@@ -968,21 +968,18 @@ void processStale(CEPtr c, connectionPtr conn)
 	}
 	else
 	{
-		long nn, read;
-		long fm = FreeMem();
+		long nn, read, step;
 		Ptr getbuf;
 		Str255 s2;
 		
 		if(c->event==C_CharsAvailable)
 		{
+			step = 8192;
 			nn = c->value;
-			do {
-				if(!nn)
-					return;
-				if(nn > fm - 10000)
-					nn = fm-10000;
-				getbuf = NewPtr(nn);
-				read = ConnGetData(conn, getbuf, nn);
+			while(nn > 0)
+			{
+				getbuf = NewPtr(step);
+				read = ConnGetData(conn, getbuf, step);
 				nn -= read;
 				DisposePtr(getbuf);
 				if(debugOn)
@@ -993,7 +990,7 @@ void processStale(CEPtr c, connectionPtr conn)
 					LSConcatStrAndStrAndStr("\p¥Data received for stale connection: ", s2, s, &ls);
 					LineMsg(&ls);
 				}
-			} while(1);
+			}
 		}
 		else
 		{

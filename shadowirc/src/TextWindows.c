@@ -140,54 +140,48 @@ pascal MWPtr TWOpen(const FSSpec *f)
 		
 		FileAdd(ref, false);
 		GetEOF(ref, &size);
-		if(FreeMem()-(size*2) < 6144) //low on mem. need size * 2 to handle file read in and then inserting to waste, plus 6kb for spare...
+		
+		data = NewPtr(size);
+		err = MemError();
+		if(!err)
 		{
-			memerr = 1;
+			SetFPos(ref, fsFromStart, 0);
+			FSRead(ref, &size, data);
+
+			mw = TWCreate(f->name);
+			if(mw)
+			{
+				p=(textWinDataPtr)mw->refCon;
+				p->ref = ref;
+				p->file = *f;
+				p->saved = 1;
+				err = WEInsert(data, size, 0, 0, mw->we);
+				
+				if(!err)
+				{
+					WEResetModCount(mw->we);
+					MWPaneResize(mw);
+					WEActivate(mw->we);
+					WESetSelection(0, 0, mw->we);
+					WESelView(mw->we);
+					
+					SetWindowProxyFSSpec(mw->w, f);
+					SetWindowModified(mw->w, false);
+					WSelect(mw->w);
+				}
+			}
+			
+			if(err)
+			{
+				memerr = 1;
+				MWDelete(mw);
+				mw = 0;
+			}
+			
+			DisposePtr(data);
 		}
 		else
-		{
-			data = NewPtr(size);
-			err = MemError();
-			if(!err)
-			{
-				SetFPos(ref, fsFromStart, 0);
-				FSRead(ref, &size, data);
-
-				mw = TWCreate(f->name);
-				if(mw)
-				{
-					p=(textWinDataPtr)mw->refCon;
-					p->ref = ref;
-					p->file = *f;
-					p->saved = 1;
-					err = WEInsert(data, size, 0, 0, mw->we);
-					
-					if(!err)
-					{
-						WEResetModCount(mw->we);
-						MWPaneResize(mw);
-						WEActivate(mw->we);
-						WESetSelection(0, 0, mw->we);
-						WESelView(mw->we);
-						
-						SetWindowProxyFSSpec(mw->w, f);
-						SetWindowModified(mw->w, false);
-						WSelect(mw->w);
-					}
-				}
-				
-				if(err)
-				{
-					memerr = 1;
-					MWDelete(mw);
-					mw = 0;
-				}
-				
-				DisposePtr(data);
-			}
-			else
-				memerr = 1;
-		}
+			memerr = 1;
 		
 		if(memerr)
 		{	

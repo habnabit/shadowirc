@@ -191,8 +191,8 @@ static pascal void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, 
 		{
 			MWPtr mw;
 			
-			//All this extra crap is for magn0lia, so the window pops up on an action.
-			if(mainPrefs->autoQuery && FreeMem() > 16000) //don't open if < 16k free
+			//Open a window on private action. (For magn0lia)
+			if(mainPrefs->autoQuery)
 				mw = DoJoinQuery(fr, link);
 			else
 			{

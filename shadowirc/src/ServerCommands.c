@@ -254,7 +254,7 @@ static pascal void nPrivmsg(linkPtr link, LongString *ls, StringPtr fromuser, St
 				
 				MBNewMessage(link, from);
 
-				if(p.autoQuery && FreeMem() > 16000) //don't open if < 16k free
+				if(p.autoQuery)
 					mw = DoJoinQuery(from, link);
 				else
 				{

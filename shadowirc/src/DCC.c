@@ -1080,9 +1080,6 @@ static pascal void DCCSendFileChunk(connectionPtr *cn)
 		bufSiz = dd->bufSiz;
 		if(dd->sendpacketlen < bufSiz)
 			bufSiz = dd->sendpacketlen;
-		eof = FreeMem();
-		while(eof - bufSiz < 20000)
-			bufSiz -= 1024;
 		
 		sendbuf = NewPtr(bufSiz);
 		dd->sendpacketlen = bufSiz;
@@ -1440,7 +1437,7 @@ static void DCCGetLineGet(connectionPtr conn, CEPtr c)
 	long cnt;
 	long paddedLenOfDFork;
 	int readfromoffset;
-        size_t abytes = c->value;
+	size_t abytes = c->value;
 	dccPtr d = conn->dcc;
 	dccGETDataPtr dd = (dccGETDataPtr)d->dccData;
 	Ptr getbuf;
@@ -1450,16 +1447,10 @@ static void DCCGetLineGet(connectionPtr conn, CEPtr c)
 		if(abytes<1)
 			break;
 			
-		cnt = FreeMem();
-		while(cnt - abytes < 20000) //20k is overkill, but just to be reeeealy safe.
-			abytes -= 1024;
-
-		if(!abytes)
-			return;
 		getbuf = NewPtr(abytes);
 		if((nn = ConnGetData(conn, getbuf, abytes)) > 0)
 		{
-                        abytes -= nn;
+			abytes -= nn;
 			if(!dd->macB) //if this isn't a MacB file, or we haven't gotten the entire header yet...
 			{
 				SetEOF(dd->gfref, dd->gotten+nn);
