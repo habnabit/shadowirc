@@ -1035,13 +1035,13 @@ pascal void menuEdit(short item)
 		if(item == 3)
 		{
 			DialogCut(d);
-			ZeroScrap();
+			ClearCurrentScrap();
 			TEToScrap();
 		}
 		else if(item == 4)
 		{
 			DialogCopy(d);
-			ZeroScrap();
+			ClearCurrentScrap();
 			TEToScrap();
 		}
 		else if(item==5)
@@ -1117,7 +1117,7 @@ pascal void menuEdit(short item)
 				else if(otherFront)
 				{
 					TECut(te);
-					ZeroScrap();
+					ClearCurrentScrap();
 					TEToScrap();
 				}
 				break;
@@ -1126,7 +1126,7 @@ pascal void menuEdit(short item)
 				if(otherFront)
 				{
 					TECopy(te);
-					ZeroScrap();
+					ClearCurrentScrap();
 					TEToScrap();
 				}
 				else

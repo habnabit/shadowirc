@@ -185,7 +185,7 @@ pascal void ExitModalDialog(void)
 		inBackground=false;
 	}
 	
-	ZeroScrap();
+	ClearCurrentScrap();
 	TEToScrap();
 }
 

@@ -81,4 +81,6 @@ inline void AEGetDescData(AEDesc *desc, void* out, int size)
 	BlockMoveData(*(desc->dataHandle), out, size);
 }
 
+#define ClearCurrentScrap() ZeroScrap()
+
 #include "CarbonLibTransitional.h"
