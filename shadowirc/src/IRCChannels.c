@@ -578,6 +578,20 @@ static OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, Eve
 				break;
 			}
 			break;
+
+		case kEventClassWindow:
+			switch(eventKind)
+			{
+				case kEventWindowGetMinimumSize:
+				{
+					Point minSize = {240, 360};
+					
+					SetEventParameter(event, kEventParamDimensions, typeQDPoint, sizeof(Point), &minSize);
+					result = noErr;
+				}
+				break;
+			}
+			break;
 	}
 	
 	return result;
@@ -590,7 +604,8 @@ void ChTopicWindow(channelPtr ch)
 	static EventHandlerUPP ctUPP = NULL;
 	const EventTypeSpec ctSpec[] = {
 		{ kEventClassTextInput, kEventTextInputUnicodeForKeyEvent },
-		{ kEventClassControl, kEventControlHit }
+		{ kEventClassControl, kEventControlHit },
+		{ kEventClassWindow, kEventWindowGetMinimumSize }
 	};
 	OSStatus status;
 	WindowPtr parent;
