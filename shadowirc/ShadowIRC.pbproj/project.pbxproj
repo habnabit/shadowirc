@@ -40,7 +40,7 @@
 				F552BFBC0211030901A80061,
 				F552BFBD0211030901A80061,
 				F552BFBE0211030901A80061,
-				F54C279E02152A0001A80061,
+				F5059DA402A5C0930132A983,
 			);
 			isa = PBXRezBuildPhase;
 		};
@@ -235,14 +235,14 @@
 		};
 		20286C2CFDCF999611CA2CEA = {
 			children = (
-				F526526C0227D84B0132A983,
+				F5059DA802A5C0C70132A983,
 				F552BF300211030901A80061,
 				F552BF440211030901A80061,
 				F552BF480211030901A80061,
 				F552BF490211030901A80061,
 				F552BF4F0211030901A80061,
+				F5059DA302A5C0930132A983,
 				0867D6AAFE840B52C02AAC07,
-				F54C279D02152A0001A80061,
 				F5059D9402A3470A0132A983,
 				F5F61A2F02A02E380132A988,
 			);
@@ -419,9 +419,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				0867D6ACFE840B52C02AAC07,
-				F526526D0227D84B0132A983,
 				F5F61A3102A02E390132A988,
 				F5059D9602A3470A0132A983,
+				F5059DAA02A5C0C70132A983,
 			);
 			isa = PBXResourcesBuildPhase;
 		};
@@ -536,6 +536,30 @@
 		};
 		F5059D9602A3470A0132A983 = {
 			fileRef = F5059D9402A3470A0132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5059DA302A5C0930132A983 = {
+			isa = PBXFileReference;
+			name = irc.r;
+			path = rsrc/irc.r;
+			refType = 4;
+		};
+		F5059DA402A5C0930132A983 = {
+			fileRef = F5059DA302A5C0930132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5059DA802A5C0C70132A983 = {
+			isa = PBXFileReference;
+			name = ShadowIRC.icns;
+			path = rsrc/Icons/ShadowIRC.icns;
+			refType = 4;
+		};
+		F5059DAA02A5C0C70132A983 = {
+			fileRef = F5059DA802A5C0C70132A983;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -678,28 +702,6 @@
 		};
 		F510A8B9021CBC000132A983 = {
 			fileRef = F510A8B7021CBC000132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F526526C0227D84B0132A983 = {
-			isa = PBXFileReference;
-			path = ShadowIRC.icns;
-			refType = 4;
-		};
-		F526526D0227D84B0132A983 = {
-			fileRef = F526526C0227D84B0132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F54C279D02152A0001A80061 = {
-			isa = PBXFileReference;
-			path = irc.r;
-			refType = 4;
-		};
-		F54C279E02152A0001A80061 = {
-			fileRef = F54C279D02152A0001A80061;
 			isa = PBXBuildFile;
 			settings = {
 			};
