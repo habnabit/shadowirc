@@ -89,8 +89,4 @@ pascal void CloseTCPConnection(long);
 pascal void FinishEverything(void);
 pascal char GetConnectionEvent(CEPtr);
 
-// getnameinfo is implemented on 10.1, definition is just missing in
-// /usr/include/netdb.h
-int getnameinfo (const struct sockaddr *, size_t, char *, size_t, char *, size_t, int);
-
 #endif
