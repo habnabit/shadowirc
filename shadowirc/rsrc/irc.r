@@ -601,42 +601,6 @@ resource 'DITL' (130) {
 	}
 };
 
-resource 'DITL' (131, "Quit.Save") {
-	{	/* array DITLarray: 5 elements */
-		/* [1] */
-		{60, 248, 80, 306},
-		Button {
-			enabled,
-			"Yes"
-		},
-		/* [2] */
-		{60, 159, 80, 217},
-		Button {
-			enabled,
-			"No"
-		},
-		/* [3] */
-		{5, 46, 48, 307},
-		StaticText {
-			disabled,
-			"Do you want to save preferences before q"
-			"uitting?"
-		},
-		/* [4] */
-		{5, 12, 37, 44},
-		Icon {
-			disabled,
-			0
-		},
-		/* [5] */
-		{60, 12, 80, 70},
-		Button {
-			enabled,
-			"Cancel"
-		}
-	}
-};
-
 resource 'DITL' (136, "nonfatal error") {
 	{	/* array DITLarray: 3 elements */
 		/* [1] */
@@ -1909,17 +1873,6 @@ resource 'DLOG' (-300) {
 data 'DLOG' (130, "Err") {
 	$"0036 0028 009C 01AF 0001 0100 0100 0000"            /* .6.(.œ.¯........ */
 	$"0000 0082 00"                                       /* ...‚. */
-};
-
-resource 'DLOG' (131, "Quit") {
-	{73, 90, 161, 410},
-	dBoxProc,
-	visible,
-	noGoAway,
-	0x0,
-	131,
-	"Quit",
-	alertPositionMainScreen
 };
 
 resource 'DLOG' (132, "Quit/Save Prefs") {
@@ -4895,12 +4848,6 @@ resource 'dlgx' (-3010) {
 };
 
 resource 'dlgx' (-3000) {
-	versionZero {
-		15
-	}
-};
-
-resource 'dlgx' (131) {
 	versionZero {
 		15
 	}

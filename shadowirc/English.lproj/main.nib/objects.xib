@@ -23,15 +23,18 @@
           <object class="IBCarbonButton" id="185">
             <string name="bounds">64 60 84 142 </string>
             <string name="title">Cancel</string>
+            <ostype name="command">not!</ostype>
             <int name="buttonType">2</int>
           </object>
           <object class="IBCarbonButton" id="186">
             <string name="bounds">64 242 84 300 </string>
             <string name="title">No</string>
+            <ostype name="command">ok  </ostype>
           </object>
           <object class="IBCarbonButton" id="187">
             <string name="bounds">64 312 84 374 </string>
             <string name="title">Yes</string>
+            <ostype name="command">save</ostype>
             <int name="buttonType">1</int>
           </object>
         </array>

@@ -196,37 +196,108 @@ pascal OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel)
 
 #pragma mark -
 
+#define kNibWinConfirmQuit CFSTR("SavePrefs")
+#define kNibMain CFSTR("main")
+
+typedef struct sqData {
+	WindowRef win;
+	int save;
+} sqData;
+
+static pascal OSStatus ConfirmQuitEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+{
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	WindowRef aboutWindow;
+	sqData *data = (sqData*)userData;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	aboutWindow = (WindowRef)userData;
+	
+	switch(eventClass)
+	{
+		case kEventClassControl:
+		{
+			ControlRef theControl = NULL;
+			UInt32 cmd;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &theControl);
+			GetControlCommandID(theControl, &cmd);
+			
+			switch(cmd)
+			{
+				case kHICommandSave:
+				case kHICommandOK:
+				case kHICommandCancel:
+					if(cmd == kHICommandSave)
+						data->save = 1;
+					else if(cmd == kHICommandOK)
+						data->save = 0;
+					
+					QuitAppModalLoopForWindow(data->win);
+					result = noErr;
+					break;
+			}
+			break;
+		}
+	}
+	
+	return result;
+}
 
 pascal char doQuit(LongString *reason)
 {
-	short i;
 	linkPtr link;
-	int save;
+	sqData sq;
 	
 	if(mainPrefs->quitAction == qaAutoSave)
-		save = 1;
+		sq.save = 1;
 	else
 	{
-		save = 0;
+		sq.save = -1; //update from dialog
 		if(mainPrefs->quitAction == qaConfirm)
 		{
-			DialogPtr d=GetNewDialog(131, 0, (WindowPtr)-1);
-			SetupModalDialog(d, 1, 5);
-			do {
-				ModalDialog(0, &i);
-			} while(!i);
+			static EventHandlerUPP swUPP = NULL;
+			WindowRef cqWin;
+			IBNibRef mainNibRef;
+			OSStatus status;
 			
-			DisposeDialog(d);
-			FinishModalDialog();
+			const EventTypeSpec ctSpec[] = {
+				{ kEventClassControl, kEventControlHit }
+			};
 			
-			if(i == 5)
+			if(!swUPP)
+				swUPP = NewEventHandlerUPP(ConfirmQuitEventHandler);
+			
+			status = CreateNibReference(kNibMain, &mainNibRef);
+			require_noerr(status, CantFindDialogNib);
+			
+			status = CreateWindowFromNib(mainNibRef, kNibWinConfirmQuit, &cqWin);
+			require_noerr(status, CantCreateDialogWindow);
+			
+			DisposeNibReference(mainNibRef);
+			
+			status = InstallWindowEventHandler(cqWin, swUPP, GetEventTypeCount(ctSpec), ctSpec, (void*)&sq, NULL);
+			require_noerr(status, CantInstallDialogHandler);
+			
+			ShowWindow(cqWin);
+			
+			sq.win = cqWin;
+			status = RunAppModalLoopForWindow(cqWin);
+			
+			DisposeWindow(cqWin);
+			
+CantFindDialogNib:
+CantCreateDialogWindow:
+CantInstallDialogHandler:
+			if(sq.save == -1)
 				return 0;
-			else if(i == 1) //Else they chose save or not.
-				save = 1;
 		}
 	}
 		
-	if(save)
+	if(sq.save)
 		writeAllFiles();
 	
 	linkfor(link, firstLink)
