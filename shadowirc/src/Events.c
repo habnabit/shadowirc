@@ -82,9 +82,13 @@ static OSStatus MWDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef th
 
 void MWInstallMouseWheelHandlers(MWPtr mw)
 {
+	static EventHandlerUPP mouseWheelHandler = 0;
 	EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
 	
-	InstallWindowEventHandler(mw->w, NewEventHandlerUPP(MWDoMouseWheelEvent), 1, &wheelType, mw, NULL);
+	if(!mouseWheelHandler)
+		mouseWheelHandler = NewEventHandlerUPP(MWDoMouseWheelEvent);
+	
+	InstallWindowEventHandler(mw->w, mouseWheelHandler, 1, &wheelType, mw, NULL);
 }
 
 #pragma mark -
