@@ -53,8 +53,6 @@ char noFloatingInput = 0;
 inline void IWInternalDraw(iwWidgetPtr o);
 
 static char _ILInsertLine(WEReference il, LongString *ls, char select);
-static char _ILSetLine(WEReference il, LongString *ls);
-static char _ILGetLine(WEReference il, LongString *ls);
 static long _ILGetHpos(MWPtr mw);
 static CharsHandle _ILGetHist(MWPtr mw);
 static void _ILSetHpos(MWPtr mw, long hp);
@@ -820,7 +818,7 @@ static void RecallLine(WEReference il, CharsHandle hist, int p)
 	} while(ls.data[i]);
 	
 	ls.len=i-1;
-	_ILSetLine(il, &ls);
+	ILSetText(il, &ls);
 }
 
 pascal void RecallLineUp(void)
@@ -863,7 +861,7 @@ pascal void RecallLineDown(void)
 			else
 			{
 				int ls = 0;
-				_ILSetLine(il, (LongString*)&ls);
+				ILSetText(il, (LongString*)&ls);
 			}
 		}
 	}
@@ -871,7 +869,7 @@ pascal void RecallLineDown(void)
 
 #pragma mark -
 
-pascal WEReference _ILGetWE(MWPtr mw)
+WEReference ILGetWEFromMW(MWPtr mw)
 {
 	if(!noFloatingInput)
 		return inputLine._il;
@@ -884,7 +882,7 @@ pascal WEReference _ILGetWE(MWPtr mw)
 	}
 }
 
-pascal WEReference ILGetWE(void)
+WEReference ILGetWE(void)
 {
 	if(!noFloatingInput)
 		return inputLine._il;
@@ -951,17 +949,27 @@ pascal long ILGetHpos(void)
 	return _ILGetHpos(MWFromWindow(ActiveNonFloatingWindow()));
 }
 
+void ILSetCursorSelection(WEReference il, long start, long finish)
+{
+	WESetSelection(start, finish, il);
+}
+
 pascal void SetInputLineCursorSelection(long start, long finish)
 {
-	WESetSelection(start, finish, ILGetWE());
+	ILSetCursorSelection(ILGetWE(), start, finish);
+}
+
+void ILGetCursorSelection(WEReference il, long *start, long *finish)
+{
+	WEGetSelection(start, finish, il);
 }
 
 pascal void GetInputLineCursorSelection(long *start, long *finish)
 {
-	WEGetSelection(start, finish, ILGetWE());
+	ILGetCursorSelection(ILGetWE(), start, finish);
 }
 
-static char _ILSetLine(WEReference il, LongString *ls)
+char ILSetText(WEReference il, LongString *ls)
 {
 	if(il)
 	{
@@ -978,20 +986,20 @@ static char _ILSetLine(WEReference il, LongString *ls)
 		return false;
 }
 
-pascal char ILSetLine(MWPtr mw, LongString *ls)
+pascal char ILSetTextFromMW(MWPtr mw, LongString *ls)
 {
 	if(mw && mw->il)
-		return _ILSetLine(mw->il, ls);
+		return ILSetText(mw->il, ls);
 	else
-		return _ILSetLine(ILGetWE(), ls);
+		return ILSetText(ILGetWE(), ls);
 }
 
 pascal void SetInputLine(LongString *ls)
 {
-	_ILSetLine(ILGetWE(), ls);
+	ILSetText(ILGetWE(), ls);
 }
 
-static char _ILGetLine(WEReference il, LongString *ls)
+char ILGetText(WEReference il, LongString *ls)
 {
 	long i;
 	
@@ -1012,17 +1020,17 @@ static char _ILGetLine(WEReference il, LongString *ls)
 	}
 }
 
-pascal char ILGetLine(MWPtr mw, LongString *ls)
+char ILGetTextFromMW(MWPtr mw, LongString *ls)
 {
 	if(mw && mw->il)
-		return _ILGetLine(mw->il, ls);
+		return ILGetText(mw->il, ls);
 	else
-		return _ILGetLine(ILGetWE(), ls);
+		return ILGetText(ILGetWE(), ls);
 }
 
 pascal void GetInputLine(LongString *line)
 {
-	_ILGetLine(ILGetWE(), line);
+	ILGetText(ILGetWE(), line);
 }
 
 static char _ILInsertLine(WEReference il, LongString *ls, char select)

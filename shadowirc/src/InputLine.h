@@ -124,7 +124,13 @@ void StatusLineClick(Point where, short modifiers);
 
 #ifdef _WASTE_
 pascal char ILWEIsInput(WEReference we);
-pascal WEReference ILGetWE(void);
+WEReference ILGetWE(void);
+
+void ILSetCursorSelection(WEReference il, long start, long finish);
+void ILGetCursorSelection(WEReference il, long *start, long *finish);
+
+char ILGetText(WEReference il, LongString *ls);
+char ILSetText(WEReference il, LongString *ls);
 #endif
 
 pascal void IWLock();
@@ -144,8 +150,8 @@ pascal short IWOverride(long type, iwWidgetPtr *object);
 
 #ifdef _MsgWindows_
 #ifdef _WASTE_
-pascal char ILSetLine(MWPtr mw, LongString *ls);
-pascal char ILGetLine(MWPtr mw, LongString *ls);
+char ILSetTextFromMW(MWPtr mw, LongString *ls);
+char ILGetTextFromMW(MWPtr mw, LongString *ls);
 #endif
 #endif
 
@@ -156,7 +162,7 @@ pascal void RecallLineDown(void);
 
 #ifdef _MsgWindows_
 #ifdef _WASTE_
-pascal WEReference _ILGetWE(MWPtr mw);
+WEReference ILGetWEFromMW(MWPtr mw);
 #endif
 pascal char ILInsertLine(MWPtr mw, LongString *ls, char select);
 #endif

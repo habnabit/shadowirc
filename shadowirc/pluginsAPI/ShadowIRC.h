@@ -1,5 +1,5 @@
 /*	ShadowIRC Plugins Header File
-		Version 2.0-preliminary
+		Version 2.0a9-preliminary
 		© John Bafford 1997-2003. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x02000008
+#define _ShadowIRC_API_Version_ 0x02000009
 
 #include <Carbon/Carbon.h>
 #include <netinet/in.h>
@@ -1823,6 +1823,7 @@ pascal short LSPosCaseCustom(ConstStr255Param s, const LongString *ls, short sta
 		Input:	s - Pascal substring
 					ls - LongString to search
 					start - in LSPosCustom and LSPosCaseCustom, the first character to start searching at
+								if < 0, start that many characters from the end of the string and search to the begining
 		Output:	return value - Location of the first character found, or 0 if not found.
 */
 
@@ -2240,14 +2241,14 @@ pascal short IWOverride(long type, iwWidgetPtr *widget);
 					return value: error condition. See enum iwOverrideErrors
 */
 
-pascal char ILGetLine(MWPtr mw, LongString *ls);
+char ILGetTextFromMW(MWPtr mw, LongString *ls);
 /*	Gets the inputline of a given window.
 		Input:	mw - The message window to get the input from, or nil for the frontmost input.
 		Output:	ls - The text of the inputfield.
 					return value: true if an input field was found, false if not.
 */
 
-pascal char ILSetLine(MWPtr mw, LongString *ls);
+char ILSetTextFromMW(MWPtr mw, LongString *ls);
 /*	Sets the inputline of a given window.
 		Input:	mw - The message window to set the input for, or nil for the frontmost input.
 		Output:	ls - The text to set the inputfield to.

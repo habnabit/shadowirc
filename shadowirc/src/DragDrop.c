@@ -575,7 +575,7 @@ inline OSErr MWReceiveDrag(MWPtr mw, DragReference drag)
 			
 			case mwInputPane:
 			{
-				OSErr err = WEReceiveDrag(drag, _ILGetWE(mw));
+				OSErr err = WEReceiveDrag(drag, ILGetWEFromMW(mw));
 				if(!err)
 				{
 					processPaste(mw, true);

@@ -41,12 +41,17 @@
 #include "TextManip.h"
 #include "Floaters.h"
 #include "AppearanceHelp.h"
+#include "simpleList.h"
 
 long lastInput, lastKey;
 char iwFront=0;
 char inputLocked = 0;
 
 static char MWNavKey(MWPtr mw, UInt32 modifiers, char c);
+
+static char MaximizeNick(Str255 nick, simpleListPtr sl);
+static void HandleNickComplete(WEReference il);
+static void HandleMsgBufferShortcut(UInt32 modifiers);
 
 pascal void ServerCommands(LongString *ls, linkPtr link);
 inline void pluginMWGotText(LongString *ls, MWPtr win);
@@ -121,7 +126,7 @@ pascal void processPaste(MWPtr mw, char dragAndDrop)
 	long lastCR;
 	Ptr p;
 	char cp;
-	WEReference il = _ILGetWE(mw);
+	WEReference il = ILGetWEFromMW(mw);
 	
 	WEDeactivate(il);
 	l=WEGetTextLength(il);
@@ -148,7 +153,7 @@ pascal void processPaste(MWPtr mw, char dragAndDrop)
 		if(cp)
 		{
 			l = 0;
-			ILSetLine(mw, (LongString*)&l);
+			ILSetTextFromMW(mw, (LongString*)&l);
 		}
 		//Else do nothing. It's compeltely processed unless it's not a complete line.
 	}
@@ -223,9 +228,9 @@ pascal void GetLine(char action, MWPtr mw)
 	LongString line;
 	short s;
 	
-	ILGetLine(mw, &line);
+	ILGetTextFromMW(mw, &line);
 	s=0;
-	ILSetLine(mw, (LongString*)&s);
+	ILSetTextFromMW(mw, (LongString*)&s);
 	ProcessLine(&line, true, action, mw);
 }
 
@@ -363,12 +368,189 @@ static void BackwordDel(WEReference we)
 	WEDelete(we);
 }
 
+static char MaximizeNick(Str255 nick, simpleListPtr sl)
+{
+	char ret = false;
+	int x, cur;
+	StringPtr s;
+	char test;
+	
+	//nick is the root of the nicks in the list
+	//expand it as much as possible. Return true if nick was modified.
+	do
+	{
+		test = 0;
+		for(x = 0; x < sl->eltCount; x++)
+		{
+			s = sl->elts[x];
+			
+			if(s[0] > nick[0])
+			{
+				cur = nick[0] + 1;
+				if(!test)
+					test = upc(s[cur]);
+				else if(test != upc(s[cur]))
+					return ret;
+				
+				if(x == sl->eltCount - 1) //the end
+				{
+					pstrcpymax(s, nick, nick[0] + 1);
+					ret = true;
+				}
+			}
+			else
+				return ret;
+		}
+	} while(ret);
+	
+	return ret;
+}
+
+static void HandleNickComplete(WEReference il)
+{
+	if(!CurrentTarget.inactive && CurrentTarget.type == targChannel)
+	{
+		LongString ls;
+		long cStart, cEnd;
+		long wStart, wEnd;
+		long sel;
+		
+		ILGetText(il, &ls);
+		ILGetCursorSelection(il, &cStart, &cEnd);
+		
+		//Get the word that the cursor is currently in...
+		WEFindWord(cStart, kTrailingEdge, &wStart, &wEnd, il);
+		
+		if(wStart != wEnd)
+		{
+			Str255 nick, n2;
+			UserListPtr u;
+			simpleListPtr sl;
+			int x;
+			
+			wStart++;
+			sel = wEnd - wStart;
+		
+			LSCopyString(&ls, wStart, sel + 1, nick);
+			
+			if(nick[0] == 0)
+				return;
+			
+			//need to build a list of nicks in the channel which begin with that prefix
+			sl = NewSimpleList(SLPstrCaseCompare);
+			
+			linkfor(u, CurrentTarget.chan->userlist)
+			{
+				if(u->nick[0] >= nick[0])
+				{
+					pstrcpy(u->nick, n2);
+					n2[0] = nick[0];
+					if(pstrcasecmp(n2, nick))
+						SLAddItem(sl, u->nick);
+				}
+			}
+			
+			if(sl->eltCount)
+			{
+				SLSort(sl);
+				
+				MaximizeNick(nick, sl);
+				
+				if(sl->eltCount == 1)
+				{
+					//If we're at the begining of the line, add a :
+					if(wStart == 1)
+						SAppend1(nick, ':');
+					
+					SAppend1(nick, ' ');
+				}
+				
+				LSDelete(&ls, wStart, wStart + sel);
+				LSInsertStr(nick, wStart - 1, &ls);
+				
+				ILSetText(il, &ls);
+				ILSetCursorSelection(il, wStart + nick[0], wStart + nick[0]);
+				
+				if(sl->eltCount > 1)
+				{
+					for(x = 0; x < sl->eltCount; x++)
+					{
+						StringPtr sp = sl->elts[x];
+						
+						LSStrLS(sp, &ls);
+						Message(&ls);
+					}
+				}
+			}
+			
+			FreeSimpleList(sl);
+		}
+	}
+}
+
+static void HandleMsgBufferShortcut(UInt32 modifiers)
+{
+	LongString ls, ls2;
+	long p1, p2;
+	Str255 s;
+	
+	mbInput = true;
+	if(modifiers & shiftKey)
+	{
+		if(--mbnum < 0)
+		{
+			mbnum = MAXMB -1;
+			while(mbnum && !messagebuffers[mbnum]->nick[0])
+				mbnum--;
+		}
+	}
+	else
+	{
+		if(++mbnum>=MAXMB || !messagebuffers[mbnum]->nick[0])
+		{
+			if(!mbnum)
+				mbnum=-1;
+			else
+				mbnum=0;
+		}
+	}
+	
+	if(mbnum>-1)
+	{
+		pstrcpy(messagebuffers[mbnum]->nick, s);
+		SAppend1(s, ' ');
+	}
+	else
+		s[0]=0;
+	
+	LSConcatStrAndStr("\p/msg ", s, &ls);
+	GetInputLine(&ls2);
+	if(ls2.len > 4 && *(long*)&ls2.data[1] == '/msg' && ls2.data[5]==' ') //replace
+	{
+		LSNextArg(&ls2, 0);
+		LSNextArg(&ls2, 0);
+		LSConcatLSAndLS(&ls, &ls2, &ls);
+	}
+	else //insert
+		LSConcatLSAndLS(&ls, &ls2, &ls);
+	
+	p1= LSPosChar(' ', &ls);
+	ls.data[p1]='_';
+	p2 = LSPosChar(' ', &ls);
+	ls.data[p1] = ' ';
+	
+	if(++p1>--p2)
+		p1--;
+	
+	SetInputLineCursorSelection(p1, p2);
+	SetInputLine(&ls);
+}
+
 void Key(EventRef event, char dontRepeat)
 {
 	char c;
 	LongString ls;
 	pKeyDownDataRec p;
-	Str255 s;
 	WEReference il;
 	MWPtr mw;
 	char dontProcess;
@@ -412,62 +594,11 @@ void Key(EventRef event, char dontRepeat)
 			break;
 		
 		case 9: //tab
-		{
-			LongString ls2;
-			long p1, p2;
-			
-			mbInput = true;
-			if(modifiers & shiftKey)
-			{
-				if(--mbnum < 0)
-				{
-					mbnum = MAXMB -1;
-					while(mbnum && !messagebuffers[mbnum]->nick[0])
-						mbnum--;
-				}
-			}
+			if(modifiers & optionKey)
+				HandleMsgBufferShortcut(modifiers);
 			else
-			{
-				if(++mbnum>=MAXMB || !messagebuffers[mbnum]->nick[0])
-				{
-					if(!mbnum)
-						mbnum=-1;
-					else
-						mbnum=0;
-				}
-			}
-			
-			if(mbnum>-1)
-			{
-				pstrcpy(messagebuffers[mbnum]->nick, s);
-				SAppend1(s, ' ');
-			}
-			else
-				s[0]=0;
-			
-			LSConcatStrAndStr("\p/msg ", s, &ls);
-			GetInputLine(&ls2);
-			if(ls2.len > 4 && *(long*)&ls2.data[1] == '/msg' && ls2.data[5]==' ') //replace
-			{
-				LSNextArg(&ls2, 0);
-				LSNextArg(&ls2, 0);
-				LSConcatLSAndLS(&ls, &ls2, &ls);
-			}
-			else //insert
-				LSConcatLSAndLS(&ls, &ls2, &ls);
-			
-			p1= LSPosChar(' ', &ls);
-			ls.data[p1]='_';
-			p2 = LSPosChar(' ', &ls);
-			ls.data[p1] = ' ';
-			
-			if(++p1>--p2)
-				p1--;
-			
-			SetInputLineCursorSelection(p1, p2);
-			SetInputLine(&ls);
+				HandleNickComplete(il);
 			break;
-		}
 		
 		case 27: //esc
 			if(mainPrefs->escClearsInputline)

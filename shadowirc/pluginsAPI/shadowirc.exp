@@ -65,8 +65,8 @@ _IWDeleteWidget
 _IWRecalculateRects
 _IWPopUpMenu
 _IWOverride
-_ILGetLine
-_ILSetLine
+_ILGetTextFromMW
+_ILSetTextFromMW
 _UpdateStatusLine
 _SetInputLineCursorSelection
 _GetInputLineCursorSelection
