@@ -1453,9 +1453,8 @@ INLINE void SULPaneResize(pMWPaneResizeData *p)
 			DeactivateControl(ul->browser);
 		else
 			ActivateControl(ul->browser);
-
-		SizeControl(ul->browser, r.right - r.left, r.bottom - r.top);
-		MoveControl(ul->browser, r.left, r.top);
+		
+		SetControlBounds(ul->browser, &r);
 	}
 }
 
@@ -1631,11 +1630,10 @@ static void ULResizeWin(ULI ul, short height, short wid)
 {
 	if(ul->uwinSize.bottom != height || ul->uwinSize.right != wid) //size changed
 	{
-		MoveControl(ul->browser, 0, 0);
-		SizeControl(ul->browser, wid, height);
-	
 		ul->uwinSize.bottom = height;
 		ul->uwinSize.right = wid;
+		
+		SetControlBounds(ul->browser, &ul->uwinSize);
 	}
 }
 
@@ -1806,7 +1804,7 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			shadowircColors = sidrIN->shadowircColors;
 			
 			l=((pVersionCheckDataPtr)sidrIN->messageData)->version;
-			if(l<0x0200000B) //2.0a11
+			if(l<0x0200000C) //2.0a12
 			{
 				((pVersionCheckDataPtr)sidrIN->messageData)->version = pVersionShadowIRCTooOld;
 				displayOldVersionMsg();
