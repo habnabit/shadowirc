@@ -87,7 +87,7 @@ static struct {
 	char autoHilightCurNick;
 } prefs = {
 	1, 1,
-	0
+	1
 };
 
 
