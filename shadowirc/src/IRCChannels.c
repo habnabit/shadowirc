@@ -619,7 +619,7 @@ void ChTopicWindow(channelPtr ch)
 
 	DisposeNibReference(mainNibRef);
 
-	status = InstallWindowEventHandler(channelTopicSheet, ctUPP, (sizeof(ctSpec)/sizeof(ctSpec[0])), ctSpec,(void *)channelTopicSheet, NULL);
+	status = InstallWindowEventHandler(channelTopicSheet, ctUPP, GetEventTypeCount(ctSpec), ctSpec,(void *)channelTopicSheet, NULL);
 	require_noerr(status, CantInstallDialogHandler);
 	
 	parent = ch->window->w;
