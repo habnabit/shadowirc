@@ -382,7 +382,6 @@ static void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, co
 static char SplitCTCPCommand(const LongString *ls, Str255 cmd, LongString *text)
 {
 	const unsigned char ctrlASearchString[] = {1, 1};
-	const unsigned char spaceSearchString[] = {1, ' '};
 	int endOfCTCP, endOfCmd;
 	
 	if(ls->data[1] != 1)
@@ -392,7 +391,7 @@ static char SplitCTCPCommand(const LongString *ls, Str255 cmd, LongString *text)
 	if(!endOfCTCP)
 		endOfCTCP = ls->len;
 	
-	endOfCmd = LSPos(spaceSearchString, ls);
+	endOfCmd = LSPosChar(' ', ls);
 	if(!endOfCmd)
 		endOfCmd = endOfCTCP + 1;
 	
