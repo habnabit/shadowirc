@@ -113,11 +113,12 @@ static pascal void DoFind2(void)
 	Handle t;
 	long s0, s1;
 	long found;
+	MWPtr mw = MWActive;
 	
-	if(find.searchFor[0] && MWActive)
+	if(find.searchFor[0] && mw)
 	{
-		t=WEGetText(MWActive->we);
-		WEGetSelection(&s0, &s1, MWActive->we);
+		t=WEGetText(mw->we);
+		WEGetSelection(&s0, &s1, mw->we);
 		if(s0==s1)
 		{
 			if(find.reverse)
@@ -134,8 +135,8 @@ static pascal void DoFind2(void)
 			found=FindText(t, s0, find.searchFor, find.caseSen, find.reverse);
 			if(found>=0)
 			{
-				WESetSelection(found, found+find.searchFor[0], MWActive->we);
-				WESelView(MWActive->we);
+				WESetSelection(found, found+find.searchFor[0], mw->we);
+				WESelView(mw->we);
 			}
 			else
 				SysBeep(0);
@@ -404,9 +405,10 @@ static pascal void HitFontsMenu(short item)
 	long l;
 	DialogPtr d;
 	char b;
+	MWPtr mw = MWActive;
 	
 	//We don't do anything if there's no ac
-	if(!MWActive)
+	if(!mw)
 		return;
 	
 	if(item == gFontSizeOtherItem)
@@ -440,8 +442,8 @@ static pascal void HitFontsMenu(short item)
 			StringToNum(s, &l);
 			if(l >= 4 && l < 32767)
 			{
-				MWSetFontSize(MWActive, -1, l);
-				WEActivate(MWActive->we);
+				MWSetFontSize(mw, -1, l);
+				WEActivate(mw->we);
 			}
 		}
 	}
@@ -452,15 +454,15 @@ static pascal void HitFontsMenu(short item)
 		{
 			FMFontFamily fontFamily = FMGetFontFamilyFromName(s);
 			
-			MWSetFontSize(MWActive, fontFamily, -1);
+			MWSetFontSize(mw, fontFamily, -1);
 		}
 		else
 		{
 			StringToNum(s, &l);
-			MWSetFontSize(MWActive, -1, l);
+			MWSetFontSize(mw, -1, l);
 		}
 		
-		WEActivate(MWActive->we);
+		WEActivate(mw->we);
 	}
 }
 
@@ -552,12 +554,13 @@ pascal void MenuBarClick(const EventRecord *e)
 	int x, y;
 	long l;
 	WindowPtr w;
+	MWPtr mw = MWActive;
 	
 	//Update file menu
-	SetMenuItemText(gFileMenu, 6, GetIntStringPtr(spCM, smSavePreferences + (MWActive && MWActive->winType == textWin)));
+	SetMenuItemText(gFileMenu, 6, GetIntStringPtr(spCM, smSavePreferences + (mw && mw->winType == textWin)));
 	
 	//Update edit menu
-	if(MWActive)
+	if(mw)
 	{
 		EnableMenuItem(gEditMenu, 9);
 		EnableMenuItem(gEditMenu, 10);
@@ -569,7 +572,7 @@ pascal void MenuBarClick(const EventRecord *e)
 	}
 	
 	//Update fonts menu, but only if we have one..
-	if(MWActive && gFontsMenu)
+	if(mw && gFontsMenu)
 	{
 		m = gFontsMenu;
 		
@@ -580,7 +583,7 @@ pascal void MenuBarClick(const EventRecord *e)
 		{
 			GetMenuItemText(m, x, s);
 			StringToNum(s, &l);
-			if(l == MWActive->size)
+			if(l == mw->size)
 			{
 				CheckMenuItem(m, x, true);
 				previousSizeCheck = x;
@@ -591,7 +594,7 @@ pascal void MenuBarClick(const EventRecord *e)
 		if(previousFontCheck)
 			CheckMenuItem(m, previousFontCheck, false);
 		
-		GetFontName(MWActive->font, s);
+		GetFontName(mw->font, s);
 		y=CountMenuItems(m);
 		for(x=fontsBegin+1;x<=y;x++)
 		{
