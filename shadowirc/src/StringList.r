@@ -295,7 +295,7 @@ resource 'STR#' (261, "URL Menu", locked, preload)
 		"ShadowIRC Support", "http://www.shadowirc.com/support.phtml",
 		"ShadowIRC Plugins", "http://plugins.shadowirc.com/",
 		"-", "-",
-		"GNU GPL LIcense", "http://www.gnu.org/copyleft/gpl.html",
+		"GNU GPL License", "http://www.gnu.org/copyleft/gpl.html",
 		"-", "-",
 		"Email ShadowIRC's Author", "mailto:dshadow@shadowirc.com"
 	};
