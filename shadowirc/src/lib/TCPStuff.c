@@ -352,7 +352,7 @@ static int set_blk(int sockfd)
  * Write n number of bytes to fd
  * Retry on EINTR
  */
-ssize_t writen(int fd, const void *vptr, size_t n)
+static ssize_t writen(int fd, const void *vptr, size_t n)
 {
 	size_t nleft;
 	ssize_t nwritten;
