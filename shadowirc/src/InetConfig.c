@@ -58,10 +58,6 @@ OSStatus GetFSRefForDownloadsFolder(FSRef *ref)
 	ICAttr attr;
 	AliasHandle fsAliasHdl = NULL;
 	
-	err = ReadDirURLRef(kPrefDCCFolder, ref);
-	if(err == noErr)
-		return err;
-	
 	if(internetConfig)
 	{
 		err = ICGetPref(internetConfig, kICDownloadFolder, &attr, NULL, &prefSize);
