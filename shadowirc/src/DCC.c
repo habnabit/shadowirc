@@ -67,7 +67,6 @@ typedef struct dccsendbit {
 static pascal void str10neg(StringPtr s);
 
 static pascal connectionPtr DCCFindSendPort(unsigned short port);
-static pascal connectionPtr DCCFindRefcon(void* refcon);
 static pascal void DCCSendReposition(connectionPtr conn, long newpos);
 
 static pascal char DCCPutFile(connectionPtr x, char forceSave);
@@ -281,17 +280,6 @@ static pascal connectionPtr DCCFindSendPort(unsigned short port)
 	return 0;
 }
 
-
-static pascal connectionPtr DCCFindRefcon(void* refcon)
-{
-	connectionPtr c;
-
-	linkfor(c, fConn)
-		if(c->refCon == refcon)
-			return c;
-	
-	return 0;
-}
 
 #pragma mark -
 
@@ -1956,7 +1944,7 @@ static pascal void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr2
 				}
 				if(type == dccGET) //the response from a dcc reverse send
 				{
-					x = DCCFindRefcon((void*)l);
+					x = ConnFindRefcon((void*)l);
 					if(x)
 					{
 						NextArg(s, 0); //name

@@ -84,9 +84,15 @@ typedef void (*ConnInputFuncPtr)(void*, connectionPtr conn);
 typedef void (*ConnInputFuncPtr)(CEPtr, connectionPtr conn);
 #endif
 
+#ifndef __CONNECTIONS__
+#define PRIVATE(type, var) type __PRIVATE__##var
+#else
+#define PRIVATE(type, var) type var
+#endif
+
 struct Connection {
 	CONST connectionPtr next;
-	CONST long private_socket;
+	PRIVATE(CONST long, private_socket);
 	CONST short connType;
 	unsigned short port;
 	
@@ -122,7 +128,7 @@ struct Connection {
 		Str63 name;
 		short port;
 		CONST short type;
-		char methodVersion, method;
+		unsigned char methodVersion, method;
 		char secondLookup;
 		short stage;
 		struct in_addr ip;
@@ -211,7 +217,10 @@ pascal char IsLinkValid(linkPtr link);
 
 pascal char LinkCanMode(linkPtr link, char mode, char umode);
 pascal void deleteConnection(connectionPtr *c);
+
 pascal connectionPtr findConnectionSock(long sock);
+connectionPtr ConnFindRefcon(void* refcon);
+
 pascal connectionPtr pluginNewConnection(char textOrBinary);
 
 pascal void ConnClose(connectionPtr conn);

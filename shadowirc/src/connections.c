@@ -197,6 +197,17 @@ pascal connectionPtr findConnectionSock(long sock)
 	return 0;
 }
 
+connectionPtr ConnFindRefcon(void* refcon)
+{
+	connectionPtr c;
+
+	linkfor(c, fConn)
+		if(c->refCon == refcon)
+			return c;
+	
+	return 0;
+}
+
 pascal void ConnSetup(connectionPtr c, ConstStr255Param name, unsigned short port)
 {
 	if(c->connType == connSOCKS)
