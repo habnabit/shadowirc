@@ -236,13 +236,6 @@ pascal OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel)
 #pragma internal on
 
 #pragma dont_inline off
-inline char inupc(char c);
-inline char inupc(char c)
-{
-	if((c>='a') && (c<='z'))
-		c-=32;
-	return c;
-}
 
 static pascal char _strncmp(const char *s1, const char *s2, unsigned long len)
 {

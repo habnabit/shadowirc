@@ -555,13 +555,6 @@ asm pascal char pstrcmp(register ConstStr255Param s1, register ConstStr255Param 
 
 #pragma dont_inline off
 #pragma internal on
-inline char inupc(char c);
-inline char inupc(char c)
-{
-	if((c>='a') && (c<='z'))
-		c-=32;
-	return c;
-}
 
 #pragma internal reset
 

@@ -41,10 +41,17 @@ inline char IsChannel(ConstStringPtr s)
 
 inline char IsDCCName(ConstStringPtr s)
 {
-if((s[0]!=0)&&(s[1]=='='))
+	if((s[0]!=0)&&(s[1]=='='))
 		return true;
 	else
 		return false;
+}
+
+inline char inupc(char c)
+{
+	if((c>='a') && (c<='z'))
+		c-=32;
+	return c;
 }
 
 #define LineMsg(ls) MWMessage(consoleWin, ls)
