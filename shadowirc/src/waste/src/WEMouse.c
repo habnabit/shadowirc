@@ -180,18 +180,6 @@ static pascal OSErr _WESendFlavor(FlavorType requestedType, void *dragSendRefCon
 {
 #pragma unused(dragSendRefCon)
 
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #if !TARGET_RT_MAC_CFM
-	SInt32 saveA5 = SetCurrentA5();	// this fixes a conflict with HoverBar
-									// (well, probably a bug in the Drag Manager)
-  #endif
-#else
-  #if !GENERATINGCFM
-	SInt32 saveA5 = SetCurrentA5();	// this fixes a conflict with HoverBar
-									// (well, probably a bug in the Drag Manager)
-  #endif
-#endif
-
 	WEPtr pWE = *hWE;
 	SInt32 selStart = pWE->selStart;
 	SInt32 selEnd = pWE->selEnd;
@@ -289,19 +277,8 @@ cleanup:
 		_WEForgetHandle(&hItem);
 	}
 
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #if !TARGET_RT_MAC_CFM
-	SetA5(saveA5);
-  #endif
-#else
-  #if !GENERATINGCFM
-	SetA5(saveA5);
-  #endif
-#endif
-
 	// return result code
 	return err;
-
 }
 
 pascal RgnHandle _WEOutlineRgn ( RgnHandle solidRgn )
@@ -1346,16 +1323,9 @@ pascal void _WEResolveURL(EventModifiers modifiers, SInt32 urlStart, SInt32 urlE
 	ProcessSerialNumber psn;
 	ProcessInfoRec info;
 	ICInstance inst;
-#if defined(OLDROUTINENAMES) && OLDROUTINENAMES
-	ICError err;
-#else
 	OSStatus err;
-#endif
-#if (UNIVERSAL_INTERFACES_VERSION < 0x0300)
-	SInt32 junkLong;
-#else
 	UInt32 junkLong;
-#endif
+	
 	//Handle hURL = nil; //commented since we don't use this anymore.
 	Boolean saveTextLock;
 
