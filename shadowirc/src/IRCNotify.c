@@ -75,15 +75,16 @@ pascal void ListNotify(linkPtr link)
 	}
 }
 
-pascal notifyPtr findNotify(linkPtr link, ConstStr255Param nick)
+notifyPtr findNotify(linkPtr link, ConstStr255Param nick, notifySearchType nst)
 {
 	notifyPtr n;
 	Str255 s;
 	
 	pstrcpyucase(nick, s);
 	linkfor(n, link->notifyList)
-		if(pstrcasecmp2(s, n->nick))
-			return n;
+		if(nst == kNotifyEither || n->ISON == nst)
+			if(pstrcasecmp2(s, n->nick))
+				return n;
 	
 	return 0;
 }
@@ -121,20 +122,10 @@ pascal void killISONs(linkPtr link)
 
 pascal void deleteNotify(linkPtr link, ConstStr255Param nick)
 {
-	notifyPtr n = findNotify(link, nick);
-	notifyPtr n2;
-	char l;
+	notifyPtr n = findNotify(link, nick, kNotifyRegular);
 	
-	if(n && n->ISON)
-	{
-		n2 = n;
-		l = n2->nick[0];
-		n2->nick[0] = 0;
-		n = findNotify(link, nick);
-		n2->nick[0] = l;
-	}
-	
-	trashNotify(link, n);
+	if(n)
+		trashNotify(link, n);
 }
 
 pascal notifyPtr addNotify(linkPtr link, ConstStr63Param nick, char ison)
@@ -194,6 +185,7 @@ pascal void DoNotify(linkPtr link, LongString *in)
 	char remove;
 	LongString out;
 	int x;
+	notifyPtr np;
 	
 	if(in->len)
 	{
@@ -211,10 +203,17 @@ pascal void DoNotify(linkPtr link, LongString *in)
 				deleteNotify(link, str);
 			else
 			{
-				if(findNotify(link, str))
+				np = findNotify(link, str, kNotifyEither);
+				
+				if(np)
 				{
-					LSParamString(&out, GetIntStringPtr(spInfo, sAlreadyOnNotify), str, 0, 0, 0);
-					SMPrefixColor(&out, dsFrontWin, sicNotifyColor);
+					if(np->ISON)
+						np->ISON = false;
+					else
+					{
+						LSParamString(&out, GetIntStringPtr(spInfo, sAlreadyOnNotify), str, 0, 0, 0);
+						SMPrefixColor(&out, dsFrontWin, sicNotifyColor);
+					}
 				}
 				else
 					addNotify(link, str, false);
@@ -304,7 +303,7 @@ pascal void ProcessISON(linkPtr link, LongString *rest)
 		while(rest->len)
 		{
 			LSNextArgIRC(rest, st);
-			n=findNotify(link, st);
+			n = findNotify(link, st, kNotifyEither);
 			if(n)
 			{
 				if(!n->signedon)

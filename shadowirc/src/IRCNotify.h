@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -28,6 +28,12 @@
 #define CONST
 #endif
 
+typedef enum {
+	kNotifyRegular = 0,
+	kNotifyISON = 1,
+	kNotifyEither = -1,
+} notifySearchType;
+
 typedef struct notifyRec notifyRec, *notifyPtr;
 struct notifyRec {
 	CONST notifyPtr next, back;		//Next and previous notify entries.
@@ -42,7 +48,7 @@ pascal void DoNotify(linkPtr link, LongString *parse);
 pascal void RunNotify(void);
 
 pascal void ListNotify(linkPtr link);
-pascal notifyPtr findNotify(linkPtr link, ConstStr255Param nick);
+notifyPtr findNotify(linkPtr link, ConstStr255Param nick, notifySearchType ison);
 pascal void deleteNotify(linkPtr link, ConstStr255Param nick);
 pascal notifyPtr addNotify(linkPtr link, ConstStr63Param nick, char ison);
 

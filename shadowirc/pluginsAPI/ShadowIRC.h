@@ -1,6 +1,6 @@
 /*	ShadowIRC Plugins Header File
 		Version 2.0a9-preliminary
-		© John Bafford 1997-2003. All Rights Reserved.
+		© John Bafford 1997-2004. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
 		
@@ -463,6 +463,12 @@ struct Connection {
 
 /*	Notify List Record
 */
+
+typedef enum {
+	kNotifyRegular = 0,
+	kNotifyISON = 1,
+	kNotifyEither = -1,
+} notifySearchType;
 
 typedef struct notifyRec notifyRec, *notifyPtr;
 struct notifyRec {
@@ -3306,10 +3312,11 @@ pascal void ListNotify(linkPtr link);
 		Output:	none
 */
 
-pascal notifyPtr findNotify(linkPtr link, ConstStr255Param nick);
+notifyPtr findNotify(linkPtr link, ConstStr255Param nick, notifySearchType ison);
 /*	Finds an entry in the notify list for a link.
 		Input:	link - link to search in
 					nick - nickname to search for. (Case insensitive)
+					nst - whether to search for /notify entries, /ison entries, or either
 		Output:	return value: notifyPtr if found, nil if not.
 */
 
