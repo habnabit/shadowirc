@@ -63,15 +63,19 @@
 extern "C" {
 #endif
 
-/* ShadowIRC: Not needed since we set this explicitly in the target settings
-#if PRAGMA_ALIGN_SUPPORTED
-#pragma options align=mac68k
+#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
+  #if PRAGMA_STRUCT_ALIGN
+  #pragma options align=mac68k
+  #endif
+#else
+  #if PRAGMA_ALIGN_SUPPORTED
+  #pragma options align=mac68k
+  #endif
 #endif
 
 #if PRAGMA_IMPORT_SUPPORTED
 #pragma import on
 #endif
-*/
 
 //	The macro WASTE_VERSION expands to the current version of WASTE,
 //	expressed in standard NumVersion format (see Types.h)
@@ -460,7 +464,17 @@ enum
 
 */
 
-#if TARGET_RT_MAC_CFM //ShadowIRC: was GENERATINGCFM
+#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
+  #ifndef WASTE_USE_UPPS
+  #define WASTE_USE_UPPS					TARGET_RT_MAC_CFM && !TARGET_API_MAC_CARBON
+  #endif
+#else
+  #ifndef WASTE_USE_UPPS
+  #define WASTE_USE_UPPS					GENERATINGCFM && !TARGET_API_MAC_CARBON
+  #endif
+#endif
+
+#if WASTE_USE_UPPS
 
 typedef UniversalProcPtr WEClickLoopUPP;
 typedef UniversalProcPtr WEScrollUPP;
@@ -872,11 +886,15 @@ extern pascal Boolean WELongPointInLongRect(const LongPt *lp, const LongRect *lr
 #pragma import off
 #endif
 
-/* ShadowIRC: Not needed since we set this explicitly in the target settings
-if PRAGMA_ALIGN_SUPPORTED
-#pragma options align=reset
+#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
+  #if PRAGMA_STRUCT_ALIGN
+  #pragma options align=reset
+  #endif
+#else
+  #if PRAGMA_ALIGN_SUPPORTED
+  #pragma options align=reset
+  #endif
 #endif
-*/
 
 #ifdef __cplusplus
 }

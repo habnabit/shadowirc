@@ -180,8 +180,14 @@
 #endif
 
 //	make sure WASTE_SHARED_LIBRARY is false if building a non-CFM project
+#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
+  #if ( WASTE_SHARED_LIBRARY && ( ! TARGET_RT_MAC_CFM ) )
+  #error "WASTE_SHARED_LIBRARY must be 0 in a classic 68K project"
+  #endif
+#else
 #if ( WASTE_SHARED_LIBRARY && ( ! GENERATINGCFM ) )
 #error "WASTE_SHARED_LIBRARY must be 0 in a classic 68K project"
+#endif
 #endif
 
 // set WASTE_DEBUG to 1 to perform various consistency checks;
@@ -207,8 +213,15 @@
 #endif
 
 // set WASTE_USE_UPPS to 0 if you don't need UPPs
-#ifndef WASTE_USE_UPPS
-#define WASTE_USE_UPPS					GENERATINGCFM
+// carbon builds are by definition powerpc-only, so no UPPs
+#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
+  #ifndef WASTE_USE_UPPS
+  #define WASTE_USE_UPPS					TARGET_RT_MAC_CFM && !TARGET_API_MAC_CARBON
+  #endif
+#else
+  #ifndef WASTE_USE_UPPS
+  #define WASTE_USE_UPPS					GENERATINGCFM && !TARGET_API_MAC_CARBON
+  #endif
 #endif
 
 // set WASTE_NO_SYNCH to 1 if you don't want WASTE to synchronize keyboard and fonts
@@ -545,8 +558,14 @@ enum
 	kAutoOrderingSize = 32		// size of stack-based format array used by _WESegmentLoop
 };
 
-#if PRAGMA_ALIGN_SUPPORTED
-#pragma options align=mac68k
+#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
+  #if PRAGMA_STRUCT_ALIGN
+  #pragma options align=mac68k
+  #endif
+#else
+  #if PRAGMA_ALIGN_SUPPORTED
+  #pragma options align=mac68k
+  #endif
 #endif
 
 typedef UInt16 WEStyleMode;
@@ -1320,8 +1339,14 @@ struct FormatOrderData
 	WEHandle hWE;
 };
 
-#if PRAGMA_ALIGN_SUPPORTED
-#pragma options align=reset
+#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
+  #if PRAGMA_STRUCT_ALIGN
+  #pragma options align=reset
+  #endif
+#else
+  #if PRAGMA_ALIGN_SUPPORTED
+  #pragma options align=reset
+  #endif
 #endif
 
 #ifdef __cplusplus

@@ -19,11 +19,8 @@
 #endif
 
 #if WASTE_IC_SUPPORT
-#ifndef __ICTYPES__
-#include "ICTypes.h"
-#endif
-#ifndef __ICAPI__
-#include "ICAPI.h"
+#ifndef __INTERNETCONFIG__
+#include "InternetConfig.h"
 #endif
 #ifndef __PROCESSES__
 #include <Processes.h>
@@ -188,9 +185,16 @@ static pascal OSErr _WESendFlavor(FlavorType requestedType, void *dragSendRefCon
 {
 #pragma unused(dragSendRefCon)
 
-#if !GENERATINGCFM
+#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
+  #if !TARGET_RT_MAC_CFM
 	SInt32 saveA5 = SetCurrentA5();	// this fixes a conflict with HoverBar
 									// (well, probably a bug in the Drag Manager)
+  #endif
+#else
+  #if !GENERATINGCFM
+	SInt32 saveA5 = SetCurrentA5();	// this fixes a conflict with HoverBar
+									// (well, probably a bug in the Drag Manager)
+  #endif
 #endif
 
 	WEPtr pWE = *hWE;
@@ -290,8 +294,14 @@ cleanup:
 		_WEForgetHandle(&hItem);
 	}
 
-#if !GENERATINGCFM
+#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
+  #if !TARGET_RT_MAC_CFM
 	SetA5(saveA5);
+  #endif
+#else
+  #if !GENERATINGCFM
+	SetA5(saveA5);
+  #endif
 #endif
 
 	// return result code
@@ -354,7 +364,11 @@ pascal OSErr _WEMakeDragImage ( GWorldPtr * imageGWorld, RgnHandle * imageRgn, W
 	}
 
 	//	get bounding rectangle of image region
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	GetRegionBounds( *imageRgn, & localBounds );
+#else
 	localBounds = ( ** imageRgn ) -> rgnBBox ;
+#endif
 
 	//	translate to global coordinates
 	globalBounds = localBounds ;
@@ -411,7 +425,14 @@ pascal OSErr _WEMakeDragImage ( GWorldPtr * imageGWorld, RgnHandle * imageRgn, W
 	if ( pixels != nil )
 	{
 		//	convert the image itself to global coordinates
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+		Rect	imageRgnBBox;
+		
+		GetRegionBounds( * imageRgn, & imageRgnBBox );
+		offset = topLeft ( imageRgnBBox );
+#else
 		offset = topLeft ( ( ** imageRgn ) -> rgnBBox ) ;
+#endif
 		OffsetRect ( & ( * pixels ) -> bounds, offset . h, offset . v ) ;
 	}
 
@@ -451,7 +472,16 @@ pascal OSErr _WEDrag ( Point mouseLoc, EventModifiers modifiers, UInt32 clickTim
 	SetPort ( pWE -> port ) ;
 
 	// turn the cursor into an arrow
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	{
+	static Cursor arrow;
+
+	GetQDGlobalsArrow ( &arrow );
+	SetCursor ( &arrow ) ;
+	}
+#else
 	SetCursor ( & qd . arrow ) ;
+#endif
 
 	// fabricate an EventRecord for TrackDrag
 	event . what = mouseDown ;
@@ -531,7 +561,7 @@ pascal OSErr _WEDrag ( Point mouseLoc, EventModifiers modifiers, UInt32 clickTim
 	// we need supply a data send callback
 	if ( _weFlavorSender == nil )
 	{
-		_weFlavorSender = NewDragSendDataProc ( _WESendFlavor ) ;
+		_weFlavorSender = NewDragSendDataProc ( ( DragSendDataProcPtr ) _WESendFlavor ) ;
 	}
 
 	if ( ( err = SetDragSendProc ( drag, _weFlavorSender, 0 ) ) != noErr )
@@ -561,7 +591,11 @@ pascal OSErr _WEDrag ( Point mouseLoc, EventModifiers modifiers, UInt32 clickTim
 #endif
 
 	//	set the bounds of the drag
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	GetRegionBounds( dragRgn, &dragBounds );
+#else
 	dragBounds = ( * dragRgn ) -> rgnBBox ;
+#endif
 	if ( ( err = SetDragItemBounds ( drag, ( ItemReference ) hWE, & dragBounds ) ) != noErr )
 	{
 		goto cleanup ;
@@ -1345,8 +1379,15 @@ pascal Boolean WEDraggedToTrash(DragReference drag)
 	}
 
 	// lock the data handle of the coerced descriptor
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	if (AEGetDescData(&coercedDropLocation, &pSpec, sizeof(pSpec)))
+	{
+		goto cleanup;
+	}
+#else
 	HLock(coercedDropLocation.dataHandle);
 	pSpec = *(FSSpecHandle)coercedDropLocation.dataHandle;
+#endif
 
 	// determine the directory ID of the drop location (assuming it's a folder!)
 	BLOCK_CLR(pb);
@@ -1398,7 +1439,11 @@ pascal void _WEResolveURL(EventModifiers modifiers, SInt32 urlStart, SInt32 urlE
 	ProcessSerialNumber psn;
 	ProcessInfoRec info;
 	ICInstance inst;
+#if defined(OLDROUTINENAMES) && OLDROUTINENAMES
 	ICError err;
+#else
+	OSStatus err;
+#endif
 #if (UNIVERSAL_INTERFACES_VERSION < 0x0300)
 	SInt32 junkLong;
 #else
@@ -1430,7 +1475,9 @@ pascal void _WEResolveURL(EventModifiers modifiers, SInt32 urlStart, SInt32 urlE
 
 	if (ICStart(&inst, signature) == noErr)
 	{
+#if !defined(TARGET_API_MAC_CARBON) || !TARGET_API_MAC_CARBON
 		if (ICFindConfigFile(inst, 0, nil) == noErr)
+#endif
 		{
 			saveTextLock = _WESetHandleLock(pWE->hText, true);
 

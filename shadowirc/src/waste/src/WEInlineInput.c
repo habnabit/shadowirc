@@ -110,6 +110,9 @@ static pascal OSErr _WEHandleUpdateActiveInputArea(const AppleEvent *ae, AppleEv
 	Boolean saveTextLock;
 	Boolean saveWELock = false;
 	OSErr err;
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	Handle hDescData = nil;
+#endif
 
 	// initialize descriptors to null values
 	text.descriptorType = typeNull;
@@ -154,7 +157,11 @@ static pascal OSErr _WEHandleUpdateActiveInputArea(const AppleEvent *ae, AppleEv
 	}
 
 	// get total length of text in the active input area
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	totalLength = AEGetDescDataSize(&text);
+#else
 	totalLength = GetHandleSize(text.dataHandle);
+#endif
 
 	// extract the length of confirmed text in the active input area
 	if ((err = AEGetParamPtr(ae, keyAEFixLength, typeLongInteger, &actualType,
@@ -212,9 +219,24 @@ static pascal OSErr _WEHandleUpdateActiveInputArea(const AppleEvent *ae, AppleEv
 	SetPort(savePort);
 
 	// insert the text
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	if ((err = _WEAllocate(totalLength, kAllocTemp, &hDescData)) != noErr)
+	{
+		goto cleanup;
+	}
+	saveTextLock = _WESetHandleLock(hDescData, true);
+	if ((err = AEGetDescData(&text, *(hDescData), totalLength)) != noErr)
+	{
+		_WEForgetHandle(&hDescData);
+		goto cleanup;
+	}
+	err = _WEInsertText(tsmOffset, *(hDescData), totalLength, hWE);
+	_WEForgetHandle(&hDescData);
+#else
 	saveTextLock = _WESetHandleLock(text.dataHandle, true);
 	err = _WEInsertText(tsmOffset, *(text.dataHandle), totalLength, hWE);
 	_WESetHandleLock(text.dataHandle, saveTextLock);
+#endif
 	if (err != noErr)
 	{
 		goto cleanup;
@@ -619,10 +641,10 @@ pascal OSErr WEInstallTSMHandlers(void)
 	// the first time we're called, create routine descriptors for our Apple event handlers
 	if (_weUpdateActiveInputAreaHandler == nil)
 	{
-		_weUpdateActiveInputAreaHandler = NewAEEventHandlerProc(_WEHandleUpdateActiveInputArea);
-		_wePositionToOffsetHandler = NewAEEventHandlerProc(_WEHandlePositionToOffset);
-		_weOffsetToPositionHandler = NewAEEventHandlerProc(_WEHandleOffsetToPosition);
-		_weGetTextHandler = NewAEEventHandlerProc(_WEHandleGetText);
+		_weUpdateActiveInputAreaHandler = NewAEEventHandlerProc((AEEventHandlerProcPtr) _WEHandleUpdateActiveInputArea);
+		_wePositionToOffsetHandler = NewAEEventHandlerProc((AEEventHandlerProcPtr) _WEHandlePositionToOffset);
+		_weOffsetToPositionHandler = NewAEEventHandlerProc((AEEventHandlerProcPtr) _WEHandleOffsetToPosition);
+		_weGetTextHandler = NewAEEventHandlerProc((AEEventHandlerProcPtr) _WEHandleGetText);
 	}
 
 	// install Apple Event handlers to be used by Text Service components

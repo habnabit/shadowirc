@@ -1193,6 +1193,7 @@ cleanup:
 pascal Boolean WECanPaste(WEHandle hWE)
 {
 	SInt32 scrapOffset;
+	#pragma unused(scrapOffset) //not used in carbon
 #if WASTE_OBJECTS
 	FlavorType objectType;
 	SInt32 index;
@@ -1201,7 +1202,14 @@ pascal Boolean WECanPaste(WEHandle hWE)
 	if (!BTST((*hWE)->features, weFReadOnly))
 	{
 		// return true if the desk scrap contains a text flavor
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+		ScrapRef scrap;
+		ScrapFlavorFlags flags;
+		if (GetCurrentScrap(&scrap) == noErr &&
+			GetScrapFlavorFlags(scrap, kTypeText, &flags) > 0)
+#else
 		if (GetScrap(nil, kTypeText, &scrapOffset) > 0)
+#endif
 		{
 			return true;
 		}
@@ -1211,7 +1219,11 @@ pascal Boolean WECanPaste(WEHandle hWE)
 		index = 0;
 		while (_WEGetIndObjectType(index, &objectType, hWE) == noErr)
 		{
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+			if (GetScrapFlavorFlags(scrap, objectType, &flags) > 0)
+#else
 			if (GetScrap(nil, objectType, &scrapOffset) > 0)
+#endif
 			{
 				return true;
 			}
@@ -1224,20 +1236,44 @@ pascal Boolean WECanPaste(WEHandle hWE)
 
 pascal OSErr _WEGetScrapHandle ( FlavorType dataFlavor, Handle * dataHandle )
 {
-	SInt32 scrapOffset ;
 	SInt32 scrapResult ;
+	SInt32 scrapLength = 0 ;
 	OSErr err ;
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	ScrapRef scrap ;
+	//ScrapFlavorFlags scrapFlags ;
+#else
+	SInt32 scrapOffset ;
+#endif
 
 	* dataHandle = nil;
 
-	//	allocate a temporary handle
-	if ( ( err = _WEAllocate ( 0, kAllocTemp, dataHandle ) ) != noErr )
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	if ( ( err = GetCurrentScrap(&scrap)) != noErr ||
+		 ( err = GetScrapFlavorSize(scrap, kTypeText, &scrapLength ) ) != noErr )
 	{
+		goto cleanup ;
+	}
+#endif
+
+	//	allocate a temporary handle
+	if ( ( err = _WEAllocate ( scrapLength, kAllocTemp, dataHandle ) ) != noErr )
+	{
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+		_WEForgetHandle ( dataHandle ) ;
+#endif
 		goto cleanup ;
 	}
 
 	//	look for an item with the specified flavor on the desk scrap
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	_WESetHandleLock ( * dataHandle, true ) ;
+	err = GetScrapFlavorData(scrap, kTypeText, &scrapLength,  ** dataHandle ) ;
+	_WESetHandleLock ( * dataHandle, false ) ;
+	if ( ( scrapResult = err ) != noErr )
+#else
 	if ( ( scrapResult = GetScrap ( * dataHandle, dataFlavor, & scrapOffset ) ) < 0 )
+#endif
 	{
 		//	a negative result from GetScrap is an error code
 		err = scrapResult ;
@@ -1377,7 +1413,11 @@ pascal OSErr _WESmartSetFont(WEStyleMode mode, const WETextStyle *ts, WEHandle h
 	// set up the graphics port
 	GetPort(&savePort);
 	SetPort(pWE->port);
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	saveFont = GetPortTextFont(pWE->port);
+#else
 	saveFont = pWE->port->txFont;
+#endif
 
 	// get the script corresponding to the font we're applying
 	script = FontToScript(ts->tsFont);

@@ -411,21 +411,28 @@ pascal OSErr _WEPutScrapHandle ( FlavorType dataFlavor, Handle dataHandle )
 {
 	Boolean saveDataLock ;
 	OSErr err ;
+	Handle scrapHdl, myData = 0;
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	ScrapRef scrap;
+#endif
 
 	saveDataLock = _WESetHandleLock ( dataHandle, true ) ;
 	if(dataFlavor == kTypeStyles) //convert it to a TextEdit scrap, rather than modified stuff
-	{
-		Handle myData;
-//ShadowIRC: Convert style to standard		
-		myData = MyExtendedStyleToTE((TEStyleScrapHandle)dataHandle);
-		if(myData)
-		{
-			err = PutScrap ( GetHandleSize ( myData ), dataFlavor, * myData ) ;
-			DisposeHandle(myData);
-		}
-	}
+		scrapHdl = myData = MyExtendedStyleToTE((TEStyleScrapHandle)dataHandle); //ShadowIRC: Convert style to standard
 	else
-		err = PutScrap ( GetHandleSize ( dataHandle ), dataFlavor, * dataHandle ) ;
+		scrapHdl = dataHandle;
+
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	err = GetCurrentScrap(& scrap);
+	if( err == noErr)
+		err = PutScrapFlavor ( scrap, dataFlavor, kScrapFlavorMaskNone, GetHandleSize ( scrapHdl ), * scrapHdl ) ;
+#else
+	err = PutScrap ( GetHandleSize ( scrapHdl ), dataFlavor, * scrapHdl ) ;
+#endif
+	
+	if(myData)
+		DisposeHandle(myData);
+
 	_WESetHandleLock ( dataHandle, saveDataLock ) ;
 
 	return err ;
@@ -455,7 +462,11 @@ pascal OSErr WECopy ( WEHandle hWE )
 	}
 
 	//	clear the desk scrap
+#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	if ( ( err = ClearCurrentScrap ( ) ) != noErr )
+#else
 	if ( ( err = ZeroScrap ( ) ) != noErr )
+#endif
 	{
 		goto cleanup ;
 	}
