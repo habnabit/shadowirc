@@ -88,7 +88,6 @@ typedef struct aspData {
 	SndChannelPtr soundChannel;
 	
 	struct aspData *next, *prev;
-	char *gSoundIsFinished;
 	plugsPtr pluginRef;
 
 	char isFinished;
@@ -96,16 +95,13 @@ typedef struct aspData {
 } pAsyncSoundCompletionData, *pAsyncSoundCompletionDataPtr, aspData, *aspDataPtr;
 
 static aspDataPtr aspList=0;
-static char gSoundIsFinished = 0;
-
 static SndCallBackUPP scb;
+static EventLoopTimerRef AsyncSoundTimer;
 
-static pascal void AsyncSoundCheck(void)
+static void AsyncSoundCleanup(EventLoopTimerRef timer, void* data)
 {
 	aspDataPtr asp = aspList;
 	aspDataPtr next;
-	
-	gSoundIsFinished = 0;
 	
 	while(asp)
 	{
@@ -130,6 +126,8 @@ static pascal void AsyncSoundCheck(void)
 		}
 		asp=next;
 	}
+	
+	SetEventLoopTimerNextFireTime(timer, kEventDurationForever);
 }
 
 static pascal void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord)
@@ -138,7 +136,8 @@ static pascal void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand 
 	
 	aspDataPtr asp = (aspDataPtr)infoRecord->param2;
 	asp->isFinished=1;
-	*asp->gSoundIsFinished=1;
+	
+	SetEventLoopTimerNextFireTime(AsyncSoundTimer, kEventDurationNoWait);
 }
 
 pascal OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel)
@@ -183,7 +182,6 @@ pascal OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel)
 			asp->sound=(SndListHandle)sound;
 			asp->soundChannel=(SndChannelPtr)soundChannel;
 			asp->isFinished=0;
-			asp->gSoundIsFinished = &gSoundIsFinished;
 			asp->disposeOfChannel = disposeOfChannel;
 			
 			asp->pluginRef=sidr.yourInfo;
@@ -585,8 +583,8 @@ static void Timer5(EventLoopTimerRef timer, void* data)
 
 static void InitTimers()
 {
-	EventLoopTimerUPP mtu, t20u, t5u;
 	EventLoopRef mainLoop = GetMainEventLoop();
+	EventLoopTimerUPP mtu, t20u, t5u, AsyncSoundTimerProc;
 	EventLoopTimerRef timer;
 	
 	mtu = NewEventLoopTimerUPP(MinuteTimer);
@@ -596,6 +594,9 @@ static void InitTimers()
 	InstallEventLoopTimer(mainLoop, 60 * kEventDurationSecond, 60 * kEventDurationSecond, mtu, NULL, &timer);
 	InstallEventLoopTimer(mainLoop, 20 * kEventDurationSecond, 20 * kEventDurationSecond, t20u, NULL, &timer);
 	InstallEventLoopTimer(mainLoop, 5 * kEventDurationSecond, 5 * kEventDurationSecond, t5u, NULL, &timer);
+	
+	AsyncSoundTimerProc = NewEventLoopTimerUPP(AsyncSoundCleanup);
+	InstallEventLoopTimer(mainLoop, kEventDurationForever, kEventDurationForever, AsyncSoundTimerProc, NULL, &AsyncSoundTimer);
 }
 
 static pascal void IdleTasks(EventRecord *e)
@@ -609,9 +610,6 @@ static pascal void IdleTasks(EventRecord *e)
 		if(!++x)
 			break;
 	}
-	
-	if(gSoundIsFinished)
-		AsyncSoundCheck();
 	
 	//Stuff we need to do periodically when we're in the foreground
 	if(!inBackground)
