@@ -282,10 +282,6 @@ static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef the
 				case kEventProcessCommand:
 					switch(hiCommand.commandID)
 					{
-						case kHICommandClose:
-							MWPart(mw);
-							return noErr;
-						
 						case 'FIND':
 							DoFind(false);
 							return noErr;
