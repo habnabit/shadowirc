@@ -808,7 +808,6 @@ pascal void processServer(CEPtr c, connectionPtr conn)
 			//read to LF
 			nn = ConnGetUntil(conn, (Ptr)&ls.data[1], '\n', MIN(maxLSlen-1, abytes));
 			
-			conn->dataIn += nn;
 			abytes -= nn;
 			cr = 0;
 			//kill CR/LF at end
@@ -861,8 +860,6 @@ pascal void processPlugin(CEPtr c, connectionPtr conn)
 		conn->lastData=now;
 		nn = ConnGetUntil(conn, (Ptr)&ls.data[1], '\n', MIN(maxLSlen-1, abytes));
 		ls.len=nn;
-		
-		conn->dataIn += nn;
 		
 		if(debugOn)
 		{

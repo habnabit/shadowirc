@@ -120,8 +120,6 @@ struct Connection {
 	char textOrBinary;
 	char lineTerm;
 	
-	unsigned long dataIn, dataOut;	//Bytes sent or received. (Valid for text-based connections only)
-	
 	//Not in API
 	CONST ConnInputFuncPtr InputFunc;
 	DCCInputFuncPtr DCCInputFunc; //Should be CONST...

@@ -282,7 +282,6 @@ pascal connectionPtr newConnection(short connType)
 		c->pluginRef=0;
 		c->textOrBinary=0;
 		c->lineTerm=0;
-		c->dataIn = c->dataOut = 0;
 		c->closeTime = 0;
 		c->realConnType = 0;
 		c->socksName[0]=0;

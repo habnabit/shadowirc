@@ -481,8 +481,6 @@ struct Connection {
 	char tryingToConnect;				//True if we're in the process of connecting
 	char textOrBinary;					//True if text, false if not. Determines how it's processed on input and output.
 	char lineTerm;							//See enum lineTermList. Valid only for ConnPutLS().
-	
-	unsigned long dataIn, dataOut;	//Bytes sent or received. (Valid for text-based connections only)
 };
 
 /*	Notify List Record
