@@ -861,7 +861,7 @@ pascal char readMainPrefs(void)
 		mainResNum=FSpOpenResFile(&mainPrefsLoc, fsRdPerm);
 		if(ResError())
 		{
-			FSpCreateResFile(&mainPrefsLoc, creatorType, prefsType, 0);
+			FSpCreateResFile(&mainPrefsLoc, kApplicationSignature, kPrefsType, 0);
 			mainResNum=FSpOpenResFile(&mainPrefsLoc, fsRdPerm);
 			if(ResError())
 				SysBeep(0);
@@ -872,12 +872,12 @@ pascal char readMainPrefs(void)
 	else
 	{
 		created = true;
-		err = FSpCreate(&mainPrefsLoc, creatorType, prefsType, 0);
+		err = FSpCreate(&mainPrefsLoc, kApplicationSignature, kPrefsType, 0);
 		err=FSpOpenDF(&mainPrefsLoc, fsRdWrPerm, &mainRefNum);
 		mainResNum=FSpOpenResFile(&mainPrefsLoc, fsRdWrPerm);
 		if(ResError())
 		{
-			FSpCreateResFile(&mainPrefsLoc, creatorType, prefsType, 0);
+			FSpCreateResFile(&mainPrefsLoc, kApplicationSignature, kPrefsType, 0);
 			mainResNum=FSpOpenResFile(&mainPrefsLoc, fsRdWrPerm);
 			if(ResError())
 				SysBeep(0);

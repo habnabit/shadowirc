@@ -235,8 +235,11 @@ extern int wLastServiceItem;
 
 #define windowsStart (wLastServiceItem + 5)
 
-#define creatorType 'SIRC'
-#define prefsType 'pref'
+enum {
+	kApplicationSignature = 'SIRC',
+	
+	kPrefsType = 'pref'
+};
 
 #define CmdChar '/'
 
