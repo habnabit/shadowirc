@@ -264,7 +264,7 @@ pascal int signoffClearChannels(linkPtr link)
 	}
 	
 	if(CurrentTarget.link == link)
-		if(CurrentTarget.mw->winType == chanWin)
+		if(CurrentTarget.mw && CurrentTarget.mw->winType == chanWin)
 			InvalTarget(&CurrentTarget);
 	
 	return x;
