@@ -238,6 +238,7 @@
 		};
 		20286C2CFDCF999611CA2CEA = {
 			children = (
+				F526526C0227D84B0132A983,
 				F552BF300211030901A80061,
 				F552BF440211030901A80061,
 				F552BF480211030901A80061,
@@ -310,7 +311,7 @@
 	<key>CFBundleGetInfoString</key>
 	<string>2.0a1, © 1996-2002 John Bafford</string>
 	<key>CFBundleIconFile</key>
-	<string></string>
+	<string>ShadowIRC.icns</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -396,6 +397,7 @@
 			files = (
 				0867D6ACFE840B52C02AAC07,
 				F573F87F021878C601A80061,
+				F526526D0227D84B0132A983,
 			);
 			isa = PBXResourcesBuildPhase;
 			name = "Bundle Resources";
@@ -636,6 +638,17 @@
 		};
 		F510A8B9021CBC000132A983 = {
 			fileRef = F510A8B7021CBC000132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F526526C0227D84B0132A983 = {
+			isa = PBXFileReference;
+			path = ShadowIRC.icns;
+			refType = 4;
+		};
+		F526526D0227D84B0132A983 = {
+			fileRef = F526526C0227D84B0132A983;
 			isa = PBXBuildFile;
 			settings = {
 			};
