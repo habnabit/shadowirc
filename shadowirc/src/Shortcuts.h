@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -24,9 +24,10 @@
 
 pascal void ProcessShortcutText(LongString *ls, short *cursorPos, short *endPos);
 
-pascal void getShortcutsDlg(void);
+void DoShortcutsEditor(void);
 pascal void ShortcutsMenuUpdate(void);
 
 pascal void ShortcutsMenu(short item);
+void ShortcutsMenuInit(MenuHandle sm);
 
 #endif

@@ -30,7 +30,7 @@
 #include "utils.h"
 #include "MsgWindows.h"
 #include "IRCChannels.h"
-
+#include "Shortcuts.h"
 #include "Floaters.h"
 #include "MenuCommands.h"
 #include "TextWindows.h"
@@ -376,7 +376,15 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 		case 'WTIL':
 			DoTileWindows();
 			return noErr;
-			
+		
+		//Shortcuts Menu
+		case 'ESHT':
+			DoShortcutsEditor();
+			return noErr;
+		
+		case 'SHOR':
+			ShortcutsMenu(hiCommand.menu.menuItemIndex);
+			return noErr;
 	}
 	
 	return myErr;

@@ -693,6 +693,7 @@ pascal void MenuInit(void)
 	gFileMenu = GetMenuHandle(FileMenu);
 	FontsMenuInit();
 	gShortcutsMenu = GetMenuHandle(shortcutsMenu);
+	ShortcutsMenuInit(gShortcutsMenu);
 	gWindowMenu = GetMenuHandle(windowMenu);
 
 	if(hasAquaMenuMgr)

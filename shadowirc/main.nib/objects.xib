@@ -4,7 +4,7 @@
   <object name="rootObject" class="NSCustomObject" id="1">
     <string name="customClass">NSApplication</string>
   </object>
-  <array count="119" name="allObjects">
+  <array count="89" name="allObjects">
     <object class="IBCarbonWindow" id="166">
       <string name="windowRect">188 219 332 579 </string>
       <string name="title">Splash Screen</string>
@@ -272,153 +272,14 @@
           <object name="submenu" class="IBCarbonMenu" id="249">
             <string name="title">Shortcuts</string>
             <int name="menuID">261</int>
-            <array count="32" name="items">
+            <array count="2" name="items">
               <object class="IBCarbonMenuItem" id="250">
                 <string name="title">Edit Shortcuts…</string>
                 <string name="keyEquivalent">\</string>
+                <ostype name="command">ESHT</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="264">
                 <boolean name="separator">TRUE</boolean>
-              </object>
-              <object class="IBCarbonMenuItem" id="251">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">1</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="255">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">2</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="256">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">3</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="258">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">4</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="259">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">5</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="260">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">6</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="262">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">7</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="261">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">8</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="263">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">9</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="257">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">0</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="254">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">1</string>
-                <int name="keyEquivalentModifier">1572864</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="265">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">2</string>
-                <int name="keyEquivalentModifier">1572864</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="266">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">3</string>
-                <int name="keyEquivalentModifier">1572864</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="267">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">4</string>
-                <int name="keyEquivalentModifier">1572864</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="268">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">5</string>
-                <int name="keyEquivalentModifier">1572864</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="269">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">6</string>
-                <int name="keyEquivalentModifier">1572864</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="270">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">7</string>
-                <int name="keyEquivalentModifier">1572864</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="271">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">8</string>
-                <int name="keyEquivalentModifier">1572864</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="272">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">9</string>
-                <int name="keyEquivalentModifier">1572864</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="273">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">0</string>
-                <int name="keyEquivalentModifier">1572864</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="274">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">1</string>
-                <int name="keyEquivalentModifier">1310720</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="275">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">2</string>
-                <int name="keyEquivalentModifier">1310720</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="276">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">3</string>
-                <int name="keyEquivalentModifier">1310720</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="277">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">4</string>
-                <int name="keyEquivalentModifier">1310720</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="278">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">5</string>
-                <int name="keyEquivalentModifier">1310720</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="279">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">6</string>
-                <int name="keyEquivalentModifier">1310720</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="280">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">7</string>
-                <int name="keyEquivalentModifier">1310720</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="281">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">8</string>
-                <int name="keyEquivalentModifier">1310720</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="282">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">9</string>
-                <int name="keyEquivalentModifier">1310720</int>
-              </object>
-              <object class="IBCarbonMenuItem" id="283">
-                <string name="title">Item</string>
-                <string name="keyEquivalent">0</string>
-                <int name="keyEquivalentModifier">1310720</int>
               </object>
             </array>
           </object>
@@ -550,37 +411,7 @@
     <reference idRef="248"/>
     <reference idRef="249"/>
     <reference idRef="250"/>
-    <reference idRef="251"/>
-    <reference idRef="254"/>
-    <reference idRef="255"/>
-    <reference idRef="256"/>
-    <reference idRef="257"/>
-    <reference idRef="258"/>
-    <reference idRef="259"/>
-    <reference idRef="260"/>
-    <reference idRef="261"/>
-    <reference idRef="262"/>
-    <reference idRef="263"/>
     <reference idRef="264"/>
-    <reference idRef="265"/>
-    <reference idRef="266"/>
-    <reference idRef="267"/>
-    <reference idRef="268"/>
-    <reference idRef="269"/>
-    <reference idRef="270"/>
-    <reference idRef="271"/>
-    <reference idRef="272"/>
-    <reference idRef="273"/>
-    <reference idRef="274"/>
-    <reference idRef="275"/>
-    <reference idRef="276"/>
-    <reference idRef="277"/>
-    <reference idRef="278"/>
-    <reference idRef="279"/>
-    <reference idRef="280"/>
-    <reference idRef="281"/>
-    <reference idRef="282"/>
-    <reference idRef="283"/>
     <reference idRef="284"/>
     <reference idRef="285"/>
     <reference idRef="286"/>
@@ -717,7 +548,7 @@
     <reference idRef="353"/>
     <reference idRef="355"/>
   </array>
-  <array count="119" name="allParents">
+  <array count="89" name="allParents">
     <reference idRef="1"/>
     <reference idRef="166"/>
     <reference idRef="167"/>
@@ -757,36 +588,6 @@
     <reference idRef="210"/>
     <reference idRef="203"/>
     <reference idRef="248"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
-    <reference idRef="249"/>
     <reference idRef="249"/>
     <reference idRef="249"/>
     <reference idRef="203"/>

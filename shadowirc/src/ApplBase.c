@@ -1110,25 +1110,12 @@ static pascal void ApplEvents(EventRecord *e)
 
 	if((e->what==keyDown) && (e->modifiers & cmdKey))
 	{
-		char c= e->message & 0xFF;
-		if(((e->modifiers&(controlKey|cmdKey|shiftKey|optionKey)) == (controlKey|cmdKey)) && c>='0' && c<='9') //hack for cmd-ctrl-# for 8.5
-		{
-			l = c - '0';
-			if(!l)
-				l=10;
-			FlashMenuBar(shortcutsMenu);
-			ShortcutsMenu(22 + l);
-			FlashMenuBar(shortcutsMenu);
-		}
-		else
-		{
-			l = MenuEvent(e);
+		l = MenuEvent(e);
 
-			if(!l)
-				Key(e, 1);
-			else
-				DoMenuEvent(l, e);
-		}
+		if(!l)
+			Key(e, 1);
+		else
+			DoMenuEvent(l, e);
 		return;
 	}
 	else if(IsDialogEvent(e))

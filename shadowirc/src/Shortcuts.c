@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -38,7 +38,7 @@ inline void PluginShortcutText(Handle lh);
 static pascal void ParseShortcutText(ConstStr255Param s);
 
 
-pascal void getShortcutsDlg(void)
+void DoShortcutsEditor(void)
 {
 	short x;
 	DialogPtr shortcutsDlg;
@@ -306,11 +306,27 @@ static pascal void ParseShortcutText(ConstStr255Param s)
 
 pascal void ShortcutsMenu(short item)
 {
-	if(item==1)
-		getShortcutsDlg();
-	else
+	if(item >= 3)
 	{
 		if(mainPrefs->shortcuts[item-3][0])
 			ParseShortcutText(mainPrefs->shortcuts[item-3]);
 	}
 }
+
+void ShortcutsMenuInit(MenuHandle sm)
+{
+	int x;
+	const int kShortcutsOffset = 2;
+	
+	for(x = 1; x <= 30; x++)
+	{
+		AppendMenuItemText(sm, "\p.");
+		SetMenuItemCommandID(sm, kShortcutsOffset + x, 'SHOR');
+		SetItemCmd(sm, kShortcutsOffset + x, '0' + x % 10);
+		if(x >= 10 && x <= 19)
+			SetMenuItemModifiers(sm, kShortcutsOffset + x, kMenuOptionModifier);
+		else if(x >= 20)
+			SetMenuItemModifiers(sm, kShortcutsOffset + x, kMenuControlModifier | kMenuNoCommandModifier);
+	}
+}
+
