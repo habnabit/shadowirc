@@ -1270,7 +1270,7 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 	myStScrpHandle sty;
 	short colorMethod, colorMethod_saved, cm;
 	char dontLog;
-	char noCR = 0;
+	char noCR;
 	pMWTextDataRec p;
 
 	if(msg->len && win)
@@ -1318,7 +1318,7 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 		savedstyle = newstyle = 0;
 		numbeeps = 0;
 		colorMethod_saved = colorMethod = win->colorMethod;
-		dontLog = false;
+		noCR = dontLog = false;
 		while(i<=ls.len)
 		{
 			c=ls.data[i];
