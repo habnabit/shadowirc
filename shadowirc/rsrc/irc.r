@@ -1,13 +1,5 @@
 #include <Carbon/Carbon.r>
 
-resource 'open' (301, purgeable)
-{
-	'SIRC',
-	{
-		'COLR'
-	}
-};
-
 resource 'scsz' (0)
 {
 	launchToGetTerminology,
