@@ -544,24 +544,30 @@ static CFBooleanRef MakeCFBoolean(Boolean b)
 
 static Boolean ReadDictBoolean(CFDictionaryRef dict, CFStringRef key, Boolean *outValue)
 {
-	Boolean exists;
+	Boolean exists = FALSE;
 	CFBooleanRef value;
 	
 	value = CFDictionaryGetValue(dict, key);
 	if(value)
+	{
 		*outValue = CFBooleanGetValue(value);
+		exists = TRUE;
+	}
 	
 	return exists;
 }
 
 static Boolean ReadDictStr(CFDictionaryRef dict, CFStringRef key, StringPtr outStr, int outLen)
 {
-	Boolean exists;
+	Boolean exists = FALSE;
 	CFStringRef value;
 	
 	value = CFDictionaryGetValue(dict, key);
 	if(value)
+	{
 		CFStringGetPascalString(value, outStr, outLen, kCFStringEncodingMacRoman);
+		exists = TRUE;
+	}
 	
 	return exists;
 }
