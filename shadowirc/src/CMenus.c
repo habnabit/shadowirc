@@ -677,11 +677,11 @@ static char CMMW(MWPtr mw, Point where, char optCM)
 			break;
 		
 		case ConnectionListMenu: //from console
-			MenuConnectionList(outMenuItem);
+			HitConnectionListMenu(outMenuItem);
 			break;
 		
 		case SignoffConnectionListMenu: //from console
-			MenuSignoffConnectionList(outMenuItem);
+			HitSignoffConnectionListMenu(outMenuItem);
 			break;
 			
 		case 203: //color styles

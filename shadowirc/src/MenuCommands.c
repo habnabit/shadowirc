@@ -47,7 +47,8 @@ static MenuHandle gFontsMenu;
 
 static void DoFind2(MWPtr mw);
 
-void FontsMenuInit(void);
+static void FontsMenuInit(void);
+static void ApplicationURLMenuInit(void);
 
 static void ApplicationURLMenuInit(void);
 
@@ -325,7 +326,7 @@ char ToggleConsoleWindow(void)
 
 #pragma mark -
 
-pascal void HitEditMenu(short item)
+void HitEditMenu(short item)
 {
 	char mwFront, otherFront;
 	WEReference we;
@@ -601,7 +602,7 @@ void HitSelectConnectionMenu(short item)
 
 #pragma mark -
 
-pascal void MenuConnectionList(short item)
+void HitConnectionListMenu(short item)
 {
 	linkPtr link;
 	
@@ -620,7 +621,7 @@ pascal void MenuConnectionList(short item)
 	}	
 }
 
-pascal void MenuSignoffConnectionList(short item)
+void HitSignoffConnectionListMenu(short item)
 {
 	if(item)
 	{
@@ -759,7 +760,7 @@ static void ApplicationURLMenuInit(void)
 
 #pragma mark -
 
-void FontsMenuInit(void)
+static void FontsMenuInit(void)
 {
 	if(mainPrefs->noFontsMenu)
 	{
@@ -861,7 +862,7 @@ void ConnectionMenuHilites(void)
 	}
 }
 
-pascal void MenuInit(void)
+void MenuInit(void)
 {
 	IBNibRef mainNibRef;
 

@@ -783,11 +783,11 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 			return noErr;
 		
 		case 'CONO':
-			MenuConnectionList(hiCommand.menu.menuItemIndex);
+			HitConnectionListMenu(hiCommand.menu.menuItemIndex);
 			return noErr;
 		
 		case 'CONC':
-			MenuSignoffConnectionList(hiCommand.menu.menuItemIndex);
+			HitSignoffConnectionListMenu(hiCommand.menu.menuItemIndex);
 			return noErr;
 		
 		case 'CONX':
