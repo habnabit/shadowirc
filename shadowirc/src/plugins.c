@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -947,15 +947,6 @@ pascal void pluginCloseWindow(WindowPtr win, pluginDlgInfoPtr p)
 	pp.w=win;
 	pp.mw=0;
 	runIndPlugin(p->pluginRef, pUIWindowCloseMessage, &pp);
-}
-
-pascal void pluginHitDialog(DialogPtr win, pluginDlgInfoPtr p, short i)
-{
-	pUIDialogItemHitDataRec pl;
-	
-	pl.dlg=win;
-	pl.item=i;
-	runIndPlugin(p->pluginRef, pUIDialogItemHitMessage, &pl);
 }
 
 pascal DialogPtr pluginNewDialog(short dialogID)

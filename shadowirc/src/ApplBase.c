@@ -70,7 +70,6 @@ static pascal void doMouseUp(EventRecord *e);
 static pascal void doMouseDown(EventRecord *e);
 static void doTCPEvent(CEPtr message);
 static pascal void ApplEvents(EventRecord *e);
-static pascal char doDialogEvent(EventRecord *e);
 static pascal void ApplExit(void);
 
 WindowPtr ContextWindow = 0;
@@ -992,66 +991,8 @@ static void doTCPEvent(CEPtr c)
 	conn->InputFunc(c, conn);
 }
 
-static pascal char doDialogEvent(EventRecord *e)
-{
-	WindowPtr fw;
-	DialogPtr p;
-	short theItem;
-	pluginDlgInfoPtr pl;
-	
-	if((e->what==keyDown) && (((e->message & 255)==3) || ((e->message & 255)==13)))
-	{	//pressing return or enter in dlg
-		fw=FrontNonFloater();
-		e->message=(long)fw;
-		
-		pl=(pluginDlgInfoPtr)GetWRefCon(fw);
-		if(pl && (pl->magic==PLUGIN_MAGIC))
-			pluginHitDialog(GetDialogFromWindow(fw), pl, 1);
-		
-		return 1;
-	}
-	else if((e->what==keyDown) && ((e->message&255)==27))
-	{	//pressing esc in dlg
-		fw=FrontNonFloater();
-		e->message=(long)fw;
-		
-		pl=(pluginDlgInfoPtr)GetWRefCon(fw);
-		if(pl && (pl->magic==PLUGIN_MAGIC))
-			pluginHitDialog(GetDialogFromWindow(fw), pl, 2);
-		
-		return 1;
-	}
-	else if(DialogSelect(e, &p, &theItem))
-	{
-		e->message=(long)p;
-		
-		pl=(pluginDlgInfoPtr)GetWRefCon(GetDialogWindow(p));
-		if(pl && (pl->magic==PLUGIN_MAGIC))
-			pluginHitDialog(p, pl, theItem);
-		return 1;
-	}
-	else 
-		return (e->what == updateEvt) || (e->what !=0);
-}
-
 static pascal void ApplEvents(EventRecord *e)
 {
-	long l;
-
-	if((e->what==keyDown) && (e->modifiers & cmdKey))
-	{
-		l = MenuEvent(e);
-
-		if(!l)
-			Key(e, 1);
-		else
-			DoMenuEvent(l, e);
-		return;
-	}
-	else if(IsDialogEvent(e))
-		if(doDialogEvent(e))
-			return;
-	
 	switch(e->what)
 	{
 		case nullEvent:
@@ -1073,7 +1014,14 @@ static pascal void ApplEvents(EventRecord *e)
 		case autoKey:
 			if(!(e->modifiers & cmdKey))
 		case keyDown:
-				Key(e, 0);
+			{
+				long l = MenuEvent(e);
+		
+				if(!l)
+					Key(e, !!(e->modifiers & cmdKey));
+				else
+					DoMenuEvent(l, e);
+			}
 			break;
 			
 		case mouseDown:

@@ -1176,7 +1176,6 @@ pascal void runService(short message, void* messageData); //messages to any serv
 pascal void runIndService(long serviceType, short message, void* messageData); //messages to a specific service
 
 pascal void pluginCloseWindow(WindowPtr win, pluginDlgInfoPtr p);
-pascal void pluginHitDialog(DialogPtr win, pluginDlgInfoPtr p, short i);
 
 pascal long FindService(FourCharCode serviceType);
 pascal void SoundService(long sound, long data);
