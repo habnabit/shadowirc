@@ -126,30 +126,6 @@ pascal void SetText(DialogPtr theDialog, short itemNum, ConstStr255Param theText
 	}
 }
 
-pascal void SetDlogItemTextHdl( DialogPtr dp, short item, const char *buf, long bufLen )
-{
-   Rect   dumBox;
-   Handle itemHdl;
-   long   hlen;
-   short  dumType;
-   
-   GetDialogItem(dp, item, &dumType, &itemHdl, &dumBox);
-   hlen = GetHandleSize(itemHdl);
-
-   SetHandleSize(itemHdl, hlen + bufLen);
-   BlockMoveData( buf, *itemHdl + hlen, bufLen);
-
-   SetDialogItem(dp, item, dumType, itemHdl, &dumBox);
-
-	if(GetDialogKeyboardFocusItem(dp) == item)
-	{
-		TEHandle te = GetDialogTextEditHandle(dp);
-		
-		TESetText(itemHdl, hlen + bufLen, te);
-		TECalText(te);     // is this actually needed?
-	}
-}
-
 pascal char getCheckBox(DialogPtr d, short item)
 {
 	return GetControlValue(GetControlHandle(d,item))==1;

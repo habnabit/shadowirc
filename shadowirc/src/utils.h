@@ -67,7 +67,6 @@ pascal unsigned char StandardDialogFilter(DialogPtr d, EventRecord *e, short *it
 typedef struct NavCBRec* NavCBRecPtr;
 #endif
 pascal void NavDialogFilter(const long callBackSelector, NavCBRecPtr callBackParms, void* callBackUD);
-pascal void SetDlogItemTextHdl( DialogPtr dp, short item, const char *buf, long bufLen );
 
 
 pascal void pstrcpymax(ConstStringPtr src, StringPtr dest, char max);

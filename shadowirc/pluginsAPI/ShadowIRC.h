@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x02000003
+#define _ShadowIRC_API_Version_ 0x02000004
 
 #include <Carbon/Carbon.h>
 
@@ -3768,15 +3768,6 @@ pascal void SetText(DialogPtr dlg, short item, ConstStr255Param text);
 		Input:	dlg - The dialog.
 					item - The item number.
 					text - Pascal string containing the text to set.
-		Output:	none
-*/
-
-pascal void SetDlogItemTextHdl(DialogPtr dlg, short item, const char *buf, long bufLen);
-/*	Sets the text of a dialog item. Can be used to set more than 255 characters of text.
-		Input:	dlg - the dialog
-					item - the item number
-					buf - a pointer to the text to set in the dialog item
-					bufLen - the length of the text
 		Output:	none
 */
 
