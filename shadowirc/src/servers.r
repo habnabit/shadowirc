@@ -502,18 +502,16 @@ resource 'SRVR' (146, "Duh-Net")
 	};
 };
 
+//updated 2001-11-11 "ShawnH" <ShawnH@AfterNET.Org>
 resource 'SRVR' (147, "AfterNet")
 {
 	'aftr',
 	{
-		6667, 0, 0, "Agora.AfterNET.Org",
-		6667, 0, 0, "Crypto.AfterNET.Org",
-		6667, 0, 0, "DigitalD.UK.AfterNET.Org",
-		6667, 0, 0, "Frodo.AfterNET.Org",
-		6667, 0, 0, "Infinet.AfterNET.Org",
-		6667, 0, 0, "Recycle.AfterNET.Org",
-		6667, 0, 0, "Scorpion.AfterNET.Org",
-		6667, 0, 0, "Storm.AfterNET.Org"
+		6667, 0, 0, "irc.AfterNET.Org",
+		6667, 0, 0, "ny.us.AfterNET.Org",
+		6667, 0, 0, "boston.AfterNET.Org",
+		6667, 0, 0, "ic5.eu.AfterNET.Org",
+		6667, 0, 0, "baltimore.md.AfterNET.Org"
 	};
 };
 
@@ -596,7 +594,6 @@ resource 'SRVR' (152, "Open Projects Network")
 		6667, 0, 0, "irc.openprojects.net"
 	};
 };
-
 
 resource 'SRVR' (153, "QDeckers")
 {
