@@ -46,7 +46,7 @@ long lastInput, lastKey;
 char iwFront=0;
 char inputLocked = 0;
 
-static pascal char MWNavKey(EventModifiers modifiers, long message);
+static char MWNavKey(MWPtr mw, EventModifiers modifiers, long message);
 
 pascal void ServerCommands(LongString *ls, linkPtr link);
 inline void pluginMWGotText(LongString *ls, MWPtr win);
@@ -304,7 +304,7 @@ pascal void UnlockInput(void)
 
 #pragma mark -
 
-static pascal char MWNavKey(EventModifiers modifiers, long message)
+static char MWNavKey(MWPtr mw, EventModifiers modifiers, long message)
 {
 	char c = message % 256;
 	char cmd = (modifiers & cmdKey) == cmdKey;
@@ -313,34 +313,34 @@ static pascal char MWNavKey(EventModifiers modifiers, long message)
 	char proc = 1;
 	
 	if(c == 11 || c == 12)
-		MWPage(MWActive, c==11);
+		MWPage(mw, c==11);
 	else if((modifiers & controlKey) == controlKey)
 	{
 		if(c == 30)
-			MWScroll(MWActive, -MWActive->scrpHeight);
+			MWScroll(mw, -mw->scrpHeight);
 		else if(c==31)
-			MWScroll(MWActive, MWActive->scrpHeight);
+			MWScroll(mw, mw->scrpHeight);
 		else
 			proc = 0;
 	}
 	else if(!cmd)
 	{
 		if(c == 1) //home
-			MWPage(MWActive, 3);
+			MWPage(mw, 3);
 		else if(c==4)
-			MWPage(MWActive, 2);
+			MWPage(mw, 2);
 		else
-			proc=0;
+			proc = 0;
 	}
 	else if(cmd)
 	{
 		if(c == 30 || c==31)
-			MWPage(MWActive, (c==30) + (opt*2));
+			MWPage(mw, (c==30) + (opt*2));
 		else
-			proc=0;
+			proc = 0;
 	}
 	else
-		proc=0;
+		proc = 0;
 	
 	return proc;
 }
@@ -371,17 +371,19 @@ pascal void Key(EventRecord *e, char dontProcess)
 	pKeyDownDataRec p;
 	Str255 s;
 	WEReference il;
-	
+	MWPtr mw;
 	c=e->message & 0xFF;
-
-	if(!iwFront && (MWActive && MWActive->winType == textWin))
+	
+	mw = MWActive;
+	
+	if(!iwFront && (mw && mw->winType == textWin))
 	{
-		if(!MWNavKey(e->modifiers, e->message))
+		if(!MWNavKey(mw, e->modifiers, e->message))
 		{
 			if(c!=27)
 			{
-				WEKey(c, e->modifiers, MWActive->we);
-				SetWindowModified(MWActive->w, WEGetModCount(MWActive->we) != 0);
+				WEKey(c, e->modifiers, mw->we);
+				SetWindowModified(mw->w, WEGetModCount(mw->we) != 0);
 			}
 		}
 		return;
@@ -398,7 +400,7 @@ pascal void Key(EventRecord *e, char dontProcess)
 	if(!c)
 		return;
 	
-	if(MWNavKey(e->modifiers, e->message) || dontProcess)
+	if((mw && MWNavKey(mw, e->modifiers, e->message)) || dontProcess)
 		return;
 	
 	iwFront = true;
