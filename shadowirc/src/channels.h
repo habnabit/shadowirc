@@ -83,6 +83,7 @@ typedef struct Channel {
 	CONST bansP exceptions;
 	char hasHalfOps;
 	char gotNames;
+	char partRequested;
 } Channel;
 
 extern long userNum;

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -28,12 +28,19 @@ typedef struct DNSLookupData {
 	Ptr u;
 } DNSLookupData, *DNSLookupDataPtr;
 
+//Server Command Wrappers
+void SCJoin(linkPtr link, ConstStr255Param channel, ConstStringPtr key);
+void SCPart(linkPtr link, ConstStr255Param channel, const LongString* partMessage);
+
 pascal void doBroadcast(linkPtr link, const LongString *ls, char action);
 pascal void DoONotice(channelPtr ch, const LongString *text);
-pascal void DNSLookup(Str255 addr, long saveReply);
-pascal void HandleCommand(linkPtr link, LongString *ls);
+
 pascal void StackModes(LongString *theMode, channelPtr channel, ConstStr255Param mode, ConstStr255Param arg);
+pascal void DNSLookup(Str255 addr, long saveReply);
+
+pascal void HandleCommand(linkPtr link, LongString *ls);
 pascal void SendCommand(linkPtr link, LongString *ls);
+
 pascal void GetSignoffMessage(linkPtr link, LongString *s);
 
 pascal void DoServer(linkPtr link, LongString *rest, const LongString* reason);

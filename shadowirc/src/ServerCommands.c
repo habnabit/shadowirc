@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2004 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -357,6 +357,18 @@ static void nJoin(linkPtr link, LongString *ls, StringPtr from, StringPtr fromus
 		SoundService(sndJoin, p.isMe);
 }
 
+static void UserLeftChannel(channelPtr ch)
+{
+	MWQuote(ch->window);
+	if(ch->window == CurrentTarget.mw)
+	{
+		InvalTarget(&CurrentTarget);
+		UpdateStatusLine();
+	}
+	
+	ChDestroy(ch);
+}
+
 static void nPart(linkPtr link, LongString *target, StringPtr from, StringPtr fromuser, StringPtr targ)
 {
 	Str255 channel;
@@ -388,9 +400,6 @@ static void nPart(linkPtr link, LongString *target, StringPtr from, StringPtr fr
 
 	runPlugins(pServerPARTMessage, &p);
 
-	if(p.isMe)
-		HideWindow(p.channel->window->w);
-	
 	if(!p.dontDisplay)
 	{
 		LSConcatStrAndStrAndStr(from, "\p has left ", channel, &tls);
@@ -408,10 +417,15 @@ static void nPart(linkPtr link, LongString *target, StringPtr from, StringPtr fr
 	if(!p.dontSound)
 		SoundService(sndPart, p.isMe);
 
-	if(p.isMe)
-		ChPart(p.channel->window);
-	else
+	if(!p.isMe)
 		ULDeleteUser(p.userPtr);
+	else
+	{
+		if(p.channel->partRequested)
+			ChPart(p.channel->window);
+		else
+			UserLeftChannel(p.channel);
+	}
 }
 
 static void nQuit(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target)
@@ -985,23 +999,10 @@ static void nKick(linkPtr link, LongString *ls, StringPtr from, StringPtr fromus
 
 	if(p.isMe)
 	{
-		MWQuote(ch->window);
-		if(ch->window == CurrentTarget.mw)
-		{
-			InvalTarget(&CurrentTarget);
-			UpdateStatusLine();
-		}
 		if(p.autoRejoin)
-		{
-			LSConcatStrAndStr("\pJOIN ", target, ls);
-			if(ch->key[0])
-			{
-				LSAppend1(*ls, ' ');
-				LSConcatLSAndStr(ls, ch->key, ls);
-			}
-			SendCommand(link, ls);
-		}
-		ChDestroy(ch);
+			SCJoin(link, target, ch->key);
+		
+		UserLeftChannel(ch);
 	}
 	else
 		ULDeleteUser(ULFindUserName(ch, kickedNick));
@@ -1040,10 +1041,7 @@ static void nInvite(linkPtr link, LongString *ls, StringPtr from, StringPtr from
 	}
 	
 	if(p.autojoin)
-	{
-		LSConcatStrAndStr("\pJOIN ", ls->data, &tls);
-		SendCommand(link, &tls);
-	}
+		SCJoin(link, ls->data, NULL);
 	
 	if(!p.ignored && !p.dontSound)
 		SoundService(sndInvite, 0);

@@ -87,7 +87,6 @@ pascal void StackModes(LongString *theMode, channelPtr channel, ConstStr255Param
 	short p;
 	Str255 s,s2;
 	LongString ls;
-	//int numModes = HTFindNumericDefault(channel->link->serverOptions, "\pMODES", 4);
 	int numModes = channel->link->serverFeatures->numModes;
 		
 	if(mode)
@@ -635,8 +634,13 @@ pascal void sendCTCP(linkPtr link, ConstStr255Param t, LongString *ls)
 
 pascal void SendCommand(linkPtr link, LongString *ls)
 {
-	if(link && ls->len && link->serverStatus==S_CONN)
-		putServer(link, ls);
+	if(link && ls->len)
+	{
+		if(link->serverStatus == S_CONN)
+			putServer(link, ls);
+		else
+			StatusMsg(link, 1);
+	}
 }
 
 pascal void rejoinDeactiveChannels(linkPtr link)
@@ -811,9 +815,39 @@ pascal void RegUser(linkPtr link)
 	}
 }
 
+#pragma mark -
+#pragma mark ¥ Command Wrappers
+
+void SCJoin(linkPtr link, ConstStr255Param channel, ConstStringPtr key)
+{
+	LongString s;
+	
+	LSConcatStrAndStr("\pJOIN ", channel, &s);
+	
+	if(key && key[0])
+	{
+		LSAppend1(s, ' ');
+		LSConcatLSAndStr(&s, key, &s);
+	}
+	
+	SendCommand(link, &s);
+}
+
+void SCPart(linkPtr link, ConstStr255Param channel, const LongString* partMessage)
+{
+	LongString s;
+	
+	LSConcatStrAndStr("\pPART ", channel, &s);
+	
+	if(partMessage && partMessage->len)
+		LSConcatLSAndStrAndLS(&s, "\p :", partMessage, &s);
+	
+	SendCommand(link, &s);
+}
+
 
 #pragma mark -
-#pragma mark ¥ÊCommand Handlers
+#pragma mark ¥ Command Handlers
 
 static void _ucBroadcast(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
@@ -942,13 +976,20 @@ static void _ucIgnore(linkPtr link, ConstStr255Param com, LongString *rest, Long
 
 static void _ucJoin(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
-#pragma unused(link,com)
+#pragma unused(com)
+	Str255 channel;
+	
 	if(rest->len)
 	{
+		LSNextArg(rest, channel);
 		LSMakeStr(*rest);
-		MakeChannel(link, rest->data);
-		LSConcatStrAndStr("\pJOIN ", rest->data, s);
+		
+		MakeChannel(link, channel);
+		
+		SCJoin(link, channel, rest->data);
 	}
+	
+	s->len = 0;
 }
 
 static void _ucKill(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
@@ -966,7 +1007,7 @@ static void _ucKill(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 
 static void _ucPart(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
-#pragma unused(link,com)
+#pragma unused(com)
 	Str255 s1;
 	
 	s1[0]=0;
@@ -982,14 +1023,18 @@ static void _ucPart(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 	
 	if(s1[0])
 	{
-		LSConcatStrAndStr("\pPART ", s1, s);
-		if(rest->len)
+		if(link)
 		{
-			LSConcatLSAndStrAndLS(s, "\p :",rest, s);
+			channelPtr ch = ChFind(s1, link);
+			
+			if(ch)
+				ch->partRequested = 1;
 		}
+		
+		SCPart(link, s1, rest);
 	}
-	else
-		s->len=0;
+	
+	s->len = 0;
 }
 
 static void _ucRping(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
@@ -1481,10 +1526,8 @@ static const UserCommandItem TranslateCommandList[] = {
 	{"\pBANS",	_ucBans},
 	{"\pEXCEPTIONS",	_ucExceptions},
 	{"\pIGNORE",	_ucIgnore},
-	{"\pJOIN",	_ucJoin},
 	{"\pJ",	_ucJoin},
 	{"\pKILL",	_ucKill},
-	{"\pPART",	_ucPart},
 	{"\pLEAVE",	_ucPart},
 	{"\pRPING",	_ucRping},
 	{"\pSAY",	_ucSay},
@@ -1506,6 +1549,8 @@ static const UserCommandItem TranslateCommandList[] = {
 	{"\pFTP",	_ucFtp},
 	
 	//Safe commands that directly access the link
+	{"\pJOIN",	_ucJoin},
+	{"\pPART",	_ucPart},
 	{"\pNICK",	_ucNick},
 	{"\pUMODE",	_ucUmode},
 	
@@ -1600,12 +1645,6 @@ static void TranslateCommand(linkPtr link, LongString *s)
 pascal void HandleCommand(linkPtr link, LongString *ls)
 {
 	TranslateCommand(link, ls);
-	if(link && ls->len)
-	{
-		if(link->serverStatus==S_CONN)
-			putServer(link, ls);
-		else
-			StatusMsg(link, 1);
-	}
+	SendCommand(link, ls);
 	UpdateStatusLine();
 }

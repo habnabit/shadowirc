@@ -599,6 +599,7 @@ struct Channel {
 	const bansP exceptions;		//Exceptions list for TS4.
 	char hasHalfOps;					//True if +h. (TS4 servers)
 	char gotNames;						//True if the channel has gotten it's entire names list.
+	char partRequested;			//True if the user requested a /part
 };
 
 	/*	A note about the userlist: the userlist is updated before plugins are called for

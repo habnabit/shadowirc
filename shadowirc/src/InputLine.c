@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2004 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -635,15 +635,14 @@ static void IWStatusLineWidgetClick(ILCSDataPtr ilcsd, iwWidgetPtr o, Point wher
 				else
 				{
 					channelPtr ch;
+					
 					GetMenuItemText(rcm, i, s);
-					ch=ChFind(s, CurrentTarget.link);
+					ch = ChFind(s, CurrentTarget.link);
+					
 					if(ch)
 						WSelect(ch->window->w);
 					else
-					{
-						LSConcatStrAndStr("\pJOIN ", s, &ls);
-						SendCommand(CurrentTarget.link, &ls);
-					}
+						SCJoin(CurrentTarget.link, s, NULL);
 				}
 				break;
 		}

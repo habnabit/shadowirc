@@ -1776,7 +1776,6 @@ void ChPart(MWPtr w)
 void MWPart(MWPtr mw)
 {
 	pUIWindowCloseDataRec p;
-	LongString ls;
 	
 	if(mw)
 	{
@@ -1792,13 +1791,14 @@ void MWPart(MWPtr mw)
 			{
 				channelPtr ch = MWGetChannel(mw);
 				
-				if(ch)
-				{
-					LSConcatStrAndStr("\pPART ", ch->chName, &ls);
-					SendCommand(mw->link, &ls);
-				}
-				else
+				if(!ch)
 					ChPart(mw);
+				else
+				{
+					SCPart(mw->link, ch->chName, NULL);
+					ch->partRequested = 1;
+				}
+				
 				break;
 			}
 			
