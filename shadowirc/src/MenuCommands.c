@@ -48,6 +48,7 @@
 MenuHandle gAppleMenu, gEditMenu, gShortcutsMenu, gWindowMenu;
 static MenuHandle gFileMenu, gFontsMenu;
 static short applMItems;
+static short gFontSizeOtherItem;
 
 UserItemUPP AboutDlgVersionFilter;
 
@@ -60,7 +61,7 @@ static pascal void DoTileWindows(void);
 static pascal void DoCycleCommand(char next);
 
 static pascal void DoAbout(void);
-inline void HitFontsMenu(short item);
+static pascal void HitFontsMenu(short item);
 static pascal void MenuAppleURL(short item);
 static pascal void HitFileMenu(int item);
 static pascal void CloseFrontWindow(void);
@@ -709,29 +710,73 @@ pascal void HitWindowMenu(const short item)
 	}
 }
 
-inline void HitFontsMenu(short item)
+static pascal void HitFontsMenu(short item)
 {
 	Str255 s;
 	short i;
 	long l;
+	DialogPtr d;
+	char b;
 	
-	GetMenuItemText(gFontsMenu, item, s);
-	if(item>fontsBegin)
+	if(item == gFontSizeOtherItem)
 	{
 		if(MWActive)
 		{
-			GetFNum(s, &i);
-			MWSetFontSize(MWActive, i, -1);
-			WEActivate(MWActive->we);
+			s[0] = 0;
+			EnterModalDialog();
+			d = GetNewDialog(141, 0, (WindowPtr)-1);
+			
+			SetText(d, 4,"\p");
+			SetupModalDialog(d, 1, 2);
+			b = 0;
+			do {
+				ModalDialog(StdDlgFilter, &i);
+				
+				switch(i)
+				{
+					case 1:
+						GetText(d, 4, s);
+						
+					case 2:
+						b = i;
+						break;
+				}
+			} while(!b);
+			
+			DisposeDialog(d);
+			FinishModalDialog();
+			
+			if(s[0])
+			{
+				StringToNum(s, &l);
+				if(l >= 4 && l < 32767)
+				{
+					MWSetFontSize(MWActive, -1, l);
+					WEActivate(MWActive->we);
+				}
+			}
 		}
 	}
 	else
 	{
-		StringToNum(s, &l);
-		if(MWActive)
+		GetMenuItemText(gFontsMenu, item, s);
+		if(item>fontsBegin)
 		{
-			MWSetFontSize(MWActive, -1, l);
-			WEActivate(MWActive->we);
+			if(MWActive)
+			{
+				GetFNum(s, &i);
+				MWSetFontSize(MWActive, i, -1);
+				WEActivate(MWActive->we);
+			}
+		}
+		else
+		{
+			StringToNum(s, &l);
+			if(MWActive)
+			{
+				MWSetFontSize(MWActive, -1, l);
+				WEActivate(MWActive->we);
+			}
 		}
 	}
 }
@@ -959,6 +1004,7 @@ inline void FontsMenuInit(void)
 		MenuHandle mh = GetMenuHandle(fontsMenu);
 		gFontsMenu = mh;
 		fontsBegin=CountMenuItems(mh);
+		gFontSizeOtherItem = fontsBegin - 1;
 		AppendResMenu(mh, 'FONT');
 	}
 }
