@@ -226,6 +226,34 @@ pascal void LinkSuccessfulConnection(linkPtr link, char reg)
 		RegUser(link);
 }
 
+static void CreateIdentdConn(linkPtr link)
+{
+	if(mainPrefs->firewallType != fwSOCKS5) //Why?
+	{
+		LongString ls;
+		connectionPtr identConn;
+		connectionPtr conn = link->conn;
+		
+		link->identConn = identConn = newConnection(connIDENTD);
+		if(identConn)
+		{
+			LSGetIntString(&ls, spError, sOpeningIdentd);
+			SMPrefixLink(link, &ls, 1);
+			
+			identConn->ip = conn->ip;
+			identConn->port = 113;
+			identConn->link=link;
+			if(mainPrefs->firewallType == fwSOCKS4A || mainPrefs->firewallType == fwSOCKS4)
+				identConn->refCon = NewPString(mainPrefs->socksUser);
+			else
+				identConn->refCon = NewPString(conn->link->linkPrefs->user);
+			
+			//Allow for a 10 connection backlog. This is more than enough.
+			ConnNewListen(identConn, 10);
+		}
+	}
+}
+
 void DisplayLookupResult(connectionPtr conn)
 {
 	LongString ls;
@@ -243,6 +271,7 @@ int connection2(connectionPtr conn)
 	{
 		if(conn->socks.type == connIRC)
 		{
+			CreateIdentdConn(conn->link);
 			LinkSetStage(conn->link, csOpeningConnection);
 			conn->link->serverStatus=S_OPENING;
 			UpdateStatusLine();

@@ -64,6 +64,7 @@ static pascal void InitLink(linkPtr l, linkPrefsPtr lp, int linkNum)
 	l->next = 0;
 	
 	l->conn=0;
+	l->identConn = 0;
 	l->connectedTime=0;
 	
 	l->serverStatus=S_OFFLINE;
@@ -238,6 +239,9 @@ static pascal void ConnSetInputFunc(connectionPtr conn)
 	{
 		case connIRC:
 			conn->InputFunc = processServer;
+			break;
+		case connIDENTD:
+			conn->InputFunc = processIdentd;
 			break;
 		case connDCC:
 			conn->InputFunc = dccEvent;

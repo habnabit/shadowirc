@@ -23,6 +23,7 @@
 #define _IRCInputPrivate_
 
 void processSOCKS(CEPtr c, connectionPtr conn);
+void processIdentd(CEPtr c, connectionPtr conn);
 void processServer(CEPtr c, connectionPtr conn);
 void processPlugin(CEPtr c, connectionPtr conn);
 void dnsEvent(CEPtr c, connectionPtr conn);

@@ -193,7 +193,11 @@ pascal void DoSignoff(linkPtr link, const LongString *reason)
 		LongString ls;
 		int x;
 		pServerQUITDataRec p;
-	
+		
+		//Kill identd if it's open
+		if(link->identConn)
+			deleteConnection(&link->identConn);
+		
 		LSGetIntString(&ls, spError, sCClosing);
 		SMPrefixLink(link, &ls, dsConsole);
 

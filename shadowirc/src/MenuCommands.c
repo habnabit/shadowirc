@@ -507,8 +507,7 @@ pascal void MenuSignoffConnectionList(short item)
 		while(--item)
 			link = link->next;
 		
-		if(link->serverStatus==S_CONN)
-			DoSignoff(link, 0);
+		DoSignoff(link, 0);
 		
 		if(CurrentTarget.link == link)
 			InvalTarget(&CurrentTarget);
