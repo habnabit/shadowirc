@@ -270,7 +270,8 @@
 			);
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "";
-				HEADER_SEARCH_PATHS = "";
+				GCC_VERSION = 3.x;
+				HEADER_SEARCH_PATHS = "src src/lib src/waste/public-inc src/waste/private-inc";
 				INSTALL_PATH = /Applications;
 				LIBRARY_SEARCH_PATHS = "";
 				OPTIMIZATION_CFLAGS = "-O0";
@@ -613,6 +614,8 @@
 				F50FA70C0358BD880132A983,
 			);
 			buildSettings = {
+				GCC_VERSION = 3.x;
+				HEADER_SEARCH_PATHS = pluginsAPI;
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -2363,6 +2366,8 @@
 				F580515803905D880132A983,
 			);
 			buildSettings = {
+				GCC_VERSION = 3.x;
+				HEADER_SEARCH_PATHS = pluginsAPI;
 				OPTIMIZATION_CFLAGS = "-O0";
 				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
 				OTHER_REZFLAGS = "";
@@ -2507,6 +2512,7 @@
 				F59209360317839001A80166,
 			);
 			buildSettings = {
+				GCC_VERSION = 3.x;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
