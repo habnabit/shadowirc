@@ -302,6 +302,7 @@ resource 'STR#' (263, "WHOIS Strings", locked, preload)
 		"^0 signed on at ^1, ^2",
 		"^0 is on IRC via ^1 (^2)",
 		"^0 was on IRC via ^1 (^2)",
-		"^0 has been idle for ^1"
+		"^0 has been idle for ^1",
+		"^0 is logged in as ^1"
 	};
 };

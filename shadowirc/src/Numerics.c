@@ -851,10 +851,13 @@ _Skip:
 			break;
 		
 		case 312: //whois host/server
+		case 330: //whois logged in as (undernet)
 			LSNextArg(rest, s1); //nick
-			LSNextArgIRC(rest, s2); //server
+			LSNextArgIRC(rest, s2); //312 server; 330 username
 			
-			if(link->lastNumerics[1]==314) //whowas
+			if(comm == 330)
+				sp = GetIntStringPtr(spWhois, sIsLoggedInAs);
+			else if(link->lastNumerics[1]==314) //whowas
 				sp = GetIntStringPtr(spWhois, sWasOnIRCVia);
 			else
 				sp = GetIntStringPtr(spWhois, sOnIRCVia);

@@ -185,7 +185,8 @@ enum whoisStrings {
 	sWhSignedOnAt = 1,
 	sOnIRCVia,
 	sWasOnIRCVia,
-	sIdleFor
+	sIdleFor,
+	sIsLoggedInAs
 };
 
 #endif
