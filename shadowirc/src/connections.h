@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -223,6 +223,10 @@ pascal long ConnCharsAvail(connectionPtr conn);
 pascal unsigned short ConnGetLocalPort(connectionPtr conn);
 #pragma export off
 #pragma lib_export off
+
+pascal char ConnNewPassiveBlankListener(connectionPtr c);
+pascal OSErr NetGetLocalIP(unsigned long *ip);
+pascal OSErr ConnGetUpTo(connectionPtr conn, char term, long timeout, Ptr readPtr, long readSize, long *readPos, char *gotterm);
 
 pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host);
 

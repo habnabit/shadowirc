@@ -593,7 +593,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 		if(conn->connectStage == csSOCKSNegotiatingMethod)
 		{
 			//Read two bytes: version, and method
-			nn = TCPCharsAvailable(c->tcpc); //This had better be >= 2.
+			nn = ConnCharsAvail(conn); //This had better be >= 2.
 			if(nn < 2)
 				return;
 			nn = 2;
@@ -644,7 +644,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 		}
 		else if(conn->connectStage == csSOCKSSendingAuthRequest) //authing for user/host respponse
 		{
-			nn = TCPCharsAvailable(c->tcpc); //This had better be >= 2.
+			nn = ConnCharsAvail(conn); //This had better be >= 2.
 			if(nn < 2)
 				return;
 			nn = 2;
@@ -677,7 +677,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 		else if(conn->connectStage == csSOCKSSendingRequest)
 		{
 			//This is the reply to our connection request
-			nn = TCPCharsAvailable(c->tcpc); //This had better be >= 2.
+			nn = ConnCharsAvail(conn); //This had better be >= 2.
 			if(nn < 8)
 				return;
 			else if(nn>255)
@@ -764,7 +764,7 @@ pascal void processIdentd(CEPtr c, connectionPtr conn)
 	if(c->event==C_CharsAvailable)
 	{
 		nn=0;
-		TCPReceiveUpTo(c->tcpc, 10, readTimeout, (Ptr)&s[1], 250, &nn, &cr);
+		ConnGetUpTo(conn, 10, readTimeout, (Ptr)&s[1], 250, &nn, &cr);
 		while((nn>0) && ((s[nn]==10)||(s[nn]==13)))
 			nn--;
 		if(nn)
@@ -807,7 +807,7 @@ pascal void processServer(CEPtr c, connectionPtr conn)
 		{
 			nn=0;
 			//read to LF
-			TCPReceiveUpTo(c->tcpc, 10, readTimeout, (Ptr)&ls.data[1], maxLSlen-1, &nn, &cr);
+			ConnGetUpTo(conn, 10, readTimeout, (Ptr)&ls.data[1], maxLSlen-1, &nn, &cr);
 			
 			conn->dataIn += nn;
 			
@@ -832,7 +832,7 @@ pascal void processServer(CEPtr c, connectionPtr conn)
 				ServerCommands(&link->firstHalfOfIncoming, link);
 				link->firstHalfOfIncoming.len=0;
 			}
-		} while(++count && TCPCharsAvailable(c->tcpc));
+		} while(++count && ConnCharsAvail(conn));
 	}
 	else
 		ServerOK(c->event, link);
@@ -853,7 +853,7 @@ pascal void processPlugin(CEPtr c, connectionPtr conn)
 	{
 		conn->lastData=now;
 		nn=0;
-		TCPReceiveUpTo(c->tcpc, 10, readTimeout, (Ptr)&ls.data[1], maxLSlen-1, &nn, &cr);
+		ConnGetUpTo(conn, 10, readTimeout, (Ptr)&ls.data[1], maxLSlen-1, &nn, &cr);
 		ls.len=nn;
 		
 		conn->dataIn += nn;
@@ -999,7 +999,7 @@ pascal void processStale(CEPtr c, connectionPtr conn)
 		if(c->event==C_CharsAvailable)
 		{
 			do {
-				nn=TCPCharsAvailable(c->tcpc);
+				nn = ConnCharsAvail(conn);
 				if(!nn)
 					return;
 				if(nn > fm - 10000)

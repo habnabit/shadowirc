@@ -918,7 +918,7 @@ pascal void DCCOpen(connectionPtr *x)
 	}
 	else if(d->dccFlags == closed)
 	{
-		if(!IPGetMyIPAddr(&cc->ip) && !NewPassiveConnection(&cc->private_socket, 8192, 0, 0, 0))
+		if(!NetGetLocalIP(&cc->ip) && !ConnNewPassiveBlankListener(cc))
 		{
 			cc->port=ConnGetLocalPort(cc);
 			ulongstr(cc->ip, ipa);
@@ -1391,7 +1391,7 @@ pascal void DCCConnOpened(connectionPtr *cn)
 
 #pragma mark -
 
-static pascal void DCCGetLineChat(connectionPtr conn, TCPConnectionPtr tcpc)
+static pascal void DCCGetLineChat(connectionPtr conn, TCPConnectionPtr)
 {
 	int i;
 	long nn;
@@ -1401,7 +1401,7 @@ static pascal void DCCGetLineChat(connectionPtr conn, TCPConnectionPtr tcpc)
 	pDCCIncomingChatDataRec p;
 	
 	nn=0;
-	if(!TCPReceiveUpTo(tcpc, 10, readTimeout, (Ptr)&ls.data[1], 512, &nn, &b))
+	if(!ConnGetUpTo(conn, 10, readTimeout, (Ptr)&ls.data[1], 512, &nn, &b))
 	{
 		while((nn>0) && ((ls.data[nn]==10) || (ls.data[nn]==13)))
 			nn--;

@@ -504,9 +504,20 @@ pascal char ConnNewPassive(connectionPtr c)
 	return NewPassiveConnection(&c->private_socket, 8192, c->port, c->ip, 0)==0;
 }
 
+pascal char ConnNewPassiveBlankListener(connectionPtr c)
+{
+	return NewPassiveConnection(&c->private_socket, 8192, 0, 0, 0)==0;
+}
+
 pascal OSErr ConnGetData(connectionPtr conn, Ptr d, short len)
 {
 	return TCPReceiveChars(GetConnectionTCPC(conn->private_socket), d, len);
+}
+
+
+pascal OSErr ConnGetUpTo(connectionPtr conn, char term, long timeout, Ptr readPtr, long readSize, long *readPos, char *gotterm)
+{
+	return TCPReceiveUpTo(GetConnectionTCPC(conn->private_socket), term, timeout, readPtr, readSize, readPos, gotterm);
 }
 
 pascal long ConnCharsAvail(connectionPtr conn)
@@ -527,4 +538,9 @@ pascal OSErr ConnSend(connectionPtr conn, const void* writePtr, short writeCount
 pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host)
 {
 	return FindAddress(&conn->private_socket, host);
+}
+
+pascal OSErr NetGetLocalIP(unsigned long *ip)
+{
+	return IPGetMyIPAddr(ip);
 }
