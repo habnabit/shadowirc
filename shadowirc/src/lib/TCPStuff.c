@@ -609,10 +609,6 @@ TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short rem
  * Bind a listen socket with specified backlog
  */
 
-#ifndef PORTSTR_LEN
-    #define PORTSTR_LEN 8
-#endif
-
 TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog)
 {
         if((*sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -626,30 +622,30 @@ TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog)
                     return (T_Failed);
         } else {
 	    struct addrinfo hints, *res, *res_saved;
-	    char portstr[PORTSTR_LEN];
+	    char *portstr;
 	    
 	    memset(&hints, 0, sizeof(hints));
 	    hints.ai_family = PF_UNSPEC;
 	    hints.ai_flags = AI_PASSIVE;
 	    hints.ai_socktype = SOCK_STREAM;
-	    snprintf(portstr, PORTSTR_LEN, "%d", htons(localport));
-	    
+
+	    if (asprintf(&portstr, "%d", htons(localport)) == -1)
+		    return (T_Failed);
 	    getaddrinfo(NULL, portstr, &hints, &res);
-	    
+
 	    res_saved = res;
+	    free(portstr);
 	    
 	    while(res)
 	    {
-		    if ((bind(*sockfd, (struct sockaddr *)res->ai_addr, res->ai_addrlen)) < 0)
-			    if(res->ai_next != NULL)
+		    if ((bind(*sockfd, (struct sockaddr *)res->ai_addr, res->ai_addrlen)) < 0) {
+			    if(res->ai_next != NULL) {
 				    res = res->ai_next;
-			    else
-			    {
+			    } else {
 				    freeaddrinfo(res_saved);
 				    return (T_Failed);
 			    }
-		    else
-		    {
+		    } else {
 			    freeaddrinfo(res_saved);
 			    break;
 		    }
