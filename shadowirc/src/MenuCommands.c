@@ -192,8 +192,6 @@ char ToggleConsoleWindow()
 		}
 		else
 		{
-			if(!IsWindowVisible(consoleWin->w)) //not front and visible
-				ShowWindow(consoleWin->w);
 			WSelect(consoleWin->w);
 			return mainPrefs->consoleOpen = 1;
 		}
