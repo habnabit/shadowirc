@@ -53,7 +53,6 @@ static void MyWEFindWord(long offset, long *selStart, long *selEnd, WEReference 
 static OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBalloonAvailable, UInt32 inHelpType, ConstStr255Param inHelpItemString, const AEDesc* inSelection, UInt32* outUserSelectionType, SInt16* outMenuID, UInt16* outMenuItem);
 
 static char CMMW(MWPtr mw, Point where, char optCM);
-static char CMIW(Point where);
 static char CMPlugin(WindowPtr w, Point where);
 
 void CMSetCursor(char ctrlDown)
