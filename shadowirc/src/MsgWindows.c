@@ -772,11 +772,9 @@ pascal void MWNewPosition(Rect *windowSize)
 	short x;
 	short windowTopHeight, windowBotHeight;
 	short windowLeftWid, windowRightWid;
-	BitMap screenBits;
 	Rect sb;
 
-	GetQDGlobalsScreenBits(&screenBits);
-	sb = screenBits.bounds;
+	GetAvailableWindowPositioningBounds(GetGDevice(), &sb);
 	
 	if(consoleWin)
 	{
