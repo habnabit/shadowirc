@@ -933,8 +933,6 @@ long unused3[4];
 	char userlistScrollbarLeft;		//True if the scrollbar is on the left
 } prefsRec, *prefsPtr;
 
-#pragma mark еее Miscelaneous
-
 
 #pragma mark -
 #pragma mark еее ShadowIRC Data Record
@@ -984,6 +982,12 @@ enum pVersionCheckMessageReply {
 	pUndocumentedAPIReply = 0x42414421 //This reply is undocumented. Do not use it.
 };
 
+void pluginMain(ShadowIRCDataRecord* sidr);
+/*	Plugin Main Function
+	This function must be implemented by plugins. It is the plugin's main function.
+	Input:	sidr - The ShadowIRC Data Record structure as described above.
+	Output:	none
+*/
 
 #pragma mark еее Message Data structures
 /*			------------------------------------------------------------------------------------------
