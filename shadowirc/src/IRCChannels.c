@@ -497,6 +497,9 @@ static void UpdateTopicLength(WindowRef sheet, channelPtr ch)
 	GetControlByID(sheet, &topicOpsControlID, &topicOpsControl);
 	GetControlByID(sheet, &topicTextControlID, &topicTextControl);
 	
+	//Hack to keep from crashing in Jaguar. (GCByID() is returning null controls if esc is pressed.
+	theString = CFStringCreateWithCString(NULL, "", CFStringGetSystemEncoding());
+	
 	GetControlData(topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
 	
 	NumToString(CFStringGetLength(theString), st);	// CFStringGetLength() returns the number of UNICODE characters
@@ -551,11 +554,9 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 				case kHICommandOK:
 					GetControlData(topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
 					CFStringGetPascalString(theString, s1, sizeof(Str255), CFStringGetSystemEncoding());
-					if(s1[0])
-					{
-						LSStrCat4(&ls,"\pTOPIC ", ch->chName, "\p :", s1);
-						SendCommand(ch->link, &ls);
-					}
+					
+					LSStrCat4(&ls,"\pTOPIC ", ch->chName, "\p :", s1);
+					SendCommand(ch->link, &ls);
 		
 				case kHICommandCancel:
 					ChCloseTopicWindow(ch);
