@@ -239,6 +239,8 @@ pascal OSErr MWLogToFSp(MWPtr mw, const FSSpec *fs, long s0, long s1);
 pascal void MWLogToFile(MWPtr mw, long s0, long s1);
 pascal void MWStopLogging(MWPtr mw);
 pascal void MWStartLogging(MWPtr w);
+
+pascal void MWReposition(MWPtr win);
 #pragma internal off
 
 #undef CONST

@@ -648,6 +648,35 @@ pascal MWPtr MWFromWindow(WindowPtr w)
 	return 0;
 }
 
+//Record the change in the window position from a user drag
+pascal void MWReposition(MWPtr mw)
+{
+	Rect r;
+	pUIWindowMoveDataRec p;
+	WindowPtr win = mw->w;
+	
+	if(mw->winType == conWin)
+	{
+		r = WGetBBox(win);
+		if(r.bottom-r.top >= 64)
+			mainPrefs->consoleLoc = r;
+	}
+	else if(mw->winType==chanWin)
+	{
+		linkPrefsPtr lp = mw->link->linkPrefs;
+		
+		r=WGetBBox(win);
+		if(r.bottom-r.top >= 64)
+			lp->windowLoc[mw->channelWindowNumber] = r;
+	}
+	else if(mw->pluginRef)
+	{
+		p.w = mw->w;
+		p.newpos = WGetBBox(win);
+		runIndPlugin(mw->pluginRef, pUIWindowMoveMessage, &p);
+	}
+}
+
 pascal void MWSetDimen(MWPtr win, short left, short top, short width, short height)
 {
 	GrafPtr gp;

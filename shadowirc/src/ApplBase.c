@@ -646,8 +646,8 @@ static pascal char CheckMem(void)
 	}
 
 exitCheckMem:	
-	lastFmem=fm;
-	lastCheck=TickCount();
+	lastFmem = fm;
+	lastCheck = TickCount();
 	return purgedAnything;
 }
 
@@ -661,34 +661,13 @@ static pascal void UpdateWindowPosition(WindowPtr win)
 	{
 		r=WGetBBox(win);
 		if(r.bottom-r.top>32)
-			mainPrefs->inputLoc=r;
+			mainPrefs->inputLoc = r;
 	}
 	else
 	{
 		mw=MWFromWindow(win);
 		if(mw)
-		{
-			if(mw->winType == conWin)
-			{
-				r=WGetBBox(win);
-				if(r.bottom-r.top>=64)
-					mainPrefs->consoleLoc=r;
-			}
-			else if(mw->winType==chanWin)
-			{
-				linkPrefsPtr lp=mw->link->linkPrefs;
-				
-				r=WGetBBox(win);
-				if(r.bottom-r.top>=64)
-					lp->windowLoc[mw->channelWindowNumber]=r;
-			}
-			else if(mw->pluginRef)
-			{
-				p.w=mw->w;
-				p.newpos=WGetBBox(win);
-				runIndPlugin(mw->pluginRef, pUIWindowMoveMessage, &p);
-			}
-		}
+			MWReposition(mw);
 		else
 		{
 			pluginDlgInfoPtr pl = (pluginDlgInfoPtr)GetWRefCon(win);
