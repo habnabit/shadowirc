@@ -224,16 +224,16 @@ pascal char doQuit(LongString *reason)
 			else if(i == 1) //Else they chose save or not.
 				save = 1;
 		}
-		
-		if(save)
-			writeAllFiles();
-		
-		linkfor(link, firstLink)
-			if(link->serverStatus==S_CONN)
-				DoSignoff(link, reason);
-		
-		QuitRequest=1;
 	}
+		
+	if(save)
+		writeAllFiles();
+	
+	linkfor(link, firstLink)
+		if(link->serverStatus==S_CONN)
+			DoSignoff(link, reason);
+	
+	QuitRequest = 1;
 	
 	return QuitRequest;
 }
