@@ -1771,10 +1771,6 @@ static void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param ua
 		}
 	}
 	
-	//need to shrink file name if it's too long
-	if(des[0] > 31)
-		des[0] = 31;
-	
 	pstrcpy(uah, x->name);
 	if(revNum != -1)
 	{
