@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -39,7 +39,6 @@ extern const RGBColor white, black, VLtGrey, LtGrey, MedGrey, HalfGrey, MDkGrey,
 
 pascal ListHandle GetAppearanceListBoxHandle(DialogPtr theDialog, short itemNum);
 pascal void SetTextColor(short color);
-pascal void SetBackground(short color);
 
 pascal void DrawBorder(const Rect *rIn, long state, char draggable);
 

@@ -2390,12 +2390,6 @@ pascal void SetTextColor(short color);
 		Output:	none
 */
 
-pascal void SetBackground(short color);
-/*	Emlates SetThemeBackground() if Appearance is not present, or calls through if it is.
-		Input:	color - Appearance Manager theme pen
-		Output:	none
-*/
-
 pascal void DrawBorder(const Rect *r, long state, char draggable);
 /*	Draws a border.
 		Input:	r - Rect to draw in

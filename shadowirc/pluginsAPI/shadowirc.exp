@@ -81,7 +81,6 @@ _WGetBBox
 _StandardDialogFilter
 _MWPart
 _SetTextColor
-_SetBackground
 _DrawBorder
 _GetAppearanceListBoxHandle
 _CMAdd
