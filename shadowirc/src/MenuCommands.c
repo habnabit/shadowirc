@@ -789,7 +789,7 @@ pascal void MenuConnectionList(short item)
 	
 	if(item)
 	{
-		InitTCP();
+		ConnStartNetworking();
 		
 		link = firstLink;
 		while(--item)

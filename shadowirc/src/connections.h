@@ -193,6 +193,9 @@ pascal linkPtr GetLinkNum(int i);
 
 pascal void initLinks(void);
 
+pascal char ConnStartNetworking();
+pascal void ConnStopNetworking();
+
 pascal connectionPtr newConnection(short connType);
 pascal void newIRCConnection(linkPtr link);
 

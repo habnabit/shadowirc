@@ -351,6 +351,111 @@ pascal char IsLinkValid(linkPtr link)
 }
 
 #pragma internal on
+
+pascal char ConnStartNetworking()
+{
+	short i;
+	Str255 s;
+	
+	if(!allowConnections)
+	{
+		i=InitConnections();
+		if(!i)
+			allowConnections=1;
+		else
+		{
+			NumToString(i, s);
+			ParamText(s, "\p", "\p", "\p");
+			Alert(129, 0);
+			allowConnections = 0;
+		}
+	}
+	
+	return allowConnections;
+}
+
+static pascal void ConnFinishStaleConnections(void)
+{
+	connectionPtr conn, conn2;
+	int x=0, y=0, z=0;
+	
+	//Trash all non-stale connections
+	conn  = fConn;
+	while(conn)
+	{
+		x++;
+		conn2 = conn->next;
+		if(conn->connType < connSTALE)
+			deleteConnection(&conn);
+		else
+			y++;
+		conn = conn2;
+	}
+	
+	//Find irc connetions ith no channel windows
+	conn = fConn;
+	while(conn)
+	{
+		conn2 = conn->next;
+		if(conn->realConnType == connIRC)
+		{
+			linkPtr link = conn->link;
+			
+			if(!link->channelList) //no cative channels, kill the link now
+			{
+				deleteConnection(&conn);
+				z++;
+			}
+		}
+
+		conn=conn2; 
+	}
+	
+	if(fConn) //Now, if there are still stale connections left, let them time out.
+	{
+		long time = now;
+		
+		while(fConn) //while there's still a (stale) connection. Spin for _at most_ two seconds, and then ditch.
+		{
+			connectionEventRecord connEvt;
+			
+			if(GetConnectionEvent(&connEvt))
+			{
+				conn=findConnectionSock(connEvt.connection);
+				if(conn)
+				{
+					if(conn->connType == connSTALE)
+						processStale(&connEvt, conn);
+					else
+						deleteConnection(&conn);
+				}
+			}
+			
+			GetDateTime(&now);
+			conn  = fConn;
+			while(conn)
+			{
+				conn2 = conn->next;
+				if(conn->closeTime < now)
+					deleteConnection(&conn);
+				conn = conn2;
+			}
+			
+			if(now - time > 2) //too long. ditch.
+				break;
+		}
+	}
+}
+
+pascal void ConnStopNetworking()
+{
+	if(allowConnections)
+	{
+		ConnFinishStaleConnections();
+		FinishEverything();
+	}
+}
+
 pascal void ConnStale(connectionPtr conn)
 {
 	conn->realConnType = conn->connType;

@@ -229,7 +229,7 @@ pascal void ApplicationInit(void)
 	CheckPreferences();
 	DCCTypeInit();
 	
-	InitTCP();
+	ConnStartNetworking();
 
 	launchTime = idleTime = lastKey = lastInput = now;
 	ISOEncode=*GetResource('Tabl', 256);

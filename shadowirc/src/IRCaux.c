@@ -99,28 +99,6 @@ pascal void ConnectionMenuHilites(void)
 	}
 }
 
-pascal char InitTCP(void)
-{
-	short i;
-	Str255 s;
-	
-	if(!allowConnections)
-	{
-		i=InitConnections();
-		if(!i)
-			allowConnections=1;
-		else
-		{
-			NumToString(i, s);
-			ParamText(s, "\p", "\p", "\p");
-			Alert(129, 0);
-			allowConnections = 0;
-		}
-	}
-	
-	return allowConnections;
-}
-
 pascal void ServerOK(short status, linkPtr link)
 {
 	short a, n;

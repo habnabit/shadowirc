@@ -598,7 +598,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 				return;
 			nn = 2;
 
-			TCPReceiveChars(c->tcpc, send, nn);
+			ConnGetData(conn, (Ptr)send, nn);
 			conn->socksMethodVersion = send[0];
 			conn->socksMethod = send[1];
 			
@@ -649,7 +649,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 				return;
 			nn = 2;
 
-			TCPReceiveChars(c->tcpc, send, nn);
+			ConnGetData(conn, (Ptr)send, nn);
 			
 			if(send[1] == 0) //success!
 				SOCKSConnect(conn);
@@ -683,7 +683,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 			else if(nn>255)
 				nn = 255;
 			
-			TCPReceiveChars(c->tcpc, send, nn);
+			ConnGetData(conn, (Ptr)send, nn);
 			
 			//We don't need anything other than the error code, which is now in send[1].
 			/*
@@ -1005,7 +1005,7 @@ pascal void processStale(CEPtr c, connectionPtr conn)
 				if(nn > fm - 10000)
 					nn = fm-10000;
 				getbuf = NewPtr(nn);
-				TCPReceiveChars(c->tcpc, getbuf, nn);
+				ConnGetData(conn, getbuf, nn);
 				DisposePtr(getbuf);
 				if(debugOn)
 				{

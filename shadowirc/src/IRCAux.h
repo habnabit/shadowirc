@@ -43,7 +43,6 @@ pascal void ConnectionMenuSetup(void);
 pascal void ConnectionMenuHilites(void);
 
 #ifdef _connections
-pascal char InitTCP(void);
 pascal void StatusMsg(linkPtr link, short n);
 pascal char ValidPrefs(linkPtr link);
 pascal void ServerOK(short status, linkPtr link);
