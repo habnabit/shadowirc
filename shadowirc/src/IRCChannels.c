@@ -393,6 +393,11 @@ void ChCloseTopicWindow(channelPtr ch)
 
 #pragma mark -
 
+CFStringRef LSCreateCFStr(LongString *ls)
+{
+	return CFStringCreateWithBytes(NULL, &ls->data[1], ls->len, kCFStringEncodingMacRoman, false);
+}
+
 static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 {
 	ControlRef topicOpsControl = NULL;
@@ -421,9 +426,8 @@ static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 		NumToString(maxLen, st2);
 
 		LSParamString(&ls, GetIntStringPtr(spInfo, sTopicLength), st, st2, 0, 0);
-		LSMakeStr(ls);
-
-		theString = CFStringCreateWithPascalString(NULL, ls.data,kCFStringEncodingMacRoman);
+		
+		theString = LSCreateCFStr(&ls);
 		SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
 		CFRelease(theString);
 		DrawOneControl(topicOpsControl);
