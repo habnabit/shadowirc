@@ -418,10 +418,8 @@ static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 		LongString ls;
 		Str255 st, st2;
 		
-		GetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
-
-		CFStringGetPascalString(theString, st, sizeof(Str255), CFStringGetSystemEncoding());
-		twi->topicLen = st[0];
+		pstrcpy(twi->ch->topic, st);
+		twi->topicLen = twi->ch->topic[0];	/* this works but I don't much like it */
 		NumToString(st[0], st);
 		NumToString(maxLen, st2);
 
@@ -496,6 +494,34 @@ static void TopicWindowSet(WindowRef dlgWindow, channelPtr ch)
 	SetKeyboardFocus(dlgWindow, topicTextControl, kControlFocusNextPart);
 }
 
+static void UpdateTopicLength(WindowRef sheet, channelPtr ch)
+{
+	int maxLen = HTFindNumericDefault(ch->link->serverOptions, "\pTOPICLEN", 0);
+	ControlID topicOpsControlID = { kApplicationSignature, kSIRCTopicOpsControlID };
+	ControlID topicTextControlID = { kApplicationSignature, kSIRCTopicTextControlID };
+	ControlRef topicOpsControl = NULL, topicTextControl = NULL;
+	CFStringRef theString;
+	LongString ls;
+	Str255 st, st2;
+	
+	if (!maxLen) return;
+	GetControlByID(sheet, &topicOpsControlID, &topicOpsControl);
+	GetControlByID(sheet, &topicTextControlID, &topicTextControl);
+	
+	GetControlData(topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
+	
+	NumToString(CFStringGetLength(theString), st);	// CFStringGetLength() returns the number of UNICODE characters
+							// is this a fallacy?
+	NumToString(maxLen, st2);
+	
+	LSParamString(&ls, GetIntStringPtr(spInfo, sTopicLength), st, st2, 0, 0);
+	
+	theString = LSCreateCFStr(&ls);
+	SetControlData(topicOpsControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
+	CFRelease(theString);
+	DrawOneControl(topicOpsControl);
+}
+
 static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
@@ -558,6 +584,7 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 				result = CallNextEventHandler(myHandler, event);
 				if((result == noErr) && twi->hadOps)
 				{
+					UpdateTopicLength(sheet, ch);
 					SetWindowDefaultButton(sheet, topicOKControl);
 					result = noErr;
 				}
@@ -624,6 +651,8 @@ static void DoTopicWidget(mwWidgetPtr o)
 			ChTopicWindow(ch);
 	}
 }
+
+#pragma mark -
 
 void DoModeLWindow(channelPtr ch, LongString *ls)
 {
