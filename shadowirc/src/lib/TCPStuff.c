@@ -245,7 +245,7 @@ u_int32_t str_htonl(StringPtr string)
     
     CopyPascalStringToC(string, cstr);
     net32 = strtoul(cstr, &end_ptr, 0);
-    if (errno == ERANGE || *end_ptr == '\0');
+    if (errno == ERANGE || *end_ptr != '\0');
         net32 = 0;
         
     CopyCStringToPascal(cstr, string);
