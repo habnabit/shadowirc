@@ -151,7 +151,7 @@
 	};
 	F54C279D02152A0001A80061 = {
 		uiCtxt = {
-			sepNavWindowFrame = "{{193, 410}, {750, 502}}";
+			sepNavWindowFrame = "{{153, 4}, {595, 1174}}";
 		};
 	};
 	F54C279F02152A1B01A80061 = {
@@ -166,7 +166,7 @@
 	};
 	F552BEF80211030901A80061 = {
 		uiCtxt = {
-			sepNavWindowFrame = "{{314, 398}, {750, 502}}";
+			sepNavWindowFrame = "{{66, 46}, {674, 1132}}";
 		};
 	};
 	F552BEF90211030901A80061 = {
@@ -176,7 +176,7 @@
 	};
 	F552BEFA0211030901A80061 = {
 		uiCtxt = {
-			sepNavWindowFrame = "{{337, 377}, {750, 502}}";
+			sepNavWindowFrame = "{{191, 4}, {743, 1174}}";
 		};
 	};
 	F552BEFB0211030901A80061 = {
@@ -224,6 +224,11 @@
 			sepNavWindowFrame = "{{358, 305}, {706, 873}}";
 		};
 	};
+	F552BF0F0211030901A80061 = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{-6, 599}, {750, 502}}";
+		};
+	};
 	F552BF100211030901A80061 = {
 		uiCtxt = {
 			sepNavWindowFrame = "{{176, 524}, {750, 502}}";
@@ -232,6 +237,11 @@
 	F552BF110211030901A80061 = {
 		uiCtxt = {
 			sepNavWindowFrame = "{{222, 482}, {750, 502}}";
+		};
+	};
+	F552BF130211030901A80061 = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{52, 134}, {514, 1044}}";
 		};
 	};
 	F552BF150211030901A80061 = {
@@ -349,6 +359,11 @@
 			sepNavWindowFrame = "{{161, 554}, {730, 587}}";
 		};
 	};
+	F552BF300211030901A80061 = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{222, 482}, {750, 502}}";
+		};
+	};
 	F552BF320211030901A80061 = {
 		uiCtxt = {
 			sepNavWindowFrame = "{{84, 608}, {750, 502}}";
@@ -356,12 +371,17 @@
 	};
 	F552BF340211030901A80061 = {
 		uiCtxt = {
-			sepNavWindowFrame = "{{265, 391}, {762, 677}}";
+			sepNavWindowFrame = "{{38, 650}, {750, 502}}";
 		};
 	};
 	F552BF350211030901A80061 = {
 		uiCtxt = {
 			sepNavWindowFrame = "{{659, 83}, {750, 502}}";
+		};
+	};
+	F552BF360211030901A80061 = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{221, 435}, {726, 743}}";
 		};
 	};
 	F552BF370211030901A80061 = {
@@ -414,9 +434,14 @@
 			sepNavWindowFrame = "{{567, 167}, {750, 502}}";
 		};
 	};
+	F552BF440211030901A80061 = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{199, 503}, {750, 502}}";
+		};
+	};
 	F552BF460211030901A80061 = {
 		uiCtxt = {
-			sepNavWindowFrame = "{{613, 125}, {750, 502}}";
+			sepNavWindowFrame = "{{157, 659}, {750, 502}}";
 		};
 	};
 	F552BF4B0211030901A80061 = {
@@ -447,6 +472,16 @@
 	F552BF570211030901A80061 = {
 		uiCtxt = {
 			sepNavWindowFrame = "{{538, 263}, {650, 915}}";
+		};
+	};
+	F552BF580211030901A80061 = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{245, 461}, {750, 502}}";
+		};
+	};
+	F552BF590211030901A80061 = {
+		uiCtxt = {
+			sepNavWindowFrame = "{{130, 10}, {666, 1168}}";
 		};
 	};
 	F552BF5A0211030901A80061 = {

@@ -2,16 +2,16 @@
 
 resource 'vers' (1)
 {
-	0x1, 0x20, alpha, 0x01,
+	0x2, 0x00, alpha, 0x01,
 	0,
 	"",
-	"1.2d1"
+	"2.0a1"
 };
 
 resource 'vers' (2)
 {
-	0x1, 0x20, alpha, 0x01,
+	0x2, 0x00, alpha, 0x01,
 	0,
 	"",
-	"©Ê1996-2001 John Bafford"
+	"©Ê1996-2002 John Bafford"
 };
