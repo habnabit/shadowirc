@@ -1160,7 +1160,7 @@ static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short mod
 		{
 			case 1001: //channel liust
 				if(i==1) //console
-					HitWindowMenu(1);
+					ToggleConsoleWindow();
 				else if(i<dashPoint) //channel window
 					HitWindowMenu(i - 2 + windowsStart);
 				else //other window

@@ -199,6 +199,24 @@ static pascal void DoFind(char again)
 
 #pragma mark -
 
+char ToggleConsoleWindow()
+{
+		if(FrontNonFloater() == consoleWin->w && IsVisible(consoleWin->w))
+		{
+			WHide(consoleWin->w);
+			return mainPrefs->consoleOpen = 0;
+		}
+		else
+		{
+			if(!IsVisible(consoleWin->w)) //not front and visible
+				WShow(consoleWin->w);
+			WSelect(consoleWin->w);
+			return mainPrefs->consoleOpen = 1;
+		}
+}
+
+#pragma mark -
+
 void HitAppleURLMenu(short item)
 {
 	Str255 url;

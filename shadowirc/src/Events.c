@@ -359,18 +359,7 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 		
 		//Window Menu
 		case 'CONS':
-			if(FrontNonFloater() == consoleWin->w && IsVisible(consoleWin->w))
-			{
-				WHide(consoleWin->w);
-				mainPrefs->consoleOpen=0;
-			}
-			else
-			{
-				if(!IsVisible(consoleWin->w)) //not front and visible
-					WShow(consoleWin->w);
-				WSelect(consoleWin->w);
-				mainPrefs->consoleOpen=1;
-			}
+			ToggleConsoleWindow();
 			return noErr;
 		
 		case 'PWIN':
