@@ -860,12 +860,6 @@ static void ProcessApplicationPlugins()
 	}
 }
 
-/*
-		LSGetIntString(&ls, spError, sNoPluginsFolder);
-		LSGetIntString(&ls, spError, sPlugsFolderEmpty);
-								LSGetIntString(&ls, spError, sPlugsMemErr);
-*/
-
 inline void initSIDR(void)
 {
 	sidr.yourInfo=0; //If yourInfo == 0, there's nothing running
@@ -894,17 +888,8 @@ inline void initSIDR(void)
 	sidr.internetConfig = (Ptr)internetConfig;
 }
 
-/*
-			LSGetIntString(&ls, spError, spCantCreatPluginPrefsFldr);
-			LSGetIntString(&ls, spError, sPlugsPrefsFolderIsFile);
-*/
-
 pascal void makePlugsDB(void)
 {
-/*
-			LSGetIntString(&ls, spError, sNoPluginsFolder);
-			LSGetIntString(&ls, spError, sPlugsFldrIsFile);
-*/
 	initSIDR();
 	hmiList=(hmiListHand)NewHandleClear(sizeof(long));
 	ProcessApplicationPlugins();
