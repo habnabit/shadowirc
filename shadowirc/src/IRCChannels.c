@@ -1701,20 +1701,10 @@ MWPtr ChJoin(channelPtr ch)
 
 void DoJoinSelWin(MWPtr mw)
 {
-	if(mainPrefs->dontActivateNewWindowsIfInputlineText)
-	{
-		LongString ls;
-		inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
-		
-		IADGetText(iad, &ls);
-
-		if(!ls.len)
-			WSelect(mw->w);
-		else
-			ShowWindow(mw->w);
-	}
-	else
-		WSelect(mw->w);
+	ShowWindow(mw->w);
+	
+	if(!mainPrefs->dontActivateNewWindowsIfInputlineText || !IADGetText(ILGetInputDataFromMW(mw), NULL))
+		SelectWindow(mw->w);
 }
 
 MWPtr DoJoinQuery(ConstStr255Param q, linkPtr link)

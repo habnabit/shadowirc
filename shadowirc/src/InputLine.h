@@ -125,8 +125,8 @@ void StatusLineClick(Point where, short modifiers);
 
 void IADDispose(inputAreaDataPtr iad);
 
-char IADGetText(inputAreaDataPtr iad, LongString *ls);
-char IADSetText(inputAreaDataPtr iad, LongString *ls);
+long IADGetText(inputAreaDataPtr iad, LongString *ls);
+void IADSetText(inputAreaDataPtr iad, LongString *ls);
 
 void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish);
 void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish);

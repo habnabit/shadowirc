@@ -922,51 +922,42 @@ void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish)
 	WEGetSelection(start, finish, iad->il);
 }
 
-char IADSetText(inputAreaDataPtr iad, LongString *ls)
+void IADSetText(inputAreaDataPtr iad, LongString *ls)
 {
-	if(iad)
-	{
-		WEReference il = iad->il;
-		short i;
-		
-		while((i = LSPosChar(13, ls)) != 0)
-			LSDelete(ls, i, i);
-		
-		WEDeactivate(il);
-		WESetSelection(0, 0x7FFFFFFF, il);
-		WEDelete(il);
+	WEReference il = iad->il;
+	short i;
+	
+	while((i = LSPosChar(13, ls)) != 0)
+		LSDelete(ls, i, i);
+	
+	WEDeactivate(il);
+	WESetSelection(0, 0x7FFFFFFF, il);
+	WEDelete(il);
 
-		if(ls->len)
-			WEInsert(&ls->data[1], ls->len, 0, 0, il);
+	if(ls->len)
+		WEInsert(&ls->data[1], ls->len, 0, 0, il);
 
-		WESetSelection(0x7FFFFFFF, 0x7FFFFFFF, il);
-		WESelView(il);
-		WEActivate(il);
-		return true;
-	}
-	else
-		return false;
+	WESetSelection(0x7FFFFFFF, 0x7FFFFFFF, il);
+	WESelView(il);
+	WEActivate(il);
 }
 
-char IADGetText(inputAreaDataPtr iad, LongString *ls)
+long IADGetText(inputAreaDataPtr iad, LongString *ls)
 {
-	long i;
+	long textLen = WEGetTextLength(iad->il);
 	
-	if(iad)
+	if(ls)
 	{
-		i=WEGetTextLength(iad->il);
-		if(i>500)
-			i=500;
+		long tl = textLen;
 		
-		BlockMoveData(*WEGetText(iad->il), &ls->data[1], i);
-		ls->len=i;
-		return true;
+		if(tl > 500)
+			tl = 500;
+		
+		BlockMoveData(*WEGetText(iad->il), &ls->data[1], tl);
+		ls->len = tl;
 	}
-	else
-	{
-		ls->len = 0;
-		return false;
-	}
+	
+	return textLen;
 }
 
 #pragma mark -
