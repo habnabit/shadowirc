@@ -661,7 +661,7 @@ static void doMouseDown(EventRecord *e)
 			if(p!=ActiveNonFloatingWindow())
 			{
 				if(!WIsFloater(p))
-					WSelect(p);
+					SelectWindow(p);
 				
 				ich = 0;
 			}

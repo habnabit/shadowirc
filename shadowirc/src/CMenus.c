@@ -90,7 +90,7 @@ pascal char CMClick(WindowPtr w, const EventRecord *e)
 	if(stdCM || optCM)
 	{
 		if(!WIsFloater(w) && !IsWindowHilited(w))
-			WSelect(w);
+			SelectWindow(w);
 		
 		return DetermineCM(w, e->where, optCM);
 	}
