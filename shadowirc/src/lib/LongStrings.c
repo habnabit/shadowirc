@@ -339,38 +339,28 @@ pascal void LSCopyString(const LongString *ls, short firstpos, short len, String
 
 short LSPosCharInRange(int ch, const LongString *ls, short start, short length)
 {
-	//if the length is negative, adjust the start position appropriately.
-	// (this is a convenience feature.)
+	int cur, stop;
+	
+	//If the length is negative, we want the length characters preceeding start. (WHY?)
 	if(length < 0)
 	{
 		start += length; //remember, length is negative, so this is subtraction.
 		length = -length;
 	}
-
+	
 	//if the start index is outside the string's own bounds, or if the length is zero, bail with no work.
 	if(start > ls->len || start < 1 || length == 0)
 		return 0;
-
-	//if necessary, truncate the range to end with the string.
-	if(length > (ls->len - start))
-		length = ls->len - start;
-
-	const unsigned char  ch8 = ch; //8-bit form of ch.
-	const unsigned char *cur = &ls->data[start];
-
-	//we re-use start as the index currently being checked.
-	while(length)
-	{
-		cur++;
-		start++;
-		if(*cur == ch8)
-			break;
-		length--;
-	}
-
-	//if length is greater than 0, we found a match; return its index.
-	//if length <= 0, we did not find a match; return 0.
-	return length > 0 ? start : 0;
+	
+	stop = start + length - 1;
+	if(stop > ls->len)
+		stop = ls->len;
+	
+	for(cur = start; cur <= stop; cur++)
+		if(ls->data[cur] == ch)
+			return cur;
+	
+	return 0;
 }
 
 pascal short LSPosCustom(ConstStr255Param s, const LongString *ls, short start)
