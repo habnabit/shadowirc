@@ -19,15 +19,14 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-//#include <Appearance.h>
 #include <Carbon/Carbon.h>
 
 #include "userlist.h"
 #include "ULList.h"
 
-ShadowIRCDataRecord* sidr;
-prefsPtr mainPrefs;
-RGBColor *shadowircColors = 0;
+static ShadowIRCDataRecord* sidr;
+static prefsPtr mainPrefs;
+static RGBColor *shadowircColors = 0;
 
 static short prefsPanel;
 
@@ -881,12 +880,28 @@ static Boolean DBItemCompare(ControlRef browser, DataBrowserItemID itemOne, Data
 	return !pstrgt(s1, s2);
 }
 
+static void ULDoubleClick(ULI ul, UserListPtr u)
+{
+	LongString ls;
+	
+	if(ul && ul->ch && u)
+	{
+		LSConcatStrAndStr("\pWHOIS ", u->nick, &ls);
+		HandleCommand(ul->ch->link, &ls);
+	}
+}
+
 static void DBItemNotify(ControlRef browser, DataBrowserItemID item, DataBrowserItemNotification message)
 {
+	ULI ul;
+	long actualSize;
+	UserListPtr u = (UserListPtr)item;
+	
 	switch(message)
 	{
 		case kDataBrowserItemDoubleClicked:
-			
+			GetControlProperty(browser, kUserlistSignature, kUserlistSignature, sizeof(ULI), &actualSize, &ul);
+			ULDoubleClick(ul, u);
 			break;
 	}
 }
@@ -1027,6 +1042,7 @@ static ULI ULINew(WindowPtr w, long type)
 		SetDataBrowserTableViewNamedColumnWidth(ul->browser, 'host', ul->uwinSize.right - ul->nickListWidth);
 		
 		SetDataBrowserSelectionFlags(ul->browser, kDataBrowserDragSelect | kDataBrowserCmdTogglesSelection);
+		SetControlProperty(ul->browser, kUserlistSignature, kUserlistSignature, sizeof(ULI), &ul);
 	}
 	
 	GetPort(&gp);
@@ -1086,7 +1102,7 @@ static void ULIPaneDrawBorder(ULI ul, mwPanePtr o, char pressed)
 			state = kThemeStateInactive;
 		
 		DrawBorder(&r, state, true);
-		WValidRect(ul->uwin, &r);
+		ValidWindowRect(ul->uwin, &r);
 
 		//Draw border
 		r = o->drawArea;
@@ -1116,7 +1132,7 @@ static void ULIPaneDrawBorder(ULI ul, mwPanePtr o, char pressed)
 		LineTo(r.left, r.bottom);
 		LineTo(r.left, r.top);
 		LineTo(r.right, r.top);
-		WValidRect(ul->uwin, &r);
+		ValidWindowRect(ul->uwin, &r);
 /* еее */
 	}
 }
@@ -1226,7 +1242,7 @@ static void SULPaneClick(pMWPaneClickData *p)
 		
 		if((l = FindControl(p->e->where, ul->uwin, &c)) != 0)
 		{
-			//hit the databrowser
+			HandleControlClick(c, p->e->where, p->e->modifiers, NULL);
 		}
 		else
 		{
@@ -1284,7 +1300,7 @@ INLINE void SULPaneResize(pMWPaneResizeData *p)
 		else
 			ActivateControl(ul->browser);
 
-		SizeControl(ul->browser, 16, r.bottom - r.top);
+		SizeControl(ul->browser, r.right - r.left, r.bottom - r.top);
 		MoveControl(ul->browser, r.left, r.top);
 	}
 }

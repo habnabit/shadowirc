@@ -73,22 +73,13 @@ enum {
 	
 	kMinimumPaneWidth = kInWindowBorder, //= 20,
 	
-	kULMininumWidth = 64,
-	kULMinimumHeight = 64
+	kULMininumWidth = 80,
+	kULMinimumHeight = 80
 };
 
 enum {
 	kIdleNormal = 20,
 	kIdleFast = 4
 };
-
-extern ShadowIRCDataRecord* sidr;
-extern prefsPtr mainPrefs;
-extern RGBColor *shadowircColors;
-
-#define WInvalRect(w, r) InvalWindowRect(w, r)
-#define WInvalRgn(w, r) InvalWindowRgn(w, r)
-#define WValidRect(w, r) ValidWindowRect(w, r)
-#define WValidRgn(w, r) ValidWindowRgn(w, r)
 
 #endif
