@@ -335,17 +335,6 @@ static pascal char MWNavKey(EventModifiers modifiers, long message)
 	{
 		if(c == 30 || c==31)
 			MWPage(MWActive, (c==30) + (opt*2));
-		else if(c == 28 || c == 29)
-		{
-			 //special case for cmd-left/right for inputline, since the event will get eaten by the dontProcess in Key()
-			 WEReference il = ILGetWE();
-			 if(il)
-			 {
-				WEKey(c, modifiers, il);
-				WESelView(il);
-			 }
-			 else proc = 0;
-		}
 		else
 			proc=0;
 	}
