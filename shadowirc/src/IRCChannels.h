@@ -81,7 +81,4 @@ MWPtr DoJoinQuery(ConstStr255Param ch, linkPtr link);
 
 void InvalTarget(targetPtr targ);
 
-void CloseHelp(void);
-void ShowHelp(short helpID);
-
 #endif

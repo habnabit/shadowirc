@@ -60,7 +60,7 @@ inline void SetupUPPs(void);
 void ApplInit();
 void setVers(void);
 
-STRnPtr spFiles, spCM, spError, spInfo, spDCC, spHelp, spTopic, spAppleURL, spServices, spSOCKS, spServer, spFile, spWhois;
+STRnPtr spFiles, spCM, spError, spInfo, spDCC,  spTopic, spAppleURL, spServices, spSOCKS, spServer, spFile, spWhois;
 
 enum {
     kSIRCVersionInfoID = 3
@@ -118,7 +118,6 @@ void ApplicationInit(void)
 	spError=GetStrN(srError);
 	spInfo=GetStrN(srInfo);
 	spDCC=GetStrN(srDCC);
-	spHelp=GetStrN(srHelp);
 	spTopic=GetStrN(srTopic);
 	spAppleURL=GetStrN(srAppleURL);
 	spServices=GetStrN(srServices);

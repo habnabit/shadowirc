@@ -64,10 +64,7 @@ static void TopicWindowSet(WindowRef dlgWindow, channelPtr ch);
 
 target CurrentTarget = {0, 0, 0, 0, 1, 0, 0};
 
-static MWPtr hel=0;
-static short curHelpItem = 0;
-
-static CIconHandle giCMWidgetIcon[4], giHelpWidgetIcon[4], giLinkWidgetIcon[4];
+static CIconHandle giCMWidgetIcon[4], giLinkWidgetIcon[4];
 
 inline void linkWinAdd(MWPtr win, int i);
 inline int linkWinNull(linkPtr link);
@@ -150,10 +147,6 @@ enum iconIDs {
 	kiCMWidgetDisabled = 129,
 	kiCMWidgetDown = 130,
 	
-	kiHelpWidgetUp = 132,
-	kiHelpWidgetDisabled = 133,
-	kiHelpWidgetDown = 134,
-
 	kiLinkWidgetUp = 136,
 	kiLinkWidgetDisabled = 137,
 	kiLinkWidgetDown = 138
@@ -164,10 +157,6 @@ void GetIcons(void)
 	giCMWidgetIcon[kIconWidgetUp] = GetCIcon(kiCMWidgetUp);
 	giCMWidgetIcon[kIconWidgetDownDisabled] = giCMWidgetIcon[kIconWidgetDisabled] = GetCIcon(kiCMWidgetDisabled);
 	giCMWidgetIcon[kIconWidgetDown] = GetCIcon(kiCMWidgetDown);
-
-	giHelpWidgetIcon[kIconWidgetUp] = GetCIcon(kiHelpWidgetUp);
-	giHelpWidgetIcon[kIconWidgetDownDisabled] = giHelpWidgetIcon[kIconWidgetDisabled] = GetCIcon(kiHelpWidgetDisabled);
-	giHelpWidgetIcon[kIconWidgetDown] = GetCIcon(kiHelpWidgetDown);
 
 	giLinkWidgetIcon[kIconWidgetUp] = GetCIcon(kiLinkWidgetUp);
 	giLinkWidgetIcon[kIconWidgetDownDisabled] = giLinkWidgetIcon[kIconWidgetDisabled] = GetCIcon(kiLinkWidgetDisabled);
@@ -840,14 +829,6 @@ static void MWStatusLineClickInternal(mwWidgetPtr o, Point p)
 				StandardIconWidget(o, giCMWidgetIcon);
 			break;
 			
-		case mwHelpWidget:
-			LocalToGlobal(&p);
-
-			StandardIconWidget(o, &giHelpWidgetIcon[kIconWidgetDown]);
-			PopUpMenuSelect(menuHelpWidget, p.v, p.h, curHelpItem);
-			StandardIconWidget(o, giHelpWidgetIcon);
-			break;
-		
 		case mwLinkWidget:
 			ConnectionMenuHilites();
 			if(CurrentTarget.link)
@@ -1244,12 +1225,6 @@ static void DrawTopicWidget(mwWidgetPtr o, char winActive)
 			}
 			break;
 		
-		case helpWin:
-			DrawString(GetIntStringPtr(spTopic, sHelp));
-			TextFace(0);
-			DrawString(GetIntStringPtr(spHelp, curHelpItem));
-			break;
-		
 		case queryWin:
 			DrawString(GetIntStringPtr(spTopic, sQuery));
 			if(mw->link)
@@ -1317,10 +1292,6 @@ static void MWWidgetInternalDraw(mwWidgetPtr o, char winActive)
 		
 		case mwCMWidget:
 			StandardIconWidget(o, giCMWidgetIcon);
-			break;
-		
-		case mwHelpWidget:
-			StandardIconWidget(o, giHelpWidgetIcon);
 			break;
 		
 		case mwLinkWidget:
@@ -1685,10 +1656,6 @@ void MWPart(MWPtr mw)
 				MWDelete(mw);
 				break;
 			
-			case helpWin:
-				CloseHelp();
-				break;
-			
 			case dccWin:
 				DCCWindowClose(mw);
 				break;
@@ -1707,70 +1674,4 @@ void MWPart(MWPtr mw)
 	
 	if(!GetActiveMW())
 		InvalTarget(&CurrentTarget);
-}
-
-#pragma mark -
-
-void CloseHelp(void)
-{
-	MWDelete(hel);
-	hel=0;
-	curHelpItem = 0;
-}
-
-void ShowHelp(short helpID)
-{
-	Handle ht, hs;
-	pHelpMenuData p;
-	Str255 title;
-	
-	if(!hel)
-	{
-		hel=MWNew("\pHelp", helpWin, 0, 0);
-		if(!hel)
-			return;
-		MWNewWidget(hel, mwHelpWidget, mwForceLeft, 17);
-	}
-	
-	if(helpID != curHelpItem)
-	{
-		curHelpItem = helpID;
-		
-		if(helpID >= (normHelpMenuItems - defaultHelpItems)) //plugin text
-		{
-			helpID -= defaultHelpItems;
-			p.reference = helpID;
-			p.text = p.style = 0;
-			runIndPlugin((**hmiList).list[helpID].pluginRef, pHelpMenuMessage, &p);
-			ht = p.text;
-			hs = p.style;
-			
-			pstrcpy((**hmiList).list[helpID].name, title);
-		}
-		else //my text
-		{
-			ht=GetResource('TEXT', 127 + helpID);
-			hs=GetResource('styl', 127 + helpID);
-			
-			GetIntString(title, spHelp, helpID);
-		}
-		if(ht && hs)
-		{
-			pstrcat("\pHelp: ", title, title);
-			SetWTitle(hel->w, title);
-			
-			WEDeactivate(hel->we);
-			WESetSelection(0, 0x7FFFFFFF, hel->we);
-			HLock(ht);
-			HLock(hs);
-			WEInsert(*ht, GetHandleSize(ht), (StScrpHandle)hs, 0, hel->we);
-			WESetSelection(0, 0, hel->we);
-			ReleaseResource(ht);
-			ReleaseResource(hs);
-			WEActivate(hel->we);
-		}
-	}
-
-	WSelect(hel->w);
-	DrawMWinStatus(hel);
 }

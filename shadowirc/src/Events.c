@@ -450,11 +450,6 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 			ShortcutsMenu(hiCommand.menu.menuItemIndex);
 			return noErr;
 		
-		//Help Menu
-		case 'HWIN':
-			ShowHelp(hiCommand.menu.menuItemIndex - defaultHelpItems);
-			return noErr;
-		
 		//Apple URL Menu
 		case 'AURL':
 			HitAppleURLMenu(hiCommand.menu.menuItemIndex);

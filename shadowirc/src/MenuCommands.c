@@ -55,7 +55,6 @@ static pascal void DoFind(char again);
 static pascal void HitFontsMenu(short item);
 
 void FontsMenuInit(void);
-static void HelpMenuInit(void);
 
 static pascal long FindText(Handle t, long start, Str255 searchFor, char caseSen, char reverse)
 {
@@ -670,34 +669,6 @@ void FontsMenuInit(void)
 	}
 }
 
-static void HelpMenuInit(void)
-{
-/*
-	OSErr err;
-	short x, num;
-	ConstStringPtr s;
-	
-	menuHelpWidget = NewMenu(mHelpWidget, "\p");
-	if(!err)
-	{
-		defaultHelpItems = CountMenuItems(gHelpMenu);
-		num = *(short*)spHelp;
-		if(num>0)
-			for(x=1;x<=num;x++)
-			{
-				s = GetIntStringPtr(spHelp, x);
-				AppendMenu(gHelpMenu, s);
-				SetMenuItemCommandID(gHelpMenu, x, 'HWIN');
-				AppendMenu(menuHelpWidget, s);
-				SetMenuItemCommandID(menuHelpWidget, x, 'HWIN');
-			}
-	}
-	
-	normHelpMenuItems = CountMenuItems(gHelpMenu)+2;
-	InsertMenu(menuHelpWidget, -1);
-*/
-}
-
 void ConnectionMenuInit(void)
 {
 	short x, y;
@@ -790,9 +761,6 @@ pascal void MenuInit(void)
 	ShortcutsMenuInit(gShortcutsMenu);
 	gWindowMenu = GetMenuHandle(windowMenu);
 	
-	gHelpMenu = GetMenuHandle(helpMenu);
-	HelpMenuInit();
-
 	if(hasAquaMenuMgr)
 	{
 		MenuRef menu;

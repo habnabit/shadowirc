@@ -217,14 +217,11 @@ enum menuList {
 	shortcutsMenu = 261,
 	commandsMenu = 262,
 	fontsMenu = 263,
-	helpMenu = 264,
 	
 	ConnectionListMenu = 205,
 	SignoffConnectionListMenu = 206,
 	SelectConnectionListMenu = 207,
 	AppleURLMenu = 208,
-	
-	mHelpWidget = 202
 };
 
 enum {
@@ -271,8 +268,6 @@ extern TableChars ISOEncode, ISODecode;
 extern char hasAquaMenuMgr;
 
 extern MenuHandle menuConnectionList, menuSignoffConnectionList, menuSelectConnectionList;
-extern MenuHandle menuHelpWidget, gHelpMenu;
-extern short defaultHelpItems, normHelpMenuItems;
 
 extern ModalFilterUPP StdDlgFilter;
 

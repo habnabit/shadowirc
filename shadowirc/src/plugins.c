@@ -348,6 +348,7 @@ pascal short IPCRegister(FourCharCode IPCType, long version, long data)
 
 pascal short HMIAdd(ConstStr63Param name)
 {
+/*
 	int i;
 	
 	if(name[0])
@@ -369,6 +370,7 @@ pascal short HMIAdd(ConstStr63Param name)
 		return i;
 	}
 	else
+*/
 		return -1;
 }
 

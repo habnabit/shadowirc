@@ -278,7 +278,6 @@ resource 'STR#' (260, "Topic Widget", locked, preload)
 {
 	{
 		"Console",
-		"Help: ",
 		"Query",
 		"DCC Chat",
 		"Inactive DCC Chat",
@@ -319,15 +318,5 @@ resource 'STR#' (263, "WHOIS Strings", locked, preload)
 		"^0 is on IRC via ^1 (^2)",
 		"^0 was on IRC via ^1 (^2)",
 		"^0 has been idle for ^1"
-	};
-};
-
-resource 'STR#' (259, "Help Menu Items", locked, preload)
-{
-	{
-		"Credits",
-		"Command Reference",
-		"Colors",
-		"Manual"
 	};
 };

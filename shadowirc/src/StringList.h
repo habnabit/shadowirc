@@ -27,7 +27,7 @@ typedef struct STRnList {
 	const unsigned char list[1];
 } STRnList, *STRnPtr, **STRnHand;
 
-extern STRnPtr spFiles, spCM, spError, spInfo, spDCC, spHelp, spTopic, spAppleURL, spServices, spSOCKS, spServer, spFile, spWhois;
+extern STRnPtr spFiles, spCM, spError, spInfo, spDCC, spTopic, spAppleURL, spServices, spSOCKS, spServer, spFile, spWhois;
 
 enum stringResources {
 	srAboutBox = 128,
@@ -41,7 +41,6 @@ enum stringResources {
 	srError = 256,
 	srInfo = 257,
 	srDCC = 258,
-	srHelp = 259,
 	srTopic = 260,
 	srAppleURL = 261,
 	srFile = 262,
@@ -153,7 +152,6 @@ enum InfoStrings {
 
 enum topicStrings {
 	sConsole = 1,
-	sHelp,
 	sQuery,
 	sDCCChat,
 	sInactiveDCCChat,

@@ -45,9 +45,6 @@ TableChars ISOEncode, ISODecode;
 char hasAquaMenuMgr;
 
 MenuHandle menuConnectionList, menuSignoffConnectionList, menuSelectConnectionList;
-MenuHandle menuHelpWidget, gHelpMenu;
-
-short defaultHelpItems = 0, normHelpMenuItems = 0;
 
 int wLastServiceItem = wFirstServiceItem - 1;
 
