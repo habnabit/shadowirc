@@ -10,13 +10,15 @@
 		<string>58 647 450 44 0 0 1024 746 </string>
 	</dict>
 	<key>IBFramework Version</key>
-	<string>248.0</string>
+	<string>219.0</string>
+	<key>IBMainMenuLocation</key>
+	<string>222 159 450 44 0 0 1600 1178 </string>
 	<key>IBOpenObjects</key>
 	<array>
 		<integer>203</integer>
 	</array>
 	<key>IBSystem Version</key>
-	<string>5P48</string>
+	<string>5Q45</string>
 	<key>targetFramework</key>
 	<string>IBCarbonFramework</string>
 </dict>

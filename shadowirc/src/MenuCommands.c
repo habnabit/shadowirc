@@ -978,7 +978,6 @@ void FontsMenuInit(void)
 
 pascal void MenuInit(void)
 {
-	MenuHandle m;
 	IBNibRef mainNibRef;
 
 	if((CreateNibReference(CFSTR("main"), &mainNibRef) == noErr) && (SetMenuBarFromNib(mainNibRef, CFSTR("MenuBar")) == noErr))
@@ -992,7 +991,7 @@ pascal void MenuInit(void)
 		ExitToShell();
 	}
 
-	gAppleMenu = m = GetMenuHandle(appleMenu);
+	gAppleMenu = GetMenuHandle(appleMenu);
 	gEditMenu = GetMenuHandle(EditMenu);
 	gFileMenu = GetMenuHandle(FileMenu);
 	FontsMenuInit();
@@ -1003,12 +1002,5 @@ pascal void MenuInit(void)
 	{
 		// Enable the Application menu Preferences... item
 		EnableMenuCommand(NULL, kHICommandPreferences);
-
-		// Delete the Edit menu Preferences... item
-		DeleteMenuItem(gEditMenu, 12); // Preferences... item
-		DeleteMenuItem(gEditMenu, 11); // Separator above Preferences item
-
-		// Delete the Quit item from File since it's under the Application menu
-		DeleteMenuItem(gFileMenu, 9); // Quit menu item
 	}
 }

@@ -4,7 +4,7 @@
   <object name="rootObject" class="NSCustomObject" id="1">
     <string name="customClass">NSApplication</string>
   </object>
-  <array count="122" name="allObjects">
+  <array count="119" name="allObjects">
     <object class="IBCarbonWindow" id="166">
       <string name="windowRect">188 219 332 579 </string>
       <string name="title">Splash Screen</string>
@@ -121,7 +121,7 @@
       <string name="name">_NSAppleMenu</string>
     </object>
     <object class="IBCarbonMenu" id="203">
-      <string name="title">MenuBar</string>
+      <string name="title">main</string>
       <int name="menuID">256</int>
       <array count="7" name="items">
         <object class="IBCarbonMenuItem" id="208">
@@ -133,7 +133,7 @@
           <object name="submenu" class="IBCarbonMenu" id="214">
             <string name="title">File</string>
             <int name="menuID">257</int>
-            <array count="9" name="items">
+            <array count="8" name="items">
               <object class="IBCarbonMenuItem" id="217">
                 <boolean name="dynamic">TRUE</boolean>
                 <string name="title">Open Connection</string>
@@ -162,11 +162,6 @@
               <object class="IBCarbonMenuItem" id="234">
                 <string name="title">Close Connection</string>
               </object>
-              <object class="IBCarbonMenuItem" id="235">
-                <string name="title">Quit</string>
-                <string name="keyEquivalent">q</string>
-                <ostype name="command">quit</ostype>
-              </object>
             </array>
           </object>
         </object>
@@ -175,7 +170,7 @@
           <object name="submenu" class="IBCarbonMenu" id="210">
             <string name="title">Edit</string>
             <int name="menuID">258</int>
-            <array count="12" name="items">
+            <array count="10" name="items">
               <reference idRef="201"/>
               <object class="IBCarbonMenuItem" id="204">
                 <boolean name="separator">TRUE</boolean>
@@ -195,13 +190,6 @@
               <object class="IBCarbonMenuItem" id="238">
                 <string name="title">Find Again</string>
                 <string name="keyEquivalent">g</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="239">
-                <boolean name="separator">TRUE</boolean>
-              </object>
-              <object class="IBCarbonMenuItem" id="240">
-                <string name="title">Preferences…</string>
-                <string name="keyEquivalent">=</string>
               </object>
             </array>
           </object>
@@ -544,12 +532,9 @@
     <reference idRef="232"/>
     <reference idRef="233"/>
     <reference idRef="234"/>
-    <reference idRef="235"/>
     <reference idRef="236"/>
     <reference idRef="237"/>
     <reference idRef="238"/>
-    <reference idRef="239"/>
-    <reference idRef="240"/>
     <reference idRef="248"/>
     <reference idRef="249"/>
     <reference idRef="250"/>
@@ -720,7 +705,7 @@
     <reference idRef="353"/>
     <reference idRef="355"/>
   </array>
-  <array count="122" name="allParents">
+  <array count="119" name="allParents">
     <reference idRef="1"/>
     <reference idRef="166"/>
     <reference idRef="167"/>
@@ -755,9 +740,6 @@
     <reference idRef="214"/>
     <reference idRef="214"/>
     <reference idRef="214"/>
-    <reference idRef="214"/>
-    <reference idRef="210"/>
-    <reference idRef="210"/>
     <reference idRef="210"/>
     <reference idRef="210"/>
     <reference idRef="210"/>
