@@ -614,7 +614,7 @@ pascal void displayTooOldMessage(void)
 {
 	LongString ls;
 
-	LSStrLS("\pThe popups plugin requires ShadowIRC 1.1 or later.", &ls);
+	LSStrLS("\pThe popups plugin requires ShadowIRC 2.0 or later.", &ls);
 	SMPrefixIrcleColor(&ls, dsConsole, '2');
 }
 
@@ -628,7 +628,7 @@ pascal void main(ShadowIRCDataRecord* sidrIN)
 			sidr=sidrIN;
 
 			l=((pVersionCheckDataPtr)sidrIN->messageData)->version;
-			if(l<0x0101000b) //we must have ShadowIRC 1.1d11 or later.
+			if(l < 0x0200000E) //we must have ShadowIRC 2.0a14 or later.
 			{
 				displayTooOldMessage();
 				((pVersionCheckDataPtr)sidrIN->messageData)->version = pVersionShadowIRCTooOld;
