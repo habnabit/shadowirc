@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -53,8 +53,6 @@ char hasNav=0;
 char hasAppearance11 = 0;
 char hasWM11 = 0;
 char hasFloatingWindows = 0;
-
-char hasDrag=0;
 
 MenuHandle menuConnectionList, menuSignoffConnectionList;
 MenuHandle menuHelpWidget, helpMenu;

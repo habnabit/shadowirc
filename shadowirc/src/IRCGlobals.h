@@ -276,7 +276,7 @@ extern char inBackground;
 
 extern TableChars ISOEncode, ISODecode;
 
-extern char hasCM, hasDrag;
+extern char hasCM;
 extern char hasSpeech;
 
 extern char gTalkCityPlug;

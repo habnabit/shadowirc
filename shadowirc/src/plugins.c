@@ -839,7 +839,7 @@ inline void initSIDR(void)
 	sidr.reserved = sidr.reserved2 = sidr.reserved3 = 1;
 	sidr.hasCM=hasCM;
 	sidr.shasAppearance11 = hasAppearance11;
-	sidr.hasDrag = hasDrag;
+	sidr.hasDrag = 1;
 	sidr.shasWM11 = hasWM11;
 	sidr.connections=&fConn;
 	sidr.allowConnections=&allowConnections;

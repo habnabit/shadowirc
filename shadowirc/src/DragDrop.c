@@ -762,31 +762,18 @@ static pascal OSErr PreDrag(DragReference drag, WEReference we)
 
 pascal void InitDrag(void)
 {
-	long tempResult;
+	void* l = 0;
+	sPreTrackerUPP = NewWEPreTrackDragProc(PreDrag);
 	
-	if(!Gestalt(gestaltDragMgrAttr, &tempResult))
-	{
-		hasDrag = tempResult & (1<<gestaltDragMgrPresent);
-	
-		if(hasDrag)
-		{
-			void* l = 0;
-			sPreTrackerUPP = NewWEPreTrackDragProc(PreDrag);
-			
-			//Install Handlers
-			sMyTrackingHandlerUPP = NewDragTrackingHandlerProc(MyTrackingHandler);
-			sMyReceiveHandlerUPP = NewDragReceiveHandlerProc(MyReceiveHandler);
-			InstallTrackingHandler(sMyTrackingHandlerUPP, 0, l);
-			InstallReceiveHandler(sMyReceiveHandlerUPP, 0, l);
-		}
-	}
+	//Install Handlers
+	sMyTrackingHandlerUPP = NewDragTrackingHandlerUPP(MyTrackingHandler);
+	sMyReceiveHandlerUPP = NewDragReceiveHandlerUPP(MyReceiveHandler);
+	InstallTrackingHandler(sMyTrackingHandlerUPP, 0, l);
+	InstallReceiveHandler(sMyReceiveHandlerUPP, 0, l);
 }
 
 pascal void RemoveDragHandlers(void)
 {
-	if(hasDrag)
-	{
-		RemoveTrackingHandler(sMyTrackingHandlerUPP, 0);
-		RemoveReceiveHandler(sMyReceiveHandlerUPP, 0);
-	}
+	RemoveTrackingHandler(sMyTrackingHandlerUPP, 0);
+	RemoveReceiveHandler(sMyReceiveHandlerUPP, 0);
 }
