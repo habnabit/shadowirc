@@ -1654,6 +1654,7 @@ typedef struct pConnectionData {
 	connectionPtr conn;	//The connection
 	char event;				//The event. see enum connectionStatus
 	char sendEvent;		//If true, the event is the result of a ConnPut*()
+	size_t abytes;			//Number of bytes waiting to be read
 	LongString *data;		//If event==C_CharsAvailable, and this is a text connection, ptr to data recieved.
 } pConnectionData, *pConnectionDataPtr, 
 	pTextConnectionData, *pTextConnectionDataPtr, pDataConnectionData, *pDataConnectionDataPtr;

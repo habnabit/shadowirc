@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -1031,19 +1031,18 @@ void processServer(CEPtr c, connectionPtr conn)
 void processPlugin(CEPtr c, connectionPtr conn)
 {
 	long nn;
-	size_t abytes;
 	LongString ls;
 	pConnectionData p;
 	
 	p.conn = conn;
 	p.event = c->event;
-	abytes = c->value;
+	p.abytes = c->value;
 	p.sendEvent = false;
 	
 	if(c->event == C_CharsAvailable && conn->textOrBinary)
 	{
 		conn->lastData=now;
-		nn = ConnGetUntil(conn, (Ptr)&ls.data[1], '\n', MIN(maxLSlen-1, abytes));
+		nn = ConnGetUntil(conn, (Ptr)&ls.data[1], '\n', MIN(maxLSlen-1, p.abytes));
 		ls.len=nn;
 		
 		if(debugOn)
