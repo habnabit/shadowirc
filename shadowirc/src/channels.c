@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -28,13 +28,27 @@
 #include "utils.h"
 #include "Inline.h"
 #include "plugins.h"
+#include "IRCSFeatures.h"
 
-char IsChannel(ConstStringPtr s)
+char IsChannel(linkPtr link, ConstStringPtr s)
 {
-	if((s[0]!=0) && ((s[1]=='#') || (s[1]=='&') || (s[1]=='+')))
-		return true;
-	else
+	StringPtr chTypes;
+	int x;
+	
+	//false if empty string
+	if(!s[0])
 		return false;
+	
+	if(link && link->serverFeatures && link->serverFeatures->chanTypes)
+		chTypes = link->serverFeatures->chanTypes;
+	else
+		chTypes = "\p#&";
+	
+	for(x = 1; x <= chTypes[0]; x++)
+		if(s[1] == chTypes[x])
+			return true;
+	
+	return false;
 }
 
 static void ULKillAllUsers(channelPtr channel);
@@ -158,7 +172,7 @@ pascal channelPtr ChFind(ConstStr255Param name, linkPtr link)
 {
 	channelPtr ch;
 
-	if(link && IsChannel(name))
+	if(link && IsChannel(link, name))
 		linkfor(ch, link->channelList)
 			if(pstrcasecmp(name, ch->chName))
 				return ch;

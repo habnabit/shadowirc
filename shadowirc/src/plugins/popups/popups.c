@@ -1,6 +1,6 @@
 /*
 	Popups - ShadowIRC plugin for context-based menus in Message Windows
-	Copyright (C) 1998-2003 John Bafford
+	Copyright (C) 1998-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -383,7 +383,7 @@ inline void MakeCMMenu(pCMPopupsDataPtr d)
 		channelPtr ch = MWGetChannel(d->mw);
 		UserListPtr user;
 		char oper = isOper((linkPtr)d->mw->link);
-		char channel = IsChannel(d->theWord);
+		char channel = IsChannel(ch->link, d->theWord);
 		char ip = isIPNumber(d->theWord);
 		char host = pos('.', d->theWord)>=1;
 		char op;

@@ -1,6 +1,6 @@
 /*	ShadowIRC Plugins Header File
-		Version 2.0a13-preliminary
-		© John Bafford 1997-2004. All Rights Reserved.
+		Version 2.0a14-preliminary
+		© John Bafford 1997-2005. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
 		
@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x0200000D
+#define _ShadowIRC_API_Version_ 0x0200000E
 
 #include <Carbon/Carbon.h>
 #include <netinet/in.h>
@@ -2644,9 +2644,10 @@ MWPtr GetFrontMW(void);
 		------------------------------------------------------------------------------------------
 */
 
-pascal char IsChannel(ConstStr255Param s);
+char IsChannel(linkPtr link, ConstStr255Param s);
 /*	Returns true if the string is a channel. False if not.
-		Input:	s - Pascal string
+		Input:	link - the link which is being tested
+				s - Pascal string
 		Output:	return value - 1 if s is a channel. 0 if not.
 */
 
@@ -2656,9 +2657,10 @@ pascal char IsDCCName(ConstStr255Param s);
 		Output:	return value: true if dcc window name, false if not.
 */
 
-pascal void MakeChannel(Str255 s);
+void MakeChannel(linkPtr link, Str255 s);
 /*	Makes the string a channel by adding '#' if necessary.
-		Input:	s - Pascal string
+		Input:	link - the link which is being tested
+				s - Pascal string
 		Output: s - Pascal string
 */
 

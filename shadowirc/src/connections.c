@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -101,8 +101,9 @@ static void InitLink(linkPtr l, linkPrefsPtr lp, int linkNum)
 	l->awayString = 0;
 	l->channelList = 0;
 	
-	l->serverOptions = 0;
 	l->connectStage=csNil;
+	
+	l->serverFeatures = NULL;
 	
 	pstrcpy(l->linkPrefs->nick, l->CurrentNick);
 }

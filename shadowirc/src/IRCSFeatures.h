@@ -19,27 +19,22 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#ifndef _IRCAux
-#define _IRCAux
+typedef struct IRCSFeatures {
+	int topicLength;
+	int kickLength;
+	int awayLength;
+	int nickLength;
+	int numModes;
+	int maxChannels;
+	int maxBans;
+	
+	StringPtr chanTypes;
+	
+	char hasWallchops;
+} IRCSFeatures, *IRCSFeaturesPtr;
 
-void MakeChannel(linkPtr link, StringPtr s);
+void SFDestroy(IRCSFeaturesPtr sf);
+IRCSFeaturesPtr SFNew(void);
 
-#ifdef _connections
-pascal void putServer(linkPtr link, LongString *ls);
-pascal char OpenConnection(linkPtr link);
-
-
-pascal void ConnPut(connectionPtr *conn, const void* p, long len);
-pascal void ConnPutText(connectionPtr *conn, void* p, long len);
-pascal void ConnPutLS(connectionPtr *conn, LongString *ls);
-
-pascal void StatusMsg(linkPtr link, short n);
-pascal char ValidPrefs(linkPtr link);
-pascal void ServerOK(short status, linkPtr link);
-int connection2(connectionPtr conn);
-pascal void LinkSuccessfulConnection(linkPtr link, char reg);
-void LinkSetStage(linkPtr link, short stage);
-void DisplayLookupResult(connectionPtr conn);
-#endif
-
-#endif
+char SFSetFeature(IRCSFeaturesPtr sf, StringPtr name, void* data);
+char SFDeleteFeature(IRCSFeaturesPtr sf, StringPtr name);

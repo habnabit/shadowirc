@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -167,9 +167,9 @@ pascal void putServer(linkPtr link, LongString *ls)
 		ConnPutLS(&link->conn, ls);
 }
 
-pascal void MakeChannel(StringPtr s)
+void MakeChannel(linkPtr link, StringPtr s)
 {
-	if(!IsChannel(s))
+	if(!IsChannel(link, s))
 	{
 		if(s[0]>254)
 			s[0]--;

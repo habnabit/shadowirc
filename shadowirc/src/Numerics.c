@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -35,6 +35,7 @@
 #include "Inline.h"
 #include "IRCNotify.h"
 #include "TextManip.h"
+#include "IRCSFeatures.h"
 
 static void UpdateUserInfo(linkPtr link, ConstStr63Param nick, ConstStr255Param userhost, char isOper, char isAway);
 
@@ -61,7 +62,7 @@ static void AttemptNickRegainNickChange(linkPtr link, ConstStringPtr cantUse)
 
 
 inline void n302userhost(linkPtr link, LongString *ls);
-inline void n353names(LongString *rest, linkPtr link);
+static void n353names(LongString *rest, linkPtr link);
 inline void n433nickInUse(linkPtr link, LongString *rest);
 
 /*
@@ -73,16 +74,18 @@ inline void n433nickInUse(linkPtr link, LongString *rest);
 		TOPICLEN=160
 		MODES=6
 		WALLCHOPS
+		CHANTYPES=+#&
+	
+	Processed now, but not used:
+		KICKLEN=160
+		AWAYLEN=160
+		NICKLEN=9
+		MAXCHANNELS=10
+		MAXBANS=30
 	
 	Use later:
 		WHOX WALLVOICES USERIP CPRIVMSG CNOTICE MAP
 		SILENCE=15
-		MAXCHANNELS=10
-		MAXBANS=30
-		NICKLEN=9
-		KICKLEN=160
-		AWAYLEN=160
-		CHANTYPES=+#&
 		PREFIX=(ov)@+
 		CHANMODES=b,k,l,imnpst
 		CHARSET=UTF=8
@@ -100,23 +103,6 @@ inline void n433nickInUse(linkPtr link, LongString *rest);
 			c = mode changes a setting. (has param only when set)
 			d = mode changes a setting. (never has param)
 */
-
-static HTPtr ServerOptionsDefaults = NULL;
-
-static HTPtr DefaultServerOptions(void)
-{
-	if(!ServerOptionsDefaults)
-	{
-		HTPtr dso = HTCreate(DEFAULT_HASHSIZE);
-		
-		HTAdd(dso, "\pCHANTYPES", "\p#&", htTypeString);
-		HTAdd(dso, "\pPREFIX", "\p(ov)@+", htTypeString);
-		
-		ServerOptionsDefaults = dso;
-	}
-	
-	return HTCreateDuplicate(ServerOptionsDefaults);
-}
 
 static void n005ServerFeatures(linkPtr link, LongString *ls)
 {
@@ -139,7 +125,7 @@ static void n005ServerFeatures(linkPtr link, LongString *ls)
 		x = pos('=', feature);
 		if(!x)
 		{
-			data = 0;
+			data = (void*)1;
 			dt = htTypeNull;
 		}
 		else
@@ -162,11 +148,12 @@ static void n005ServerFeatures(linkPtr link, LongString *ls)
 		if(feature[1] == '-') //remove the feature (reset to the default value)
 		{
 			pdelete(feature, 1, 1);
-			HTDelete(link->serverOptions, feature);
-			HTCopyElt(link->serverOptions, ServerOptionsDefaults, feature);
+			SFDeleteFeature(link->serverFeatures, feature);
 		}
 		else
-			HTAdd(link->serverOptions, feature, data, dt);
+		{
+			SFSetFeature(link->serverFeatures, feature, data);
+		}
 	}
 }
 
@@ -220,7 +207,7 @@ inline void n302userhost(linkPtr link, LongString *ls)
 	runIndService(userlistServiceClass, pServiceULUserhosts, &p);
 }
 
-inline void n353names(LongString *rest, linkPtr link)
+static void n353names(LongString *rest, linkPtr link)
 {
 	short p;
 	UserListPtr ul, ul2;
@@ -472,10 +459,10 @@ pascal char NumericComm(short comm, StringPtr from, ConstStringPtr target, LongS
 			pstrcpy(from, link->CurrentServer);
 			SMPrefixLink(link, rest, dsFrontWin);
 			
-			//Clear and create a new hashtable.
-			if(link->serverOptions)
-				HTDestroy(link->serverOptions);
-			link->serverOptions = DefaultServerOptions();
+			//Clear and create a new set of server features
+			if(link->serverFeatures)
+				SFDestroy(link->serverFeatures);
+			link->serverFeatures = SFNew();
 			
 			LinkSetStage(link, csOnline);
 			UpdateStatusLine();

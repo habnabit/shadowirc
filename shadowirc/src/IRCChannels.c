@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -49,6 +49,7 @@
 #include "ApplBase.h"
 #include "TextManip.h"
 #include "MenuCommands.h"
+#include "IRCSFeatures.h"
 
 static void MWWidgetInternalDraw(mwWidgetPtr o, char winActive);
 inline void DrawTopic(mwWidgetPtr o, char winActive);
@@ -386,7 +387,7 @@ static void _TopicWindowLengthDisplay(WindowRef dlgWindow, channelPtr ch)
 {
 	ControlRef topicOpsControl = NULL;
 	ControlID topicOpsControlID = { kApplicationSignature, kSIRCTopicOpsControlID };
-	int maxLen = HTFindNumericDefault(ch->link->serverOptions, "\pTOPICLEN", 0);
+	int maxLen = ch->link->serverFeatures->topicLength;
 	TopicWindowInfoPtr twi = GetTopicWindowInfo(dlgWindow);
 	CFStringRef theString;
 	
@@ -482,7 +483,7 @@ static void TopicWindowSet(WindowRef dlgWindow, channelPtr ch)
 
 static void UpdateTopicLength(WindowRef sheet, channelPtr ch)
 {
-	int maxLen = HTFindNumericDefault(ch->link->serverOptions, "\pTOPICLEN", 0);
+	int maxLen = ch->link->serverFeatures->topicLength;
 	ControlID topicOpsControlID = { kApplicationSignature, kSIRCTopicOpsControlID };
 	ControlID topicTextControlID = { kApplicationSignature, kSIRCTopicTextControlID };
 	ControlRef topicOpsControl = NULL, topicTextControl = NULL;
@@ -1626,7 +1627,7 @@ MWPtr ChannelWindow(linkPtr link, ConstStr255Param ch)
 	else
 	{
 		//if it's not a channel it's query...
-		if(!IsChannel(ch) && mainPrefs->privmsgsToConsole)
+		if(!IsChannel(link, ch) && mainPrefs->privmsgsToConsole)
 			return consoleWin;
 		else //I dunno...front window sounds good to me
 		{

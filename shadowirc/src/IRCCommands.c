@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2004 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -48,6 +48,7 @@
 #include "TextManip.h"
 #include "filesMan.h"
 #include "MenuCommands.h"
+#include "IRCSFeatures.h"
 
 static void doBanList(LongString *args, char e);
 pascal void rejoinDeactiveChannels(linkPtr link);
@@ -86,7 +87,8 @@ pascal void StackModes(LongString *theMode, channelPtr channel, ConstStr255Param
 	short p;
 	Str255 s,s2;
 	LongString ls;
-	int numModes = HTFindNumericDefault(channel->link->serverOptions, "\pMODES", 4);
+	//int numModes = HTFindNumericDefault(channel->link->serverOptions, "\pMODES", 4);
+	int numModes = channel->link->serverFeatures->numModes;
 		
 	if(mode)
 	{
@@ -475,7 +477,7 @@ pascal void DoONotice(channelPtr ch, const LongString *text)
 	int method;
 	
 	//Determine method to use based on server settings
-	if(HTIsSet(link->serverOptions, "\pWALLCHOPS"))
+	if(link->serverFeatures->hasWallchops)
 		method = 3;
 	else //use the prefs
 		method = link->linkPrefs->onoticeMethod;
@@ -944,7 +946,7 @@ static void _ucJoin(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 	if(rest->len)
 	{
 		LSMakeStr(*rest);
-		MakeChannel(rest->data);
+		MakeChannel(link, rest->data);
 		LSConcatStrAndStr("\pJOIN ", rest->data, s);
 	}
 }
@@ -970,7 +972,7 @@ static void _ucPart(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 	s1[0]=0;
 	LSNextArgND(rest, s1);
 	
-	if(IsChannel(s1))
+	if(IsChannel(link, s1))
 		LSNextArg(rest, 0);
 	else
 	{
@@ -1232,7 +1234,7 @@ static void _ucMsg(linkPtr link, ConstStr255Param com, LongString *rest, LongStr
 	if(mbInput && mbnum >= 0 && mbnum < MAXMB && pstrcmp(s1, messagebuffers[mbnum]->nick))
 		link = messagebuffers[mbnum]->link;
 
-	if(IsChannel(s1))
+	if(IsChannel(link, s1))
 	{
 		LSConcatStrAndStr("\p> ", s1, s);
 		LSAppend1(*s, ' ');
@@ -1396,7 +1398,7 @@ static void _ucKick(linkPtr link, ConstStr255Param com, LongString *rest, LongSt
 	if(rest->len)
 	{
 		LSNextArg(rest, s1);
-		MakeChannel(s1);
+		MakeChannel(link, s1);
 		LSNextArg(rest, s2);
 		LSStrCat(5, s, "\pKICK ", s1, "\p ", s2, "\p :");
 		if(rest->len)

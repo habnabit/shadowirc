@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -87,7 +87,7 @@ typedef struct Channel {
 
 extern long userNum;
 
-extern char IsChannel(ConstStringPtr s);
+extern char IsChannel(linkPtr link, ConstStringPtr s);
 
 pascal bansP ChFindBan(channelPtr ch, ConstStr255Param n, char exceptionList);
 pascal bansP ChMatchBan(channelPtr ch, ConstStr255Param n, char exceptionList);
