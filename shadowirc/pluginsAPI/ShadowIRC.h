@@ -2244,18 +2244,6 @@ pascal short IWOverride(long type, iwWidgetPtr *widget);
 					return value: error condition. See enum iwOverrideErrors
 */
 
-
-/*	Depreciated Functions:
-		These function still work now, however their use is depreciated since ShadowIRC now has the ability
-		to put the inputline inside message windows.
-*/
-
-pascal void UpdateStatusLine(void);
-/*	Updates the status line
-		Input:	none
-		Output:	none
-*/
-
 inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw);
 /*
 	Gets the inputAreaDataPtr for the current message window (or the global inputline).
@@ -2289,6 +2277,12 @@ void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish);
 		Input:	iad - The IAD reference of the input field
 		Output:	start - The start of the selection.
 					finish - The end of the selection.
+*/
+
+pascal void UpdateStatusLine(void);
+/*	Updates the status line
+		Input:	none
+		Output:	none
 */
 
 
