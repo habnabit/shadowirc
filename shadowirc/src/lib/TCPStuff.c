@@ -148,7 +148,7 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 static void FindAddressDNR(DNRRecordPtr);
 
 TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short remoteport);
-TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog);
+TCPStateType doTCPListenOpen(int af, int *sockfd, u_short localport, int backlog);
 
 int GetConnectionSocket(long cp);
 
@@ -609,11 +609,8 @@ TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short rem
  * Bind a listen socket with specified backlog
  */
 
-TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog)
+TCPStateType doTCPListenOpen(int af, int *sockfd, u_short localport, int backlog)
 {
-        if((*sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-                return (T_Failed);
-                
         /*
          * Special case (low) ident port
          */
@@ -625,7 +622,7 @@ TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog)
 	    char *portstr;
 	    
 	    memset(&hints, 0, sizeof(hints));
-	    hints.ai_family = PF_UNSPEC;
+	    hints.ai_family = af;
 	    hints.ai_flags = AI_PASSIVE;
 	    hints.ai_socktype = SOCK_STREAM;
 
@@ -640,6 +637,9 @@ TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog)
 	    
 	    while(res)
 	    {
+		    if((*sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
+			    return (T_Failed);
+		    
 		    if ((bind(*sockfd, (struct sockaddr *)res->ai_addr, res->ai_addrlen)) < 0) {
 			    if(res->ai_next != NULL) {
 				    res = res->ai_next;
@@ -912,7 +912,7 @@ OSErr NewListenConnection(connectionIndex *cp, u_short localport, int backlog)
 		if(ValidConnection(&cpi))
 		{
 			cpi--;
-			connections[cpi].state = doTCPListenOpen(&connections[cpi].sockfd, localport, backlog);
+			connections[cpi].state = doTCPListenOpen(AF_INET, &connections[cpi].sockfd, localport, backlog);
 			connections[cpi].timeout = TickCount() + TO_ListenOpen;
 			connections[cpi].status = CS_Opening;
                         /*
