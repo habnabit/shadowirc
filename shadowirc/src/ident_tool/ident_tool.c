@@ -14,8 +14,7 @@
 #include <sys/uio.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
-
-#define PORT 113
+#include <netdb.h>
 
 ssize_t write_fd(int fd, void *ptr, size_t nbytes, int sendfd) {
 	struct msghdr msg;
@@ -48,23 +47,28 @@ ssize_t write_fd(int fd, void *ptr, size_t nbytes, int sendfd) {
 }
 
 int main(int argc, char **argv) {
-	int sockfd;
-	struct sockaddr_in servaddr;
-
-	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+	int n, sockfd;
+	struct addrinfo hints, *res;
+	
+	memset(&hints, 0, sizeof(struct addrinfo));
+	
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_family = PF_INET6;
+	hints.ai_socktype = SOCK_STREAM;
+	
+	if ((n = getaddrinfo(NULL, "ident", &hints, &res)) == -1)
 		return 1;
-
-	bzero(&servaddr, sizeof(servaddr));
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(PORT);
-
-	if ((bind(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr))) < 0) {
+	
+	if ((sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
 		return 1;
-	}
+	
+	if ((bind(sockfd, res->ai_addr, res->ai_addrlen)) < 0)
+		return 1;
         
 	if (write_fd(STDOUT_FILENO, "", 1, sockfd) < 0)
 		return 1;
-
+	
+	freeaddrinfo(res);
+	
 	return 0;
 }
