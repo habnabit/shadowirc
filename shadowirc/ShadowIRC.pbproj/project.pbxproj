@@ -56,6 +56,31 @@
 //142
 //143
 //144
+		1401A78B069294AF0002FDCB = {
+			children = (
+				1401A78C069294AF0002FDCB,
+			);
+			isa = PBXVariantGroup;
+			name = InfoPlist.strings;
+			path = "";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		1401A78C069294AF0002FDCB = {
+			fileEncoding = 10;
+			isa = PBXFileReference;
+			lastKnownFileType = text.plist.strings;
+			name = English;
+			path = English.lproj/InfoPlist.strings;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		1401A78D069294AF0002FDCB = {
+			fileRef = 1401A78B069294AF0002FDCB;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		14886206068971DA00FEB302 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -631,6 +656,7 @@
 				F552BF4F0211030901A80061,
 				F5059DA302A5C0930132A983,
 				F4BBC2FF056EE75A00BD6D17,
+				1401A78B069294AF0002FDCB,
 				F424EAA605A5345400B68878,
 				14EEACA8044D95C800A80001,
 				F5D4BE900323C8880132A983,
@@ -1157,6 +1183,7 @@
 				F424EAA805A5345400B68878,
 				14B760010688B95F0069164D,
 				14EB08CD0689648200B74698,
+				1401A78D069294AF0002FDCB,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
