@@ -624,35 +624,6 @@ resource 'DITL' (136, "nonfatal error") {
 	}
 };
 
-resource 'DITL' (141, "Font Size") {
-	{	/* array DITLarray: 4 elements */
-		/* [1] */
-		{62, 125, 82, 183},
-		Button {
-			enabled,
-			"OK"
-		},
-		/* [2] */
-		{62, 7, 82, 65},
-		Button {
-			enabled,
-			"Cancel"
-		},
-		/* [3] */
-		{3, 2, 33, 187},
-		StaticText {
-			disabled,
-			"Set font size to:"
-		},
-		/* [4] */
-		{39, 66, 53, 125},
-		EditText {
-			enabled,
-			""
-		}
-	}
-};
-
 resource 'DITL' (500, "Servers") {
 	{	/* array DITLarray: 9 elements */
 		/* [1] */
@@ -1873,17 +1844,6 @@ resource 'DLOG' (-300) {
 data 'DLOG' (130, "Err") {
 	$"0036 0028 009C 01AF 0001 0100 0100 0000"            /* .6.(.œ.¯........ */
 	$"0000 0082 00"                                       /* ...‚. */
-};
-
-resource 'DLOG' (141, "Font Size") {
-	{180, 266, 267, 456},
-	movableDBoxProc,
-	invisible,
-	goAway,
-	0x0,
-	141,
-	"Font Size",
-	alertPositionMainScreen
 };
 
 resource 'DLOG' (300) {
@@ -4837,12 +4797,6 @@ resource 'dlgx' (-3010) {
 };
 
 resource 'dlgx' (-3000) {
-	versionZero {
-		15
-	}
-};
-
-resource 'dlgx' (141) {
 	versionZero {
 		15
 	}
