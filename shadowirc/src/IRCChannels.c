@@ -503,13 +503,6 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 			}
 			break;
 		
-		case kHICommandCancel:
-			HideSheetWindow(sheet);
-			DeleteTopicWindowInfo(sheet);
-			DisposeWindow(sheet);
-			ExitModalDialog();
-			break;
-			
 		case kHICommandOK:
 			GetControlByID(sheet, &topicTextControlID, &topicTextControl);
 			GetControlData(topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
@@ -519,10 +512,11 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 				LSStrCat4(&ls,"\pTOPIC ", ch->chName, "\p :", s1);
 				SendCommand(ch->link, &ls);
 			}
+
+		case kHICommandCancel:
 			HideSheetWindow(sheet);
 			DeleteTopicWindowInfo(sheet);
 			DisposeWindow(sheet);
-			ExitModalDialog();
 			break;
 	}
 		
@@ -532,11 +526,14 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 void ChTopicWindow(channelPtr ch)
 {
 	IBNibRef mainNibRef;
-	WindowRef parentWindow = NULL, channelTopicSheet = NULL;
-	EventHandlerUPP ctUPP = NewEventHandlerUPP(TopicWidgetDialogEventHandler);
-	EventTypeSpec ctSpec = { kEventClassControl, kEventControlHit };
-	OSStatus status = noErr;
-
+	WindowRef channelTopicSheet = NULL;
+	static EventHandlerUPP ctUPP = NULL;
+	const EventTypeSpec ctSpec = { kEventClassControl, kEventControlHit };
+	OSStatus status;
+	
+	if(!ctUPP)
+		ctUPP = NewEventHandlerUPP(TopicWidgetDialogEventHandler);
+	
 	status = CreateNibReference(kNibChannel, &mainNibRef);
 	require_noerr(status, CantFindDialogNib);
 
@@ -549,14 +546,9 @@ void ChTopicWindow(channelPtr ch)
 	require_noerr(status, CantInstallDialogHandler);
 	
 	NewTopicWindowInfo(channelTopicSheet, ch);
-	
 	TopicWindowSet(channelTopicSheet, ch);
 
-	parentWindow = ch->window->w;
-
-	EnterModalDialog();
-
-	ShowSheetWindow(channelTopicSheet, parentWindow);
+	ShowSheetWindow(channelTopicSheet, ch->window->w);
 	SelectWindow(channelTopicSheet);
 
 CantFindDialogNib:
