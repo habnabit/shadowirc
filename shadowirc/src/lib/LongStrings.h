@@ -42,6 +42,7 @@ pascal char LSCaseCmp(const LongString *ls1, const LongString *ls2);
 pascal void LSDelete(LongString *ls, short firstpos, short lastpos);
 pascal void LSCopy(const LongString *ls, short firstpos, short len, LongString *out);
 pascal void LSCopyString(const LongString *ls, short firstpos, short len, StringPtr str);
+short LSPosCharInRange(int ch, const LongString *ls, short start, short length);
 pascal short LSPosCustom(ConstStr255Param s, const LongString *ls, short start);
 pascal short LSPos(ConstStr255Param s, const LongString *ls);
 pascal short LSPosCaseCustom(ConstStr255Param s, const LongString *ls, short start);
