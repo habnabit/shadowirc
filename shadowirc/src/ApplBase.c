@@ -58,8 +58,6 @@ static void ApplExit(void);
 
 static void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord);
 
-static RgnHandle mouseRgn;
-
 typedef struct aspData {
 	long refcon;
 	SndListHandle sound;
@@ -669,9 +667,6 @@ static void InitLocalEventHandlers()
 
 void ApplInit(void)
 {
-	mouseRgn=NewRgn();
-	SetRectRgn(mouseRgn, -32767, -32767, 32766, 32766);
-	
 	InitEventHandlers();
 	InitLocalEventHandlers();
 
