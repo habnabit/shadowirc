@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -27,7 +27,7 @@ pascal void TWStatus(mwWidgetPtr o, char winActive);
 pascal MWPtr TWSelect(void);
 pascal MWPtr TWOpen(const FSSpec *f);
 pascal MWPtr NewTextWin(void);
-pascal char TWClose(MWPtr mw, char lowMem);
+pascal char TWClose(MWPtr mw);
 pascal char TWCloseAll(void);
 pascal void TWSave(MWPtr mw, char saveas);
 

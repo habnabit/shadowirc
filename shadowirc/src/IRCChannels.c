@@ -1663,7 +1663,7 @@ void MWPart(MWPtr mw)
 				break;
 			
 			case textWin:
-				TWClose(mw, false);
+				TWClose(mw);
 				break;
 		}
 	}

@@ -715,43 +715,6 @@ resource 'DITL' (137, "TW.SaveChanges?") {
 	}
 };
 
-resource 'DITL' (138, "TW.SaveChangesLowMem") {
-	{	/* array DITLarray: 5 elements */
-		/* [1] */
-		{87, 284, 107, 344},
-		Button {
-			enabled,
-			"Save"
-		},
-		/* [2] */
-		{87, 211, 107, 271},
-		Button {
-			enabled,
-			"Cancel"
-		},
-		/* [3] */
-		{87, 70, 107, 155},
-		Button {
-			enabled,
-			"Don’t Save"
-		},
-		/* [4] */
-		{10, 20, 42, 52},
-		Icon {
-			disabled,
-			2
-		},
-		/* [5] */
-		{10, 72, 76, 344},
-		StaticText {
-			disabled,
-			"ShadowIRC is running low on memory. Save"
-			" changes to the text file “^0” and close"
-			" to free up memory?"
-		}
-	}
-};
-
 resource 'DITL' (139, "TW.NoFreeMem") {
 	{	/* array DITLarray: 3 elements */
 		/* [1] */
@@ -2056,17 +2019,6 @@ resource 'DLOG' (137) {
 	goAway,
 	0x0,
 	137,
-	"",
-	alertPositionMainScreen
-};
-
-resource 'DLOG' (138) {
-	{62, 41, 179, 394},
-	dBoxProc,
-	visible,
-	goAway,
-	0x0,
-	138,
 	"",
 	alertPositionMainScreen
 };
@@ -5079,12 +5031,6 @@ resource 'dlgx' (131) {
 };
 
 resource 'dlgx' (137) {
-	versionZero {
-		15
-	}
-};
-
-resource 'dlgx' (138) {
 	versionZero {
 		15
 	}

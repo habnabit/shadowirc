@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -301,7 +301,7 @@ static pascal unsigned char TWSaveWindowDialogFilter(DialogPtr d, EventRecord *e
 		return true;
 }
 
-pascal char TWClose(MWPtr mw, char lowMem)
+pascal char TWClose(MWPtr mw)
 {
 	textWinDataPtr p =  (textWinDataPtr)mw->refCon;
 	DialogPtr d;
@@ -311,7 +311,7 @@ pascal char TWClose(MWPtr mw, char lowMem)
 	
 	if(WEGetModCount(mw->we)) //ask to save
 	{
-		d = GetNewDialog(137 + lowMem, 0, (WindowPtr)-1);
+		d = GetNewDialog(137, 0, (WindowPtr)-1);
 		if(p->saved)
 			pstrcpy(p->file.name, s);
 		else
@@ -363,7 +363,7 @@ pascal char TWCloseAll(void)
 	{
 		mw2=mw->next;
 		if(mw->winType == textWin)
-			r=TWClose(mw, false);
+			r=TWClose(mw);
 		if(!r)
 			return false;
 		mw=mw2;
