@@ -991,30 +991,33 @@ static ULI ULINew(WindowPtr w, long type)
 		
 		dbColumn.propertyDesc.propertyID = 'name';
 		dbColumn.propertyDesc.propertyType = kDataBrowserTextType;
-		dbColumn.propertyDesc.propertyFlags = kDataBrowserDefaultPropertyFlags;
+		dbColumn.propertyDesc.propertyFlags = kDataBrowserDefaultPropertyFlags | kDataBrowserListViewSortableColumn | kDataBrowserListViewSelectionColumn;
 		dbColumn.headerBtnDesc.version= kDataBrowserListViewLatestHeaderDesc,
 		dbColumn.headerBtnDesc.minimumWidth = 55;
 		dbColumn.headerBtnDesc.maximumWidth = 500;
 		dbColumn.headerBtnDesc.titleOffset = 0;
 		dbColumn.headerBtnDesc.titleString = CFSTR("User");
 		dbColumn.headerBtnDesc.initialOrder = kDataBrowserOrderIncreasing;
-		dbColumn.headerBtnDesc.btnFontStyle.flags = kControlUseSizeMask;
+		dbColumn.headerBtnDesc.btnFontStyle.flags = kControlUseSizeMask | kControlUseFontMask;
 		dbColumn.headerBtnDesc.btnFontStyle.size = 9;
+		dbColumn.headerBtnDesc.btnFontStyle.font = kControlFontSmallSystemFont;
 		dbColumn.headerBtnDesc.btnContentInfo.contentType = kControlContentTextOnly;
+//kControlFontSmallSystemFont with kControlFontSystemFont
 		
 		AddDataBrowserListViewColumn(ul->browser, &dbColumn, ULONG_MAX);
 
 		dbColumn.propertyDesc.propertyID = 'host';
 		dbColumn.propertyDesc.propertyType = kDataBrowserTextType;
-		dbColumn.propertyDesc.propertyFlags = kDataBrowserDefaultPropertyFlags;
+		dbColumn.propertyDesc.propertyFlags = kDataBrowserDefaultPropertyFlags | kDataBrowserListViewSortableColumn | kDataBrowserListViewSelectionColumn;
 		dbColumn.headerBtnDesc.version= kDataBrowserListViewLatestHeaderDesc,
 		dbColumn.headerBtnDesc.minimumWidth = 55;
 		dbColumn.headerBtnDesc.maximumWidth = 500;
 		dbColumn.headerBtnDesc.titleOffset = 0;
 		dbColumn.headerBtnDesc.titleString = CFSTR("Hostname");
 		dbColumn.headerBtnDesc.initialOrder = kDataBrowserOrderIncreasing;
-		dbColumn.headerBtnDesc.btnFontStyle.flags = kControlUseSizeMask;
+		dbColumn.headerBtnDesc.btnFontStyle.flags = kControlUseSizeMask | kControlUseFontMask;
 		dbColumn.headerBtnDesc.btnFontStyle.size = 9;
+		dbColumn.headerBtnDesc.btnFontStyle.font = kControlFontSmallSystemFont;
 		dbColumn.headerBtnDesc.btnContentInfo.contentType = kControlContentTextOnly;
 		
 		AddDataBrowserListViewColumn(ul->browser, &dbColumn, ULONG_MAX);
