@@ -549,17 +549,6 @@ static OSStatus EventHandler(EventHandlerCallRef handlerCallRef, EventRef event,
 			}
 			break;
 		}
-		
-		case kEventClassKeyboard:
-		{
-			switch(eventKind)
-			{
-				case kEventRawKeyRepeat:
-				case kEventRawKeyDown:
-					Key(event, eventKind == kEventRawKeyRepeat);
-			}
-			break;
-		}
 	}
 	
 	return result;
@@ -669,8 +658,6 @@ static void InitLocalEventHandlers()
 		{kEventClassWindow, kEventWindowActivated},
 		{kEventClassWindow, kEventWindowDeactivated},
 		{kEventClassWindow, kEventWindowHandleContentClick},
-		{kEventClassKeyboard, kEventRawKeyDown},
-		{kEventClassKeyboard, kEventRawKeyRepeat},
 	};
 	
 	MyIAEH(kEventClassApplication, kEventAppActivated, DoResumeEvent);

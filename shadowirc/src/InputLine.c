@@ -44,6 +44,7 @@
 #include "MenuCommands.h"
 #include "TextManip.h"
 #include "CMenus.h"
+#include "IRCInput.h"
 
 inputLineRec inputLine;
 
@@ -354,6 +355,17 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 			}
 			break;
 		}
+		
+		case kEventClassKeyboard:
+		{
+			switch(eventKind)
+			{
+				case kEventRawKeyRepeat:
+				case kEventRawKeyDown:
+					Key(event, eventKind == kEventRawKeyRepeat);
+			}
+			break;
+		}
 	}
 
 	return result;
@@ -378,7 +390,9 @@ void OpenInputLine()
 			{kEventClassWindow, kEventWindowGetMinimumSize},
 			{kEventClassWindow, kEventWindowBoundsChanged},
 			{kEventClassWindow, kEventWindowActivated},
-			{kEventClassWindow, kEventWindowDeactivated}
+			{kEventClassWindow, kEventWindowDeactivated},
+			{kEventClassKeyboard, kEventRawKeyDown},
+			{kEventClassKeyboard, kEventRawKeyRepeat},
 		};
 		static EventHandlerUPP ilUPP = NULL;
 

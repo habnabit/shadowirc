@@ -39,6 +39,7 @@
 #include "MenuCommands.h"
 #include "CMenus.h"
 #include "CommandsMenu.h"
+#include "IRCInput.h"
 
 static void DoAbout(void);
 
@@ -217,6 +218,17 @@ static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef even
 			}
 			break;
 		}
+		
+		case kEventClassKeyboard:
+		{
+			switch(eventKind)
+			{
+				case kEventRawKeyRepeat:
+				case kEventRawKeyDown:
+					Key(event, eventKind == kEventRawKeyRepeat);
+			}
+			break;
+		}
 	}
 	
 	return result;
@@ -238,6 +250,8 @@ void MWInstallEventHandlers(MWPtr mw)
 			{kEventClassWindow, kEventWindowBoundsChanged},
 			{kEventClassWindow, kEventWindowClose},
 			{kEventClassWindow, kEventWindowHandleContentClick},
+			{kEventClassKeyboard, kEventRawKeyDown},
+			{kEventClassKeyboard, kEventRawKeyRepeat},
 	};
 	
 	if(!mouseWheelHandler)
