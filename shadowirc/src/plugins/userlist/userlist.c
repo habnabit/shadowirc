@@ -64,7 +64,7 @@ static void ProcessShortcuts(pShortcutProcessData *p);
 INLINE void IdleCursor(void);
 INLINE void CreateGlobalUserlistWindow(void);
 INLINE void DestroyGlobalUserlistWindow(void);
-INLINE void ULCloseWindow(pUIWindowCloseDataRec *p);
+static void ULCloseWindow(ULI ul);
 INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p);
 static void ULResizeWin(ULI ul, short height, short wid);
 INLINE void ULMouse(pUIMouseUpDownData *p);
@@ -775,7 +775,7 @@ static OSStatus UlDoWindowEventHandler(EventHandlerCallRef nextHandler, EventRef
 	switch(eventClass)
 	{
 		case kEventClassWindow:
-			GetEventParameter (event, kEventParamDirectObject, typeWindowRef, NULL, sizeof (WindowRef), NULL, &ilWindow);
+			GetEventParameter(event, kEventParamDirectObject, typeWindowRef, NULL, sizeof (WindowRef), NULL, &ilWindow);
 			
 			switch (eventKind)
 			{
@@ -797,6 +797,10 @@ static OSStatus UlDoWindowEventHandler(EventHandlerCallRef nextHandler, EventRef
 					result = noErr;
 					break;
 				}
+				case kEventWindowClose:
+					ULCloseWindow(ul);
+					result = noErr;
+					break;
 			}
 			break;
 	}
@@ -809,7 +813,8 @@ static void ULInstallWindowHandlers(ULI ul)
 	static EventHandlerUPP ulWindowHandler = NULL;
 	const EventTypeSpec ulWindowTypes[] = {
 		{kEventClassWindow, kEventWindowGetMinimumSize},
-		{kEventClassWindow, kEventWindowBoundsChanged}
+		{kEventClassWindow, kEventWindowBoundsChanged},
+		{kEventClassWindow, kEventWindowClose}
 	};
 	
 	if(!ulWindowHandler)
@@ -1415,16 +1420,11 @@ INLINE void IdleCursor(void)
 		SetIdleThreshold(kIdleNormal);
 }
 
-INLINE void ULCloseWindow(pUIWindowCloseDataRec *p)
+static void ULCloseWindow(ULI ul)
 {
-	ULI ul = ULIFromWindow(p->w);
-	
-	if(ul) //then it's the global window
-	{
-		HideWindow(ul->uwin);
-		mainPrefs->userListOpen = false;
-		CheckMenuItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType), mainPrefs->userListOpen);
-	}
+	HideWindow(ul->uwin);
+	mainPrefs->userListOpen = false;
+	CheckMenuItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType), mainPrefs->userListOpen);
 }
 
 INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p)
@@ -1755,10 +1755,6 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			PWClosed();
 			break;
 
-		case pUIWindowCloseMessage:
-			ULCloseWindow((pUIWindowCloseDataPtr)sidrIN->messageData);
-			break;
-		
 		case pServiceWindowMenu:
 			ULWindowMenuSelect((pServiceWindowMenuPtr)sidrIN->messageData);
 			break;
