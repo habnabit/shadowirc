@@ -105,10 +105,12 @@ struct Connection {
 	/*
          * ip: store ip address
          * ip2: used w/ storing SOCKS proxy IP address
+	 * localip: local IP address (getsockname on sockfd)
          * sockfd: hold TCP socket
          */
 	struct in_addr ip;
         struct in_addr ip2;
+	struct in_addr localip;
         int sockfd;
 	Str255 name;
 	unsigned short port;
@@ -225,7 +227,7 @@ size_t ConnGetData(connectionPtr conn, Ptr d, size_t len);
 size_t ConnGetUntil(connectionPtr conn, Ptr d, char c, size_t len);
 int ConnGetLocalPort(connectionPtr conn);
 
-pascal OSErr NetGetLocalIP(unsigned long *ip);
+pascal OSErr ConnGetLocalIP(connectionPtr conn, struct in_addr *ip);
 
 pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host);
 

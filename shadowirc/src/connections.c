@@ -272,6 +272,7 @@ pascal connectionPtr newConnection(short connType)
 		else
 			c->connType=connType;
 		c->ip.s_addr=0;
+		c->localip.s_addr=0;
 		c->name[0]=0;
 		c->port=0;
 		c->tryingToConnect=0;
@@ -494,7 +495,7 @@ pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host)
 	return FindAddress(&conn->private_socket, host);
 }
 
-pascal OSErr NetGetLocalIP(unsigned long *ip)
+pascal OSErr ConnGetLocalIP(connectionPtr conn, struct in_addr *ip)
 {
-	return IPGetMyIPAddr(ip);
+	return TCPLocalIP(GetConnectionSocket(conn->private_socket), ip);
 }

@@ -31,11 +31,10 @@
 
 typedef struct TCPConnection *TCPConnectionPtr;
 
-OSErr IPGetMyIPAddr(unsigned long*);
-
 OSErr TCPSendAsync(connectionPtr conn, const void* writePtr, short writeCount, char push);
 
 int TCPLocalPort(int sockfd);
 long TCPRemoteIP(TCPConnectionPtr conn);
+int TCPLocalIP(int sockfd, struct in_addr *ip);
 
 #endif

@@ -345,20 +345,6 @@ ssize_t writen(int fd, const void *vptr, size_t n)
 	return (n);
 }
 
-OSErr IPGetMyIPAddr(ip_addr *myIP)
-{
-    /*
-	IPControlBlock cb;
-	OSErr err;
-	
-	IPZeroCB(&cb, ipctlGetAddr);
-	err = ipPBSync(&cb);
-	*myIP = cb.csParam.IPEchoPB.dest;
-	return err;
-     */
-    return noErr;
-}
-
 #pragma mark -
 
 static void ZotBlocks(void)
@@ -529,22 +515,46 @@ static size_t TCPCharsAvailable(int sockfd)
 }
 
     /*
+ * sockaddr_union
+ * utilized by getsockname below in:
  * TCPLocalPort
- * Return local port for sockfd, else return -1 on failure
+ * TCPLocalIP
+ * TCPRemoteIP
      */
-int TCPLocalPort(int sockfd)
-{
-    union {
+
+typedef union {
         struct sockaddr sa;
         struct sockaddr_in sin;
         struct sockaddr_in6 sin6;
     } sockaddr_union;
+
+/*
+ * TCPLocalPort
+ * Return local port for sockfd, else return -1 on failure
+ */
+int TCPLocalPort(int sockfd)
+{
+    sockaddr_union sau;
     int len;
     
     len = sizeof(sockaddr_union);
-    if (getsockname(sockfd, (SA *) &sockaddr_union.sa, &len) < 0)
+    if(getsockname(sockfd, (SA *) &sau.sa, &len) < 0)
         return (-1);
-    return (ntohs(sockaddr_union.sin.sin_port));
+    return (ntohs(sau.sin.sin_port));
+}
+
+
+int TCPLocalIP(int sockfd, struct in_addr *ip)
+{
+    sockaddr_union sau;
+    int len;
+    
+    len = sizeof(sockaddr_union);
+    if(getsockname(sockfd, (SA *) &sau.sa, &len) < 0)
+        return (-1);
+    
+    memcpy(ip, &sau.sin.sin_addr, sizeof(ip));
+    return (0);
 }
 
 /*

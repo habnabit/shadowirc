@@ -333,12 +333,13 @@ pascal char DCCCreate(linkPtr link, short typ, ConstStr255Param fr, connectionPt
 	dccPtr d;
 	pDCCCreateData p;
 	
-	if(!link || ((*c=DCCFind(link, typ, fr)) != 0) && typ == dccCHAT)
+	if(!link || ((*c=DCCFind(link, typ, fr)) != 0) && typ == dccCHAT || !link->conn)
 		return 0;
 	else
 	{
 		*c=newConnection(connDCC);
 		(*c)->link=link;
+		ConnGetLocalIP(link->conn, &(*c)->localip);
 		d=(*c)->dcc=(dccPtr)NewPtr(sizeof(dccRec));
 		pstrcpy(fr, d->dccUserName);
 		d->dccType=typ;
@@ -856,10 +857,14 @@ pascal void DCCOpen(connectionPtr *x)
 	}
 	else if(d->dccFlags == closed)
 	{
-		if(!NetGetLocalIP(&cc->ip) && ConnNewListen(cc, 10))
+		if(ConnNewListen(cc, 10))
 		{
 			cc->port=ConnGetLocalPort(cc);
-			ntohl_str(cc->ip.s_addr, ipa);
+                        /*
+                         * DCCCreate sets cc->localip to local IP address
+                         * based off of connected sockfd
+                         */
+			ntohl_str(cc->localip.s_addr, ipa);
 			ulongstr(cc->port, pn);
 			args[0]=0;
 			
