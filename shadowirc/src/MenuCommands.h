@@ -51,6 +51,4 @@ void AppleMenuURLInit(void);
 void ConnectionMenuInit(void);
 void ConnectionMenuHilites(void);
 
-void WindowClose(WindowPtr wp);
-
 char ToggleConsoleWindow();

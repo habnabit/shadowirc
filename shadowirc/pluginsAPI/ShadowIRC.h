@@ -2413,12 +2413,6 @@ pascal void MWPart(MWPtr mw);
 		Output:	none
 */
 
-void WindowClose(WindowPtr w);
-/*	Closes any window. Same as hitting cmd-w on a window.
-		Input:	w - The window to close
-		Output:	none
-*/
-
 #pragma mark ¥ Appearance Manager
 /*	------------------------------------------------------------------------------------------
 		Appearance Manager abstractions.

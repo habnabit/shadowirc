@@ -78,7 +78,6 @@ _WGetBBox
 _StandardDialogFilter
 _NavDialogFilter
 _MWPart
-_WindowClose
 _SetTextColor
 _SetBackground
 _DrawBorder

@@ -89,6 +89,10 @@ static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef the
 	
 	switch(hiCommand.commandID)
 	{
+		case kHICommandClose:
+			MWPart(mw);
+			return noErr;
+		
 		case 'FIND':
 			DoFind(false);
 			return noErr;
@@ -119,7 +123,7 @@ void MWInstallEventHandlers(MWPtr mw)
 
 #pragma mark -
 
-void WindowClose(WindowPtr wp)
+static void WindowClose(WindowPtr wp)
 {
 	long i;
 	
@@ -128,9 +132,7 @@ void WindowClose(WindowPtr wp)
 		i=GetWRefCon(wp);
 		if(i)
 		{
-			if(((MWPtr)i)->magic==MW_MAGIC)
-				MWPart((MWPtr)i);
-			else if(((pluginDlgInfoPtr)i)->magic==PLUGIN_MAGIC)
+			if(((pluginDlgInfoPtr)i)->magic==PLUGIN_MAGIC)
 				pluginCloseWindow((WindowPtr)wp, (pluginDlgInfoPtr)i);
 		}
 	}
