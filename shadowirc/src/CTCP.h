@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -22,9 +22,9 @@
 #ifndef _CTCP
 #define _CTCP
 
-pascal void SendCTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, LongString *st);
+void CTCPSendReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, const LongString *st);
 
-pascal char doCTCP(ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *s, char isReply, char ign, linkPtr link);
-pascal char DCCCTCP(connectionPtr connn, LongString *ls);
+char doCTCP(ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, const LongString *s, char isReply, char ign, linkPtr link);
+char DCCCTCP(connectionPtr connn, const LongString *ls);
 
 #endif

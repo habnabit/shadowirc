@@ -3,6 +3,7 @@ _environ
 _NXArgv
 _NXArgc
 __mh_execute_header
+_LSDupe
 _LSCmp
 _LSCaseCmp
 _LSDelete
@@ -144,7 +145,7 @@ _ConnPutLS
 _ConnGetData
 _ConnGetLocalPort
 _putServer
-_SendCTCPReply
+_CTCPSendReply
 _OpenConnection
 _DoServer
 _DoSignoff

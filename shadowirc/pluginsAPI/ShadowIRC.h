@@ -1272,7 +1272,7 @@ typedef struct pCTCPDataRec {
 	StringPtr userhost;				//The userhost of the user. 
 	StringPtr target;					//The target. (Nick or channel.)
 	StringPtr cmd;						//The CTCP command.
-	StringPtr rest;						//Any parameters for the CTCP message. (Action text, CPING time, etc)
+	LongString *rest;						//Any parameters for the CTCP message. (Action text, CPING time, etc)
 	char *ignored;						//If true, the CTCP will be ignored.
 	char isReply;						//If true, this is a reply to a CTCP we did.
 	char completelyProcessed;	//Set this to true to keep ShadowIRC from processing this CTCP message.
@@ -1791,6 +1791,11 @@ enum displaySelection {
 		
 		NOTE: ALL Character pointers are pascal strings.
 		------------------------------------------------------------------------------------------
+*/
+void LSDupe(const LongString * const src, LongString *dest);
+/*	Duplicates a LongString.
+	Input:	src: source LongString
+	Output: dest: destination LongString
 */
 
 pascal char LSCmp(const LongString *ls1, const LongString *ls2);
@@ -2884,7 +2889,7 @@ pascal void putServer(linkPtr link, LongString *ls);
 		Output:	none
 */
 
-pascal void SendCTCPReply(linkPtr link, ConstStr255Param target, ConstStr255Param command, LongString *args);
+void CTCPSendReply(linkPtr link, ConstStr255Param target, ConstStr255Param command, const LongString *args);
 /*	Sends a CTCP reply.
 		Input:	link - the link to send the CTCP through
 					target - Where to send the reply.

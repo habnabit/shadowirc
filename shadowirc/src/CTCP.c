@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -35,92 +35,97 @@
 #include "TextManip.h"
 
 
-static void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *ctcp, char ign);
-inline void quote(LongString *s);
-inline void unquote(StringPtr s);
-static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, ConstStr255Param ta, ConstStr255Param co, StringPtr re);
-static void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, Str255 re);
-static void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstStr255Param fr, ConstStr255Param re);
+static void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, ConstStr255Param comm, const LongString *ctcp, char ign);
+static void CTCPQuoteLS(const LongString *in, LongString *out);
+static void CTCPUnquoteLS(LongString *ls);
+static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, ConstStr255Param ta, ConstStr255Param co, const LongString *text);
+static void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, const LongString *text);
+static void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstStr255Param fr, const LongString *text);
+static char SplitCTCPCommand(const LongString *ls, Str255 cmd, LongString *text);
 
-inline void quote(LongString *s)
+static void CTCPQuoteLS(const LongString *in, LongString *out)
 {
-	int i=1;
+	int i, o, m = in->len;
 	
-	while(i<=s->len)
+	out->len = in->len;
+	
+	for(i = 1, o = 1; i <= m; i++, o++)
 	{
-		switch(s->data[i])
+		switch(in->data[i])
 		{
 			case 0:
-				s->data[i]=16;
-				LSInsertChar(0, i+1, s);
+				out->data[o] = 16;
+				out->data[++o] = '0';
 				break;
 			case 10:
-				s->data[i]=16;
-				LSInsertChar('n', i+1, s);
+				out->data[o] = 16;
+				out->data[++o] = 'n';
 				break;
 			case 13:
-				s->data[i]=16;
-				LSInsertChar('r', i+1, s);
+				out->data[o] = 16;
+				out->data[++o] = 'r';
 				break;
 			case 16:
-				s->data[i]=16;
-				i++;
-				LSInsertChar(16, i, s);
+				out->data[o] = 16;
+				out->data[++o] = 16;
 				break;
+			default:
+				out->data[o] = in->data[i];
 		}
-		i++;
 	}
 }
 
-inline void unquote(StringPtr s)
+static void CTCPUnquoteLS(LongString *ls)
 {
-	int i;
+	const unsigned char quoteCharSearchStr[]= {1, 16};
+	int i = 0;
 
 	do
 	{
-		i=pos(16, s);
+		i = LSPosCustom(quoteCharSearchStr, ls, i + 1);
 		if(!i)
 			break;
-		else if(i==s[0])
-			s[0]=i-1;
+		else if(i == ls->len)
+			ls->len--;
 		else
 		{
-			switch(s[i+i])
+			switch(ls->data[i+1])
 			{
-				case 48:
-					s[i+1]=0;
+				case '0':
+					ls->data[i] = 0;
 					break;
-				case 110:
-					s[i+1]=10;
+				case 'n':
+					ls->data[i] = 10;
 					break;
-				case 114:
-					s[i+1]=13;
+				case 'r':
+					ls->data[i] = 13;
 					break;
 				case 16:
-					s[i+1]=16;
+					ls->data[i] = 16;
 					break;
 			}
-			pdelete(s,i,1);
+			LSDelete(ls, i+1, i+1);
 		}
 	} while(1);
 }
 
-pascal void SendCTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, LongString *st)
+void CTCPSendReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, const LongString *st)
 {
 	LongString ls;
+	LongString quotedST;
 	
 	if(!mainPrefs->disableCTCP)
 	{
-		quote(st);
+		CTCPQuoteLS(st, &quotedST);
 		LSStrCat4(&ls, "\pNOTICE ", fr, "\p :\1", co);
 		LSAppend1(ls, ' ');
-		LSConcatLSAndLS(&ls, st, &ls);
+		LSConcatLSAndLS(&ls, &quotedST, &ls);
 		LSAppend1(ls, 1);
 		SendCommand(link, &ls);
 	}
 }
 
-static void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *ctcp, char ign)
+static void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, ConstStr255Param comm, const LongString *text, char ign)
 {
 	LongString ls;
 	channelPtr targChan;
@@ -129,14 +134,22 @@ static void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param ua
 	
 	if(!mainPrefs->disableCTCPMessages)
 	{
+		LongString ctcp;
+		
 		targChan = ChFind(target, link);
-		LSMakeStr(*ctcp);
 		if(targChan)
 			sp = GetIntStringPtr(spServer, sReceivedChannelCTCP);
 		else
 			sp = GetIntStringPtr(spServer, sReceivedCTCP);
 		
-		LSParamString(&ls, sp, ctcp->data, from, target, 0);
+		//NOTE: This trims the output to 255 chars for command + text, but it was like this before...
+		if(text->len)
+			LSConcatStrAndStrAndLS(comm, "\p ", text, &ctcp);
+		else
+			LSStrLS(comm, &ctcp);
+		
+		LSMakeStr(ctcp);
+		LSParamString(&ls, sp, ctcp.data, from, target, 0);
 		
 		if(mainPrefs->showUserHostsWithMsgs)
 		{
@@ -166,7 +179,7 @@ static void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param ua
 	}
 }
 
-static void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstStr255Param fr, ConstStr255Param re)
+static void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstStr255Param fr, const LongString *text)
 {
 	LongString ls;
 	channelPtr targChan;
@@ -179,8 +192,7 @@ static void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstSt
 			type |= kNickPrivmsg;
 	}
 	
-	LSStrLS(re, &ls);
-	FormatMessage(fr, &ls, 0, 0, type, &ls);
+	FormatMessage(fr, text, 0, 0, type, &ls);
 	
 	if(ta)
 	{
@@ -209,7 +221,7 @@ static void DisplayAction(linkPtr link, ConstStr255Param ta, dccPtr dcc, ConstSt
 	}
 }
 
-static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, ConstStr255Param ta, ConstStr255Param co, StringPtr re)
+static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, ConstStr255Param ta, ConstStr255Param co, const LongString *text)
 {
 	Str255 st;
 	LongString ls;
@@ -218,22 +230,23 @@ static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, Co
 	
 	if(pstrcmp(co, "\pACTION"))
 	{
-		DisplayAction(link, ta, 0, fr, re);
+		DisplayAction(link, ta, 0, fr, text);
 		return 0;
 	}
 	else if(pstrcmp(co, "\pCREATOR"))
 	{
 		LSStrLS("\pJohn Bafford (DShadow), dshadow@shadowirc.com", &ls);
-		SendCTCPReply(link, fr, co, &ls);
+		CTCPSendReply(link, fr, co, &ls);
 	}
 	else if(pstrcmp(co, "\pCLIENTINFO"))
 	{
 		LSStrLS("\pACTION CREATOR CLIENTINFO DCC FINGER PING SOURCE TIME USERINFO VERSION", &ls);
-		SendCTCPReply(link, fr, co, &ls);
+		CTCPSendReply(link, fr, co, &ls);
 	}
 	else if(pstrcmp(co, "\pDCC"))
 	{
-		DCCRequest(link, fr, uah, re);
+		LSCopyString(text, 1, 255, st);
+		DCCRequest(link, fr, uah, st);
 		return 0;
 	}
 	else if(pstrcmp(co, "\pFINGER"))
@@ -243,19 +256,20 @@ static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, Co
 			sp = link->linkPrefs->fingerMessage;
 		else
 			sp = link->linkPrefs->user;
-		LSStrCat(6, &ls, re, "\p :", sp, "\p :idle ", st, "\p seconds");
-		SendCTCPReply(link, fr, co, &ls);
+		LSConcatLSAndStrAndStr(text, "\p :", sp, &ls);
+		LSConcatLSAndStrAndStr(&ls, "\p :idle ", st, &ls);
+		LSConcatLSAndStr(&ls, "\p seconds", &ls);
+		CTCPSendReply(link, fr, co, &ls);
 	}
 	else if(pstrcmp(co, "\pPING"))
 	{
-		LSStrLS(re, &ls);
-		SendCTCPReply(link, fr, co, &ls);
+		CTCPSendReply(link, fr, co, text);
 		SoundService(sndGotPing, 0);
 	}
 	else if(pstrcmp(co, "\pSOURCE"))
 	{
 		LSStrLS("\pShadowIRC can be downloaded from http://www.shadowirc.com/", &ls);
-		SendCTCPReply(link, fr, co, &ls);
+		CTCPSendReply(link, fr, co, &ls);
 	}
 	else if(pstrcmp(co, "\pTIME"))
 	{
@@ -264,7 +278,7 @@ static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, Co
 		TimeString(now, true, st, 0);
 		LSAppend1(ls, ' ');
 		LSConcatLSAndStr(&ls, st, &ls);
-		SendCTCPReply(link, fr, co, &ls);
+		CTCPSendReply(link, fr, co, &ls);
 	}
 	else if(pstrcmp(co, "\pUSERINFO"))
 	{
@@ -272,21 +286,29 @@ static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, Co
 			LSStrLS(link->linkPrefs->userinfoMessage, &ls);
 		else
 			LSStrLS(shadowIRCDefaultSignoff, &ls);
-		SendCTCPReply(link, fr, co, &ls);
+		CTCPSendReply(link, fr, co, &ls);
 	}
 	else if(pstrcmp(co, "\pVERSION"))
 	{
-		LSConcatStrAndStrAndStr("\pShadowIRC ", CL_VERSION, "\p © John Bafford 1996-2003 (", &ls);
+		LSConcatStrAndStrAndStr("\pShadowIRC ", CL_VERSION, "\p © John Bafford 1996-2004 (", &ls);
 		LSConcatLSAndStrAndStr(&ls, cdt, "\p)", &ls);
-		SendCTCPReply(link, fr, co, &ls);
+		CTCPSendReply(link, fr, co, &ls);
 	}
 	else
 	{
 		targChan=ChFind(ta, link);
 		if(targChan)
-			LSStrCat(8, &ls, "\pUnknown channel CTCP \"", co, "\p ", re, "\p\" for ", ta, "\p from ", fr);
+			sp = "\pUnknown channel CTCP \"";
 		else
-			LSStrCat(6, &ls, "\pUnknown CTCP \"", co, "\p ", re, "\p\" from ", fr);
+			sp = "\pUnknown CTCP \"";
+		
+		LSConcatStrAndStrAndStr(sp, co, "\p ", &ls);
+		LSConcatLSAndLS(&ls, text, &ls);
+		
+		if(targChan)
+			LSConcatLSAndStrAndStr(&ls, "\p\" for ", ta, &ls);
+		
+		LSConcatLSAndStrAndStr(&ls, "\p\" from ", fr, &ls);
 		
 		if(mainPrefs->showUserHostsWithMsgs)
 		{
@@ -308,16 +330,19 @@ static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, Co
 		if(!mainPrefs->noCTCPUnknownErrMsg)
 		{
 			LSConcatStrAndStr(co, "\p :unknown query", &ls);
-			SendCTCPReply(link, fr, "\pERRMSG", &ls);
+			CTCPSendReply(link, fr, "\pERRMSG", &ls);
 		}
 		return 0;
 	}
 	return 1;
 }
 
-static void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, Str255 re)
+static void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, const LongString *text)
 {
 	LongString ls;
+	Str255 re;
+	
+	LSCopyString(text, 1, 255, re);
 	
 	if(pstrcmp(co, "\pPING"))
 	{
@@ -354,96 +379,65 @@ static void CTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co, St
 	SMPrefixLinkColor(link, &ls, dsFrontWin, sicCTCP);
 }
 
-pascal char DCCCTCP(connectionPtr conn, LongString *s)
+static char SplitCTCPCommand(const LongString *ls, Str255 cmd, LongString *text)
 {
-	short j, k;
-	Str255 comm, rest;
-
-	if(s->data[1]!=1)
+	const unsigned char ctrlASearchString[] = {1, 1};
+	const unsigned char spaceSearchString[] = {1, ' '};
+	int endOfCTCP, endOfCmd;
+	
+	if(ls->data[1] != 1)
 		return 0;
 	
-	LSCopyString(s, 2, 255, comm);
-	j=pos(1, comm);
-	if(!j)
-		j=254;
-	k=pos(' ', comm);
-	if(!k)
-		k=j;
-	myCopy(comm, k+1, j-1, rest);
-	comm[0]=k-1;
-	unquote(rest);
+	endOfCTCP = LSPosCustom(ctrlASearchString, ls, 2);
+	if(!endOfCTCP)
+		endOfCTCP = ls->len;
+	
+	endOfCmd = LSPos(spaceSearchString, ls);
+	if(!endOfCmd)
+		endOfCmd = endOfCTCP + 1;
+	
+	LSCopyString(ls, 2, endOfCmd - 2, cmd);
+	ucase(cmd);
+	
+	LSCopy(ls, endOfCmd + 1, maxLSlen, text);
+	CTCPUnquoteLS(text);
+	
+	return 1;
+}
 
-	ucase(comm);
+char DCCCTCP(connectionPtr conn, const LongString *s)
+{
+	Str255 comm;
+	LongString text;
+	
+	if(!SplitCTCPCommand(s, comm, &text))
+		return 0;
+	
 	if(pstrcmp(comm, "\pACTION"))
 	{
-		DisplayAction(0, 0, conn->dcc, conn->dcc->dccUserName, rest);
+		DisplayAction(0, 0, conn->dcc, conn->dcc->dccUserName, &text);
 		return 1;
 	}
 	else if(pstrcmp(comm, "\pDCC"))
 	{
-		DCCRequest(conn->link, conn->dcc->dccUserName, conn->name, rest);
+		//NOTE: Should probably change DCCRequest to accept a longstring for DCC parameters
+		LSCopyString(s, 1, 255, comm);
+		DCCRequest(conn->link, conn->dcc->dccUserName, conn->name, comm);
 		return 1;
 	}
 	
-/*	
-	p.link=conn->link;
-	p.dcc=conn;
-	p.username=from;
-	p.userhost=uah;
-	p.target=target;
-	p.cmd=comm;
-	p.rest=rest;
-	p.isReply=isReply;
-	p.ignored=&ign;
-	p.completelyProcessed=0;
-
-	ucase(comm);
-
-	runPlugins(pCTCPMessage, (Ptr)&p);
-	if(!p.completelyProcessed && !ign)
-		if(isReply)
-			CTCPReply(link, from, comm, rest);
-		else
-			ok=CTCPComm(link, from, uah, target, comm, rest);
-
-	if(!ign && !isReply && ok)
-	{
-		s->len=j;
-		DisplayCTCP(link, from, uah, target, s);
-	}
-
-*/
 	return 1;
 }
 
-pascal char doCTCP(ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *s, char isReply, char ign, linkPtr link)
+char doCTCP(ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, const LongString *s, char isReply, char ign, linkPtr link)
 {
-	short j, k;
-	Str255 comm, rest;
+	Str255 comm;
+	LongString text;
 	pCTCPDataRec p;
 	char ok;
-
-	//Only accept ctrl-a if first character!
-	if(s->data[1]!=1)
+	
+	if(!SplitCTCPCommand(s, comm, &text))
 		return 0;
-	
-	if(s->len == 1)
-	{
-		LSStrLS("\p<<EMPTY>>", s);
-		DisplayCTCP(link, from, uah, target, s, true);
-		return 1;
-	}
-	
-	LSCopyString(s, 2, 255, comm);
-	j=pos(1, comm);
-	if(!j)
-		j=comm[0];
-	k=pos(' ', comm);
-	if(!k)
-		k=j;
-	myCopy(comm, k+1, j-1, rest);
-	comm[0]=k-1;
-	unquote(rest);
 	
 	p.link=link;
 	p.dcc=0;
@@ -451,28 +445,24 @@ pascal char doCTCP(ConstStr255Param from, ConstStr255Param uah, ConstStr255Param
 	p.userhost=uah;
 	p.target=target;
 	p.cmd=comm;
-	p.rest=rest;
+	p.rest = &text;
 	p.isReply=isReply;
 	p.ignored=&ign;
 	p.completelyProcessed=0;
-
-	ucase(comm);
-
+	
+	ok = 0;
+	
 	runPlugins(pCTCPMessage, &p);
 	if(!p.completelyProcessed && !ign)
 	{
 		if(isReply)
-			CTCPReply(link, from, comm, rest);
+			CTCPReply(link, from, comm,  &text);
 		else
-			ok=CTCPComm(link, from, uah, target, comm, rest);
+			ok = CTCPComm(link, from, uah, target, comm, &text);
 	}
 	
 	if(!ign && !isReply && ok)
-	{
-		s->len=j;
-		LSDelete(s, 1, 1); //delete initial ctrl-a
-		DisplayCTCP(link, from, uah, target, s, false);
-	}
+		DisplayCTCP(link, from, uah, target, comm, &text, false);
 
 	return 1;	
 }

@@ -234,7 +234,7 @@ static void HandleCTCPMsg(pCTCPDataPtr p)
 	{
 		LongString ls;
 		
-		LSStrLS(p->rest, &ls);
+		LSDupe(p->rest, &ls);
 		wp = SearchLS(&ls, p->link->CurrentNick);
 		
 		if(wp)

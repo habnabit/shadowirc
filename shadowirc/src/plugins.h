@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -598,7 +598,7 @@ typedef struct pCTCPDataRec {
 	ConstStr255Param userhost;		//The userhost of the user. 
 	ConstStr255Param target;			//The target. (Nick or channel.)
 	StringPtr cmd;						//The CTCP command.
-	StringPtr rest;						//Any parameters for the CTCP message. (Action text, CPING time, etc)
+	LongString *rest;						//Any parameters for the CTCP message. (Action text, CPING time, etc)
 	char *ignored;						//If true, the CTCP will be ignored.
 	char isReply;						//If true, this is a reply to a CTCP we did.
 	char completelyProcessed;	//Set this to true to keep ShadowIRC from processing this CTCP message.
