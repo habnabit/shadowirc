@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -332,7 +332,6 @@ static OSErr MWWidgetTrackDrag(MWPtr mw,  Point mouse, short state, DragReferenc
 static OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage message, DragReference drag)
 {
 	OSErr ret = noErr;
-	WEReference il;
 	
 	if(o)
 	{
@@ -365,8 +364,7 @@ static OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage mess
 				break;
 			
 			case mwInputPane:
-				il = ILGetWEFromMW(mw);
-				ret = WETrackDrag(message, drag, il);
+				ret = IADFieldTrackDrag(ILGetInputDataFromMW(mw), message, mw->w, drag);
 				break;
 
 			default:
@@ -577,12 +575,7 @@ inline OSErr MWReceiveDrag(MWPtr mw, DragReference drag)
 			
 			case mwInputPane:
 			{
-				OSErr err = WEReceiveDrag(drag, ILGetWEFromMW(mw));
-				if(!err)
-				{
-					processPaste(mw, true);
-					ret = 0;
-				}
+				ret = IADFieldReceiveDrag(ILGetInputDataFromMW(mw), mw->w, drag);
 				break;
 			}
 			

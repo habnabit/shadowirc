@@ -19,24 +19,9 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-const unsigned char CL_VERSION[] = "\p2.0a12";
-#define SIVersion 0x0200000C
+typedef struct CircularList *CLPtr;
 
-#include "IRCGlobals.h"
-#include "utils.h"
-#include "Inline.h"
-
-long ShadowIRCVersion(StringPtr str);
-long ShadowIRCVersion2(StringPtr v, StringPtr date);
-long ShadowIRCVersion(StringPtr str){if(str)pstrcpy(CL_VERSION, str);return SIVersion;}
-long ShadowIRCVersion2(StringPtr v, StringPtr date){if(v) pstrcpy(CL_VERSION,v); if(date) pstrcpy(cdt,date);return SIVersion;}
-
-void setVers(void);
-void setVers(void)
-{
-	//compile date & time
-	CopyCStringToPascal(__DATE__  " " __TIME__, cdt);
-	
-	//shadowIRCDefaultSignoff
-	pstrcat("\pShadowIRC ", CL_VERSION, shadowIRCDefaultSignoff);
-}
+CLPtr CLNew(int size);
+void CLDispose(CLPtr list);
+void CLEnqueue(CLPtr list, void* item, int size);
+void CLWalk(CLPtr list, int direction, void* *data, int *size);

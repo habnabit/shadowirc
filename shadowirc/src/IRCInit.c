@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -234,6 +234,14 @@ static void Gestalts(void)
 	}
 }
 
+static void MyInitMLTE(void)
+{
+	OSErr status;
+	TXNInitOptions options = kTXNWantGraphicsMask;
+
+	status = TXNInitTextension(NULL, 0, options);
+}
+
 static void ToolboxInit(void)
 {
 	gApplResFork = CurResFile();
@@ -245,4 +253,6 @@ static void ToolboxInit(void)
 	StartupIC();
 
 	InitDrag();
+	
+	MyInitMLTE();
 }

@@ -31,7 +31,6 @@
 #include "connections.h"
 #include "IRCChannels.h"
 #include "IRCInputPrivate.h"
-#include "IRCInput.h"
 #include "InputLine.h"
 #include "MsgBuffer.h"
 #include "plugins.h"
@@ -42,6 +41,7 @@
 #include "Floaters.h"
 #include "AppearanceHelp.h"
 #include "simpleList.h"
+#include "IRCInput.h"
 
 long lastInput, lastKey;
 char iwFront=0;
@@ -106,7 +106,7 @@ pascal char ProcessInputHunk(const char* text, long len, MWPtr mw, char clearEnd
 				if(ls.len)
 				{
 					BlockMoveData(&text[start], &ls.data[1], ls.len);
-					ProcessLine(&ls, false, 0, mw);
+					ProcessLine(&ls, NULL, 0, mw);
 				}
 				start=x+1;
 			}
@@ -121,24 +121,17 @@ pascal char ProcessInputHunk(const char* text, long len, MWPtr mw, char clearEnd
 pascal void processPaste(MWPtr mw, char dragAndDrop)
 {
 	long l;
-	CharsHandle h;
-	Handle h2;
+	Handle h;
 	long lastCR;
 	Ptr p;
 	char cp;
 	inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
-	WEReference il = IADGetWE(iad);
 	
-	WEDeactivate(il);
-	l=WEGetTextLength(il);
-	h=(CharsHandle)NewHandle(l);
+	l = IADGetTextHandle(iad, &h);
 	HLock(h);
 	p = *h;
 	
-	h2=WEGetText(il);
-	BlockMoveData(*h2, p, l);
-	
-	cp=0;
+	cp = 0;
 	//If D&D and there's a CR *anywhere*, completely process it
 	if(dragAndDrop)
 		for(lastCR = 0; lastCR < l;lastCR++)
@@ -152,30 +145,19 @@ pascal void processPaste(MWPtr mw, char dragAndDrop)
 	if(dragAndDrop)
 	{
 		if(cp)
-		{
-			l = 0;
-			IADSetText(iad, (LongString*)&l);
-		}
+			IADSetTextPtr(iad, NULL, 0);
 		//Else do nothing. It's compeltely processed unless it's not a complete line.
 	}
 	else
 	{
 		if(lastCR > -1 && l - lastCR > 0)
-		{
-			WESetSelection(0, 0x7FFFFFFF, il);
-			WEDelete(il);
-			
-			WEInsert(&p[lastCR+1], l - lastCR - 1, 0, 0, il);
-			WESetSelection(0x7FFFFFFF, 0x7FFFFFFF, il);
-			WESelView(il);
-		}
+			IADSetTextPtr(iad, &p[lastCR + 1], l - lastCR - 1);
 	}
 	
-	DisposeHandle((Handle)h);
-	WEActivate(il);
+	DisposeHandle(h);
 }
 
-pascal void ProcessLine(LongString* line, char stackup, char action, MWPtr mw)
+void ProcessLine(LongString* line, inputAreaDataPtr stackup, char action, MWPtr mw)
 {
 	int i;
 	Str255 s, s2;
@@ -215,7 +197,7 @@ pascal void ProcessLine(LongString* line, char stackup, char action, MWPtr mw)
 	if(!((line->data[1]==line->data[2])&&(line->data[1]==CmdChar)))
 	{
 		if(stackup)
-			ILAddHistory(mw, line);
+			ILAddHistory(stackup, line);
 	}
 	else
 		LSDelete(line, 1, 1);
@@ -224,16 +206,15 @@ pascal void ProcessLine(LongString* line, char stackup, char action, MWPtr mw)
 	mbnum=-1;
 }
 
+//WARNING: Should change to take an IAD and a target window instead
 pascal void GetLine(char action, MWPtr mw)
 {
 	LongString line;
-	short s;
 	inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
 	
 	IADGetText(iad, &line);
-	s = 0;
-	IADSetText(iad, (LongString*)&s);
-	ProcessLine(&line, true, action, mw);
+	IADSetTextPtr(iad, NULL, 0);
+	ProcessLine(&line, iad, action, mw);
 }
 
 inline void pluginMWGotText(LongString *ls, MWPtr win)
@@ -351,25 +332,6 @@ static char MWNavKey(MWPtr mw, UInt32 modifiers, char c)
 	return proc;
 }
 
-static void BackwordDel(WEReference we)
-{
-	long selStart, selEnd;
-	long wordStart, wordEnd;
-	
-	//Delete the active selection.
-	WEGetSelection(&selStart, &selEnd, we);
-	if(selStart != selEnd)
-		WEDelete(we);
-	
-	//Then, delete from the selection to the begining of the current word.
-	//We call WEFindWord() twice so we can account for the whitespace at the beginning of the word.
-	WEFindWord(selStart, kTrailingEdge, &wordStart, &wordEnd, we);
-	WEFindWord(wordStart,kTrailingEdge, &wordStart, &wordEnd, we);
-	
-	WESetSelection(wordStart, selStart, we);
-	WEDelete(we);
-}
-
 static char MaximizeNick(Str255 nick, simpleListPtr sl)
 {
 	char ret = false;
@@ -456,6 +418,26 @@ static void _HNCFindWord(long cStart, long *wStart, long *wEnd, Ptr text, long t
 	}
 	
 	*wEnd = curPos;
+}
+
+//WARNING: This doesn't work when you ctrl-w starting from whitespace
+static void BackwordDel(inputAreaDataPtr iad)
+{
+	long selStart, selEnd;
+	long wordStart, wordEnd;
+	LongString ls;
+	
+	IADGetText(iad, &ls);
+	
+	IADGetCursorSelection(iad, &selStart, &selEnd);
+	
+	//Then, delete from the selection to the begining of the current word.
+	//We call WEFindWord() twice so we can account for the whitespace at the beginning of the word.
+	_HNCFindWord(selStart, &wordStart, &wordEnd, &ls.data[1], ls.len);
+	_HNCFindWord(wordStart, &wordStart, &wordEnd, &ls.data[1], ls.len);
+	
+	IADSetTextPtrRange(iad, NULL, 0, wordStart, wordEnd);
+	IADSetCursorSelection(iad, wordStart, wordStart);
 }
 
 static void HandleNickComplete(inputAreaDataPtr iad)
@@ -598,100 +580,80 @@ static void HandleMsgBufferShortcut(inputAreaDataPtr iad, UInt32 modifiers)
 	IADSetText(iad, &ls);
 }
 
-void Key(EventRef event, char dontRepeat)
+static MWPtr GetTargetFromIAD(inputAreaDataPtr iad)
 {
-	char c;
-	LongString ls;
-	pKeyDownDataRec p;
-	MWPtr mw;
-	char dontProcess;
-	UInt32 modifiers;
-	inputAreaDataPtr iad;
-	WEReference il;
+	MWPtr mw = MWFromWindow(IADGetWindow(iad));
 	
-	GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifiers);
-	GetEventParameter(event, kEventParamKeyMacCharCodes, typeChar, NULL, sizeof(char), NULL, &c);
+	if(mw)
+		return mw;
+	else
+		return CurrentTarget.mw;
+}
+
+//We process kEventClassTextInput/kEventUnicodeForKeyEvent here and return either eventNotHandledErr or noErr
+OSStatus NewKey(inputAreaDataPtr iad, EventRef event)
+{
+	OSStatus result = eventNotHandledErr;
 	
-	dontProcess = !!(modifiers & cmdKey);
+	UniChar mUnicodeText[8];
+	UInt32 bytecount, nchars;
+	OSErr err;
 	
-	if(dontRepeat && dontProcess)
-		return;
+	//WARNING: Disabled plugin
+	//p.character=&c;
+	//p.event = event;
+	//runPlugins(pKeyDownMessage, &p);
 	
-	mw = GetActiveMW();
-	
-	p.character=&c;
-	p.event = event;
-	runPlugins(pKeyDownMessage, &p);
-	
-	if(!c)
-		return;
-	
-	iad = ILGetInputDataFromMW(mw);
-	
-	if(!iad)
-		return;
-	
-	if((mw && MWNavKey(mw, modifiers, c)) || dontProcess)
-		return;
-	
-	il = IADGetWE(iad);
-	
-	iwFront = true;
-	lastKey=now;
-	if((c==3) && !(modifiers & controlKey)) //enter key
-		c=13;
-	
-	switch(c)
+	/* get the character */
+	err = GetEventParameter(event, kEventParamTextInputSendText, typeUnicodeText, NULL, sizeof(mUnicodeText), &bytecount, (char*) mUnicodeText);
+	if ((err == noErr) && (bytecount >= sizeof(UniChar)))
 	{
-		case 13:	//return
-			SoundService(sndUserHitReturn, 0);
-			GetLine((modifiers & optionKey)==optionKey, CurrentTarget.mw);
-			mbInput = false;
-			break;
+		nchars = bytecount / sizeof(UniChar);
+		EventRef rawKeyEvent;
+		UInt32 modifiers;
+		MWPtr mw = GetTargetFromIAD(iad);
 		
-		case 9: //tab
-			if(modifiers & optionKey)
-				HandleMsgBufferShortcut(iad, modifiers);
-			else
-				HandleNickComplete(iad);
-			break;
+		GetEventParameter(event, kEventParamTextInputSendKeyboardEvent, typeEventRef, NULL, sizeof(rawKeyEvent), NULL, &rawKeyEvent);
+		GetEventParameter(rawKeyEvent, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(modifiers), NULL, &modifiers);
 		
-		case 27: //esc
-			if(mainPrefs->escClearsInputline)
+		if(mw && MWNavKey(mw, modifiers, mUnicodeText[0]))
+			return noErr;
+	
+		switch(mUnicodeText[0])
+		{
+			case 3:
+			if(!(modifiers & controlKey)) //enter key
 			{
-		case 21: //0x15 = ctrl-u
-		case 4: //ctrl-d
-				ls.len = 0;
-				IADSetText(iad, &ls);
+			case 13:	//return
+				SoundService(sndUserHitReturn, 0);
+				GetLine((modifiers & optionKey)==optionKey, mw);
+				mbInput = false;
+				result = noErr;
+				break;
 			}
-			break;
-		
-		case 23: //ctrl-w
-			BackwordDel(il);
-			break;
-		
-		case 30:
-			if(!mainPrefs->optionToMoveInputLine || (modifiers & optionKey)==optionKey)
-				RecallLineUp(iad);
-			else
-				WEKey(c, modifiers, il);
-			break;
-		
-		case 31:
-			if(!mainPrefs->optionToMoveInputLine || (modifiers & optionKey)==optionKey)
-				RecallLineDown(iad);
-			else
-				WEKey(c, modifiers, il);
-			break;
-		
-		case 0:
-		case 1: //ctrl-a
-			break;
-		
-		default:
-			WEKey(c, modifiers, il);
-			WESelView(il);
+			
+			case '\t':
+				if(modifiers & optionKey)
+					HandleMsgBufferShortcut(iad, modifiers);
+				else
+					HandleNickComplete(iad);
+				
+				result = noErr;
+				break;
+			
+			case 23: //ctrl-w
+				BackwordDel(iad);
+				result = noErr;
+				break;
+			
+			case 0:
+			case 1: //ctrl-a
+				result = noErr;
+				break;
+		}
 	}
+	
+	return result;
 }
 
 #pragma mark -

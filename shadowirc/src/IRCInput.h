@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -27,12 +27,15 @@ pascal void InputHandler(LongString *ls, targetPtr targ);
 #endif
 pascal void GetLine(char action, MWPtr mw);
 pascal char ProcessInputHunk(const char* data, long l, MWPtr mw, char clearEnd, long *lastCR);
-pascal void ProcessLine(LongString* ls, char stackup, char action, MWPtr mw);
 
 pascal void LockInput(void);
 pascal void UnlockInput(void);
 
-void Key(EventRef event, char dontRepeat);
+#ifdef _InputControl_
+void ProcessLine(LongString* line, inputAreaDataPtr stackup, char action, MWPtr mw);
+OSStatus NewKey(inputAreaDataPtr iad, EventRef event);
+#endif
+
 pascal void parseShortcutText(ConstStr255Param s);
 pascal void processPaste(MWPtr mw, char dragAndDrop);
 #ifdef _IRCChannels

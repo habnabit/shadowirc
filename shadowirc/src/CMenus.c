@@ -760,6 +760,7 @@ static char CMIW(Point where)
 	
 	switch(outMenuID)
 	{
+/*
 		case 201: //Inputline
 			if(outMenuItem > 0)
 			{
@@ -811,7 +812,7 @@ static char CMIW(Point where)
 				}
 				break;
 			}
-
+*/
 		default: //plugin popup
 			if(outMenuID > 0)
 				CMSubmenu(&d, outMenuID, outMenuItem);

@@ -609,6 +609,9 @@
 		};
 		20286C2AFDCF999611CA2CEA = {
 			children = (
+				F40148AF06CABC0800376EB2,
+				F40147EC06C965D200376EB2,
+				F40147C306C95EA200376EB2,
 				F552BEF60211030901A80061,
 				F552BEF80211030901A80061,
 				F552BEFA0211030901A80061,
@@ -702,8 +705,7 @@
 			sourceTree = "<group>";
 		};
 		20286C33FDCF999611CA2CEA = {
-			fallbackIsa = PBXFileReference;
-			isa = PBXFrameworkReference;
+			isa = PBXFileReference;
 			lastKnownFileType = wrapper.framework;
 			name = Carbon.framework;
 			path = /System/Library/Frameworks/Carbon.framework;
@@ -720,6 +722,96 @@
 //F42
 //F43
 //F44
+		F40147C206C95EA200376EB2 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = InputControl.h;
+			path = src/InputControl.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F40147C306C95EA200376EB2 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = InputControl.c;
+			path = src/InputControl.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F40147C406C95EA200376EB2 = {
+			fileRef = F40147C206C95EA200376EB2;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F40147C506C95EA200376EB2 = {
+			fileRef = F40147C306C95EA200376EB2;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F40147EC06C965D200376EB2 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = YASTControl.c;
+			path = src/YASTControl.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F40147ED06C965D200376EB2 = {
+			fileRef = F40147EC06C965D200376EB2;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F40147EE06C965D800376EB2 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = YASTControl.h;
+			path = src/YASTControl.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F40147EF06C965D800376EB2 = {
+			fileRef = F40147EE06C965D800376EB2;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F40148AE06CABC0800376EB2 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = CircularList.h;
+			path = src/CircularList.h;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		F40148AF06CABC0800376EB2 = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
+			name = CircularList.c;
+			path = src/CircularList.c;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F40148B006CABC0800376EB2 = {
+			fileRef = F40148AE06CABC0800376EB2;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F40148B106CABC0800376EB2 = {
+			fileRef = F40148AF06CABC0800376EB2;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		F424EAA605A5345400B68878 = {
 			children = (
 				F424EAA705A5345400B68878,
@@ -862,6 +954,9 @@
 				F4BBC2A2056EE75900BD6D17,
 				F4BBC2A3056EE75900BD6D17,
 				F4BBC2A4056EE75900BD6D17,
+				F40147C406C95EA200376EB2,
+				F40147EF06C965D800376EB2,
+				F40148B006CABC0800376EB2,
 			);
 			isa = PBXHeadersBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1328,6 +1423,9 @@
 				F4BBC2F0056EE75900BD6D17,
 				F4BBC2F1056EE75900BD6D17,
 				F4BBC2F2056EE75900BD6D17,
+				F40147C506C95EA200376EB2,
+				F40147ED06C965D200376EB2,
+				F40148B106CABC0800376EB2,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1864,6 +1962,9 @@
 		};
 		F510A8AB021CB6B10132A983 = {
 			children = (
+				F40148AE06CABC0800376EB2,
+				F40147C206C95EA200376EB2,
+				F40147EE06C965D800376EB2,
 				14B760000688B95F0069164D,
 				F552BEF70211030901A80061,
 				F552BEF90211030901A80061,
@@ -3153,9 +3254,8 @@
 			sourceTree = "<group>";
 		};
 		F5BA62A0030FFFCA0132A983 = {
-			fallbackIsa = PBXFileReference;
 			includeInIndex = 1;
-			isa = PBXFolderReference;
+			isa = PBXFileReference;
 			lastKnownFileType = folder;
 			name = English;
 			path = "English.lproj/ShadowIRC Help";

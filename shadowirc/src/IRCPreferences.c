@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -1551,11 +1551,13 @@ pascal void OpenPreferencesWindow(short panelID)
 		if(!xmw->protect)
 		{
 			SetWindowContentColor(xmw->w, &shadowircColors[sicWindowBG]);
+/*
 			if(xmw->inputData)
 			{
 				WEReference il = ILGetWEFromMW(xmw);
 				WESetStyle(weDoColor, &ts, il);
 			}
+*/
 		}
 	
 	pd.canceled = cancelPrefs;

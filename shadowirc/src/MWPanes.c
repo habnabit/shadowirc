@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -47,28 +47,22 @@ static void DrawInputPane(mwPanePtr o);
 static void UpdateInputRegion(mwPanePtr w)
 {
 	MWPtr mw = w->mw;
-	LongRect lr;
-	WEReference il = IADGetWE(mw->inputData);
+	Rect r;
 	
 	EraseRect(&w->drawArea);
 	
-	lr.top = w->drawArea.top + 10;
-	lr.left = w->drawArea.left + 6;
-	lr.bottom = w->drawArea.bottom - 6;
-	lr.right = w->drawArea.right-6;
+	r.top = w->drawArea.top + 10;
+	r.left = w->drawArea.left + 6;
+	r.bottom = w->drawArea.bottom - 6;
+	r.right = w->drawArea.right-6;
 	
-	WESetDestRect(&lr, il);
-	WESetViewRect(&lr, il);
-	
-	WECalText(il);
-	WESelView(il);
-	WEUpdate(0, il);
+	IADSetFieldBounds(mw->inputData, r);
 }
 
 static void MWInputPaneClick(mwPanePtr o, Point where, float time, UInt32 modifiers)
 {
+	#pragma unused(time, modifiers)
 	extern char iwFront;
-	MWPtr mw = o->mw;
 	
 	iwFront = true;
 	if(where.v < o->drawArea.top + 8) //grow bar
@@ -106,9 +100,7 @@ static void MWInputPaneClick(mwPanePtr o, Point where, float time, UInt32 modifi
 	}
 	else if(where.v >= o->drawArea.top + 8) //field
 	{
-		WEReference il = IADGetWE(mw->inputData);
-				
-		WEClick(where, modifiers, time, il);
+		//We don't do anything here, the control handles it
 	}
 }
 
@@ -119,7 +111,7 @@ static void DrawInputPane(mwPanePtr o)
 	char ia;
 	RGBColor oldFront, oldBack;
 	RgnHandle rgn1, rgn2;
-	WEReference il = IADGetWE(mw->inputData);
+	//WEReference il = IADGetWE(mw->inputData);
 	
 	r = o->drawArea;
 	r.bottom = r.top + 5;
@@ -160,6 +152,7 @@ static void DrawInputPane(mwPanePtr o)
 	FrameRect(&r);
 	RGBForeColor(&oldFront);
 	
+/*
 	if(ia)
 	{
 		WEActivate(il);
@@ -170,6 +163,7 @@ static void DrawInputPane(mwPanePtr o)
 		WEUpdate(0, il);
 		WEDeactivate(il);
 	}
+*/
 	RGBBackColor(&oldBack);
 }
 
@@ -268,12 +262,7 @@ pascal void MWPaneActivate(MWPtr mw, char activate)
 				DrawMWinStatus(mw);
 			else if(o->type == mwInputPane)
 			{
-				WEReference il = IADGetWE(mw->inputData);
-				
-				if(activate)
-					WEActivate(il);
-				else
-					WEDeactivate(il);
+				IADActivate(mw->inputData, activate);
 				DrawInputPane(o);
 			}
 		}

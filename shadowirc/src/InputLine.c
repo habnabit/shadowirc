@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -45,13 +45,7 @@
 #include "TextManip.h"
 #include "CMenus.h"
 #include "IRCInput.h"
-
-struct inputAreaData {
-	WEReference il;
-
-	CharsHandle hist;
-	short hpos;
-};
+#include "InputControl.h"
 
 inputLineRec inputLine;
 
@@ -225,38 +219,18 @@ pascal iwWidgetPtr IWNewWidget(long type, short align, short width)
 
 static void IWGrow(WindowRef window, Rect r)
 {
-	LongRect lr;
-	GrafPtr gp;
-	WEReference il;
+	Rect textRect;
 	
-	if(noFloatingInput)
-		return;
+	mainPrefs->inputLoc = r;
 	
-	il = inputLine.inputData->il;
+	textRect.top = inputLine.statusLineHeight;
+	textRect.left = -2;
+	textRect.bottom = r.bottom - r.top;
+	textRect.right = r.right - r.left - 14;
+	IADSetFieldBounds(inputLine.inputData, textRect);
 	
-	WGetBBox(window, &r);
-	
-	mainPrefs->inputLoc=r;
-	
-	GetPort(&gp);
-	SetPortWindowPort(window);
-	GlobalToLocal((Point*)&r.bottom);
-	
-	r.left = r.right-14;
-	r.top = inputLine.statusLineHeight+2;
-	EraseRect(&r);
-	
-	WEGetDestRect(&lr, il);
-	lr.top=inputLine.statusLineHeight+2;
-	lr.right=r.right-16;
-	lr.bottom=r.bottom;
-	
-	WESetDestRect(&lr, il);
-	WESetViewRect(&lr, il);
-	WECalText(il);
 	GetPortBounds(GetWindowPort(window), &r);
 	InvalWindowRect(window, &r);
-	SetPort(gp);
 	IWRecalculateRects();
 }
 
@@ -266,20 +240,16 @@ static void IWClick(WindowRef ilWindow, EventRef event)
 {
 	Point where;
 	UInt32 modifiers;
-	float time;
 	GrafPtr gp;
 	
 	GetPort(&gp);
-	
 	SetPortWindowPort(ilWindow);
+	
 	GetEventParameter(event, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &where);
 	GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(modifiers), NULL, &modifiers);
-	time = GetEventTime(event);
 	
 	GlobalToLocal(&where);
-	if(where.v > inputLine.statusLineHeight)
-		WEClick(where, modifiers, time, inputLine.inputData->il);
-	else
+	if(where.v <= inputLine.statusLineHeight)
 		StatusLineClick(where, modifiers);
 	
 	SetPort(gp);
@@ -306,13 +276,13 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 				//For now, we do nothing as it is consistent with what we used to do. This will need to be fixed, however...
 				case kEventWindowActivated:
 				case kEventWindowShown:
-					WEActivate(inputLine.inputData->il);
+					IADActivate(inputLine.inputData, true);
 					result = noErr;
 					break;
 					
 				case kEventWindowDeactivated:
 				case kEventWindowHidden:
-					WEDeactivate(inputLine.inputData->il);
+					IADActivate(inputLine.inputData, false);
 					result = noErr;
 					break;
 				
@@ -321,9 +291,8 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 					Rect tempRect;
 					
 					EraseRect(GetWindowPortBounds(ilWindow, &tempRect));
-					WEUpdate(0, inputLine.inputData->il);
+					
 					UpdateStatusLine();
-					result = noErr;
 					break;
 				}
 				case kEventWindowHandleContentClick:
@@ -375,17 +344,6 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 			}
 			break;
 		}
-		
-		case kEventClassKeyboard:
-		{
-			switch(eventKind)
-			{
-				case kEventRawKeyRepeat:
-				case kEventRawKeyDown:
-					Key(event, eventKind == kEventRawKeyRepeat);
-			}
-			break;
-		}
 	}
 
 	return result;
@@ -393,55 +351,21 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 
 static OSErr IWDragTrackingHandler(DragTrackingMessage message, WindowPtr window, void* refCon, DragReference drag)
 {
-#pragma unused(window, refCon)
-	OSErr ret = dragNotAcceptedErr;
-	
-	if(!inputLocked)
-		ret = WETrackDrag(message, drag, inputLine.inputData->il);
-	
-	return ret;
+#pragma unused(refCon)
+	return IADFieldTrackDrag(inputLine.inputData, message, window, drag);
 }
 
 static OSErr IWDragReceiveHandler(WindowPtr window, void* refCon, DragReference drag)
 {
-#pragma unused(window, refCon)
-	OSErr err = dragNotAcceptedErr;
-	
-	if(!inputLocked)
-	{
-			err= WEReceiveDrag(drag, inputLine.inputData->il);
-			if(!err)
-				processPaste(CurrentTarget.mw, true);
-	}
-	
-	return err;
-}
-
-inputAreaDataPtr IADNew(WEReference il)
-{
-	inputAreaDataPtr iad = malloc(sizeof(inputAreaData));
-	
-	iad->il = il;
-	iad->hist = (CharsHandle)NewHandle(1);
-	(*iad->hist)[0] = 0;
-	iad->hpos = 0;
-	
-	return iad;
-}
-
-void IADDispose(inputAreaDataPtr iad)
-{
-	WEDispose(iad->il);
-	DisposeHandle(iad->hist);
-	
-	free(iad);
+#pragma unused(refCon)
+	return IADFieldReceiveDrag(inputLine.inputData, window, drag);
 }
 
 void OpenInputLine()
 {
 	if(!inputLine.w)
 	{
-		LongRect dr;
+		Rect textRect;
 		GrafPtr p0;
 		short line2;
 		Rect sb;
@@ -450,7 +374,7 @@ void OpenInputLine()
 		char offscreen;
 		ConstStringPtr s;
 		Rect wr;
-		EventTypeSpec ilSpec[] = {
+		const EventTypeSpec ilSpec[] = {
 			{kEventClassWindow, kEventWindowDrawContent},
 			{kEventClassWindow, kEventWindowHandleContentClick},
 			{kEventClassWindow, kEventWindowGetMinimumSize},
@@ -459,14 +383,10 @@ void OpenInputLine()
 			{kEventClassWindow, kEventWindowDeactivated},
 			{kEventClassWindow, kEventWindowShown},
 			{kEventClassWindow, kEventWindowHidden},
-			{kEventClassCommand, kEventCommandUpdateStatus},
-			{kEventClassKeyboard, kEventRawKeyDown},
-			{kEventClassKeyboard, kEventRawKeyRepeat}
 		};
 		static EventHandlerUPP ilUPP = NULL;
 		static DragTrackingHandlerUPP iwTrackingHandlerUPP = nil;
 		static DragReceiveHandlerUPP iwReceiveHandlerUPP = nil;
-		WEReference twe;
 
 		if(mainPrefs->nonGlobalInput)
 		{
@@ -541,24 +461,21 @@ void OpenInputLine()
 			iws->onWidth=StringWidth("\pon ");
 			iws->closeParenWid = CharWidth('(');
 			
-			//Then, setup the WASTE field			
-			dr.left=1;
-			dr.top=inputLine.statusLineHeight+2;
-			dr.right=(mainPrefs->inputLoc.right - mainPrefs->inputLoc.left)-14; //local coord
-			dr.bottom=(mainPrefs->inputLoc.bottom - mainPrefs->inputLoc.top) - 5; //local coord
-			
-			// switched off DrawOffscreen, as Aqua does that anyways
-			// (prevent triple-buffering) [smcgovern]
-			WENew(&dr, &dr, weDoUndo | weDoAutoScroll | weDoMonoStyled | weDoDragAndDrop | weDoAutoBlink, &twe);
-			WESetInfo(weRefCon, &inputLine.w, twe);
+/*
 			WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, twe);
-			WESetUserInfo(kInputField, kInputField, twe);
+*/
 			
-			inputLine.inputData = IADNew(twe);
+			textRect.top = inputLine.statusLineHeight;
+			textRect.left = -2;
+			textRect.right = (mainPrefs->inputLoc.right - mainPrefs->inputLoc.left)-14; //local coord
+			textRect.bottom = (mainPrefs->inputLoc.bottom - mainPrefs->inputLoc.top); //local coord
 			
-			WEActivate(twe);
+			inputLine.inputData = IADNew(inputLine.w, textRect, NewKey);
+			
 			SetPort(p0);
 			WSelect(inputLine.w);
+			
+			SetUserFocusWindow(inputLine.w);
 			
 			iws->maxLineWid=(CharWidth('n') * (22+22+32+1)) + iws->awayWidth + iws->istalkingwithWidth + iws->onWidth;
 			
@@ -792,95 +709,6 @@ inline void IWInternalDraw(iwWidgetPtr o)
 
 #pragma mark -
 
-void ILAddHistory(MWPtr mw, LongString *line)
-{
-	int i;
-	inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
-	CharsHandle hist = iad->hist;
-	
-	if(GetHandleSize((Handle)hist)>MAXHIST)
-	{
-		i=1;
-		while((*hist)[i])
-			i++;
-		
-		Munger((Handle)hist, 0, 0, i, (const void*)1, 0);
-	}
-	
-	i=line->len+1;
-	if(i>1)
-	{
-		line->data[i]=0;
-		PtrAndHand(&line->data[1], (Handle)hist, i);
-		iad->hpos = GetHandleSize((Handle)hist)-1;
-	}
-}
-
-static void RecallLine(inputAreaDataPtr iad, int p)
-{
-	CharsHandle hist = iad->hist;
-	int i;
-	LongString ls;
-		
-	iad->hpos = p;
-	i=0;
-	do
-	{
-		p++;
-		i++;
-		ls.data[i]=(*hist)[p];
-	} while(ls.data[i]);
-	
-	ls.len = i - 1;
-	IADSetText(iad, &ls);
-}
-
-void RecallLineUp(inputAreaDataPtr iad)
-{
-	int i;
-
-	if(iad)
-	{
-		CharsHandle hist = iad->hist;
-		
-		i = iad->hpos;
-		if(i > 0)
-		{
-			while((*hist)[--i])
-				;
-			RecallLine(iad, i);
-		}
-	}
-}
-
-void RecallLineDown(inputAreaDataPtr iad)
-{
-	int i;
-
-	if(iad)
-	{
-		CharsHandle hist = iad->hist;
-		long z = GetHandleSize((Handle)hist);
-		
-		i = iad->hpos;
-		if(i<z-1)
-		{
-			while((*hist)[++i])
-				;
-			
-			if(i<z-1)
-				RecallLine(iad, i);
-			else
-			{
-				int ls = 0;
-				IADSetText(iad, (LongString*)&ls);
-			}
-		}
-	}
-}
-
-#pragma mark -
-
 inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw)
 {
 	if(!noFloatingInput)
@@ -897,68 +725,6 @@ inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw)
 	}
 }
 
-WEReference IADGetWE(inputAreaDataPtr iad)
-{
-	if(iad)
-		return iad->il;
-	else
-		return 0;
-}
-
-WEReference ILGetWEFromMW(MWPtr mw)
-{
-	inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
-	
-	return IADGetWE(iad);
-}
-
-void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish)
-{
-	WESetSelection(start, finish, iad->il);
-}
-
-void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish)
-{
-	WEGetSelection(start, finish, iad->il);
-}
-
-void IADSetText(inputAreaDataPtr iad, LongString *ls)
-{
-	WEReference il = iad->il;
-	short i;
-	
-	while((i = LSPosChar(13, ls)) != 0)
-		LSDelete(ls, i, i);
-	
-	WEDeactivate(il);
-	WESetSelection(0, 0x7FFFFFFF, il);
-	WEDelete(il);
-
-	if(ls->len)
-		WEInsert(&ls->data[1], ls->len, 0, 0, il);
-
-	WESetSelection(0x7FFFFFFF, 0x7FFFFFFF, il);
-	WESelView(il);
-	WEActivate(il);
-}
-
-long IADGetText(inputAreaDataPtr iad, LongString *ls)
-{
-	long textLen = WEGetTextLength(iad->il);
-	
-	if(ls)
-	{
-		long tl = textLen;
-		
-		if(tl > 500)
-			tl = 500;
-		
-		BlockMoveData(*WEGetText(iad->il), &ls->data[1], tl);
-		ls->len = tl;
-	}
-	
-	return textLen;
-}
 
 #pragma mark -
 
@@ -966,11 +732,13 @@ void IWLock(void)
 {
 	if(!noFloatingInput && !inputLine.lock)
 	{
-		long l = 0;
+/*
 		inputLine.lock = 1;
-		IADSetText(inputLine.inputData, (LongString*)&l);
+		
+		IADSetTextPtr(inputLine,inputData, NULL, 0);
 		WEFeatureFlag(weFReadOnly, weBitSet, inputLine.inputData->il);
 		UpdateStatusLine();
+*/
 	}
 }
 
@@ -978,6 +746,7 @@ void IWUnlock(void)
 {
 	if(!noFloatingInput && inputLine.lock)
 	{
+/*
 		Rect r;
 		GrafPtr p0;
 
@@ -994,6 +763,7 @@ void IWUnlock(void)
 		inputLine.lock = 0;
 		SetPort(p0);
 		WEFeatureFlag(weFReadOnly, weBitClear, inputLine.inputData->il);
+*/
 	}
 }
 

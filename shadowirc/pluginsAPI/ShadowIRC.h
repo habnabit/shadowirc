@@ -1,5 +1,5 @@
 /*	ShadowIRC Plugins Header File
-		Version 2.0a11-preliminary
+		Version 2.0a12-preliminary
 		© John Bafford 1997-2004. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x0200000B
+#define _ShadowIRC_API_Version_ 0x0200000C
 
 #include <Carbon/Carbon.h>
 #include <netinet/in.h>
@@ -2180,10 +2180,10 @@ pascal void InputHandler(LongString *ls, targetPtr targ);
 		Output:	none
 */
 
-pascal void ProcessLine(LongString* line, char stackup, char action, MWPtr mw);
+void ProcessLine(LongString* line, inputAreaDataPtr stackup, char action, MWPtr mw);
 /*	Processes a line of text. Can be a command.
 		Input:	line - text to process.
-					stackup - if true, adds to inputline history unless line begins with "//"
+					stackup - if not null, adds to the specified inputline history unless line begins with "//"
 					action - if true, treat as an action
 					mw - target of the input
 		Output:	none

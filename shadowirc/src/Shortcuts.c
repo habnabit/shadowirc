@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -462,20 +462,20 @@ static void ParseShortcutText(ConstStr255Param s)
 				IADGetCursorSelection(iad, &l1, &l2);
 				if(l1!=l2)
 				{
-					WEReference il = IADGetWE(iad);
-					
-					h=NewHandle(l2-l1);
-					WECopyRange(l1, l2, h, 0, 0, il);
+					IADGetTextHandleRange(iad, &h, l1, l2);
 					IADSetText(iad, &ls);
 					if(ep<0)
 						ep=cp;
-					IADSetCursorSelection(iad, cp, ep);
+					
 					if(l2-l1!=0)
 					{
 						HLock(h);
-						WEInsert(*h, l2-l1, 0, 0, il);
+						IADSetTextPtrRange(iad, *h, l2-l1, cp, ep);
 						IADSetCursorSelection(iad, cp, (l2-l1)+cp);
 					}
+					else
+						IADSetCursorSelection(iad, cp, ep);
+					
 					DisposeHandle(h);
 				}
 				else

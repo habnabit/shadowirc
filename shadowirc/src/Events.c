@@ -377,6 +377,8 @@ static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef even
 						SetTarget(mw, &CurrentTarget);
 						UpdateStatusLine();
 						DrawMWinStatus(consoleWin);
+						
+						IADActivate(ILGetInputDataFromMW(mw), true);
 					}
 					break;
 				}
@@ -430,17 +432,6 @@ static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef even
 			}
 			break;
 		}
-		
-		case kEventClassKeyboard:
-		{
-			switch(eventKind)
-			{
-				case kEventRawKeyRepeat:
-				case kEventRawKeyDown:
-					Key(event, eventKind == kEventRawKeyRepeat);
-			}
-			break;
-		}
 	}
 	
 	return result;
@@ -468,18 +459,15 @@ void MWInstallEventHandlers(MWPtr mw)
 			{kEventClassWindow, kEventWindowBoundsChanged},
 			{kEventClassWindow, kEventWindowClose},
 			{kEventClassWindow, kEventWindowHandleContentClick},
-			{kEventClassKeyboard, kEventRawKeyDown},
-			{kEventClassKeyboard, kEventRawKeyRepeat},
 	};
 	
 	if(!mouseWheelHandler)
+	{
 		mouseWheelHandler = NewEventHandlerUPP(MWDoMouseWheelEvent);
-	if(!uiCommandHandler)
 		uiCommandHandler = NewEventHandlerUPP(MWUICommandHandler);
-	if(!mwEventHandler)
 		mwEventHandler = NewEventHandlerUPP(MWEventHandler);
-	if(!caction)
 		caction = NewControlActionUPP(MWVScrollTrack);
+	}
 	
 	InstallWindowEventHandler(mw->w, mouseWheelHandler, 1, &wheelType, mw, NULL);
 	InstallWindowEventHandler(mw->w, uiCommandHandler, GetEventTypeCount(commandType), commandType, mw, NULL);

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -587,7 +587,7 @@ static OSStatus DoResumeEvent(EventHandlerCallRef handlerCallRef, EventRef event
 	InitCursor();
 	
 	if(!noFloatingInput)
-		WEActivate(ILGetWEFromMW(0));
+		IADActivate(ILGetInputDataFromMW(0), true);
 	
 	NotifyRemove(); //Clear notification manager requests.
 
@@ -605,7 +605,7 @@ static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef even
 	inBackground=1;
 	
 	if(!noFloatingInput)
-		WEDeactivate(ILGetWEFromMW(0));
+		IADActivate(ILGetInputDataFromMW(0), false);
 	
 	p.inBackground=inBackground;
 	runPlugins(pContextSwitchMessage, &p);

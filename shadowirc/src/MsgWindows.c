@@ -41,12 +41,12 @@
 #include "filesMan.h"
 #include "DragDrop.h"
 #include "MWPanes.h"
-#include "InputLine.h"
 #include "Events.h"
 #include "MoreFilesX.h"
 #include "IRCCFPrefs.h"
 #include "StringKeys.h"
 #include "InputLine.h"
+#include "IRCInput.h"
 
 #define kLogFolderNameKey CFSTR("LogFolderName")
 
@@ -1098,22 +1098,10 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 
 				if(noFloatingInput && !h->protect)
 				{
-					LongRect dr;
-					TextStyle ts;
-					WEReference il;
-					
+					Rect zeroRect = {0, 0, 0, 0};
 					MWNewPane(h, mwInputPane, mwPaneBottom, 32, -1);
 					
-					dr.left= dr.top = dr.right = dr.bottom = 0;
-					
-					WENew(&dr, &dr, weDoUndo | weDoAutoScroll | weDoMonoStyled | weDoDragAndDrop | weDoAutoBlink, &il);
-					WESetInfo(weRefCon, &h, il);
-					WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, il);
-					WESetUserInfo(kInputField, kInputField, il);
-					ts.tsColor = shadowircColors[sicStandard];
-					WESetStyle(weDoColor, &ts, il);
-					
-					h->inputData = IADNew(il);
+					h->inputData = IADNew(h->w, zeroRect, NewKey);
 				}
 				else
 					h->inputData = 0;

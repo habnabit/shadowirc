@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -22,7 +22,7 @@
 #ifndef _InputLine_
 #define _InputLine_
 
-#define MAXHIST 4096
+#include "InputControl.h"
 
 #ifndef __INPUTLINE__
 #define CONST const
@@ -91,8 +91,6 @@ enum statuslineFlags {
 	kBoldedPopups = 1 << 2
 };
 
-typedef struct inputAreaData inputAreaData, *inputAreaDataPtr;
-
 typedef struct inputLineRec {
 	CONST WindowPtr w;
 	CONST inputAreaDataPtr inputData;
@@ -114,26 +112,8 @@ extern char noFloatingInput;
 #undef CONST
 
 
-#ifdef _MsgWindows_
-void ILAddHistory(MWPtr mw, LongString *line);
-
-inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw);
-#endif
-
 void OpenInputLine(void);
 void StatusLineClick(Point where, short modifiers);
-
-void IADDispose(inputAreaDataPtr iad);
-
-long IADGetText(inputAreaDataPtr iad, LongString *ls);
-void IADSetText(inputAreaDataPtr iad, LongString *ls);
-
-void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish);
-void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish);
-
-void RecallLineUp(inputAreaDataPtr iad);
-void RecallLineDown(inputAreaDataPtr iad);
-
 
 void IWLock(void);
 void IWUnlock(void);
@@ -145,12 +125,6 @@ pascal long IWPopUpMenu(Point p, MenuHandle m, long curItem);
 pascal char IWDeleteWidget(iwWidgetPtr o);
 pascal short IWOverride(long type, iwWidgetPtr *object);
 
-#ifdef _MsgWindows_
-#ifdef _WASTE_
-inputAreaDataPtr IADNew(WEReference il);
-WEReference ILGetWEFromMW(MWPtr mw);
-WEReference IADGetWE(inputAreaDataPtr iad);
-#endif
-#endif
+inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw);
 
 #endif

@@ -327,6 +327,7 @@ char ToggleConsoleWindow(void)
 
 void HitEditMenu(MWPtr mw, short item)
 {
+/*
 	char mwFront, otherFront;
 	WEReference we;
 	long s0, s1;
@@ -407,6 +408,7 @@ void HitEditMenu(MWPtr mw, short item)
 				break;
 		}
 	}
+*/
 }
 
 int HitWindowPluginServiceMenu(const short item)
