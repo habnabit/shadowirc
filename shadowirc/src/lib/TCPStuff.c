@@ -713,11 +713,20 @@ static void FindAddressDNR(DNRRecordPtr drp)
 
         str = safe_malloc(drp->name[0] + 1);
         CopyPascalStringToC(drp->name, str);
-        pthread_cleanup_push((void *) pthread_mutex_unlock, (void *) &dnslock);
         pthread_mutex_lock(&dnslock);
+	pthread_cleanup_push((void *) pthread_mutex_unlock, (void *) &dnslock);
         hp = gethostbyname(str);
         free(str);
 	pthread_mutex_lock(&drp->lock);
+	/*
+	 * If we have been asked to cancel, we should do it before
+	 * we attempt to play with possibly deallocated data structures.
+	 *
+	 * Otherwise, we hold the lock on the data structures
+	 * and a cancel will not be sent until we release the lock.
+	 */
+	pthread_testcancel();
+
         if(hp == NULL)
         {
             drp->ioResult = -1;
@@ -873,26 +882,48 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 	switch(c->status)
 	{
 		case CS_Searching:
-			if(pthread_mutex_trylock(&c->dnrrp->lock) == 0)
+			/*
+			 * Lookup thread will lock the DNRRecord, set dnrrp->ioResult,
+			 * dnrrp->name, and dnrrp->ip, and then unlock the DNRRecord.
+			 * Until dnrrp->ioResult is set by the applicable thread,
+			 * it is set to inProgress.
+			 */
+			pthread_mutex_lock(&c->dnrrp->lock);
+			if(c->dnrrp->ioResult == noErr)
 			{
-				if(c->dnrrp->ioResult == noErr)
-				{
-					cer->event = C_Found;
-					cer->value = (long)NewString(c->dnrrp->name);
-					cer->addr = c->dnrrp->ip;
-				} else if(c->dnrrp->ioResult != inProgress) {
-					cer->event = C_SearchFailed;
-					cer->value = c->dnrrp->ioResult;
-				}
-				pthread_mutex_unlock(&c->dnrrp->lock);
+				cer->event = C_Found;
+				cer->value = (long)NewString(c->dnrrp->name);
+				cer->addr = c->dnrrp->ip;
+			} else if(c->dnrrp->ioResult != inProgress) {
+				/*
+				 * If dnrrp->ioResult is != inProgress and we hold the mutex,
+				 * then the thread will have already completed, and we do not need
+				 * to call pthread_cancel
+				 */
+				cer->event = C_SearchFailed;
+				cer->value = c->dnrrp->ioResult;
 			}
 			else if(TickCount() > c->timeout)
 			{
+				/*
+				 * Cancel thread - precludes possibilty of a race condition
+				 * in which we destroy the DNRRecord right before
+				 * the thread uses the data structures
+				 * To maintain integrity, we MUST hold the mutex lock before
+				 * we cancel the DNS thread
+				 */
                                 pthread_cancel(c->dnrrp->thread);
 				cer->event = C_SearchFailed;
 				cer->value = 1;
 				cer->timedout = true;
 			}
+			pthread_mutex_unlock(&c->dnrrp->lock);
+			/*
+			 * If we earlier set the event to indicate an error,
+			 * we now clean up the associated data structures
+			 * The thread MUST be canceled before this point, or
+			 * we may free() its DNRRecord before it attempts to use it
+			 */
 			if(cer->event != C_NoEvent)
 			{
 				if(c->dnrrp->ioResult != inProgress)
@@ -901,7 +932,6 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 				DestroyConnection(&rcp);
 			}
 			break;
-		
 		case CS_Opening:
 			switch(c->state)
 			{
