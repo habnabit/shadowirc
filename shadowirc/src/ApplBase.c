@@ -389,16 +389,6 @@ static pascal void floatingWindowClick(EventRecord *e) //this also takes care of
 				StatusLineClick(e->where, e->modifiers, e->when);
 			SetPort(p);
 		}
-		else if(i==	inGrow)
-		{
-			e->message=(long)wp;
-			inGrowHandler(e);
-		}
-		else if(i==inDrag)
-		{
-			e->message=(long)wp;
-			inDragHandler(e);
-		}
 		
 		iwFront=1;
 		return;
