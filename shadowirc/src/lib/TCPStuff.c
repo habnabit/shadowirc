@@ -154,30 +154,6 @@ int GetConnectionSocket(long cp);
 
 #pragma mark -
 
-#ifndef BUFLEN
-    #define BUFLEN 256
-#endif
-
-void inet_ntop_str(int af, const struct sockaddr *addr, StringPtr string)
-{
-    char cstr[BUFLEN];
-    
-    switch(af)
-    {
-	    case AF_INET6:
-		    inet_ntop(af, &((struct sockaddr_in6 *)addr)->sin6_addr, cstr, BUFLEN);
-		    break;
-	    case AF_INET:
-		    inet_ntop(af, &((struct sockaddr_in *)addr)->sin_addr, cstr, BUFLEN);
-		    break;
-	    default:
-		    sprintf(cstr, "%s", "");
-		    break;
-    }
-
-    CopyCStringToPascal(cstr, string);
-}
-
 /*
  * inet_ntoa_str
  * Converts an in_addr struct to presentation format
