@@ -4,7 +4,7 @@
   <object name="rootObject" class="NSCustomObject" id="1">
     <string name="customClass">NSApplication</string>
   </object>
-  <array count="98" name="allObjects">
+  <array count="97" name="allObjects">
     <object class="IBCarbonWindow" id="181">
       <string name="windowRect">83 108 187 502 </string>
       <string name="title">Save Preferences</string>
@@ -100,7 +100,7 @@
     <object class="IBCarbonMenu" id="203">
       <string name="title">main</string>
       <int name="menuID">256</int>
-      <array count="8" name="items">
+      <array count="7" name="items">
         <object class="IBCarbonMenuItem" id="208">
           <string name="title">ShadowIRC</string>
           <reference name="submenu" idRef="202"/>
@@ -363,13 +363,6 @@
             </array>
           </object>
         </object>
-        <object class="IBCarbonMenuItem" id="356">
-          <string name="title">Help</string>
-          <object name="submenu" class="IBCarbonMenu" id="357">
-            <string name="title">Help</string>
-            <int name="menuID">264</int>
-          </object>
-        </object>
       </array>
       <string name="name">_NSMainMenu</string>
     </object>
@@ -530,8 +523,13 @@
     <reference idRef="352"/>
     <reference idRef="353"/>
     <reference idRef="355"/>
-    <reference idRef="356"/>
-    <reference idRef="357"/>
+    <object class="IBCarbonMenuItem" id="356">
+      <string name="title">Help</string>
+      <object name="submenu" class="IBCarbonMenu">
+        <string name="title">Help</string>
+        <int name="menuID">264</int>
+      </object>
+    </object>
     <object class="IBCarbonPicture" id="359">
       <string name="bounds">0 0 144 360 </string>
       <ostype name="controlSignature">SIRC</ostype>
@@ -610,7 +608,7 @@
     <reference idRef="367"/>
     <reference idRef="368"/>
   </array>
-  <array count="98" name="allParents">
+  <array count="97" name="allParents">
     <reference idRef="1"/>
     <reference idRef="181"/>
     <reference idRef="182"/>
@@ -698,7 +696,6 @@
     <reference idRef="342"/>
     <reference idRef="342"/>
     <reference idRef="203"/>
-    <reference idRef="356"/>
     <reference idRef="360"/>
     <reference idRef="362"/>
     <reference idRef="360"/>

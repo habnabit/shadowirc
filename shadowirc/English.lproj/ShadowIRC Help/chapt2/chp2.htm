@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN"
+        "http://www.w3.org/MarkUp/Wilbur/HTML32.dtd">
+<html>
+<head>
+	<title>Command Reference</title>
+	<meta name="AppleTitle" content="ShadowIRC Command Reference">
+	<meta name="AppleOrder" content="2">
+</head>
+<body>
+<font size="4" face="Lucida Grande, Helvetica, Arial">
+
+<H2>ShadowIRC 2.0<br>
+Command Reference</H2>
+
+Parameters in [brackets] are optional.
+<br><br>
+/bans [&lt;mask&gt;] - lists bans on current channel, optionally matching mask.<br>
+/bract - broadcast action<br>
+/broadcast - broadcast text to all channels<br>
+/bye [&lt;signoff reason&gt;] - disconnects from all servers.<br>
+/c &lt;connectionNumber | connectionName&gt; [&lt;server&gt; [&lt;port&gt; [&lt;password&gt;]]]- opens a connection<br>
+/clear - clears all the text in the current messge window<br>
+/cping &lt;nick&gt; - does a ctcp ping on someone and displays their ping time in tenths of seconds<br>
+/ctcp &lt;nick&gt; &lt;command&gt;<br>
+/d &lt;connectionNumber | connectionName&gt; - closes a connection<br>
+/dcc &lt;[list]|close|chat|send|get&gt;<br>
+/debug - turns on debug mode<br>
+/dns &lt;IP|machineName&gt;<br>
+/exceptions [&lt;mask&gt;] - lists exceptions on current channel, optionally matching mask.<br>
+/exit<br>
+/ignore [-]&lt;nick | user@host | nick!user@host&gt; [...]<br>
+/j = /join<br>
+/join &lt;channel&gt; [&lt;channel key&gt;]<br>
+/k = /kick<br>
+/kick &lt;channel&gt; &lt;nickname&gt; [&lt;reason&gt;] - Kicks a user from a channel.<br>
+/kill &lt;nickname&gt; [&lt;reason&gt;]<br>
+/leave = /part<br>
+/m = /msg<br>
+/me - action<br>
+/msg &lt;nickname&gt; &lt;message&gt;<br>
+/msgq - Like /msg, but doesn't display your message on the screen<br>
+/mode - Displays and sets user and channel modes.<br>
+	Channel Modes:<br>
+		+t - Only channel operators can change topic<br>
+		+n - You must be in the channel to send a message to it<br>
+		+i - Invite-only. Only channel operators can invite users to this channel.<br>
+		+m - Moderated. Only users with voice (channel mode +v) may speak.<br>
+		+p - Private.<br>
+		+s - Secret.<br>
+		+l - A limit is placed on the number of people who may join this channel.<br>
+		+k - Sets the channel password. You must know this password to join the channel.<br>
+		+o - Channel operator. Gives you the ability to set channel modes and kick people from the channel.<br>
+		+v - Voice. Allows you to speak on a moderated channel.<br>
+		+b - Banned. If you are banned, you are prevented from joining the channel.<br><br>
+/names [&lt;channel&gt;]<br>
+/nick [&lt;newnick&gt;]<br>
+/notice &lt;nickname|channelname&gt; &lt;message&gt;<br>
+/noticeq - Like /notice, but doesn't display your message on the screen<br>
+/notify [[-]&lt;nick&gt;] - Adds or removes someone from the notify list for the current connection.<br>
+/onotice - Sends a notice to all the ops of the current channel.<br>
+/part [&lt;#channel&gt;] [&lt;reason&gt;] - leaves a channel, or the current channel if none specified.<br>
+/ping = /ctcp ping<br>
+/q = /query<br>
+/query &lt;nick&gt; [&lt;message&gt;]<br>
+/quit = /exit<br>
+/quote &lt;text&gt; - Sends the text to the server without preprocessing. <br>
+/raw = /quote<br>
+/say &lt;text&gt; - Sends the text to the current window. (So you can type text that begins with the command character.)<br>
+/server<br>
+/signoff<br>
+/time [&lt;servername&gt;] - returns the local time of the server you are connected to, or the server you specify.<br>
+/topic<br>
+/umode - same as /mode CurrentNick<br>
+/unixtime time - Converts a time in unix format to a human-readable format<br>
+/version<br>
+/who<br>
+/whois<br>
+/whowas<br>
+/wh = /whois<br>
+/ww = /whowas<br>
+<br>
+//command doesn't save in inputline scrollback. Good uses: //msgq x@channels.undernet.org login #yourchannel yourpass<br>
+<br>
+Shortcuts tokens:<br>
+\n = return (to separate commands)<br>
+$channel = current target<br>
+$il = inputline text<br>
+$lastjoiner = last person to join current channel<br>
+$nick = current nick<br>
+$server = current server<br>
+$selecteduser = first user selected in the userlist<br>
+$version = version of ShadowIRC you are using<br>
+$date = current date<br>
+$date.l = current date (long format)<br>
+$time = current time<br>
+$time.s = current time with seconds<br>
+$-&gt; = set the cursor on the inputline at this position (e.g. "/ctcp $-&gt; version" would let you hit a shortcut, type in someone's nickname, and hit return to version them, without having to position the cursor between /ctcp and version.)<br>
+$&lt- = end selection<br>
+
+
+
+</font>
+</body>
+</html>

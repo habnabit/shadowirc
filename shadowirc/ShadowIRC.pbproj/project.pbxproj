@@ -208,6 +208,7 @@
 				F552BF490211030901A80061,
 				F552BF4F0211030901A80061,
 				F5059DA302A5C0930132A983,
+				F5BA629F030FFFCA0132A983,
 				0867D6AAFE840B52C02AAC07,
 				F5059D9402A3470A0132A983,
 				F5F61A2F02A02E380132A988,
@@ -299,6 +300,10 @@
 	<string>ShadowIRC</string>
 	<key>CFBundleGetInfoString</key>
 	<string>2.0a3, © 1996-2002 John Bafford</string>
+	<key>CFBundleHelpBookFolder</key>
+	<string>ShadowIRC Help</string>
+	<key>CFBundleHelpBookName</key>
+	<string>ShadowIRC Help</string>
 	<key>CFBundleIconFile</key>
 	<string>ShadowIRC.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -387,6 +392,7 @@
 				F5F61A3102A02E390132A988,
 				F5059D9602A3470A0132A983,
 				F5059DAA02A5C0C70132A983,
+				F5BA62B3030FFFCA0132A983,
 			);
 			isa = PBXResourcesBuildPhase;
 		};
@@ -2070,6 +2076,28 @@
 		};
 		F599D6550217A8B901A80061 = {
 			fileRef = F599D6530217A8B901A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5BA629F030FFFCA0132A983 = {
+			children = (
+				F5BA62A0030FFFCA0132A983,
+			);
+			isa = PBXVariantGroup;
+			name = "ShadowIRC Help";
+			path = "";
+			refType = 4;
+		};
+		F5BA62A0030FFFCA0132A983 = {
+			includeInIndex = 1;
+			isa = PBXFolderReference;
+			name = English;
+			path = "English.lproj/ShadowIRC Help";
+			refType = 4;
+		};
+		F5BA62B3030FFFCA0132A983 = {
+			fileRef = F5BA629F030FFFCA0132A983;
 			isa = PBXBuildFile;
 			settings = {
 			};

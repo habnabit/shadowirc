@@ -85,6 +85,29 @@ inline void SetupUPPs(void)
 	StdNavFilter = NewNavEventUPP(NavDialogFilter);
 }
 
+static void AppleHelpInit()
+{
+	/* Register help book */
+	CFBundleRef mainBundle = CFBundleGetMainBundle();
+	if(mainBundle)
+	{
+		CFURLRef bundleURL = NULL;
+		CFRetain(mainBundle);
+		bundleURL = CFBundleCopyBundleURL(mainBundle);
+
+		if(bundleURL)
+		{
+			FSRef bundleFSRef;
+			if(CFURLGetFSRef(bundleURL, &bundleFSRef))
+				AHRegisterHelpBook(&bundleFSRef);
+					
+			CFRelease(bundleURL);
+		}
+			
+		CFRelease(mainBundle);
+	}
+}
+
 void ApplicationInit(void)
 {
 	WindowRef splashWindow = NULL;
@@ -164,7 +187,9 @@ void ApplicationInit(void)
 	ShortcutsMenuUpdate();
 	MBInit();
 	ConnectionMenuInit();
+	
 	AppleMenuURLInit();
+	AppleHelpInit();
 	
 	if(splashWindow)
 		DisposeWindow(splashWindow);

@@ -672,6 +672,7 @@ void FontsMenuInit(void)
 
 static void HelpMenuInit(void)
 {
+/*
 	OSErr err;
 	short x, num;
 	ConstStringPtr s;
@@ -694,6 +695,7 @@ static void HelpMenuInit(void)
 	
 	normHelpMenuItems = CountMenuItems(gHelpMenu)+2;
 	InsertMenu(menuHelpWidget, -1);
+*/
 }
 
 void ConnectionMenuInit(void)
