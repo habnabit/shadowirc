@@ -241,6 +241,7 @@ pascal void MWPaneActivate(MWPtr mw, char activate)
 	mwPanePtr o;
 	pMWPaneActivateData p;
 	GrafPtr g;
+	char windowActive = IsWindowActive(mw->w);
 	
 	GetPort(&g);
 	SetPortWindowPort(mw->w);
@@ -250,7 +251,7 @@ pascal void MWPaneActivate(MWPtr mw, char activate)
 		{
 			if(o->type==mwTextPane)
 			{
-				if(activate && !inBackground)
+				if(activate && windowActive)
 				{
 					ActivateControl(mw->vscr);
 					WEActivate(mw->we);
