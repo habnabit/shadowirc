@@ -120,7 +120,7 @@ pascal void CMAddSubmenu(struct cmmwData* d, ConstStr255Param item, short *id, M
 pascal void CMSetCheckmark(struct cmmwData *d, long key, char checked);
 
 pascal char DetermineCM(WindowPtr w, Point where, char optCM);
-pascal void CMSetCursor(void);
+void CMSetCursor(char ctrlDown);
 pascal char CMClick(WindowPtr w, const EventRecord *e);
 
 #endif

@@ -546,8 +546,6 @@ static void TimerTick(EventLoopTimerRef timer, void* data)
 				if(ilWE)
 					WEIdle(0, ilWE);
 			}
-
-		CMSetCursor();
 	}
 	
 	RetryConnections();
@@ -729,6 +727,26 @@ inline void inGoAwayHandler(const EventRecord *e)
 				pluginCloseWindow((WindowPtr)e->message, pl);
 		}
 	}
+}
+
+static OSStatus DoModifierKeysChangedEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
+{
+	UInt32 modifiers;
+	OSStatus result = eventNotHandledErr;
+	static UInt32 oldModifiers = 0;
+	
+	result = GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifiers);
+	
+	if(result == noErr)
+	{
+		//Test for changes with the control key.
+		if(modifiers & controlKey != oldModifiers & controlKey)
+			CMSetCursor(modifiers & controlKey == controlKey);
+		
+		oldModifiers = modifiers;
+	}
+	
+	return result;
 }
 
 static OSStatus DoResumeEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
@@ -1001,6 +1019,7 @@ static void InitLocalEventHandlers()
 {
 	MyIAEH(kEventClassApplication, kEventAppActivated, DoResumeEvent);
 	MyIAEH(kEventClassApplication, kEventAppDeactivated, DoSuspendEvent);
+	MyIAEH(kEventClassKeyboard, kEventRawKeyModifiersChanged, DoModifierKeysChangedEvent);
 }
 
 void ApplInit(void)

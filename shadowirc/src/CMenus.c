@@ -41,11 +41,6 @@
 #include "IRCInput.h"
 #include "MenuCommands.h"
 
-static char gCMCursorOn = 0;
-
-#define kControlKey1					0x3B
-#define kControlKey2					0x3E
-
 static pascal void _CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key, short *id, MenuHandle *m);
 static pascal void CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key);
 inline void CMILDelete(cmmwData *d, short item);
@@ -63,40 +58,16 @@ static pascal char CMMW(MWPtr mw, Point where, char optCM);
 static pascal char CMIW(Point where);
 static pascal char CMPlugin(WindowPtr w, Point where);
 
-static pascal char CMUseCursor(void);
-
-static pascal char CMUseCursor(void)
+void CMSetCursor(char ctrlDown)
 {
-	union
-	{
-		KeyMap keys;
-		Byte theKeys[16];
-	} tk;
-	
-	GetKeys(tk.keys);
-	return ((tk.theKeys[kControlKey1 >> 3] >> (kControlKey1 & 7)) & 1) ||
-				  ((tk.theKeys[kControlKey2 >> 3] >> (kControlKey2 & 7)) & 1); //tests to see if ctrl is down
-}
-
-pascal void CMSetCursor(void)
-{
-	char ctrlDown = CMUseCursor();
-	if(!gCMCursorOn && ctrlDown)
-	{
-		gCMCursorOn = 1;
+	if(ctrlDown)
 		SetThemeCursor(kThemeContextualMenuArrowCursor);
-	}
-	else if(gCMCursorOn && !ctrlDown)
-	{
-		gCMCursorOn = 0;
+	else
 		SetThemeCursor(kThemeArrowCursor);
-	}
 }
 
 inline OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBalloonAvailable, UInt32 inHelpType, ConstStr255Param inHelpItemString, const AEDesc* inSelection, UInt32* outUserSelectionType, SInt16* outMenuID, UInt16* outMenuItem)
 {
-	gCMCursorOn = 0;
-	
 	return ContextualMenuSelect(inMenuRef, inGlobalLocation, inBalloonAvailable, inHelpType, inHelpItemString, inSelection, (unsigned long*)outUserSelectionType, outMenuID, outMenuItem);
 }
 
