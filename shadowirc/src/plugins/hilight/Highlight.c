@@ -20,6 +20,7 @@
 */
 
 /*	ChangeLog
+	2000-10-04	JB	Fixed prefs code. & has lower precedence than !=. Doh!
 	2000-09-16	JB	Merged in CJB's (Chris Behm) modifications.
 									Strict Matching
 									Auto-hilight current nick
@@ -609,7 +610,7 @@ static void ReadPrefs(void)
 				HUnlock((Handle)prefs);
 				PFClose(refNum);
 
-				if((**prefs).prefs.version & kPrefVersionMask != kCurrentPrefsVersion) //version bad
+				if(((**prefs).prefs.version & kPrefVersionMask) != kCurrentPrefsVersion) //version bad
 				{
 					DisposeHandle((Handle)prefs);
 					ok = false;
