@@ -346,18 +346,21 @@ static pascal void ScrollBarChanged(WEReference we, long val)
 
 pascal void MWScroll(MWPtr mw, long delta)
 {
-	ControlHandle vscr = mw->vscr;
-	long value;
-	long max;
-	
-	value = GetControl32BitValue(vscr);
-	max = GetControl32BitMaximum(vscr);
-	
-	if(((value<max) && (delta>0)) || ((value>0) && (delta<0)))
+	if(mw)
 	{
-		SetControl32BitValue(vscr, value+delta);
+		ControlHandle vscr = mw->vscr;
+		long value;
+		long max;
+		
 		value = GetControl32BitValue(vscr);
-		ScrollBarChanged(mw->we, value);
+		max = GetControl32BitMaximum(vscr);
+		
+		if(((value<max) && (delta>0)) || ((value>0) && (delta<0)))
+		{
+			SetControl32BitValue(vscr, value+delta);
+			value = GetControl32BitValue(vscr);
+			ScrollBarChanged(mw->we, value);
+		}
 	}
 }
 
