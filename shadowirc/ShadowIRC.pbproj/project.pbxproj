@@ -212,6 +212,7 @@
 				0867D6AAFE840B52C02AAC07,
 				F5059D9402A3470A0132A983,
 				F5F61A2F02A02E380132A988,
+				F5BA63C70315E9C70132A983,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -393,6 +394,7 @@
 				F5059D9602A3470A0132A983,
 				F5059DAA02A5C0C70132A983,
 				F5BA62B3030FFFCA0132A983,
+				F5BA63C90315E9C70132A983,
 			);
 			isa = PBXResourcesBuildPhase;
 		};
@@ -2098,6 +2100,27 @@
 		};
 		F5BA62B3030FFFCA0132A983 = {
 			fileRef = F5BA629F030FFFCA0132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5BA63C70315E9C70132A983 = {
+			children = (
+				F5BA63C80315E9C70132A983,
+			);
+			isa = PBXVariantGroup;
+			name = shortcuts.nib;
+			path = "";
+			refType = 4;
+		};
+		F5BA63C80315E9C70132A983 = {
+			isa = PBXFileReference;
+			name = English;
+			path = English.lproj/shortcuts.nib;
+			refType = 4;
+		};
+		F5BA63C90315E9C70132A983 = {
+			fileRef = F5BA63C70315E9C70132A983;
 			isa = PBXBuildFile;
 			settings = {
 			};
