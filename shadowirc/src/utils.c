@@ -529,6 +529,13 @@ asm pascal char pstrcmp(register ConstStr255Param s1, register ConstStr255Param 
 #endif
 
 #if !USE_SHADOWIRC_ASSEMBLY
+inline char inupc(char c)
+{
+	if((c>='a') && (c<='z'))
+		c-=32;
+	return c;
+}
+
 pascal char pstrcasecmp(ConstStr255Param s1, ConstStr255Param s2)
 {
 	int x;

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -25,13 +25,6 @@
 
 pascal void pstrcpy(ConstStringPtr f, StringPtr dest);
 pascal void LineMsg(const LongString *ls);
-
-char inupc(char c)
-{
-	if((c>='a') && (c<='z'))
-		c-=32;
-	return c;
-}
 
 pascal void pstrcpy(ConstStringPtr f, StringPtr dest)
 {

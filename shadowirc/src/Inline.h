@@ -26,8 +26,6 @@
 
 #define SetRGBColor(color, r, g, b) ((color).red = r, (color).green = g, (color).blue = b)
 
-extern char inupc(char c);
-
 #define LineMsg(ls) MWMessage(consoleWin, ls)
 
 #define pstrcmp3(str, l) (*(long*)str==0x03000000+l)

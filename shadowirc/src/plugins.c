@@ -69,14 +69,10 @@ static plugsPtr IPCFind(FourCharCode IPCType, long *version, long *data);
 
 //For Inlined crap
 #define linkfor(list, init) for((list) = (init); (list); (list)=(list)->next)
-pascal char IsChannel(ConstStr255Param s);
-pascal char IsDCCName(ConstStr255Param s);
 pascal void pstrcpy(ConstStr255Param f, ConstStr255Param dest);
 pascal void LineMsg(const LongString *ls);
-pascal void Message(const LongString *msg);
 
 pascal long ShadowIRCVersion(StringPtr);
-pascal long ShadowIRCVersion2(StringPtr, StringPtr);
 
 FSSpec pluginPrefsFSSpec;
 
