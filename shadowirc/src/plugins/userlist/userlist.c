@@ -988,6 +988,10 @@ static ULI ULINew(WindowPtr w, long type)
 		static DataBrowserItemDataUPP dbIDUPP = NULL;
 		static DataBrowserItemCompareUPP dbICUPP = NULL;
 		static DataBrowserItemNotificationUPP dbINUPP = NULL;
+		static ControlFontStyleRec controlFontStyleStruc;
+		
+		controlFontStyleStruc.flags = kControlUseSizeMask;
+		controlFontStyleStruc.size = 10;
 		
 		dbColumn.propertyDesc.propertyID = 'name';
 		dbColumn.propertyDesc.propertyType = kDataBrowserTextType;
@@ -996,11 +1000,9 @@ static ULI ULINew(WindowPtr w, long type)
 		dbColumn.headerBtnDesc.minimumWidth = 55;
 		dbColumn.headerBtnDesc.maximumWidth = 500;
 		dbColumn.headerBtnDesc.titleOffset = -7;
-		dbColumn.headerBtnDesc.titleString = CFSTR("User");
+		dbColumn.headerBtnDesc.titleString = CFSTR("Nickname");
 		dbColumn.headerBtnDesc.initialOrder = kDataBrowserOrderIncreasing;
-		dbColumn.headerBtnDesc.btnFontStyle.flags = kControlUseSizeMask | kControlUseFontMask;
-		dbColumn.headerBtnDesc.btnFontStyle.size = 9;
-		dbColumn.headerBtnDesc.btnFontStyle.font = kControlFontSmallSystemFont;
+		dbColumn.headerBtnDesc.btnFontStyle = controlFontStyleStruc;
 		dbColumn.headerBtnDesc.btnContentInfo.contentType = kControlContentTextOnly;
 		
 		AddDataBrowserListViewColumn(ul->browser, &dbColumn, ULONG_MAX);
@@ -1014,9 +1016,7 @@ static ULI ULINew(WindowPtr w, long type)
 		dbColumn.headerBtnDesc.titleOffset = 0;
 		dbColumn.headerBtnDesc.titleString = CFSTR("Hostname");
 		dbColumn.headerBtnDesc.initialOrder = kDataBrowserOrderIncreasing;
-		dbColumn.headerBtnDesc.btnFontStyle.flags = kControlUseSizeMask | kControlUseFontMask;
-		dbColumn.headerBtnDesc.btnFontStyle.size = 9;
-		dbColumn.headerBtnDesc.btnFontStyle.font = kControlFontSmallSystemFont;
+		dbColumn.headerBtnDesc.btnFontStyle = controlFontStyleStruc;
 		dbColumn.headerBtnDesc.btnContentInfo.contentType = kControlContentTextOnly;
 		
 		AddDataBrowserListViewColumn(ul->browser, &dbColumn, ULONG_MAX);
@@ -1044,9 +1044,11 @@ static ULI ULINew(WindowPtr w, long type)
 		SetDataBrowserTableViewNamedColumnWidth(ul->browser, 'host', ul->uwinSize.right - ul->nickListWidth);
 		
 		SetDataBrowserSelectionFlags(ul->browser, kDataBrowserDragSelect | kDataBrowserCmdTogglesSelection);
-		SetControlProperty(ul->browser, kUserlistSignature, kUserlistSignature, sizeof(ULI), &ul);
-		SetDataBrowserTableViewRowHeight(ul->browser, 13);
+		//SetDataBrowserTableViewRowHeight(ul->browser, 10);
 		SetDataBrowserTableViewHiliteStyle(ul->browser, kDataBrowserTableViewFillHilite);
+		
+		SetControlFontStyle(ul->browser, &controlFontStyleStruc);
+		SetControlProperty(ul->browser, kUserlistSignature, kUserlistSignature, sizeof(ULI), &ul);
 	}
 	
 	GetPort(&gp);

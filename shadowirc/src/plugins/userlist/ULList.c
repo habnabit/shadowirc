@@ -134,7 +134,6 @@ void ListDrawOneUser(ULI ul, UserListPtr u)
 
 void ListGenerate(ULI ul, channelPtr ch)
 {
-	//Add everything to the list, then sort it. Prolly should do insertion sort.
 	UserListPtr up;
 	
 	if(!ul)
