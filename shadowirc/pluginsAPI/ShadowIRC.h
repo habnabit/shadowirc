@@ -3597,7 +3597,7 @@ pascal void SecsToHMS(long secs, LongString *ls);
 		Output:	ls - LongString
 */
 
-pascal OSErr OpenURL(Str255 url);
+OSErr OpenURL(Str255 url);
 /*	Opens a URL with Internet Config
 		Input:	url - url
 		Output:	return value: -1 if Internet Config not installed, 0 if no error, or Internet Config error value.

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -26,8 +26,8 @@
 
 extern ICInstance internetConfig;
 
-pascal void StartupIC(void);
-pascal void StopIC(void);
+void StartupIC(void);
+void StopIC(void);
 
-pascal OSErr OpenURL(Str255 url);
+OSErr OpenURL(Str255 url);
 #endif

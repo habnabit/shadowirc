@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -20,22 +20,23 @@
 */
 
 #include "InetConfig.h"
+#include "IRCGlobals.h"
 
 ICInstance internetConfig;
 
-pascal void StartupIC(void)
+void StartupIC(void)
 {
-	if(ICStart(&internetConfig, 'SIRC'))
+	if(ICStart(&internetConfig, kApplicationSignature))
 		internetConfig = 0;
 }
 
-pascal void StopIC(void)
+void StopIC(void)
 {
 	if(internetConfig)
 		ICStop(internetConfig);
 }
 
-pascal OSErr OpenURL(Str255 url)
+OSErr OpenURL(Str255 url)
 {
 	if(internetConfig)
 	{
