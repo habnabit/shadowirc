@@ -796,7 +796,7 @@ inline void inGoAwayHandler(const EventRecord *e)
 	}
 }
 
-static void DoResumeEvent(EventLoopTimerRef timer, void* data)
+static OSStatus DoResumeEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
 {
 	pContextSwitchDataRec p;
 	
@@ -812,9 +812,11 @@ static void DoResumeEvent(EventLoopTimerRef timer, void* data)
 
 	p.inBackground=inBackground;
 	runPlugins(pContextSwitchMessage, &p);
+	
+	return noErr;
 }
 
-static void DoSuspendEvent(EventLoopTimerRef timer, void* data)
+static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
 {
 	pContextSwitchDataRec p;
 	
@@ -826,6 +828,8 @@ static void DoSuspendEvent(EventLoopTimerRef timer, void* data)
 
 	p.inBackground=inBackground;
 	runPlugins(pContextSwitchMessage, &p);
+	
+	return noErr;
 }
 
 pascal void doUpdateEvent(EventRecord *e)
@@ -1198,8 +1202,7 @@ pascal void ApplRun(void)
 	ApplExit();
 }
 
-typedef void(*eventHandlerProc)(EventLoopTimerRef timer, void* data);
-static void MyIAEH(long class, long type, eventHandlerProc handlerFunc)
+static void MyIAEH(long class, long type, EventHandlerProcPtr handlerFunc)
 {
 	EventTypeSpec eventType = {class, type};
 	
