@@ -446,9 +446,6 @@ static pascal OSErr MWTextPaneReceiveDrag(MWPtr mw, DragReference drag)
 	OSErr ret;
 	MWPtr mwFrom;
 	
-	if(mw->winType == textWin)
-		return WEReceiveDrag(drag, mw->we);
-		
 	ret = dragNotAcceptedErr;
 	if(!DragIsTypeAvail(drag, kTextFlavor) && DragIsTypeAvail(drag, kHFSFlavor))
 	{

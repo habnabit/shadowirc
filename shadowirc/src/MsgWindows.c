@@ -218,9 +218,6 @@ pascal ConstStringPtr MWGetName(MWPtr mw, Str255 s)
 		else if(mw->winType == helpWin)
 		{
 		}
-		else if(mw->winType == textWin)
-		{
-		}
 	}
 	
 	if(s)
@@ -992,7 +989,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 		h->paneList = 0;
 		h->refCon = 0;
 		h->colorMethod = mainPrefs->colorMethod;
-		h->protect = (winType == textWin || winType == helpWin);
+		h->protect = (winType == helpWin);
 		h->vscr = 0;
 		h->we = 0;
 		h->drawingStatus = 0;

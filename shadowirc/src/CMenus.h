@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -46,9 +46,7 @@ enum CMStrings {
 	sCutS,
 	sCopyS,
 	sClearS,
-	sPaste,
-	smSavePreferences,
-	smSaveTextFile
+	sPaste
 };
 
 typedef enum menuCommand {
@@ -60,8 +58,6 @@ typedef enum menuCommand {
     mcLog,
     mcSaveText,
     mcConnect,
-    mcTextSave,
-    mcTextSaveAs,
     mcPlugin,
     mcSubmenu,
 

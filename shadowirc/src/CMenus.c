@@ -35,7 +35,6 @@
 #include "IRCCommands.h"
 #include "IRCAux.h"
 #include "ApplBase.h"
-#include "TextWindows.h"
 #include "AppearanceHelp.h"
 #include "Floaters.h"
 #include "IRCInput.h"
@@ -303,7 +302,6 @@ static pascal void CMMWMake(cmmwData *d)
 	int x;
 	MenuHandle m;
 	char cmWindowIsHelp = mw->winType == helpWin;
-	char cmWindowIsText = mw->winType == textWin;
 	
 	m = d->m = NewMenu(200, "\p");
 	WEGetSelection(&d->s0, &d->s1, mw->we);
@@ -343,26 +341,23 @@ static pascal void CMMWMake(cmmwData *d)
 		{
 			CMILAdd(d, GetIntStringPtr(spCM, sClearAll), mcClear, 0);
 			
-			if(!cmWindowIsText)
-			{
-				CMILAdd(d, "\p-", mcNull, 0);
-				
-				CMILAdd(d, GetIntStringPtr(spCM, sColorStyle), mcNull, 0);
-				item = (**d->items).numItems;
-				SetItemCmd(m, item, hMenuCmd);
-				SetItemMark(m, item, 203);
+			CMILAdd(d, "\p-", mcNull, 0);
+			
+			CMILAdd(d, GetIntStringPtr(spCM, sColorStyle), mcNull, 0);
+			item = (**d->items).numItems;
+			SetItemCmd(m, item, hMenuCmd);
+			SetItemMark(m, item, 203);
 
-				d->colorMenu = GetMenu(203);
-				
-				InsertMenuItem(d->colorMenu, GetIntStringPtr(spCM, sNone), 0);
-				InsertMenuItem(d->colorMenu, "\p-", 1);
-				InsertMenu(d->colorMenu, -1);
-				if(mw->colorMethod == cmNone)
-					x = 1;
-				else
-					x = mw->colorMethod +2;
-				CheckMenuItem(d->colorMenu, x, true);
-			}
+			d->colorMenu = GetMenu(203);
+			
+			InsertMenuItem(d->colorMenu, GetIntStringPtr(spCM, sNone), 0);
+			InsertMenuItem(d->colorMenu, "\p-", 1);
+			InsertMenu(d->colorMenu, -1);
+			if(mw->colorMethod == cmNone)
+				x = 1;
+			else
+				x = mw->colorMethod +2;
+			CheckMenuItem(d->colorMenu, x, true);
 		}
 	}
 	else //selection
@@ -377,7 +372,7 @@ static pascal void CMMWMake(cmmwData *d)
 		}
 	}
 
-	if(!cmWindowIsText && !cmWindowIsHelp && d->pane->creator == kApplicationSignature)
+	if(!cmWindowIsHelp && d->pane->creator == kApplicationSignature)
 	{
 		ConstStringPtr s;
 		
@@ -432,12 +427,6 @@ static pascal void CMMWMake(cmmwData *d)
 		{
 			CMILAdd(d, "\p-", mcNull, 0);
 			CMILAdd(d, GetIntStringPtr(spCM, sCloseDCCConn), mcConnect, 0);
-		}
-		else if(cmWindowIsText)
-		{
-			CMILAdd(d, "\p-", mcNull, 0);
-			CMILAdd(d, GetIntStringPtr(spCM, sSave), mcTextSave, 0);
-			CMILAdd(d, GetIntStringPtr(spCM, sSaveAs), mcTextSaveAs, 0);
 		}
 	}
 	
@@ -666,14 +655,6 @@ static pascal char CMMW(MWPtr mw, Point where, char optCM)
 						}
 						break;
 					
-					case mcTextSave:
-						TWSave(mw, false);
-						break;
-					
-					case mcTextSaveAs:	
-						TWSave(mw, true);
-						break;
-
 					case mcPlugin:
 						CMDoPopup(&d, outMenuItem);
 						WESetSelection(d.s0, d.s0, mw->we);

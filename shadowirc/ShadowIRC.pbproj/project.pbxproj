@@ -190,7 +190,6 @@
 				F552BF4B0211030901A80061,
 				F552BF4C0211030901A80061,
 				F552BF510211030901A80061,
-				F552BF530211030901A80061,
 				F552BF550211030901A80061,
 				F552BF570211030901A80061,
 				F552BF590211030901A80061,
@@ -277,20 +276,6 @@
 	<string>English</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>txt</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>text file</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>TEXT</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
 			<array>
@@ -391,7 +376,6 @@
 				F510A8B3021CBBEC0132A983,
 				F510A8B5021CBBF70132A983,
 				F510A8B8021CBC000132A983,
-				F510A8B9021CBC000132A983,
 				F53198A2033827A00132A983,
 				F5B67A97033CA8700132A983,
 			);
@@ -473,7 +457,6 @@
 				F552BFB20211030901A80061,
 				F552BFB30211030901A80061,
 				F552BFB40211030901A80061,
-				F552BFB50211030901A80061,
 				F552BFB60211030901A80061,
 				F599D6550217A8B901A80061,
 				F510A8AA021CB5B90132A983,
@@ -607,7 +590,6 @@
 				F552BF4E0211030901A80061,
 				F552BF500211030901A80061,
 				F510A8B6021CBC000132A983,
-				F510A8B7021CBC000132A983,
 				F552BF560211030901A80061,
 				F552BF5A0211030901A80061,
 			);
@@ -682,20 +664,8 @@
 			path = src/TextManip.h;
 			refType = 2;
 		};
-		F510A8B7021CBC000132A983 = {
-			isa = PBXFileReference;
-			name = TextWindows.h;
-			path = src/TextWindows.h;
-			refType = 2;
-		};
 		F510A8B8021CBC000132A983 = {
 			fileRef = F510A8B6021CBC000132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F510A8B9021CBC000132A983 = {
-			fileRef = F510A8B7021CBC000132A983;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -1180,12 +1150,6 @@
 			path = src/TextManip.c;
 			refType = 4;
 		};
-		F552BF530211030901A80061 = {
-			isa = PBXFileReference;
-			name = TextWindows.c;
-			path = src/TextWindows.c;
-			refType = 4;
-		};
 		F552BF550211030901A80061 = {
 			isa = PBXFileReference;
 			name = utils.c;
@@ -1650,12 +1614,6 @@
 		};
 		F552BFB40211030901A80061 = {
 			fileRef = F552BF510211030901A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F552BFB50211030901A80061 = {
-			fileRef = F552BF530211030901A80061;
 			isa = PBXBuildFile;
 			settings = {
 			};

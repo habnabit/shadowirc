@@ -33,7 +33,6 @@
 #include "Shortcuts.h"
 #include "Floaters.h"
 #include "MenuCommands.h"
-#include "TextWindows.h"
 #include "CommandsMenu.h"
 
 static void DoAbout(void);
@@ -417,7 +416,6 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 {
 	OSStatus myErr = eventNotHandledErr;
 	HICommand hiCommand;
-	MWPtr mw;
 	
 	GetEventParameter(theEvent, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
 	
@@ -434,24 +432,12 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 		
 		
 		//File Menu
-		case 'NTWN':
-			NewTextWin();
-			return noErr;
-		
-		case kHICommandOpen:
-			TWSelect();
-			return noErr;
-		
 		case kHICommandClose:
 			CloseFrontWindow();
 			return noErr;
 		
 		case kHICommandSave:
-			mw = GetActiveMW();
-			if(mw && mw->winType == textWin)
-				TWSave(mw, false);
-			else
-				writeAllFiles();
+			writeAllFiles();
 			return noErr;
 		
 		case 'CONO':

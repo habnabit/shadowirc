@@ -75,8 +75,7 @@ enum mwTypes {
 	queryWin,
 	pluginWin,
 	helpWin,
-	dccWin,
-	textWin
+	dccWin
 };
 
 /***

@@ -376,19 +376,6 @@ pascal void Key(EventRecord *e, char dontProcess)
 	
 	mw = GetActiveMW();
 	
-	if(!iwFront && (mw && mw->winType == textWin))
-	{
-		if(!MWNavKey(mw, e->modifiers, e->message))
-		{
-			if(c!=27)
-			{
-				WEKey(c, e->modifiers, mw->we);
-				SetWindowModified(mw->w, WEGetModCount(mw->we) != 0);
-			}
-		}
-		return;
-	}
-
 	p.character=&c;
 	p.e = e;
 	runPlugins(pKeyDownMessage, &p);

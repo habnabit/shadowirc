@@ -4,7 +4,7 @@
   <object name="rootObject" class="NSCustomObject" id="1">
     <string name="customClass">NSApplication</string>
   </object>
-  <array count="95" name="allObjects">
+  <array count="93" name="allObjects">
     <object class="IBCarbonWindow" id="181">
       <string name="windowRect">83 108 187 502 </string>
       <string name="title">Save Preferences</string>
@@ -109,21 +109,10 @@
           <object name="submenu" class="IBCarbonMenu" id="214">
             <string name="title">File</string>
             <int name="menuID">257</int>
-            <array count="8" name="items">
+            <array count="6" name="items">
               <object class="IBCarbonMenuItem" id="217">
                 <boolean name="dynamic">TRUE</boolean>
                 <string name="title">Open Connection</string>
-              </object>
-              <object class="IBCarbonMenuItem" id="231">
-                <string name="title">New Text Window</string>
-                <string name="keyEquivalent">n</string>
-                <int name="keyEquivalentModifier">1572864</int>
-                <ostype name="command">NTWN</ostype>
-              </object>
-              <object class="IBCarbonMenuItem" id="232">
-                <string name="title">Open Text File…</string>
-                <string name="keyEquivalent">o</string>
-                <ostype name="command">open</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="220">
                 <string name="title">Close Window</string>
@@ -387,8 +376,6 @@
     <reference idRef="220"/>
     <reference idRef="222"/>
     <reference idRef="230"/>
-    <reference idRef="231"/>
-    <reference idRef="232"/>
     <reference idRef="233"/>
     <reference idRef="234"/>
     <reference idRef="236"/>
@@ -604,7 +591,7 @@
     <reference idRef="367"/>
     <reference idRef="368"/>
   </array>
-  <array count="95" name="allParents">
+  <array count="93" name="allParents">
     <reference idRef="1"/>
     <reference idRef="181"/>
     <reference idRef="182"/>
@@ -632,8 +619,6 @@
     <reference idRef="214"/>
     <reference idRef="202"/>
     <reference idRef="202"/>
-    <reference idRef="214"/>
-    <reference idRef="214"/>
     <reference idRef="214"/>
     <reference idRef="214"/>
     <reference idRef="210"/>

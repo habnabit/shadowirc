@@ -30,7 +30,6 @@
 #include "Floaters.h"
 #include "MsgWindows.h"
 #include "IRCChannels.h"
-#include "TextWindows.h"
 #include "ApplBase.h"
 #include "filesMan.h"
 #include "IRCPreferences.h"
@@ -423,9 +422,7 @@ pascal void HitEditMenu(short item)
 			case 1:
 				if(we)
 				{
-					if(activeMW && activeMW->winType == textWin)
-						WEUndo(activeMW->we);
-					else if(!noFloatingInput)
+					if(!noFloatingInput)
 						WEUndo(ILGetWE());
 				}
 				break;
@@ -433,8 +430,6 @@ pascal void HitEditMenu(short item)
 			case 3: //cut
 				if(iwFront)
 					WECut(ILGetWE());
-				else if(mwFront && activeMW->winType==textWin)
-					WECut(we);
 				else if(otherFront)
 					TECut(te);
 				break;
@@ -449,17 +444,12 @@ pascal void HitEditMenu(short item)
 			case 5: //paste
 				if(mwFront || iwFront)
 				{
-					if(!iwFront && activeMW->winType == textWin)
-						WEPaste(activeMW->we);
-					else
+					WEReference il = ILGetWE();
+					
+					if(il)
 					{
-						WEReference il = ILGetWE();
-						
-						if(il)
-						{
-							WEPaste(il);
-							processPaste(activeMW, false);
-						}
+						WEPaste(il);
+						processPaste(activeMW, false);
 					}
 				}
 				else if(otherFront)
@@ -676,9 +666,6 @@ pascal void MenuBarClick(const EventRecord *e)
 	int x, y;
 	long l;
 	MWPtr mw = GetActiveMW();
-	
-	//Update file menu
-	SetMenuItemText(gFileMenu, 6, GetIntStringPtr(spCM, smSavePreferences + (mw && mw->winType == textWin)));
 	
 	//Update edit menu
 	if(mw)

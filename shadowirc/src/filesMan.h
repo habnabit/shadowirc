@@ -63,7 +63,6 @@ enum NavOpts {
 };
 
 enum openRsrcs {
-	kOpenText = 300,
 	kOpenColor = 301
 };
 

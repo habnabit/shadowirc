@@ -56,9 +56,7 @@ resource 'STR#' (200, "Menu Strings", locked, preload)
 		"Cut Selection",
 		"Copy Selection",
 		"Clear Selection",
-		"Paste",
-		"Save Preferences",
-		"Save Text File"
+		"Paste"
 	}
 };
 

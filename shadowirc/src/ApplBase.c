@@ -32,7 +32,6 @@
 #include "LongStrings.h"
 #include "MsgWindows.h"
 #include "MWPanes.h"
-#include "TextWindows.h"
 #include "filesMan.h"
 #include "utils.h"
 #include "InputLine.h"
@@ -204,29 +203,26 @@ pascal char doQuit(LongString *reason)
 	linkPtr link;
 	int save;
 	
-	if(TWCloseAll())
+	if(mainPrefs->quitAction == qaAutoSave)
+		save = 1;
+	else
 	{
-		if(mainPrefs->quitAction == qaAutoSave)
-			save = 1;
-		else
+		save = 0;
+		if(mainPrefs->quitAction == qaConfirm)
 		{
-			save = 0;
-			if(mainPrefs->quitAction == qaConfirm)
-			{
-				DialogPtr d=GetNewDialog(131, 0, (WindowPtr)-1);
-				SetupModalDialog(d, 1, 5);
-				do {
-					ModalDialog(0, &i);
-				} while(!i);
-				
-				DisposeDialog(d);
-				FinishModalDialog();
-				
-				if(i == 5)
-					return 0;
-				else if(i == 1) //Else they chose save or not.
-					save = 1;
-			}
+			DialogPtr d=GetNewDialog(131, 0, (WindowPtr)-1);
+			SetupModalDialog(d, 1, 5);
+			do {
+				ModalDialog(0, &i);
+			} while(!i);
+			
+			DisposeDialog(d);
+			FinishModalDialog();
+			
+			if(i == 5)
+				return 0;
+			else if(i == 1) //Else they chose save or not.
+				save = 1;
 		}
 		
 		if(save)
@@ -536,22 +532,15 @@ static void Timer5(EventLoopTimerRef timer, void* data)
 
 static void TimerTick(EventLoopTimerRef timer, void* data)
 {
-	MWPtr mw;
-	
 	//Stuff we need to do periodically when we're in the foreground
 	if(!inBackground)
 	{
-		mw = GetActiveMW();
-		
-		if(mw && mw->winType == textWin && !iwFront)
-			WEIdle(0, mw->we);
-		else
-			if(!inputLine.lock)
-			{
-				WEReference ilWE = ILGetWE();
-				if(ilWE)
-					WEIdle(0, ilWE);
-			}
+		if(!inputLine.lock)
+		{
+			WEReference ilWE = ILGetWE();
+			if(ilWE)
+				WEIdle(0, ilWE);
+		}
 	}
 	
 	RetryConnections();

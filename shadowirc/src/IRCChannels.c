@@ -46,7 +46,6 @@
 #include "plugins.h"
 #include "IRCInput.h"
 #include "CMenus.h"
-#include "TextWindows.h"
 #include "ApplBase.h"
 #include "TextManip.h"
 #include "MenuCommands.h"
@@ -804,10 +803,7 @@ static void MWStatusLineClickInternal(mwWidgetPtr o, Point p)
 	switch(o->type)
 	{
 		case mwTopicWidget:
-			if(mw->winType == textWin)
-				TWStatusClick(o, p);
-			else
-				DoTopicWidget(o);
+			DoTopicWidget(o);
 			break;
 		
 		case mwModesWidget:
@@ -1267,10 +1263,6 @@ static void DrawTopicWidget(mwWidgetPtr o, char winActive)
 		case chanWin:
 			DrawTopic(o, winActive);
 			break;
-		
-		case textWin:
-			TWStatus(o, winActive);
-			break;
 	}
 }
 
@@ -1660,10 +1652,6 @@ void MWPart(MWPtr mw)
 				p.w=mw->w;
 				p.mw=mw;
 				runIndPlugin(mw->pluginRef, pUIWindowCloseMessage, &p); //pUIWindowClose
-				break;
-			
-			case textWin:
-				TWClose(mw);
 				break;
 		}
 	}

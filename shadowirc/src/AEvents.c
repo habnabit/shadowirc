@@ -23,7 +23,6 @@
 
 #include "AEvents.h"
 #include "MsgWindows.h"
-#include "TextWindows.h"
 #include "ApplBase.h"
 
 #include "inline.h"
@@ -62,7 +61,6 @@ pascal long RegisterAETE(Handle aete)
 
 static pascal OSErr aeOApp(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
 static pascal OSErr aeQuit(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
-static pascal OSErr aeODoc(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
 static pascal OSErr aePDoc(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
 static pascal OSErr aeGetAETE(const AppleEvent *theAEvent, AppleEvent *theReply, long refCon);
 static pascal OSErr aeGURL(const AppleEvent *event, AppleEvent *reply, long refcon);
@@ -80,72 +78,6 @@ static pascal OSErr aeQuit(const AppleEvent *ae, AppleEvent *reply, long refCon)
 	#pragma unused(ae, reply, refCon)
 	doQuit(0);
 	return noErr;
-}
-
-static pascal OSErr aeODoc(const AppleEvent *theAEvent, AppleEvent *reply, long refCon)
-{
-	#pragma unused(reply, refCon)
-	OSErr error = noErr, firstError = noErr;
-	short numErrors = 0;
-	AEDesc theList;
-	long numFiles, fileCount;
-	
-/* the direct object parameter is the list of aliases to files (one or more) */
-	error = AEGetParamDesc(theAEvent, keyDirectObject, typeAEList, &theList);
-	if (error)
-		return(error);
-
-/* that should be all, but in case something is screwy... */
-	error = EasyHasUnusedParameters(theAEvent);
-	if (error)
-		return(error);
-
-/* get number of files in list */
-	error = AECountItems(&theList, &numFiles);
-	if (error)
-		return(error);
-
-/* open each file - keep track of errors	 */
-	for(fileCount = 1; fileCount <= numFiles; fileCount++)
-	{
-		FSSpec fileToOpen;
-		long actualSize;
-		AEKeyword dummyKeyword;
-		DescType dummyType;
-		FInfo f;
-		
-		/* get the alias for the nth file, convert to an FSSpec */
-		error = AEGetNthPtr(&theList, fileCount, typeFSS, &dummyKeyword, &dummyType, (Ptr)&fileToOpen, sizeof(FSSpec), &actualSize);
-		if(error)
-			return(error);
-
-		/* open the file (also creates window) */
-		FSpGetFInfo(&fileToOpen, &f);
-		if(f.fdType == 'TEXT')
-			TWOpen(&fileToOpen);
-		else
-			error = -1;
-
-		/* count file opening errors */
-		if(error)
-		{
-			++numErrors;	/* keep count */
-			if(numErrors == 1)				
-				firstError = error;	/* save first error */
-		}
-	}
-
-/* set proper error message */
-	if(numErrors)	/* at least one happend */
-	{
-		if (numErrors > 1)	/* had more than one,  */
-			error = -1;
-		else
-			error = firstError;
-	}
-	
-	AEDisposeDesc(&theList); /* dispose what we allocated */
-	return(error);
 }
 
 static pascal OSErr aePDoc(const AppleEvent *ae, AppleEvent *reply, long refCon)
@@ -278,7 +210,6 @@ pascal OSErr InstallAEHandlers(void)
 	
 	InstHand(kCoreEventClass, kAEOpenApplication, aeOApp);
 	InstHand(kCoreEventClass, kAEQuitApplication, aeQuit);
-	InstHand(kCoreEventClass, kAEOpenDocuments, aeODoc);
 	InstHand(kCoreEventClass, kAEPrintDocuments, aePDoc);
 	
 	InstHand(kGetURLEventClass, kGetURLEventID, aeGURL);
