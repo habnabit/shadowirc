@@ -87,7 +87,7 @@ static void nNotice(linkPtr link, LongString *ls, StringPtr fromuser, StringPtr 
 	Str255 dispFrom;
 	pServerNOTICEDataRec p;
 	MWPtr mw;
-	char 	ign=IsIgnoredNickUser(from, fromuser);
+	char ign = IsIgnoredNickUser(from, fromuser);
 
 	if(!doCTCP(from, fromuser, target, ls, true, ign, link))
 	{
@@ -112,9 +112,20 @@ static void nNotice(linkPtr link, LongString *ls, StringPtr fromuser, StringPtr 
 		p.dontSound = false;
 		p.displayUserHost = mainPrefs->showUserHostsWithMsgs && !p.fromServer;
 		p.redirect = 0;
+		p.wallchops = 0;
 		
-		if((p.targChan = ((p.chan=ChFind(target, link))!=0)) == 0)
+		if(target[1] == '@')
 		{
+			p.wallchops = 1;
+			pdelete(target, 1, 1);
+		}
+		
+		p.chan = ChFind(target, link);
+		p.targChan = p.chan != 0;
+		
+		if(!p.targChan)
+		{
+			p.wallchops = 0;
 			if((p.targMe = pstrcasecmp(target, link->CurrentNick)) == 0)
 				p.targOther=1;
 		}

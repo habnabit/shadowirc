@@ -1217,8 +1217,9 @@ typedef struct pServerNOTICEDataRec {
 	char displayUserHost;			//If true, displays the person's userhost. defaults to targMe && mainPrefs->showUserHostsWithMsgs
 	char toConsole;						//Force to console
 	char dontSound;					//If true, don't play a sound.
+	char wallchops;					//If true, message was targed to @#channel
 
-char unused[3];	
+char unused[2];
 
 	MWPtr redirect;					//If not nil, redirect output to this message window.
 }  pServerNOTICEDataRec, *pServerNOTICEDataPtr;
