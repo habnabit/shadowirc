@@ -845,11 +845,14 @@ pascal void processPlugin(CEPtr c, connectionPtr conn)
 	long nn;
 	char cr;
 	LongString ls;
+	pConnectionData p;
 	
-	if(c->event==C_CharsAvailable && conn->textOrBinary)
+	p.conn = conn;
+	p.event = c->event;
+	p.sendEvent = false;
+	
+	if(c->event == C_CharsAvailable && conn->textOrBinary)
 	{
-		pTextConnectionData p;
-		
 		conn->lastData=now;
 		nn=0;
 		TCPReceiveUpTo(c->tcpc, 10, readTimeout, (Ptr)&ls.data[1], maxLSlen-1, &nn, &cr);
@@ -867,31 +870,15 @@ pascal void processPlugin(CEPtr c, connectionPtr conn)
 			LineMsg(&tls);
 		}
 		
-		p.conn=conn;
-		p.event=c->event;
-		p.sendEvent=false;
 		p.data=&ls;
 		runIndPlugin(conn->pluginRef, pTextConnectionMessage, &p);
 	}
 	else
 	{
 		if(conn->textOrBinary) // !C_CharsAvailable
-		{
-			pTextConnectionData p;
-			p.conn=conn;
-			p.event=c->event;
-			p.sendEvent=false;
-			p.data=0;
 			runIndPlugin(conn->pluginRef, pTextConnectionMessage, &p);
-		}
 		else //data connection
-		{
-			pDataConnectionData p;
-			p.conn=conn;
-			p.event=c->event;
-			p.sendEvent=false;
 			runIndPlugin(conn->pluginRef, pDataConnectionMessage, &p);
-		}
 	}
 }
 

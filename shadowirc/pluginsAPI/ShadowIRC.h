@@ -1748,24 +1748,15 @@ typedef struct pIPCReplyMessageData
 	char ack;					//Set to true if your plugin processes this message, leave alone if you don't.
 } pIPCReplyMessageData, *pIPCReplyMessageDataPtr;
 
-/*	pTextConnectionData
+/*	pConnectionData
 */
-typedef struct pTextConnectionData
-{
+typedef struct pConnectionData {
 	connectionPtr conn;	//The connection
 	char event;				//The event. see enum connectionStatus
 	char sendEvent;		//If true, the event is the result of a ConnPut*()
-	LongString *data;		//If event==C_CharsAvailable, ptr to data recieved.
-} pTextConnectionData, *pTextConnectionDataPtr;
-
-/*	pDataConnectionData
-*/
-typedef struct pDataConnectionData
-{
-	connectionPtr conn;	//The connection
-	char event;				//The event. see enum connectionStatus
-	char sendEvent;		//If true, the event is the result of a ConnPut*()
-} pDataConnectionData, *pDataConnectionDataPtr;
+	LongString *data;		//If event==C_CharsAvailable, and this is a text connection, ptr to data recieved.
+} pConnectionData, *pConnectionDataPtr, 
+	pTextConnectionData, *pTextConnectionDataPtr, pDataConnectionData, *pDataConnectionDataPtr;
 
 /*	pIWUpdateData
 */

@@ -177,24 +177,17 @@ pascal void ConnPut(connectionPtr *cn, const void* p, long len)
 	}
 	else if(conn->connType==connPLUGIN)
 	{
-		if(conn->textOrBinary)
-		{
-			pTextConnectionData p;
-			p.conn=conn;
-			p.event=status;
-			p.sendEvent=true;
-			p.data=0;
-			runIndPlugin(conn->pluginRef, pTextConnectionMessage, &p);
-		}
-		else
-		{
-			pDataConnectionData p;
-			p.conn=conn;
-			p.event=status;
-			p.sendEvent=true;
-			runIndPlugin(conn->pluginRef, pDataConnectionMessage, &p);
-		}
+		pConnectionData p;
+
+		p.conn=conn;
+		p.event=status;
+		p.sendEvent=true;
+		p.data=0;
 		
+		if(conn->textOrBinary)
+			runIndPlugin(conn->pluginRef, pTextConnectionMessage, &p);
+		else
+			runIndPlugin(conn->pluginRef, pDataConnectionMessage, &p);
 	}
 }
 
