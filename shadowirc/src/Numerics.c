@@ -142,13 +142,28 @@ static void n005ServerFeatures(linkPtr link, LongString *ls)
 	}
 }
 
+void UpdateUserInfo(linkPtr link, ConstStr63Param nick, ConstStr255Param userhost, char isOper, char isAway)
+{
+	UserListPtr ul;
+	channelPtr ch;
+
+	linkfor(ch, link->channelList)
+	{
+		ul=ULFindUserName(ch, nick);
+		if(ul)
+		{
+			pstrcpy(userhost, ul->userhost);
+			ul->isOper=isOper;
+			ul->isAway=isAway;
+			ul->lastUHUpdate=now;
+		}
+	}
+}
 
 inline void n302userhost(linkPtr link, LongString *ls)
 {
 	int i;
 	Str255 s1, s2;
-	UserListPtr ul;
-	channelPtr ch;
 	pServiceULUserhostsData p;
 	
 	char isAway, isOper;
@@ -169,18 +184,8 @@ inline void n302userhost(linkPtr link, LongString *ls)
 		}
 		else
 			isOper=0;
-		
-		linkfor(ch, link->channelList)
-		{
-			ul=ULFindUserName(ch, s1);
-			if(ul)
-			{
-				pstrcpy(s2, ul->userhost);
-				ul->isOper=isOper;
-				ul->isAway=isAway;
-				ul->lastUHUpdate=now;
-			}
-		}
+	
+		UpdateUserInfo(link, s1, s2, isOper, isAway);
 	}
 	
 	p.link = link;
@@ -893,6 +898,7 @@ _Skip:
 			break;
 		
 		case 352: //who
+			//channel user host server nick <G|H>[*][@][+] :hopcount realname
 			LSNextArg(rest, s1); //channel
 			padEnd(s1, 15, s1);
 			LSNextArg(rest, s2); //user
@@ -903,15 +909,31 @@ _Skip:
 			s2[x]='@';
 			LSNextArg(rest, s3); //server
 			LSNextArg(rest, s3); //nick
-			padBegin(s3,9,s3);
-			SAppend1(s3, ' ');
 			LSNextArgIRC(rest, s4); //user info with :hopcount
-			padEnd(s4, 7, s4);
 			
 			LSNextArg(rest, unparsedrest.data); //hopcount
 			//ignoring username
 			SAppend1(s1, ' ');
 			SAppend1(unparsedrest.data, ' ');
+			
+			//Is oper if s4 contains *; is away if s4 contains G
+			{
+				char isOper = 0, isAway = 0;
+				
+				for(x = 1; x <= s4[0]; x++)
+					if(s4[x] == '*')
+						isOper = 1;
+					else if(s4[x] == 'G')
+						isAway = 1;
+				
+				UpdateUserInfo(link, s3, s2, isOper, isAway);
+			}
+			
+			//Formatting delayed so we don't step on processing the user info
+			padBegin(s3,9,s3);
+			SAppend1(s3, ' ');
+			padEnd(s4, 7, s4);
+			
 			LSStrCat(5, &ls, s1, s3, s4, unparsedrest.data, s2);
 			MWColor(&ls, sicServer);
 			Message(&ls);
