@@ -869,7 +869,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			TextSize(mainPrefs->defaultFontSize);
 
 			lr.top = lr.left = lr.bottom = lr.right = 0;
-			WENew(&lr,&lr, weDoDrawOffscreen + weDoOutlineHilite + weDoDragAndDrop + weDoAutoScroll, &h->we);
+			WENew(&lr,&lr, weDoOutlineHilite + weDoDragAndDrop + weDoAutoScroll, &h->we);
 			if(!h->we) //failed to create the MPtr
 				goto failedWENew;
 			
@@ -929,7 +929,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 
 					dr.left= dr.top = dr.right = dr.bottom = 0;
 					
-					WENew(&dr,&dr, weDoUndo + weDoAutoScroll + weDoDrawOffscreen + weDoMonoStyled + weDoDragAndDrop,&h->il);
+					WENew(&dr,&dr, weDoUndo + weDoAutoScroll + weDoMonoStyled + weDoDragAndDrop,&h->il);
 					WESetInfo(weRefCon, &h, h->il);
 					WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, h->il);
 					WESetUserInfo(kInputField, kInputField, h->il);
