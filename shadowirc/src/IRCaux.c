@@ -323,15 +323,15 @@ pascal void startConnection(linkPtr link)
 		ConnSetup(link->conn, link->serverTryingName, link->serverTryingPort);
 		
 	if(mainPrefs->firewallType == fwSOCKS4)
+	{
+		link->conn->socks.secondLookup = 1;
 		search = link->conn->socks.name;
+	}
 	else
 		search = link->conn->name;
 	
 	if(!ConnFindAddress(link->conn, search))
 	{
-		if(mainPrefs->firewallType == fwSOCKS4)
-			link->conn->socks.secondLookup = 1;
-		
 		LinkSetStage(link, csLookingUp);
 		LSParamString(&ls, GetIntStringPtr(spInfo, sLookingUpIP), search, 0, 0, 0);
 		SMPrefix(&ls, dsConsole);
