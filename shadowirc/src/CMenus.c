@@ -52,7 +52,7 @@ static pascal void CMMWMake(cmmwData *d);
 static pascal void CMDoPopup(cmmwData *d, short item);
 static pascal void MyWEFindWord(long offset, long *selStart, long *selEnd, WEReference we);
 
-inline OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBalloonAvailable, UInt32 inHelpType, ConstStr255Param inHelpItemString, const AEDesc* inSelection, UInt32* outUserSelectionType, SInt16* outMenuID, UInt16* outMenuItem);
+static OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBalloonAvailable, UInt32 inHelpType, ConstStr255Param inHelpItemString, const AEDesc* inSelection, UInt32* outUserSelectionType, SInt16* outMenuID, UInt16* outMenuItem);
 
 static pascal char CMMW(MWPtr mw, Point where, char optCM);
 static pascal char CMIW(Point where);
@@ -66,9 +66,18 @@ void CMSetCursor(char ctrlDown)
 		SetThemeCursor(kThemeArrowCursor);
 }
 
-inline OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBalloonAvailable, UInt32 inHelpType, ConstStr255Param inHelpItemString, const AEDesc* inSelection, UInt32* outUserSelectionType, SInt16* outMenuID, UInt16* outMenuItem)
+static OSErr MyCMSelect(MenuRef inMenuRef, Point inGlobalLocation, Boolean inBalloonAvailable, UInt32 inHelpType, ConstStr255Param inHelpItemString, const AEDesc* inSelection, UInt32* outUserSelectionType, SInt16* outMenuID, UInt16* outMenuItem)
 {
-	return ContextualMenuSelect(inMenuRef, inGlobalLocation, inBalloonAvailable, inHelpType, inHelpItemString, inSelection, (unsigned long*)outUserSelectionType, outMenuID, outMenuItem);
+	OSErr ret;
+	GrafPtr gp;
+	
+	GetPort(&gp);
+
+	ret = ContextualMenuSelect(inMenuRef, inGlobalLocation, inBalloonAvailable, inHelpType, inHelpItemString, inSelection, (unsigned long*)outUserSelectionType, outMenuID, outMenuItem);
+
+	SetPort(gp);
+	
+	return ret;
 }
 
 pascal char CMClick(WindowPtr w, const EventRecord *e)
