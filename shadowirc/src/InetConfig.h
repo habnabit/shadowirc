@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -22,12 +22,12 @@
 #ifndef _InetConfig
 #define _InetConfig
 
-#ifndef __ICCAPI__
-#include "ICCAPI.h"
+#ifndef __INTERNETCONFIG_
+#include <InternetConfig.h>
 #endif
 
 #pragma internal on
-extern internetConfigurationComponent internetConfig;
+extern ComponentInstance internetConfig;
 
 pascal void StartupIC(void);
 pascal void StopIC(void);
