@@ -121,8 +121,6 @@ static void TextScrolled(WEReference we);
 
 static void ScrollBarChanged(WEReference we, long val);
 
-pascal OSErr FSpGetDirectoryID(FSSpec*, long*, char*); //for MWStartLogging
-
 static pascal void SelectLogFileNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
 static OSStatus SelectLogFile(MWPtr mw, const CFStringRef fileName, long s0, long s1);
 

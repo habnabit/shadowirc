@@ -61,8 +61,6 @@ inline void initSIDR(void);
 static void AddService(FourCharCode serviceType, plugsPtr ref);
 static void InitPlugins(void);
 
-pascal OSErr FSpGetDirectoryID(FSSpec*, long*, char*);
-
 pascal long _UndocumentedAPI(long type, long data);
 
 static plugsPtr IPCFind(FourCharCode IPCType, long *version, long *data);
