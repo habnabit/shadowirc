@@ -425,42 +425,43 @@ static pascal void HitFontsMenu(short item)
 	DialogPtr d;
 	char b;
 	
+	//We don't do anything if there's no ac
+	if(!MWActive)
+		return;
+	
 	if(item == gFontSizeOtherItem)
 	{
-		if(MWActive)
-		{
-			s[0] = 0;
-			EnterModalDialog();
-			d = GetNewDialog(141, 0, (WindowPtr)-1);
+		s[0] = 0;
+		EnterModalDialog();
+		d = GetNewDialog(141, 0, (WindowPtr)-1);
+		
+		SetText(d, 4,"\p");
+		SetupModalDialog(d, 1, 2);
+		b = 0;
+		do {
+			ModalDialog(StdDlgFilter, &i);
 			
-			SetText(d, 4,"\p");
-			SetupModalDialog(d, 1, 2);
-			b = 0;
-			do {
-				ModalDialog(StdDlgFilter, &i);
-				
-				switch(i)
-				{
-					case 1:
-						GetText(d, 4, s);
-						
-					case 2:
-						b = i;
-						break;
-				}
-			} while(!b);
-			
-			DisposeDialog(d);
-			FinishModalDialog();
-			
-			if(s[0])
+			switch(i)
 			{
-				StringToNum(s, &l);
-				if(l >= 4 && l < 32767)
-				{
-					MWSetFontSize(MWActive, -1, l);
-					WEActivate(MWActive->we);
-				}
+				case 1:
+					GetText(d, 4, s);
+					
+				case 2:
+					b = i;
+					break;
+			}
+		} while(!b);
+		
+		DisposeDialog(d);
+		FinishModalDialog();
+		
+		if(s[0])
+		{
+			StringToNum(s, &l);
+			if(l >= 4 && l < 32767)
+			{
+				MWSetFontSize(MWActive, -1, l);
+				WEActivate(MWActive->we);
 			}
 		}
 	}
@@ -469,23 +470,17 @@ static pascal void HitFontsMenu(short item)
 		GetMenuItemText(gFontsMenu, item, s);
 		if(item>fontsBegin)
 		{
-			if(MWActive)
-			{
-				FMFontFamily fontFamily = FMGetFontFamilyFromName(s);
-				
-				MWSetFontSize(MWActive, fontFamily, -1);
-				WEActivate(MWActive->we);
-			}
+			FMFontFamily fontFamily = FMGetFontFamilyFromName(s);
+			
+			MWSetFontSize(MWActive, fontFamily, -1);
 		}
 		else
 		{
-			if(MWActive)
-			{
-				StringToNum(s, &l);
-				MWSetFontSize(MWActive, -1, l);
-				WEActivate(MWActive->we);
-			}
+			StringToNum(s, &l);
+			MWSetFontSize(MWActive, -1, l);
 		}
+		
+		WEActivate(MWActive->we);
 	}
 }
 
