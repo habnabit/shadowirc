@@ -30,6 +30,6 @@ void StartupIC(void);
 void StopIC(void);
 
 OSErr OpenURL(Str255 url);
-OSStatus MapFileTypeCreator(const CFStringRef *fileName, ICMapEntry *mapEntry);
+OSStatus MapFileTypeCreator(const CFStringRef fileName, ICMapEntry *mapEntry);
 
 #endif

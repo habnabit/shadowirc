@@ -48,13 +48,13 @@ OSErr OpenURL(Str255 url)
 		return -1;
 }
 
-OSStatus MapFileTypeCreator(const CFStringRef *fileName, ICMapEntry *mapEntry)
+OSStatus MapFileTypeCreator(const CFStringRef fileName, ICMapEntry *mapEntry)
 {
 	if(internetConfig)
 	{
 		Str255 pstrFileName;
 		
-		CFStringGetPascalString(fileName, &pstrFileName, sizeof(Str255), CFStringGetSystemEncoding());
+		CFStringGetPascalString(fileName, pstrFileName, sizeof(Str255), CFStringGetSystemEncoding());
 		return ICMapFilename(internetConfig, pstrFileName, mapEntry);
 	}
 	else
