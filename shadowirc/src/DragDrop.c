@@ -331,7 +331,7 @@ static OSErr MWWidgetTrackDrag(MWPtr mw,  Point mouse, short state, DragReferenc
 
 static OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage message, DragReference drag)
 {
-	OSErr ret;
+	OSErr ret = noErr;
 	WEReference il;
 	
 	if(o)

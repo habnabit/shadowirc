@@ -125,7 +125,7 @@ static void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRe
 OSErr AsyncSoundPlay(Handle sound, long refcon, Ptr *channel)
 {
 	SndChannelPtr soundChannel=0;
-	OSErr err;
+	OSErr err = noErr;
 	char disposeOfChannel = !(channel && *channel);
 	
 	if(sound)
