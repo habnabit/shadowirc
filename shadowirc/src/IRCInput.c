@@ -39,7 +39,6 @@
 #include "Inline.h"
 #include "TextManip.h"
 #include "Floaters.h"
-#include "AppearanceHelp.h"
 #include "simpleList.h"
 #include "IRCInput.h"
 

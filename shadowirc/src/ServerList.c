@@ -26,7 +26,6 @@
 #include "filesMan.h"
 #include "inline.h"
 #include "ServerList.h"
-#include "AppearanceHelp.h"
 
 static SLNetsHand netsRes = 0;
 static SLNetsPtr netsR = 0;
@@ -608,7 +607,6 @@ pascal void DoServerSelect(ServerListServiceData *p)
 
 	w = GetDialogWindow(d);
 	
-	//nets = GetAppearanceListBoxHandle(d, 3);
 	GetDialogItem(d, 3, &dType, &dItem, &netsRect);
 	SetRect(&db, 0, 0, 1, 0);
 	*(long*)&c = 0;

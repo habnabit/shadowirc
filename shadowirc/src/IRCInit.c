@@ -42,7 +42,6 @@
 #include "InetConfig.h"
 #include "AEvents.h"
 #include "DragDrop.h"
-#include "AppearanceHelp.h"
 #include "ApplBase.h"
 #include "Floaters.h"
 #include "TextManip.h"

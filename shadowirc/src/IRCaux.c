@@ -21,7 +21,6 @@
 
 #include "LongStrings.h"
 #include "StringList.h"
-#include "AppearanceHelp.h"
 #include "MsgWindows.h"
 #include "IRCGlobals.h"
 #include "DCC.h"

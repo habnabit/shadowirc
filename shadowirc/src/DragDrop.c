@@ -23,7 +23,6 @@
 #include <Carbon/Carbon.h>
 
 #include "LongStrings.h"
-#include "AppearanceHelp.h"
 #include "IRCGlobals.h"
 #include "MsgWindows.h"
 #include "MWPanes.h"

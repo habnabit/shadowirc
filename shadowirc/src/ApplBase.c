@@ -22,8 +22,6 @@
 #include <Carbon/Carbon.h>
 #include "WASTE.h"
 
-#include "AppearanceHelp.h"
-
 #include "StringList.h"
 #include "Inline.h"
 #include "IRCGlobals.h"
