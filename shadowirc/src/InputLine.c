@@ -302,7 +302,7 @@ void OpenInputLine()
 		(*inputLine._hist)[0]=0;
 
 		s = GetIntStringPtr(spInfo, sInputline);
-		inputLine.w= WCreate(&mainPrefs->inputLoc, s, kWindowFloatGrowProc, 0, 0, true);
+		inputLine.w= WCreate(&mainPrefs->inputLoc, s, kWindowResizableAttribute, 0, true);
 		if(inputLine.w)
 		{
 			// Get rid of the close box

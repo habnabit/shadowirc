@@ -30,6 +30,6 @@ Rect *WGetBBox(WindowPtr w, Rect *r);
 pascal char WIsFloater(WindowPtr w);
 pascal void WSelect(WindowPtr w);
 
-pascal WindowPtr WCreate(const Rect *boundsRect, ConstStr255Param title, short theProc, char goAwayFlag, long refCon, char isFloater);
+WindowPtr WCreate(const Rect *boundsRect, ConstStr255Param title, WindowAttributes windowAttrs, long refCon, char isFloater);
 
 #endif

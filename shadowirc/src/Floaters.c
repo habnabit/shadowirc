@@ -45,11 +45,10 @@ pascal void WSelect(WindowPtr w)
 	SelectWindow(w);
 }
 
-pascal WindowPtr WCreate(const Rect *boundsRect, ConstStr255Param title, short theProc, char goAwayFlag, long refCon, char isFloater)
+WindowPtr WCreate(const Rect *boundsRect, ConstStr255Param title, WindowAttributes windowAttrs, long refCon, char isFloater)
 {
 	WindowPtr w = 0;
 	UInt32 wClass;
-	WindowAttributes windowAttrs = kWindowResizableAttribute;
 	
 	if(isFloater)
 	{

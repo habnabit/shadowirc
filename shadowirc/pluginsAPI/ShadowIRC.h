@@ -1808,22 +1808,6 @@ enum displaySelection {
 	dsFrontWin	//Display in front window
 };
 
-/*	Flags for pluginNewWindow() - Add the appropriate flags for your window and pass that to
-		pluginNewWindow().
-		
-		Note:	You must set either pnwDocumentWindow or pnwFloaterWindow. If you want a side floater,
-					use both pnwFloaterWindow and pnwSideFloaterWindow.
-*/
-enum pnwFlags {
-	pnwHasCloseBox = 1L << 0,				//window has a close box
-	pnwHasGrowBox = 1L << 1,				//window has a grow box
-	pnwHasZoomBox = 1L << 2,				//window has a zoom box
-	pnwDocumentWindow = 1L << 10,	//Display using a standard document window
-	pnwFloaterWindow = 1L << 11,		//Display using a utility window
-	pnwSideFloaterWindow = 1L << 12,	//Display using a utility window with the titlebar on the side
-	pnwFIsFloater = 1L << 31				//window will float
-};
-
 #pragma mark -
 #pragma mark ShadowIRC Functions
 /*	------------------------------------------------------------------------------------------
@@ -2370,12 +2354,12 @@ pascal void SetInputLine(LongString *ls);
 #pragma mark ¥ Windows
 /*	------------------------------------------------------------------------------------------
 		Windows
-
-		¥ NEVER create dialogs or windows behind ShadowIRC's back, since the only way you
-		can get events from it is through ShadowIRC. (DON'T call GetNewDialog, for example.)
 		
-		¥ If you don't use these API functions, you will also disrupt ShadowIRC's floating windows mechanism.
-
+		¥ Dialogs are bad, m'kay? Use windows instead.
+		
+		¥ NEVER create dialogs or windows behind ShadowIRC's back, since the only way you
+		can get events from it is through ShadowIRC.
+		
 		¥ DO NOT change the a dialog or window's refCon, since it's a pointer to a struct that tells ShadowIRC
 		where the window came from. Use GetWindowProperty()/SetWindowProperty() instead.
 		
@@ -2385,30 +2369,18 @@ pascal void SetInputLine(LongString *ls);
 		for example.)
 		
 		¥ List of Window Manager functions to avoid:
-			NewWindow(), NewDialog() and variants, DisposeWindow() and DisposeDialog(),
-			SelectWindow(), DragWindow(), ShowHide(),
-		
-		¥ And the exception to the previous rule...
-			When creating a modal dialog, your DLOG resource should have the 'Initially Visible' flag off, and
-			you should use this sequence of calls:
-			
-			pluginNewDialog();
-				//Set up the dialog
-			EnterModalDialog();
-			ShowWindow();
-				//Do your stuff
-			pluginDisposeDialog();
-			ExitModalDialog();
+			NewWindow() and variants, DisposeWindow(),	SelectWindow()
 */
 
-pascal WindowPtr pluginNewWindow(const Rect *boundsRect, ConstStr255Param title, short theProc, long flags);
+WindowPtr pluginNewWindow(const Rect *boundsRect, ConstStr255Param title, WindowAttributes flags, char isFloater);
 /*	Creates a new window for a plugin.
 		Input:	boundsRect - rectangle for window
 					title - name of window
-					theProc - pass -1 to let ShadowIRC pick the WDEF, otherwise, pass any other value
-					flags - flags used to specify appearance of window (see pnwFlags above)
-		Output:	return value: WindowPtr from NewCWindow()
-		Note:	¥ The window is not displayed until you explicitly do so. It is positioned behind all other windows.
+					flags - flags used to specify appearance of window
+					isFloater - true if a floating window, false if not
+					
+		Output:	return value: WindowPtr from CreateWindow()
+		Note:	¥ The window is not displayed until you explicitly do so.
 */
 
 pascal void pluginDisposeWindow(WindowPtr w);

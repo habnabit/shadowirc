@@ -904,42 +904,16 @@ pascal void pluginCloseWindow(WindowPtr win, pluginDlgInfoPtr p)
 	runIndPlugin(p->pluginRef, pUIWindowCloseMessage, &pp);
 }
 
-enum {
-	pnwHasCloseBox = 1L << 0,		//Does the window have a close box?
-	pnwHasGrowBox = 1L << 1,
-	pnwHasZoomBox = 1L << 2,
-	pnwDocumentWindow = 1L << 10,	//Display using a standard document window
-	pnwFloaterWindow = 1L << 11,		//Display using a utility window
-	pnwSideFloaterWindow = 1L << 12,	//Display using a utility window with the titlebar on the side
-	pnwFIsFloater = 1L << 31			//Will the window float?
-};
-
-pascal WindowPtr pluginNewWindow(const Rect *boundsRect, ConstStr255Param title, short theProc, long flags)
+WindowPtr pluginNewWindow(const Rect *boundsRect, ConstStr255Param title, WindowAttributes flags, char isFloater)
 {
 	pluginDlgInfoPtr p;
-	char hasGrowBox = !!(flags & pnwHasGrowBox);
-	char goAwayFlag = !!(flags & pnwHasCloseBox);
-	char hasZoomBox = !!(flags & pnwHasZoomBox);
-	char sideFloaterWindow = !!(flags & pnwSideFloaterWindow);
-	char floats = !!(flags & pnwFIsFloater);
-	short whichWDEF;
 	WindowPtr w;
-	
-	if(theProc==-1)
-	{
-		if(floats)
-			whichWDEF = (hasGrowBox*2) + (hasZoomBox*4) + (sideFloaterWindow*8) + kWindowFloatProc;
-		else if(flags & pnwDocumentWindow)
-			whichWDEF = kWindowDocumentProc + (hasGrowBox) + (hasZoomBox * 6); //zoom is vert*2 + horiz*4
-	}
-	else
-		whichWDEF = theProc;
 	
 	p=(pluginDlgInfoPtr)NewPtr(sizeof(pluginDlgInfo));
 	p->magic=PLUGIN_MAGIC;
 	p->pluginRef = sidr.yourInfo;
 	
-	w = WCreate(boundsRect, title, whichWDEF, goAwayFlag, (long)p, floats);
+	w = WCreate(boundsRect, title, flags, (long)p, isFloater);
 	if(!w) //error creating window, kill the data ptr
 		DisposePtr((Ptr)p);
 	return w;

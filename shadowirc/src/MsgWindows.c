@@ -946,7 +946,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 		
 		GetPort(&p0);
 
-		h->w=WCreate(&windowSize, title, kWindowFullZoomGrowDocumentProc, true, (long)h, false);
+		h->w=WCreate(&windowSize, title, kWindowResizableAttribute, (long)h, false);
 
 		if(!h->w)
 			goto failedWCreate;

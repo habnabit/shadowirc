@@ -1331,7 +1331,8 @@ static ULI ULINew(WindowPtr w, long type)
 			!RectInRgn(&mainPrefs->userListRect, GetGrayRgn())) //then it's displaying offscreen.
 			SetRect(&mainPrefs->userListRect, 40, 40, 300, 300);
 		
-		ul->uwin = pluginNewWindow(&mainPrefs->userListRect, "\pUserlist", -1, pnwHasCloseBox | pnwHasGrowBox | pnwFloaterWindow | pnwFIsFloater);
+		//, pnwHasCloseBox | pnwHasGrowBox
+		ul->uwin = pluginNewWindow(&mainPrefs->userListRect, "\pUserlist", kWindowResizableAttribute, true);
 		ULSetWindowProperty(ul);
 		
 		ULInstallWindowHandlers(ul);
