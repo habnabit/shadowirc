@@ -175,7 +175,6 @@ static pascal OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler
 			break;
 		}
 		
-		
 		case kEventClassCommand:
 		{
 			HICommand hiCommand;
@@ -197,7 +196,7 @@ static pascal OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler
 static void ActivateShortcutWindow(WindowRef shortcutsWin)
 {
 	ControlRef itemCtrl;
-	ControlID item = { kShortcutItemSignature, 1};
+	const ControlID item = { kShortcutItemSignature, 1};
 	
 	GetControlByID(shortcutsWin, &item, &itemCtrl);
 

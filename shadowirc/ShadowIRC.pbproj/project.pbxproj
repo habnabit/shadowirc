@@ -216,6 +216,7 @@
 				F5059D9402A3470A0132A983,
 				F5F61A2F02A02E380132A988,
 				F5BA63C70315E9C70132A983,
+				F57375F103205FE90132A983,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -400,6 +401,7 @@
 				F5BA62B3030FFFCA0132A983,
 				F5BA63C90315E9C70132A983,
 				F59209B9031789ED01A80166,
+				F57375F303205FE90132A983,
 			);
 			isa = PBXResourcesBuildPhase;
 		};
@@ -2066,6 +2068,27 @@
 		F57375420317F4930132A983 = {
 			isa = PBXTargetDependency;
 			target = F59209370317839001A80166;
+		};
+		F57375F103205FE90132A983 = {
+			children = (
+				F57375F203205FE90132A983,
+			);
+			isa = PBXVariantGroup;
+			name = find.nib;
+			path = "";
+			refType = 4;
+		};
+		F57375F203205FE90132A983 = {
+			isa = PBXFileReference;
+			name = find.nib;
+			path = English.lproj/find.nib;
+			refType = 4;
+		};
+		F57375F303205FE90132A983 = {
+			fileRef = F57375F103205FE90132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		F59209330317839001A80166 = {
 			buildActionMask = 2147483647;

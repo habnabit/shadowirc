@@ -1,0 +1,84 @@
+<?xml version="1.0" standalone="yes"?>
+<object class="NSIBObjectData">
+  <string name="targetFramework">IBCarbonFramework</string>
+  <object name="rootObject" class="NSCustomObject" id="1">
+    <string name="customClass">NSApplication</string>
+  </object>
+  <array count="8" name="allObjects">
+    <object class="IBCarbonCheckBox" id="180">
+      <string name="bounds">73 173 91 306 </string>
+      <ostype name="controlSignature">SIRC</ostype>
+      <int name="controlID">6</int>
+      <string name="title">Search Backwards</string>
+    </object>
+    <object class="IBCarbonWindow" id="181">
+      <string name="windowRect">134 108 257 437 </string>
+      <string name="title">Find Text</string>
+      <object name="rootControl" class="IBCarbonRootControl" id="182">
+        <string name="bounds">0 0 123 329 </string>
+        <array count="6" name="subviews">
+          <object class="IBCarbonButton" id="185">
+            <string name="bounds">98 249 118 317 </string>
+            <int name="controlID">1</int>
+            <string name="title">Find</string>
+            <ostype name="command">ok  </ostype>
+            <int name="buttonType">1</int>
+          </object>
+          <object class="IBCarbonButton" id="184">
+            <string name="bounds">98 10 118 78 </string>
+            <int name="controlID">2</int>
+            <string name="title">Cancel</string>
+            <ostype name="command">not!</ostype>
+            <int name="buttonType">2</int>
+          </object>
+          <object class="IBCarbonStaticText" id="183">
+            <string name="bounds">1 16 17 130 </string>
+            <int name="controlID">3</int>
+            <string name="title">Search String:</string>
+          </object>
+          <object class="IBCarbonEditText" id="186">
+            <string name="bounds">20 13 67 314 </string>
+            <ostype name="controlSignature">SIRC</ostype>
+            <int name="controlID">4</int>
+          </object>
+          <object class="IBCarbonCheckBox" id="187">
+            <string name="bounds">73 13 91 146 </string>
+            <ostype name="controlSignature">SIRC</ostype>
+            <int name="controlID">5</int>
+            <string name="title">Case Sensitive</string>
+          </object>
+          <reference idRef="180"/>
+        </array>
+      </object>
+      <boolean name="hasHorizontalZoom">FALSE</boolean>
+      <boolean name="isResizable">FALSE</boolean>
+      <boolean name="hasVerticalZoom">FALSE</boolean>
+      <int name="carbonWindowClass">4</int>
+      <int name="themeBrush">0</int>
+      <int name="windowPosition">0</int>
+    </object>
+    <reference idRef="182"/>
+    <reference idRef="183"/>
+    <reference idRef="184"/>
+    <reference idRef="185"/>
+    <reference idRef="186"/>
+    <reference idRef="187"/>
+  </array>
+  <array count="8" name="allParents">
+    <reference idRef="182"/>
+    <reference idRef="1"/>
+    <reference idRef="181"/>
+    <reference idRef="182"/>
+    <reference idRef="182"/>
+    <reference idRef="182"/>
+    <reference idRef="182"/>
+    <reference idRef="182"/>
+  </array>
+  <dictionary count="2" name="nameTable">
+    <string>File&apos;s Owner</string>
+    <reference idRef="1"/>
+    <string>Find</string>
+    <reference idRef="181"/>
+  </dictionary>
+  <unsigned_int name="nextObjectID">188</unsigned_int>
+</object>

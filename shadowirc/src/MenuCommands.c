@@ -143,42 +143,170 @@ static void DoFind2(MWPtr mw)
 	}
 }
 
+#define kNibFind CFSTR("find")
+#define KNibWinFind CFSTR("Find")
+
+static int gFindWindowCount = 0;
+static WindowPtr gFindWin = NULL;
+
+enum {
+	kFindWinText = 4,
+	kFindWinCaseSensitive = 5,
+	kFindWinReverse = 6
+};
+
+static void FindWindowGet(WindowPtr findWin)
+{
+	CFStringRef theString;
+	const ControlID textID = { kApplicationSignature, kFindWinText };
+	const ControlID senID = { kApplicationSignature, kFindWinCaseSensitive };
+	const ControlID revID = { kApplicationSignature, kFindWinReverse };
+	ControlRef ctrl = NULL;
+	
+	GetControlByID(findWin, &textID, &ctrl);
+	GetControlData(ctrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
+	CFStringGetPascalString(theString, find.searchFor, sizeof(Str255), CFStringGetSystemEncoding());
+
+	GetControlByID(findWin, &senID, &ctrl);
+	find.caseSen = GetControlValue(ctrl);
+
+	GetControlByID(findWin, &revID, &ctrl);
+	find.reverse = GetControlValue(ctrl);
+}
+
+static void FindWindowSet(WindowPtr findWin)
+{
+	CFStringRef theString;
+	const ControlID textID = { kApplicationSignature, kFindWinText };
+	const ControlID senID = { kApplicationSignature, kFindWinCaseSensitive };
+	const ControlID revID = { kApplicationSignature, kFindWinReverse };
+	ControlRef ctrl = NULL;
+	
+	GetControlByID(findWin, &textID, &ctrl);
+	theString = CFStringCreateWithPascalString(NULL, find.searchFor, kCFStringEncodingMacRoman);
+	SetControlData(ctrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString);
+	CFRelease(theString);
+	
+	GetControlByID(findWin, &senID, &ctrl);
+	SetControlValue(ctrl, find.caseSen);
+
+	GetControlByID(findWin, &revID, &ctrl);
+	SetControlValue(ctrl, find.reverse);
+}
+
+static pascal OSStatus FindWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+{
+	WindowPtr findWin = (WindowPtr)userData;
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	switch(eventClass)
+	{
+		case kEventClassControl:
+		{
+			ControlRef theControl = NULL;
+			UInt32 cmd;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &theControl);
+			GetControlCommandID(theControl, &cmd);
+			
+			switch(cmd)
+			{
+				case kHICommandOK:
+					FindWindowGet(findWin);
+					
+				case kHICommandCancel:
+					DisposeWindow(findWin);
+					gFindWindowCount--;
+					
+					if(cmd == kHICommandOK)
+						DoFind2(0);
+					return noErr;
+			}
+		}
+		
+		case kEventClassCommand:
+		{
+			HICommand hiCommand;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
+			
+			switch(hiCommand.commandID)
+			{
+				case kHICommandClose:
+					return noErr;
+			}
+			break;
+		}
+	}
+	
+	return result;
+}
+
+static void ActivateFindWindow(WindowPtr findWin)
+{
+	ControlRef itemCtrl;
+	const ControlID textItem = {kApplicationSignature, 4 };
+	
+	ShowWindow(findWin);
+	SelectWindow(findWin);
+	
+	GetControlByID(findWin, &textItem, &itemCtrl);
+	SetKeyboardFocus(findWin, itemCtrl, kControlFocusNextPart);
+}
+
 void DoFind(char again)
 {
-	DialogPtr d;
-	short i;
+	static EventHandlerUPP fwUPP = NULL;
+	WindowRef findWin;
+	IBNibRef findNib;
+	OSStatus status;
+	const EventTypeSpec ctSpec[] = {
+		{ kEventClassControl, kEventControlHit },
+		{ kEventClassCommand, kEventProcessCommand }
+	};
 	
 	if(again && find.searchFor[0])
 		DoFind2(0);
 	else //throw a dialog
 	{
-		d=GetNewDialog(135, 0, (WindowPtr)-1);
-		setCheckBox(d, 5, find.caseSen);
-		setCheckBox(d, 6, find.reverse);
-		SetText(d, 4, find.searchFor);
-		SelectDialogItemText(d, 4, 0, 255);
-
-		SetupModalDialog(d, 1, 2);
-		do {
-			ModalDialog(StdDlgFilter, &i);
-			
-			if(i==5 || i==6)
-				setCheckBox(d, i, !getCheckBox(d, i));
-		} while((i!=1) && (i!=2));
-		
-		if(i==1)
+		if(++gFindWindowCount > 1)
 		{
-			find.caseSen=getCheckBox(d, 5);
-			find.reverse=getCheckBox(d, 6);
-			GetText(d, 4, find.searchFor);
+			//Undo the change to the count and select the shortcuts window.
+			gFindWindowCount--;
+			if(gFindWin)
+				ActivateFindWindow(gFindWin);
+			return;
 		}
-
-		DisposeDialog(d);
-		FinishModalDialog();
 		
-		if(i==1)
-			DoFind2(0);
+		if(!fwUPP)
+			fwUPP = NewEventHandlerUPP(FindWindowEventHandler);
+		
+		status = CreateNibReference(kNibFind, &findNib);
+		require_noerr(status, CantFindDialogNib);
+		
+		status = CreateWindowFromNib(findNib, KNibWinFind, &findWin);
+		require_noerr(status, CantCreateDialogWindow);
+		
+		DisposeNibReference(findNib);
+		
+		status = InstallWindowEventHandler(findWin, fwUPP, GetEventTypeCount(ctSpec), ctSpec,(void *)findWin, NULL);
+		require_noerr(status, CantInstallDialogHandler);
+		
+		FindWindowSet(findWin);
+		
+		ActivateFindWindow(findWin);
+		
+		gFindWin = findWin;
 	}
+
+CantFindDialogNib:
+CantCreateDialogWindow:
+CantInstallDialogHandler:
+	return;
 }
 
 #pragma mark -

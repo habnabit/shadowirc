@@ -632,47 +632,6 @@ resource 'DITL' (131, "Quit.Save") {
 	}
 };
 
-resource 'DITL' (135, "Find") {
-	{	/* array DITLarray: 6 elements */
-		/* [1] */
-		{98, 259, 118, 317},
-		Button {
-			enabled,
-			"Find"
-		},
-		/* [2] */
-		{98, 10, 118, 68},
-		Button {
-			enabled,
-			"Cancel"
-		},
-		/* [3] */
-		{1, 16, 17, 130},
-		StaticText {
-			disabled,
-			"Search String:"
-		},
-		/* [4] */
-		{20, 13, 67, 314},
-		EditText {
-			enabled,
-			""
-		},
-		/* [5] */
-		{73, 13, 91, 146},
-		CheckBox {
-			enabled,
-			"Case Sensitive"
-		},
-		/* [6] */
-		{73, 173, 91, 306},
-		CheckBox {
-			enabled,
-			"Search Backwards"
-		}
-	}
-};
-
 resource 'DITL' (136, "nonfatal error") {
 	{	/* array DITLarray: 3 elements */
 		/* [1] */
@@ -2098,17 +2057,6 @@ resource 'DLOG' (132, "Quit/Save Prefs") {
 	0x0,
 	132,
 	"Quit",
-	alertPositionMainScreen
-};
-
-resource 'DLOG' (135, "Find") {
-	{73, 88, 196, 417},
-	movableDBoxProc,
-	invisible,
-	goAway,
-	0x0,
-	135,
-	"Find Text",
 	alertPositionMainScreen
 };
 
@@ -5158,12 +5106,6 @@ resource 'dlgx' (-3000) {
 };
 
 resource 'dlgx' (131) {
-	versionZero {
-		15
-	}
-};
-
-resource 'dlgx' (135) {
 	versionZero {
 		15
 	}
