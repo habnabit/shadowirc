@@ -225,7 +225,6 @@ size_t ConnGetData(connectionPtr conn, Ptr d, size_t len);
 size_t ConnGetUntil(connectionPtr conn, Ptr d, char c, size_t len);
 pascal unsigned short ConnGetLocalPort(connectionPtr conn);
 
-pascal char ConnNewPassiveBlankListener(connectionPtr c);
 pascal OSErr NetGetLocalIP(unsigned long *ip);
 
 pascal OSErr ConnFindAddress(connectionPtr conn, ConstStr255Param host);

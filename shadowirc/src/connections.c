@@ -480,12 +480,6 @@ pascal char ConnNewListen(connectionPtr c, int backlog)
 	return NewListenConnection(&c->private_socket, c->port, backlog)==0;
 }
 
-pascal char ConnNewPassiveBlankListener(connectionPtr c)
-{
-        /* XXX figure this shit out */
-	//return NewPassiveConnection(&c->private_socket, 8192, NULL, NULL, NULL)==0;
-}
-
 size_t ConnGetData(connectionPtr conn, Ptr d, size_t len)
 {
 	return TCPReceiveChars(GetConnectionSocket(conn->private_socket), d, len);

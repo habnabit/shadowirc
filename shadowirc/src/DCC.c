@@ -856,7 +856,7 @@ pascal void DCCOpen(connectionPtr *x)
 	}
 	else if(d->dccFlags == closed)
 	{
-		if(!NetGetLocalIP(&cc->ip) && ConnNewPassiveBlankListener(cc))
+		if(!NetGetLocalIP(&cc->ip) && ConnNewListen(cc, 10))
 		{
 			cc->port=ConnGetLocalPort(cc);
 			ntohl_str(cc->ip.s_addr, ipa);
