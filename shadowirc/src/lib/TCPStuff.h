@@ -34,7 +34,7 @@ typedef struct TCPConnection *TCPConnectionPtr;
 OSErr TCPSendChars(int sockfd, const void* d, size_t len);
 
 int TCPLocalPort(int sockfd);
-long TCPRemoteIP(TCPConnectionPtr conn);
+int TCPRemoteIP(int sockfd, struct in_addr *ip);
 int TCPLocalIP(int sockfd, struct in_addr *ip);
 
 #endif

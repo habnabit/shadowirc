@@ -88,8 +88,6 @@ typedef struct TCPConnection {
 
 OSErr TCPReceiveUpTo(connectionPtr conn, char term, long timeout, Ptr readPtr, long readSize, long *readPos, char *gotterm);
 
-static void TCPFinish(void);
-
 #pragma mark -
 #pragma mark ¥¥¥ÊTCPConnections
 #pragma mark -
@@ -463,29 +461,19 @@ int TCPLocalIP(int sockfd, struct in_addr *ip)
     return (0);
 }
 
-/*
-long TCPRemoteIP(TCPConnectionPtr conn)
+int TCPRemoteIP(int sockfd, struct in_addr *ip)
 {
-	short state, localport;
-	long remotehost;
-	
-	TCPRawState(conn, &state, &localport, &remotehost);
-	return remotehost;
+    sockaddr_union sau;
+    int len;
+    
+    len = sizeof(sockaddr_union);
+    if(getpeername(sockfd, (SA *) &sau.sa, &len) < 0)
+        return (-1);
+    
+    memcpy(ip, &sau.sin.sin_addr, sizeof(ip));
+    return (0);
 }
-*/
 
-static void TCPFinish(void)
-{
-    /*
-	int i;
-	for(i=0;i<control_block_max;i++)
-		if(controlblocks[i])
-		{
-			DisposePtr((Ptr)controlblocks[i]);
-			controlblocks[i]=0;
-		}
-     */
-}
 
 /*
  * doTCPActiveOpen
@@ -594,7 +582,6 @@ OSErr InitConnections(void)
 	signal(SIGPIPE, SIG_IGN);
         FD_ZERO(&readfds);
 	fd_max = 0;
-        TCPFinish();
         return noErr;
 }
 
@@ -650,7 +637,6 @@ void FinishEverything(void)
 			WaitNextEvent(everyEvent, &e, 5, 0);
 	}
 	
-	TCPFinish();
 }
 
 /* CreateConnection
