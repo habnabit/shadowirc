@@ -537,10 +537,10 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 			{
 				ListHandle lh;
 				Cell c;
-				DrawingState ts;
+				ThemeDrawingState ts;
 				Str255 st;
 				
-				GetDrawingState(&ts);
+				GetThemeDrawingState(&ts);
 				NormalizeDrawingState();
 				
 				lh= GetAppearanceListBoxHandle(PrefsDlg, 9);
@@ -563,7 +563,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				c.v = 0;
 				LSetSelect(true, c, lh);
 				LSetDrawingMode(true, lh);
-				SetDrawingState(ts);
+				SetThemeDrawingState(ts);
 			}
 */
 				break;

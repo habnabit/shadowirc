@@ -40,15 +40,11 @@ enum {
 extern const RGBColor white, black, VLtGrey, LtGrey, MedGrey, HalfGrey, MDkGrey, DkGrey, VDkGrey;
 
 pascal ListHandle GetAppearanceListBoxHandle(DialogPtr theDialog, short itemNum);
-pascal void DrawPlacard(const Rect *r, long state);
 pascal void SetTextColor(short color);
 pascal void SetBackground(short color);
 
 pascal void DrawBorder(const Rect *rIn, long state, char draggable);
 
-typedef struct OpaqueDrawingState *DrawingState;
-pascal void GetDrawingState(DrawingState* state);
-pascal void SetDrawingState(DrawingState state);
 pascal void NormalizeDrawingState();
 
 #endif

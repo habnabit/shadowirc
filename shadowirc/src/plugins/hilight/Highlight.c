@@ -306,12 +306,12 @@ static void PrefsWindowGet(pPWGetWindowDataPtr p)
 static void PrefWinRedraw(pPWRedrawDataPtr p)
 {
 #pragma unused(p)
-	DrawingState ts;
+	ThemeDrawingState ts;
 	
-	GetDrawingState(&ts);
+	GetThemeDrawingState(&ts);
 	NormalizeDrawingState();
 	
-	SetDrawingState(ts);
+	SetThemeDrawingState(ts);
 }
 
 static void ResizePrefs(void)
@@ -394,11 +394,11 @@ static void PrefWinHit(pPWItemHitDataPtr p)
 	if(p->id == prefPanel)
 	{
 		Str255 st;
-		DrawingState ts;
+		ThemeDrawingState ts;
 		
 		SetPort(p->PrefsDlg);
 		
-		GetDrawingState(&ts);
+		GetThemeDrawingState(&ts);
 		NormalizeDrawingState();
 		
 		switch (p->itemNum)
@@ -507,7 +507,7 @@ static void PrefWinHit(pPWItemHitDataPtr p)
 */
 		}
 			
-		SetDrawingState(ts);
+		SetThemeDrawingState(ts);
 	}
 }
 	
@@ -515,13 +515,13 @@ static void PrefWinHit(pPWItemHitDataPtr p)
 static ListHandle BuildTheList(DialogPtr dlog)
 {
 	ListHandle textListHdl;
-	DrawingState ts;
+	ThemeDrawingState ts;
 	StringPtr	theString;
 	Cell cell;
 	PrefsPtr p;
 	int x, max;
 	
-	GetDrawingState(&ts);
+	GetThemeDrawingState(&ts);
 	NormalizeDrawingState();
 
 	textListHdl = GetAppearanceListBoxHandle(dlog, iAliasList);
@@ -545,7 +545,7 @@ static ListHandle BuildTheList(DialogPtr dlog)
 	LSetSelect(true, cell, textListHdl);
 	LSetDrawingMode(true, textListHdl);
 	
-	SetDrawingState(ts);
+	SetThemeDrawingState(ts);
 	
 	return textListHdl;
 }

@@ -979,7 +979,7 @@ restart:
 	StartDrawingOffscreen(&offscreen, &r, false);
 	r.top = r.left = -3;
 	r.right ++;
-	DrawPlacard(&r, kThemeStateActive);
+	DrawThemePlacard(&r, kThemeStateActive);
 	
 	RGBBackColor(&white);
 	RGBForeColor(&shadowircColors[sicStatusLine]);

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -47,8 +47,6 @@ pascal ListHandle GetAppearanceListBoxHandle(DialogPtr theDialog, short itemNum)
 	
 	return list;
 }
-
-#define SC(c, g) c.red=c.green=c.blue=g
 
 pascal void DrawBorder(const Rect *r, long state, char draggable)
 {
@@ -110,17 +108,6 @@ pascal void DrawBorder(const Rect *r, long state, char draggable)
 	RGBForeColor(&rgbF);
 }
 
-typedef struct dpPaintRgnInfo {
-	const RGBColor *color;
-	Rect ir;
-} dpPaintRgnInfo;
-
-
-pascal void DrawPlacard(const Rect *r, long state)
-{
-	DrawThemePlacard(r, state);
-}
-
 pascal void SetTextColor(short color)
 {
 	SetThemeTextColor(color, 16, true);
@@ -133,30 +120,9 @@ pascal void SetBackground(short color)
 
 #pragma mark -
 
-struct InternalDrawingState
-{
-	RGBColor		foreColor;
-	RGBColor		backColor;
-	PenState		pen;
-	SInt16			textMode;
-	PixPatHandle	pnPixPat;
-	PixPatHandle	bkPixPat;
-	Pattern			bkPat;
-};
-typedef struct InternalDrawingState InternalDrawingState;
-
 //Replacments for the color/pen state stuff that's in Appearance 1.1
 //Copied from Apple's code from somewhere, I think
 //But, assuming we have a color port, since ShadowIRC only generates color windows...
-pascal void GetDrawingState(DrawingState *outState)
-{
-	GetThemeDrawingState((ThemeDrawingState*)outState);
-}
-
-pascal void SetDrawingState(DrawingState instate)
-{
-	SetThemeDrawingState((ThemeDrawingState)instate, true);
-}
 
 pascal void NormalizeDrawingState()
 {

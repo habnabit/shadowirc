@@ -1211,12 +1211,12 @@ restart:
 	
 	if(winActive)
 	{
-		DrawPlacard(&r, kThemeStateActive);
+		DrawThemePlacard(&r, kThemeStateActive);
 		themeTextColor = kThemeTextColorPlacardActive;
 	}
 	else
 	{
-		DrawPlacard(&r, kThemeStateInactive);
+		DrawThemePlacard(&r, kThemeStateInactive);
 		themeTextColor = kThemeTextColorPlacardInactive;
 	}
 	

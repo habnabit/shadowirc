@@ -603,7 +603,7 @@ pascal void DoServerSelect(ServerListServiceData *p)
 	SLServHand *servers = 0;
 	ModalFilterUPP df = NewModalFilterUPP(ServerDialogFilter);
 	short rf = CurResFile();
-	DrawingState ts;
+	ThemeDrawingState ts;
 	WindowPtr w;
 	short dType;
 	Handle dItem;
@@ -643,7 +643,7 @@ pascal void DoServerSelect(ServerListServiceData *p)
 	
 	UseResFile(mainResNum);
 
-	GetDrawingState(&ts);
+	GetThemeDrawingState(&ts);
 	NormalizeDrawingState();
 	
 	fillNetsList(nets);
@@ -799,7 +799,7 @@ pascal void DoServerSelect(ServerListServiceData *p)
 		}
 	} while(i != 1 && i != 2);
 	
-	SetDrawingState(ts);
+	SetThemeDrawingState(ts, true);
 
 	LDispose(nets);
 	LDispose(servs);
