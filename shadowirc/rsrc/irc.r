@@ -776,18 +776,6 @@ resource 'DITL' (139, "TW.NoFreeMem") {
 	}
 };
 
-resource 'DITL' (140) {
-	{	/* array DITLarray: 1 elements */
-		/* [1] */
-		{2, 2, 46, 207},
-		StaticText {
-			disabled,
-			"Please wait while ShadowIRC closes TCP/I"
-			"P connections…"
-		}
-	}
-};
-
 resource 'DITL' (141, "Font Size") {
 	{	/* array DITLarray: 4 elements */
 		/* [1] */
@@ -2091,17 +2079,6 @@ resource 'DLOG' (139) {
 	0x0,
 	139,
 	"",
-	alertPositionMainScreen
-};
-
-resource 'DLOG' (140, "Close Connections") {
-	{83, 133, 132, 343},
-	dBoxProc,
-	invisible,
-	noGoAway,
-	0x0,
-	140,
-	"Closing Connections",
 	alertPositionMainScreen
 };
 
@@ -5114,12 +5091,6 @@ resource 'dlgx' (138) {
 };
 
 resource 'dlgx' (139) {
-	versionZero {
-		15
-	}
-};
-
-resource 'dlgx' (140) {
 	versionZero {
 		15
 	}
