@@ -1,6 +1,6 @@
 /*	ShadowIRC Plugins Header File
-		Version 1.1b2
-		й John Bafford 1997-2000. All Rights Reserved.
+		Version 1.1
+		й John Bafford 1997-2001. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
 		
@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x01010045
+#define _ShadowIRC_API_Version_ 0x01010080
 
 #pragma mark еее ShadowIRC Message Definitions
 /*	------------------------------------------------------------------------------------------
