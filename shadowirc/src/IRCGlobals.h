@@ -29,12 +29,6 @@
 #include <Dialogs.h>
 #endif
 
-#if __POWERPC__
-	#define PPC 1
-#else
-	#define PPC 0
-#endif
-
 #pragma internal on
 
 typedef char Table[256], *TableChars;
