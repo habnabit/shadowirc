@@ -74,10 +74,10 @@ static pascal void DCCSendReposition(connectionPtr conn, long newpos);
 static pascal char DCCPutFile(connectionPtr x, char forceSave);
 static pascal void DCCSendFileChunk(connectionPtr *cn);
 //¥NOTE: chat is the only one still usint tcpc because there's no func available. When it is, zap tcpc from the def'n
-static pascal void DCCGetLineChat(connectionPtr conn, TCPConnectionPtr tcpc);
-static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr);
-static pascal void DCCGetLineSend(connectionPtr conn, TCPConnectionPtr);
-static pascal void StartDCCGet(connectionPtr x, char autoSave);
+static pascal void DCCGetLineChat(connectionPtr conn);
+static pascal void DCCGetLineGet(connectionPtr conn);
+static pascal void DCCGetLineSend(connectionPtr conn);
+static pascal void StartDCCGet(connectionPtr x);
 
 static pascal short DCCSendFileHook(short item, DialogPtr d, dccsendbitPtr info);
 static void DCCSendFileNavHookMouseDown(NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
@@ -630,14 +630,14 @@ static pascal char DCCPutFile(connectionPtr x, char forceSave)
 	return MyStandardPutFile(s, dd->gfile.name, 'BINA', 'SIRC', kNNoTypePopup, &dd->gfile, true) <= 0;
 }
 
-static pascal void StartDCCGet(connectionPtr x, char autoSave)
+static pascal void StartDCCGet(connectionPtr x)
 {
 	dccGETDataPtr 	dd=(dccGETDataPtr)x->dcc->dccData;
 	
 	if(x->dcc->dccFlags == opening || x->dcc->dccFlags == open) //already open!!
 		return;
 	
-	if(autoSave && mainPrefs->autoSaveDCC) //go ahead
+	if(mainPrefs->autoSaveDCC) //go ahead
 		DCCOpen(&x);
 	else //ask where to save
 	{
@@ -834,7 +834,7 @@ pascal void DCCCommand(linkPtr link, Str255 s)
 				if(name[0])
 				{
 					if((x=DCCFind(0, dccGET, name))!= 0)
-						StartDCCGet(x, false);
+						StartDCCGet(x);
 					else
 					{
 						LSParamString(&ls, GetIntStringPtr(spDCC, sNoSuchDCCGETNick), name, 0, 0, 0);
@@ -1391,7 +1391,7 @@ pascal void DCCConnOpened(connectionPtr *cn)
 
 #pragma mark -
 
-static pascal void DCCGetLineChat(connectionPtr conn, TCPConnectionPtr)
+static pascal void DCCGetLineChat(connectionPtr conn)
 {
 	int i;
 	long nn;
@@ -1502,7 +1502,7 @@ static pascal void DCCGetLineChat(connectionPtr conn, TCPConnectionPtr)
 	}
 }
 
-static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr)
+static pascal void DCCGetLineGet(connectionPtr conn)
 {
 	long nn;
 	short pt;
@@ -1680,7 +1680,7 @@ static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr)
 	};
 }
 
-static pascal void DCCGetLineSend(connectionPtr conn, TCPConnectionPtr)
+static pascal void DCCGetLineSend(connectionPtr conn)
 {
 	long nn, ack;
 	dccSENDDataPtr dd = (dccSENDDataPtr)conn->dcc->dccData;
@@ -1746,7 +1746,7 @@ pascal void dccEvent(CEPtr c, connectionPtr conn)
 			break;
 		
 		case C_CharsAvailable:
-			conn->DCCInputFunc(conn, c->tcpc);
+			conn->DCCInputFunc(conn);
 			break;
 			
 		case C_Found:
@@ -1926,7 +1926,7 @@ static pascal void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255P
 	SMPrefixLinkColor(link, &ls, dsFrontWin, sicCTCP);
 	
 	if(mainPrefs->autoDCCGet)
-		StartDCCGet(x, mainPrefs->autoSaveDCC);
+		StartDCCGet(x);
 }
 
 //DCC REVERSE PROTOCOL refcon filename ip port [size]
