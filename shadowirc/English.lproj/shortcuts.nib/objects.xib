@@ -115,6 +115,7 @@
             <string name="bounds">340 24 392 446 </string>
             <int name="controlID">24</int>
             <boolean name="small">TRUE</boolean>
+            <int name="controlSize">1</int>
             <string name="title">\n = return; $channel = current channel; $lastjoiner = last person to join this channel; $nick = current nick; $server = current server; $selecteduser = first user selected in userlist; $-&gt; = set cursor position/begin selection; $&lt;- = end selection; $il = inputline text; $date, $date.l, $time, $time.s, $version</string>
           </object>
           <object class="IBCarbonPopupButton" id="197">
@@ -162,7 +163,6 @@
       <boolean name="hasHorizontalZoom">FALSE</boolean>
       <boolean name="isResizable">FALSE</boolean>
       <boolean name="hasVerticalZoom">FALSE</boolean>
-      <int name="carbonWindowClass">6</int>
       <int name="themeBrush">1</int>
       <int name="windowPosition">7</int>
     </object>
