@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x01010044 //68
+#define _ShadowIRC_API_Version_ 0x01010045
 
 #pragma mark еее ShadowIRC Message Definitions
 /*	------------------------------------------------------------------------------------------

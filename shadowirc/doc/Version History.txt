@@ -4,16 +4,19 @@ All Rights Reserved
 
 Changes to the ShadowIRC Plugins SDK are listed in the Version History file in the SDK package.
 
-Changes in 1.1b2 - August 2000
+Changes in 1.1b2 - November 25, 2000
 Bug Fixes:
 ¥ Connection Actions prefs pane now changes when you select different connections.
 ¥ Worked around a compiler bug causing crashes drawing icon-based widgets in message windows.
 ¥ Fixed a bug when selecting the default file name for saving window text to a file. The generated name was being replaced accidentally by the window name, which could contain colons.
 ¥ Fixed displaying the topic length/maximum length in the topic window. (Hash table wasn't searching correctly.)
 ¥ /broadcast and /bract show using the correct color.
+¥ Fixed a crash when setting up preferences on 68k machines.
+¥ Miscelaneous string bug fixes. 
+¥ Other miscelaneous fixes.
 
 Miscelaneous:
-¥ Recompiled using Universal Interfaces 3.3.2.
+¥ Recompiled using Universal Interfaces 3.3.2 and CodeWarrior Pro 6.
 
 
 Change in 1.1b1r1 - August 4, 2000, 1 AM

@@ -19,8 +19,8 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-unsigned char myVersion[] = "\p1.1b2-pre1";
-#define SIVersion 0x01010044
+unsigned char myVersion[] = "\p1.1b2";
+#define SIVersion 0x01010045
 
 #include "IRCGlobals.h"
 #include "utils.h"
