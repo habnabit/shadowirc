@@ -206,7 +206,6 @@ u_int32_t str_htonl(StringPtr string)
     if (errno == ERANGE || *end_ptr != '\0')
         net32 = 0;
         
-    CopyCStringToPascal(cstr, string);
     free(cstr);
     return(net32);
 }
