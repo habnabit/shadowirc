@@ -3834,12 +3834,6 @@ pascal void SetDlogFont(DialogPtr d);
 		Output:	none.
 */
 
-pascal MenuHandle GetControlMenu(ControlHandle c);
-/*	Gets the menu associated with a popup menu control.
-		Input:	c - A ControlHandle.
-		Output:	return vakue - A MenuHandle.
-*/
-
 pascal OSErr CopyResource(ResType type, short id, short src, short des);
 /*	Copies a resource from one resource file to another.
 		Input:	type - the resource type

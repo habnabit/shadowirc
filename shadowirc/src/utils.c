@@ -1141,11 +1141,6 @@ pascal char maskMatch(ConstStr255Param s, ConstStr255Param mask)
 	return matchFrom(s,mask,1,1);
 }
 
-pascal MenuHandle GetControlMenu(ControlHandle c)
-{
-return GetControlPopupMenuHandle(c);
-}
-
 pascal void ulong64val(ConstStr255Param s, unsigned long long *out)
 {
 	unsigned long long l = 0;

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -53,7 +53,6 @@ pascal void selectOneCell(ListHandle l, Cell c);
 pascal void makeCellVisible(ListHandle theList, Cell theCell);
 pascal void drawListBorder(ListHandle myList);
 pascal void SetDlogFont(DialogPtr d);
-pascal MenuHandle GetControlMenu(ControlHandle c);
 pascal void makeMask(StringPtr uah, StringPtr mask);
 pascal void padEnd(ConstStr255Param s, short num, StringPtr out);
 pascal void padBegin(ConstStr255Param s, short num, StringPtr out);
