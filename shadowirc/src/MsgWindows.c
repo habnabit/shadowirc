@@ -38,7 +38,7 @@
 #include "plugins.h"
 #include "Inline.h"
 #include "Floaters.h"
-#include "FilesMan.h"
+#include "filesMan.h"
 #include "DragDrop.h"
 #include "MWPanes.h"
 #include "InputLine.h"
