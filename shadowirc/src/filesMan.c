@@ -698,7 +698,7 @@ static pascal void CreateNewPrefsMain(void)
 	mp->hideSplashScreen=0;
 	mp->doWhowasIfFailedWhois=0;
 	mp->dontActivateNewWindowsIfInputlineText=0;
-	mp->quitAction = qaConfirm;
+	mp->quitAction = qaAutoSave;
 	mp->dccWindowAutoOpen = 0;
 mp->unused4=0;
 
