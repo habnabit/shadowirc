@@ -995,15 +995,7 @@ typedef struct ShadowIRCDataRecord {
 	const char *const inBackground;			//True if ShadowIRC is in the background, false if it's in the foreground.
 	const long *const lastInput;					//The time the user last hit return in the inputline. (GetDateTime())
 	const long *const lastKeyTime;				//The time the user last input any text to the inputline. (GetDateTime())
-const char reserved3;
-	const char hasCM;									//True if System-Wide Contextual Menu support exists. (OS 8 and later)
-const char reserved;	
-	const char hasWM11;							//True if Window Manager 1.1 present
-	const char hasDrag;								//True if the Drag Manager is pesent.
-const char reserved2;
-	const char hasNavServices;					//True if Navigation Services are present and enabled.
-	const char hasAppearance11;				//True if Appearance 1.1 is present.
-	
+
 	targetPtr CurrentTarget;						//The active target
 	const MWPtr *const MWActive;			//Pointer to active MWPtr.
 	inputLinePtr inputLine;							//Pointer to the inputline data.
