@@ -30,4 +30,7 @@
 void SaveShortcutDataCFPrefs(Str255 shortcutData[]);
 void ReadShortCutDataCFPrefs(Str255 shortcutData[]);
 
+OSStatus WriteDirURLRef(CFStringRef prefName, const FSRef *ref);
+OSStatus ReadDirURLRef(CFStringRef prefName, FSRef *ref);
+
 #endif

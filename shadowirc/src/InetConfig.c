@@ -21,6 +21,10 @@
 
 #include "InetConfig.h"
 #include "IRCGlobals.h"
+#include "MoreFilesX.h"
+#include "IRCCFPrefs.h"
+
+#define kPrefDCCFolder CFSTR("DCCFolder")
 
 ICInstance internetConfig;
 
@@ -56,29 +60,60 @@ OSStatus GetFSRefForDownloadsFolder(FSRef *ref)
 	ICAttr attr;
 	AliasHandle fsAliasHdl = NULL;
 	
+	err = ReadDirURLRef(kPrefDCCFolder, ref);
+	if(err == noErr)
+		return err;
+	
 	if(internetConfig)
 	{
 		err = ICGetPref(internetConfig, kICDownloadFolder, &attr, NULL, &prefSize);
 		if(err == noErr)
 		{
 			fileSpecHdl = (ICFileSpecHandle)NewHandle(prefSize);
+			err = MemError();
+			
 			if(fileSpecHdl)
 			{
 				err = ICFindPrefHandle(internetConfig, kICDownloadFolder, &attr, (Handle)fileSpecHdl);
 				
-				fsAliasHdl = (AliasHandle)fileSpecHdl;
-				err = HandToHand((Handle *)&fsAliasHdl);
-				Munger((Handle)fsAliasHdl, 0, NULL, kICFileSpecHeaderSize, (Ptr)-1, 0);
-				
-				err = FSResolveAlias(NULL, fsAliasHdl, ref, NULL);
-				
-				DisposeHandle((Handle)fileSpecHdl);
-				DisposeHandle((Handle)fsAliasHdl);
+				if(err == noErr)
+				{
+					Size aliasSize;
+					
+					aliasSize = ((*fileSpecHdl)->alias).aliasSize;
+					
+					fsAliasHdl = (AliasHandle)NewHandle(aliasSize);
+					err = MemError();
+					
+					if(fsAliasHdl)
+					{
+						Boolean changed = FALSE;
+						
+						HLock((Handle)fsAliasHdl);
+						BlockMoveData(&(*fileSpecHdl)->alias, *fsAliasHdl, aliasSize);
+						err = MemError();
+						HUnlock((Handle)fsAliasHdl);
+						if(err == noErr)
+						{
+							err = FSResolveAlias(NULL, fsAliasHdl, ref, &changed);
+							if(!FSRefValid(ref))
+								err = paramErr;
+							else
+								err = WriteDirURLRef(kPrefDCCFolder, ref);
+						}
+					}
+				}
 			}
 		}
 	}
 	else
 		err = paramErr; // something intelligible in case IC didn't work/isn't here
+				// Purpose of which is to imply that 'ref' is INVALID.
+	
+	if(fileSpecHdl)
+		DisposeHandle((Handle)fileSpecHdl);
+	if(fsAliasHdl)
+		DisposeHandle((Handle)fsAliasHdl);
 	
 	return err;
 }

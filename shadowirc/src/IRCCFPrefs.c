@@ -76,3 +76,62 @@ void ReadShortCutDataCFPrefs(Str255 shortcutData[])
 			shortcutData[x][0]=0;
 	}
 }
+
+OSStatus WriteDirURLRef(CFStringRef prefName, const FSRef *ref)
+{
+	OSStatus err = noErr;
+	CFURLRef url;
+	
+	if(ref == NULL)
+		return paramErr;	// break out here, stupid to go on.
+	
+	url = CFURLCreateFromFSRef(kCFAllocatorDefault, ref);
+	
+	if(url)
+	{
+		CFStringRef urlString;
+		
+		urlString = CFURLGetString(url);
+		
+		if(urlString)
+		{
+			CFPreferencesSetAppValue(prefName, urlString, kCFPreferencesCurrentApplication);
+			CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
+		}
+		
+		CFRelease(urlString);
+		CFRelease(url);
+	}
+	else
+		err = paramErr;
+	
+	return err;
+}
+
+OSStatus ReadDirURLRef(CFStringRef prefName, FSRef *ref)
+{
+	OSStatus err = noErr;
+	CFStringRef urlString;
+	
+	if(ref == NULL)
+		return paramErr;	// break out here, stupid to go on.
+	
+	urlString = CFPreferencesCopyAppValue(prefName, kCFPreferencesCurrentApplication);
+
+	if(urlString)
+	{
+		CFURLRef url;
+		
+		url = CFURLCreateWithString(kCFAllocatorDefault, urlString, NULL);
+		
+		if(url)
+			CFURLGetFSRef(url, ref);
+		
+		CFRelease(urlString);
+		CFRelease(url);
+	}
+	else
+		err = paramErr;
+		
+	return err;
+}
