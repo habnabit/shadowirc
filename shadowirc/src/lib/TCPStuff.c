@@ -119,6 +119,7 @@ enum statusType {
 typedef struct DNRRecord {
     OSErr ioResult;
     pthread_t thread;
+    pthread_mutex_t lock;
     Str255 name;
     struct in_addr ip;
 } DNRRecord, *DNRRecordPtr;
@@ -704,18 +705,19 @@ static void DestroyConnection(connectionIndex *cp)
  * this thread. Thus, pthread_mutex_unlock is pushed onto the cleanup
  * stack
  */
+static pthread_mutex_t dnslock = PTHREAD_MUTEX_INITIALIZER;
 static void FindAddressDNR(DNRRecordPtr drp)
 {
         struct hostent *hp;
         char *str;
-        static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 
         str = safe_malloc(drp->name[0] + 1);
         CopyPascalStringToC(drp->name, str);
-        pthread_cleanup_push((void *) pthread_mutex_unlock, (void *) &lock);
-        pthread_mutex_lock(&lock);
+        pthread_cleanup_push((void *) pthread_mutex_unlock, (void *) &dnslock);
+        pthread_mutex_lock(&dnslock);
         hp = gethostbyname(str);
         free(str);
+	pthread_mutex_lock(&drp->lock);
         if(hp == NULL)
         {
             drp->ioResult = -1;
@@ -724,11 +726,12 @@ static void FindAddressDNR(DNRRecordPtr drp)
             bcopy(hp->h_addr_list[0], &drp->ip.s_addr, sizeof(drp->ip.s_addr));
             CopyCStringToPascal(hp->h_name, drp->name);
         }
+	pthread_mutex_unlock(&drp->lock);
         /*
          * pop pthread_mutex_unlock off the cleanup stack and execute it
          * this unlocks our lock mutex lock
          */
-        pthread_cleanup_pop(1);
+	pthread_cleanup_pop(1);
 }
 
 /*
@@ -740,7 +743,7 @@ OSErr FindAddress(connectionIndex *cp, ConstStr255Param hostname)
 {
 	OSErr err;
 	connectionIndex cpi;
-	
+
 	err = CreateConnection(cp);
 	if(!err)
 	{
@@ -749,13 +752,21 @@ OSErr FindAddress(connectionIndex *cp, ConstStr255Param hostname)
 		{
 			connections[--cpi].dnrrp = (DNRRecordPtr)NewPtr(sizeof(DNRRecord));
 			err = MemError();
+			if(pthread_mutex_init(&connections[cpi].dnrrp->lock, NULL) != 0)
+				err = -1;
 			if(!err)
 			{
-                                connections[cpi].dnrrp->ioResult = inProgress;
-                                pstrcpy(hostname, connections[cpi].dnrrp->name);
-                                pthread_create(&connections[cpi].dnrrp->thread, NULL, (void *) FindAddressDNR, connections[cpi].dnrrp);
+				pthread_mutex_lock(&connections[cpi].dnrrp->lock);
+				connections[cpi].dnrrp->ioResult = inProgress;
+				pstrcpy(hostname, connections[cpi].dnrrp->name);
+				pthread_mutex_unlock(&connections[cpi].dnrrp->lock);
 				connections[cpi].timeout = TickCount() + TO_FindAddress;
 				connections[cpi].status = CS_Searching;
+				
+				if(pthread_create(&connections[cpi].dnrrp->thread, NULL, (void *) FindAddressDNR, (void *) connections[cpi].dnrrp) != 0)
+					err = -1;
+				
+				pthread_detach(connections[cpi].dnrrp->thread);
 			}
 		}
 		
@@ -862,14 +873,18 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 	switch(c->status)
 	{
 		case CS_Searching:
-                        if(c->dnrrp->ioResult == noErr)
-                        {
-                                cer->event = C_Found;
+			if(pthread_mutex_trylock(&c->dnrrp->lock) == 0)
+			{
+				if(c->dnrrp->ioResult == noErr)
+				{
+					cer->event = C_Found;
 					cer->value = (long)NewString(c->dnrrp->name);
-                                cer->addr = c->dnrrp->ip;
-                        } else if(c->dnrrp->ioResult != inProgress) {
-                                cer->event = C_SearchFailed;
-                                cer->value = c->dnrrp->ioResult;
+					cer->addr = c->dnrrp->ip;
+				} else if(c->dnrrp->ioResult != inProgress) {
+					cer->event = C_SearchFailed;
+					cer->value = c->dnrrp->ioResult;
+				}
+				pthread_mutex_unlock(&c->dnrrp->lock);
 			}
 			else if(TickCount() > c->timeout)
 			{
