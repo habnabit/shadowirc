@@ -418,9 +418,8 @@ static void ParseShortcutText(ConstStr255Param s)
 	Handle h;
 	long l1,l2;
 	inputAreaDataPtr iad = ILGetInputDataFromMW(0);
-	WEReference il = IADGetWE(iad);
 	
-	if(!il)
+	if(!iad)
 		return;
 	
 	pstrcpy(s, s2);
@@ -460,9 +459,11 @@ static void ParseShortcutText(ConstStr255Param s)
 			x=0;
 			if(cp>=0) //check for a selection and get it, if there is one
 			{
-				WEGetSelection(&l1,&l2, il);
+				IADGetCursorSelection(iad, &l1, &l2);
 				if(l1!=l2)
 				{
+					WEReference il = IADGetWE(iad);
+					
 					h=NewHandle(l2-l1);
 					WECopyRange(l1, l2, h, 0, 0, il);
 					IADSetText(iad, &ls);

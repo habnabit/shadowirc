@@ -724,7 +724,6 @@ static char CMIW(Point where)
 	unsigned short outMenuItem;
 	long outUserSelectionType;
 	inputAreaDataPtr iad = ILGetInputDataFromMW(0);
-	WEReference il = IADGetWE(iad);
 	
 	CMCreate(&d);
 	d.type = cmInputline;
@@ -732,7 +731,7 @@ static char CMIW(Point where)
 	d.where = where;
 	
 	d.m=NewMenu(201, "\p");
-	WEGetSelection(&d.s0, &d.s1, il);
+	IADGetCursorSelection(iad, &d.s0, &d.s1);
 	if(d.s0==d.s1) //No selection
 	{
 		LongString ls;
@@ -764,6 +763,8 @@ static char CMIW(Point where)
 		case 201: //Inputline
 			if(outMenuItem > 0)
 			{
+				WEReference il = IADGetWE(iad);
+				
 				switch((**d.items).list[outMenuItem].command)
 				{
 					case mcILCut:
