@@ -467,7 +467,6 @@ enum {
 
 pascal long _UndocumentedAPI(long type, long data)
 {
-	#pragma unused(data)
 	LongString ls;
 	Str255 pluginName;
 	int x;
