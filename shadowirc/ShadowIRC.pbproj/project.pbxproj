@@ -57,6 +57,39 @@
 //142
 //143
 //144
+		14886206068971DA00FEB302 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.plist.xml;
+			path = "Info-Highlight.plist";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		14886209068971EC00FEB302 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = text.plist.xml;
+			name = "Info-Userlist.plist";
+			path = "src/plugins/userlist/Info-Userlist.plist";
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		1488628D068972C300FEB302 = {
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				1488628F068972D300FEB302,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1488628F068972D300FEB302 = {
+			fileRef = 14EB08B606895B4300B74698;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		14A4B95F04509C190066CC43 = {
 			fileEncoding = 4;
 			isa = PBXFileReference;
@@ -83,6 +116,371 @@
 		};
 		14B760990688BB3E0069164D = {
 			fileRef = 14B760000688B95F0069164D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14CB410F06896D12004268FB = {
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				14CB411F06897045004268FB,
+				14CB411206896D36004268FB,
+			);
+			isa = PBXCopyFilesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14CB411206896D36004268FB = {
+			fileRef = 14EB082E068959D300B74698;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14CB411F06897045004268FB = {
+			fileRef = 14EB084306895A5A00B74698;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB081F068959D200B74698 = {
+			buildPhases = (
+				14EB0820068959D200B74698,
+				14EB0824068959D200B74698,
+				14EB0825068959D200B74698,
+				14EB0828068959D200B74698,
+				14EB082A068959D200B74698,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = pluginsAPI;
+				INFOPLIST_FILE = "src/plugins/userlist/Info-Userlist.plist";
+				INSTALL_PATH = "@executable_path/../PlugIns";
+				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Userlist;
+				SECTORDER_FLAGS = "";
+				SKIP_INSTALL = YES;
+				UNSTRIPPED_PRODUCT = YES;
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = plugin;
+			};
+			dependencies = (
+			);
+			isa = PBXNativeTarget;
+			name = Userlist;
+			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
+			productName = Userlist;
+			productReference = 14EB082E068959D300B74698;
+			productType = "com.apple.product-type.bundle";
+		};
+		14EB0820068959D200B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+				14EB0821068959D200B74698,
+				14EB0822068959D200B74698,
+				14EB0823068959D200B74698,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB0821068959D200B74698 = {
+			fileRef = F552BFC9021103B901A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB0822068959D200B74698 = {
+			fileRef = F552BFCB021103B901A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB0823068959D200B74698 = {
+			fileRef = F50FA7160358BEB70132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB0824068959D200B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB0825068959D200B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+				14EB0826068959D200B74698,
+				14EB0827068959D200B74698,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB0826068959D200B74698 = {
+			fileRef = F552BFC8021103B901A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB0827068959D200B74698 = {
+			fileRef = F552BFCA021103B901A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB0828068959D200B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+				14EB0829068959D200B74698,
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB0829068959D200B74698 = {
+			fileRef = 20286C33FDCF999611CA2CEA;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB082A068959D200B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+				14EB082B068959D200B74698,
+			);
+			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB082B068959D200B74698 = {
+			fileRef = F5DC0A3D0358CBA30132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB082E068959D300B74698 = {
+			explicitFileType = wrapper.cfbundle;
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			path = Userlist.plugin;
+			refType = 3;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		14EB083006895A2800B74698 = {
+			containerPortal = 20286C28FDCF999611CA2CEA;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 14EB081F068959D200B74698;
+			remoteInfo = Userlist;
+		};
+		14EB083106895A2800B74698 = {
+			isa = PBXTargetDependency;
+			target = 14EB081F068959D200B74698;
+			targetProxy = 14EB083006895A2800B74698;
+		};
+		14EB083706895A5A00B74698 = {
+			buildPhases = (
+				14EB083806895A5A00B74698,
+				14EB083A06895A5A00B74698,
+				14EB083B06895A5A00B74698,
+				14EB083D06895A5A00B74698,
+				14EB083F06895A5A00B74698,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = pluginsAPI;
+				INFOPLIST_FILE = "src/plugins/hilight/Info-Highlight.plist";
+				INSTALL_PATH = "@executable_path/../PlugIns";
+				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = Highlight;
+				SECTORDER_FLAGS = "";
+				SKIP_INSTALL = YES;
+				UNSTRIPPED_PRODUCT = YES;
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+				WRAPPER_EXTENSION = plugin;
+			};
+			dependencies = (
+			);
+			isa = PBXNativeTarget;
+			name = Highlight;
+			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
+			productName = Userlist;
+			productReference = 14EB084306895A5A00B74698;
+			productType = "com.apple.product-type.bundle";
+		};
+		14EB083806895A5A00B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+				14EB083906895A5A00B74698,
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB083906895A5A00B74698 = {
+			fileRef = F50FA7160358BEB70132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB083A06895A5A00B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXResourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB083B06895A5A00B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+				14EB083C06895A5A00B74698,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB083C06895A5A00B74698 = {
+			fileRef = F552BFC2021103B901A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB083D06895A5A00B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+				14EB083E06895A5A00B74698,
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB083E06895A5A00B74698 = {
+			fileRef = 20286C33FDCF999611CA2CEA;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB083F06895A5A00B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+				14EB084006895A5A00B74698,
+			);
+			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB084006895A5A00B74698 = {
+			fileRef = F5755EBC03907F110132A983;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB084306895A5A00B74698 = {
+			explicitFileType = wrapper.cfbundle;
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			path = Highlight.plugin;
+			refType = 3;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		14EB084406895A7500B74698 = {
+			containerPortal = 20286C28FDCF999611CA2CEA;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 14EB083706895A5A00B74698;
+			remoteInfo = Highlight;
+		};
+		14EB084506895A7500B74698 = {
+			isa = PBXTargetDependency;
+			target = 14EB083706895A5A00B74698;
+			targetProxy = 14EB084406895A7500B74698;
+		};
+		14EB08AF06895B4300B74698 = {
+			buildPhases = (
+				14EB08B006895B4300B74698,
+				14EB08B106895B4300B74698,
+				14EB08B306895B4300B74698,
+				14EB08B406895B4300B74698,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				OTHER_REZFLAGS = "";
+				PRODUCT_NAME = ident_tool;
+				REZ_EXECUTABLE = YES;
+				SECTORDER_FLAGS = "";
+				SKIP_INSTALL = YES;
+				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
+			};
+			dependencies = (
+			);
+			isa = PBXNativeTarget;
+			name = ident_tool;
+			productInstallPath = /usr/local/bin;
+			productName = ident_tool;
+			productReference = 14EB08B606895B4300B74698;
+			productType = "com.apple.product-type.tool";
+		};
+		14EB08B006895B4300B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXHeadersBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB08B106895B4300B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+				14EB08B206895B4300B74698,
+			);
+			isa = PBXSourcesBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB08B206895B4300B74698 = {
+			fileRef = F592093B031783DF01A80166;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14EB08B306895B4300B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXFrameworksBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB08B406895B4300B74698 = {
+			buildActionMask = 2147483647;
+			files = (
+			);
+			isa = PBXRezBuildPhase;
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		14EB08B606895B4300B74698 = {
+			explicitFileType = "compiled.mach-o.executable";
+			includeInIndex = 0;
+			isa = PBXFileReference;
+			path = ident_tool;
+			refType = 3;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		14EB08B806895B5200B74698 = {
+			containerPortal = 20286C28FDCF999611CA2CEA;
+			isa = PBXContainerItemProxy;
+			proxyType = 1;
+			remoteGlobalIDString = 14EB08AF06895B4300B74698;
+			remoteInfo = "ident_tool (Upgraded)";
+		};
+		14EB08B906895B5200B74698 = {
+			isa = PBXTargetDependency;
+			target = 14EB08AF06895B4300B74698;
+			targetProxy = 14EB08B806895B5200B74698;
+		};
+		14EB08CD0689648200B74698 = {
+			fileRef = 14EB084306895A5A00B74698;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -118,9 +516,8 @@
 //194
 		195DF8C9FE9D4F0611CA2CBB = {
 			children = (
-				F50FA70E0358BD880132A983,
-				F580515A03905D880132A983,
 				F4BBC300056EE75A00BD6D17,
+				14EB08B606895B4300B74698,
 			);
 			isa = PBXGroup;
 			name = Products;
@@ -150,9 +547,9 @@
 			projectDirPath = "";
 			targets = (
 				F4BBC26B056EE75900BD6D17,
-				F59209370317839001A80166,
-				F50FA70D0358BD880132A983,
-				F580514D03905D880132A983,
+				14EB081F068959D200B74698,
+				14EB083706895A5A00B74698,
+				14EB08AF06895B4300B74698,
 			);
 		};
 		20286C29FDCF999611CA2CEA = {
@@ -229,7 +626,6 @@
 		};
 		20286C2CFDCF999611CA2CEA = {
 			children = (
-				F59209380317839001A80166,
 				F5059DA802A5C0C70132A983,
 				F552BF300211030901A80061,
 				F552BF480211030901A80061,
@@ -254,6 +650,8 @@
 		};
 		20286C32FDCF999611CA2CEA = {
 			children = (
+				14EB084306895A5A00B74698,
+				14EB082E068959D300B74698,
 				20286C33FDCF999611CA2CEA,
 			);
 			isa = PBXGroup;
@@ -281,27 +679,6 @@
 //F42
 //F43
 //F44
-		F41699A2054EE40200BB9A39 = {
-			containerPortal = 20286C28FDCF999611CA2CEA;
-			isa = PBXContainerItemProxy;
-			proxyType = 1;
-			remoteGlobalIDString = F580514D03905D880132A983;
-			remoteInfo = Highlight;
-		};
-		F41699A3054EE40200BB9A39 = {
-			containerPortal = 20286C28FDCF999611CA2CEA;
-			isa = PBXContainerItemProxy;
-			proxyType = 1;
-			remoteGlobalIDString = F50FA70D0358BD880132A983;
-			remoteInfo = Userlist;
-		};
-		F41699A4054EE40300BB9A39 = {
-			containerPortal = 20286C28FDCF999611CA2CEA;
-			isa = PBXContainerItemProxy;
-			proxyType = 1;
-			remoteGlobalIDString = F59209370317839001A80166;
-			remoteInfo = ident_tool;
-		};
 		F424EAA605A5345400B68878 = {
 			children = (
 				F424EAA705A5345400B68878,
@@ -352,7 +729,8 @@
 				F4BBC2B0056EE75900BD6D17,
 				F4BBC2F3056EE75900BD6D17,
 				F4BBC2F5056EE75900BD6D17,
-				F4BBC2FB056EE75900BD6D17,
+				14CB410F06896D12004268FB,
+				1488628D068972C300FEB302,
 			);
 			buildRules = (
 			);
@@ -375,9 +753,9 @@
 				ZERO_LINK = YES;
 			};
 			dependencies = (
-				F4BBC26C056EE75900BD6D17,
-				F4BBC26D056EE75900BD6D17,
-				F4BBC26E056EE75900BD6D17,
+				14EB083106895A2800B74698,
+				14EB084506895A7500B74698,
+				14EB08B906895B5200B74698,
 			);
 			isa = PBXNativeTarget;
 			name = ShadowIRC;
@@ -385,21 +763,6 @@
 			productName = "¬´PROJECTNAME¬ª";
 			productReference = F4BBC300056EE75A00BD6D17;
 			productType = "com.apple.product-type.application";
-		};
-		F4BBC26C056EE75900BD6D17 = {
-			isa = PBXTargetDependency;
-			target = F59209370317839001A80166;
-			targetProxy = F41699A4054EE40300BB9A39;
-		};
-		F4BBC26D056EE75900BD6D17 = {
-			isa = PBXTargetDependency;
-			target = F50FA70D0358BD880132A983;
-			targetProxy = F41699A3054EE40200BB9A39;
-		};
-		F4BBC26E056EE75900BD6D17 = {
-			isa = PBXTargetDependency;
-			target = F580514D03905D880132A983;
-			targetProxy = F41699A2054EE40200BB9A39;
 		};
 		F4BBC26F056EE75900BD6D17 = {
 			buildActionMask = 2147483647;
@@ -788,13 +1151,13 @@
 				F4BBC2A8056EE75900BD6D17,
 				F4BBC2A9056EE75900BD6D17,
 				F4BBC2AA056EE75900BD6D17,
-				F4BBC2AB056EE75900BD6D17,
 				F4BBC2AC056EE75900BD6D17,
 				F4BBC2AD056EE75900BD6D17,
 				F4BBC2AE056EE75900BD6D17,
 				F4BBC2AF056EE75900BD6D17,
 				F424EAA805A5345400B68878,
 				14B760010688B95F0069164D,
+				14EB08CD0689648200B74698,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -825,12 +1188,6 @@
 		};
 		F4BBC2AA056EE75900BD6D17 = {
 			fileRef = F5BA63C70315E9C70132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F4BBC2AB056EE75900BD6D17 = {
-			fileRef = F59209380317839001A80166;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -1384,29 +1741,6 @@
 			settings = {
 			};
 		};
-		F4BBC2FB056EE75900BD6D17 = {
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				F4BBC2FC056EE75900BD6D17,
-				F4BBC2FD056EE75900BD6D17,
-			);
-			isa = PBXCopyFilesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F4BBC2FC056EE75900BD6D17 = {
-			fileRef = F50FA70E0358BD880132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F4BBC2FD056EE75900BD6D17 = {
-			fileRef = F580515A03905D880132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F4BBC2FF056EE75A00BD6D17 = {
 			isa = PBXFileReference;
 			lastKnownFileType = text.plist;
@@ -1467,142 +1801,6 @@
 			refType = 4;
 			sourceTree = "<group>";
 		};
-		F50FA7080358BD880132A983 = {
-			buildActionMask = 2147483647;
-			files = (
-				F50FA7110358BE460132A983,
-				F50FA7130358BE480132A983,
-				F50FA7180358BEB70132A983,
-			);
-			isa = PBXHeadersBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F50FA7090358BD880132A983 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXResourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F50FA70A0358BD880132A983 = {
-			buildActionMask = 2147483647;
-			files = (
-				F50FA7100358BE450132A983,
-				F50FA7120358BE460132A983,
-			);
-			isa = PBXSourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F50FA70B0358BD880132A983 = {
-			buildActionMask = 2147483647;
-			files = (
-				F50FA7150358BE530132A983,
-			);
-			isa = PBXFrameworksBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F50FA70C0358BD880132A983 = {
-			buildActionMask = 2147483647;
-			files = (
-				F5DC0A3E0358CBA30132A983,
-			);
-			isa = PBXRezBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F50FA70D0358BD880132A983 = {
-			buildPhases = (
-				F50FA7080358BD880132A983,
-				F50FA7090358BD880132A983,
-				F50FA70A0358BD880132A983,
-				F50FA70B0358BD880132A983,
-				F50FA70C0358BD880132A983,
-			);
-			buildSettings = {
-				GCC_VERSION = 3.x;
-				HEADER_SEARCH_PATHS = pluginsAPI;
-				OPTIMIZATION_CFLAGS = "-O0";
-				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = Userlist;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
-				WRAPPER_EXTENSION = plugin;
-			};
-			dependencies = (
-			);
-			isa = PBXBundleTarget;
-			name = Userlist;
-			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
-			productName = Userlist;
-			productReference = F50FA70E0358BD880132A983;
-			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>Userlist</string>
-	<key>CFBundleGetInfoString</key>
-	<string></string>
-	<key>CFBundleIconFile</key>
-	<string></string>
-	<key>CFBundleIdentifier</key>
-	<string>com.shadowirc.plugins.userlist</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string></string>
-	<key>CFBundlePackageType</key>
-	<string>PLUG</string>
-	<key>CFBundleShortVersionString</key>
-	<string></string>
-	<key>CFBundleSignature</key>
-	<string>SIRC</string>
-	<key>CFBundleVersion</key>
-	<string>2.0a9</string>
-</dict>
-</plist>
-";
-		};
-		F50FA70E0358BD880132A983 = {
-			explicitFileType = wrapper.cfbundle;
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
-			path = Userlist.plugin;
-			refType = 3;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		F50FA7100358BE450132A983 = {
-			fileRef = F552BFC8021103B901A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F50FA7110358BE460132A983 = {
-			fileRef = F552BFC9021103B901A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F50FA7120358BE460132A983 = {
-			fileRef = F552BFCA021103B901A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F50FA7130358BE480132A983 = {
-			fileRef = F552BFCB021103B901A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F50FA7150358BE530132A983 = {
-			fileRef = 20286C33FDCF999611CA2CEA;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F50FA7160358BEB70132A983 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
@@ -1620,12 +1818,6 @@
 			path = pluginsAPI/shadowirc.exp;
 			refType = 4;
 			sourceTree = "<group>";
-		};
-		F50FA7180358BEB70132A983 = {
-			fileRef = F50FA7160358BEB70132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F510A8AB021CB6B10132A983 = {
 			children = (
@@ -1758,12 +1950,6 @@
 			path = src/IRCCFPrefs.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
-		};
-		F54E8C8803908C940132A983 = {
-			fileRef = 20286C33FDCF999611CA2CEA;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F552BEF60211030901A80061 = {
 			fileEncoding = 30;
@@ -2509,6 +2695,7 @@
 		};
 		F552BFC1021103B901A80061 = {
 			children = (
+				14886206068971DA00FEB302,
 				F552BFC2021103B901A80061,
 				F5755EBC03907F110132A983,
 			);
@@ -2554,6 +2741,7 @@
 		};
 		F552BFC7021103B901A80061 = {
 			children = (
+				14886209068971EC00FEB302,
 				F552BFC8021103B901A80061,
 				F552BFC9021103B901A80061,
 				F552BFCA021103B901A80061,
@@ -2840,189 +3028,6 @@
 			refType = 4;
 			sourceTree = "<group>";
 		};
-		F5755EBD03907F110132A983 = {
-			fileRef = F5755EBC03907F110132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F580514D03905D880132A983 = {
-			buildPhases = (
-				F580514E03905D880132A983,
-				F580515203905D880132A983,
-				F580515303905D880132A983,
-				F580515603905D880132A983,
-				F580515803905D880132A983,
-			);
-			buildSettings = {
-				GCC_VERSION = 3.x;
-				HEADER_SEARCH_PATHS = pluginsAPI;
-				OPTIMIZATION_CFLAGS = "-O0";
-				OTHER_LDFLAGS = "-flat_namespace -undefined suppress";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = Highlight;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
-				WRAPPER_EXTENSION = plugin;
-			};
-			dependencies = (
-			);
-			isa = PBXBundleTarget;
-			name = Highlight;
-			productInstallPath = "$(USER_LIBRARY_DIR)/Bundles";
-			productName = Userlist;
-			productReference = F580515A03905D880132A983;
-			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>Highlight</string>
-	<key>CFBundleGetInfoString</key>
-	<string></string>
-	<key>CFBundleIconFile</key>
-	<string></string>
-	<key>CFBundleIdentifier</key>
-	<string>com.shadowirc.plugins.highlight</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string></string>
-	<key>CFBundlePackageType</key>
-	<string>PLUG</string>
-	<key>CFBundleShortVersionString</key>
-	<string></string>
-	<key>CFBundleSignature</key>
-	<string>SIRC</string>
-	<key>CFBundleVersion</key>
-	<string>2.0a9</string>
-</dict>
-</plist>
-";
-		};
-		F580514E03905D880132A983 = {
-			buildActionMask = 2147483647;
-			files = (
-				F580515103905D880132A983,
-			);
-			isa = PBXHeadersBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F580515103905D880132A983 = {
-			fileRef = F50FA7160358BEB70132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F580515203905D880132A983 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXResourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F580515303905D880132A983 = {
-			buildActionMask = 2147483647;
-			files = (
-				F580515D03905DF40132A983,
-			);
-			isa = PBXSourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F580515603905D880132A983 = {
-			buildActionMask = 2147483647;
-			files = (
-				F54E8C8803908C940132A983,
-			);
-			isa = PBXFrameworksBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F580515803905D880132A983 = {
-			buildActionMask = 2147483647;
-			files = (
-				F5755EBD03907F110132A983,
-			);
-			isa = PBXRezBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F580515A03905D880132A983 = {
-			explicitFileType = wrapper.cfbundle;
-			fallbackIsa = PBXFileReference;
-			isa = PBXBundleReference;
-			path = Highlight.plugin;
-			refType = 3;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		F580515D03905DF40132A983 = {
-			fileRef = F552BFC2021103B901A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F59209330317839001A80166 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXHeadersBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F59209340317839001A80166 = {
-			buildActionMask = 2147483647;
-			files = (
-				F592093C031783DF01A80166,
-			);
-			isa = PBXSourcesBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F59209350317839001A80166 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXFrameworksBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F59209360317839001A80166 = {
-			buildActionMask = 2147483647;
-			files = (
-			);
-			isa = PBXRezBuildPhase;
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F59209370317839001A80166 = {
-			buildPhases = (
-				F59209330317839001A80166,
-				F59209340317839001A80166,
-				F59209350317839001A80166,
-				F59209360317839001A80166,
-			);
-			buildSettings = {
-				GCC_VERSION = 3.x;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				OTHER_REZFLAGS = "";
-				PRODUCT_NAME = ident_tool;
-				REZ_EXECUTABLE = YES;
-				SECTORDER_FLAGS = "";
-				WARNING_CFLAGS = "-Wmost -Wno-four-char-constants -Wno-unknown-pragmas";
-			};
-			dependencies = (
-			);
-			isa = PBXToolTarget;
-			name = ident_tool;
-			productInstallPath = /usr/local/bin;
-			productName = ident_tool;
-			productReference = F59209380317839001A80166;
-		};
-		F59209380317839001A80166 = {
-			explicitFileType = "compiled.mach-o.executable";
-			fallbackIsa = PBXFileReference;
-			isa = PBXExecutableFileReference;
-			path = ident_tool;
-			refType = 3;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		F592093A031783A601A80166 = {
 			children = (
 				F592093B031783DF01A80166,
@@ -3040,12 +3045,6 @@
 			path = ident_tool.c;
 			refType = 4;
 			sourceTree = "<group>";
-		};
-		F592093C031783DF01A80166 = {
-			fileRef = F592093B031783DF01A80166;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F599D6520217A8B901A80061 = {
 			fileEncoding = 30;
@@ -3226,12 +3225,6 @@
 			path = userlist.r;
 			refType = 4;
 			sourceTree = "<group>";
-		};
-		F5DC0A3E0358CBA30132A983 = {
-			fileRef = F5DC0A3D0358CBA30132A983;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		F5F61A2F02A02E380132A988 = {
 			children = (
