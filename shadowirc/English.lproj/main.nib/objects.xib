@@ -4,7 +4,7 @@
   <object name="rootObject" class="NSCustomObject" id="1">
     <string name="customClass">NSApplication</string>
   </object>
-  <array count="93" name="allObjects">
+  <array count="88" name="allObjects">
     <object class="IBCarbonWindow" id="181">
       <string name="windowRect">83 108 187 502 </string>
       <string name="title">Save Preferences</string>
@@ -418,98 +418,7 @@
     <reference idRef="310"/>
     <reference idRef="311"/>
     <reference idRef="312"/>
-    <object class="IBCarbonMenuItem" id="316">
-      <string name="title">ShadowIRC on the Web</string>
-      <object name="submenu" class="IBCarbonMenu">
-        <string name="title">ShadowIRC on the Web</string>
-        <int name="menuID">207</int>
-      </object>
-    </object>
     <reference idRef="323"/>
-    <object class="IBCarbonMenuItem" id="324">
-      <string name="title">Submenu</string>
-      <object name="submenu" class="IBCarbonMenu">
-        <string name="title">Submenu</string>
-        <array count="1" name="items">
-          <object class="IBCarbonMenuItem">
-            <string name="title">Item</string>
-          </object>
-        </array>
-      </object>
-    </object>
-    <object class="IBCarbonMenuItem" id="327">
-      <string name="title">Window</string>
-      <object name="submenu" class="IBCarbonMenu">
-        <string name="title">Window</string>
-        <array count="5" name="items">
-          <object class="IBCarbonMenuItem">
-            <boolean name="dynamic">TRUE</boolean>
-            <string name="title">Minimize Window</string>
-            <string name="keyEquivalent">m</string>
-            <ostype name="command">mini</ostype>
-          </object>
-          <object class="IBCarbonMenuItem">
-            <boolean name="dynamic">TRUE</boolean>
-            <string name="title">Minimize All Windows</string>
-            <string name="keyEquivalent">m</string>
-            <int name="keyEquivalentModifier">1572864</int>
-            <ostype name="command">mina</ostype>
-          </object>
-          <object class="IBCarbonMenuItem">
-            <boolean name="separator">TRUE</boolean>
-          </object>
-          <object class="IBCarbonMenuItem">
-            <boolean name="dynamic">TRUE</boolean>
-            <string name="title">Bring All to Front</string>
-            <ostype name="command">bfrt</ostype>
-          </object>
-          <object class="IBCarbonMenuItem">
-            <boolean name="dynamic">TRUE</boolean>
-            <string name="title">Arrange in Front</string>
-            <int name="keyEquivalentModifier">1572864</int>
-            <ostype name="command">frnt</ostype>
-          </object>
-        </array>
-        <string name="name">_NSWindowsMenu</string>
-      </object>
-    </object>
-    <object class="IBCarbonMenuItem" id="334">
-      <boolean name="hidden">TRUE</boolean>
-      <string name="title">Window</string>
-      <object name="submenu" class="IBCarbonMenu">
-        <string name="title">Window</string>
-        <array count="5" name="items">
-          <object class="IBCarbonMenuItem">
-            <boolean name="dynamic">TRUE</boolean>
-            <string name="title">Minimize Window</string>
-            <string name="keyEquivalent">m</string>
-            <ostype name="command">mini</ostype>
-          </object>
-          <object class="IBCarbonMenuItem">
-            <boolean name="dynamic">TRUE</boolean>
-            <string name="title">Minimize All Windows</string>
-            <string name="keyEquivalent">m</string>
-            <int name="keyEquivalentModifier">1572864</int>
-            <ostype name="command">mina</ostype>
-          </object>
-          <object class="IBCarbonMenuItem">
-            <boolean name="separator">TRUE</boolean>
-          </object>
-          <object class="IBCarbonMenuItem">
-            <boolean name="dynamic">TRUE</boolean>
-            <string name="title">Bring All to Front</string>
-            <ostype name="command">bfrt</ostype>
-          </object>
-          <object class="IBCarbonMenuItem">
-            <boolean name="dynamic">TRUE</boolean>
-            <string name="title">Arrange in Front</string>
-            <int name="keyEquivalentModifier">1572864</int>
-            <ostype name="command">frnt</ostype>
-          </object>
-        </array>
-        <string name="name">_NSWindowsMenu</string>
-      </object>
-    </object>
     <reference idRef="341"/>
     <reference idRef="342"/>
     <reference idRef="343"/>
@@ -524,13 +433,6 @@
     <reference idRef="352"/>
     <reference idRef="353"/>
     <reference idRef="355"/>
-    <object class="IBCarbonMenuItem" id="356">
-      <string name="title">Help</string>
-      <object name="submenu" class="IBCarbonMenu">
-        <string name="title">Help</string>
-        <int name="menuID">264</int>
-      </object>
-    </object>
     <object class="IBCarbonRootControl" id="360">
       <string name="bounds">0 0 188 360 </string>
       <array count="1" name="subviews">
@@ -595,7 +497,7 @@
     <reference idRef="367"/>
     <reference idRef="368"/>
   </array>
-  <array count="93" name="allParents">
+  <array count="88" name="allParents">
     <reference idRef="1"/>
     <reference idRef="181"/>
     <reference idRef="182"/>
@@ -662,10 +564,6 @@
     <reference idRef="302"/>
     <reference idRef="302"/>
     <reference idRef="202"/>
-    <reference idRef="202"/>
-    <reference idRef="203"/>
-    <reference idRef="203"/>
-    <reference idRef="203"/>
     <reference idRef="203"/>
     <reference idRef="341"/>
     <reference idRef="342"/>
@@ -680,7 +578,6 @@
     <reference idRef="342"/>
     <reference idRef="342"/>
     <reference idRef="342"/>
-    <reference idRef="203"/>
     <reference idRef="362"/>
     <reference idRef="360"/>
     <reference idRef="1"/>
