@@ -280,7 +280,8 @@ pascal void makeMask(StringPtr uah, StringPtr mask)
 	
 	pstrcpy(user, &user[3]);
 	user[1]='*';
-	*(short*)&user[2]='!*';
+	user[2] = '!';
+	user[3] = '*';
 	user[0]+=3;
 	if(user[3]==user[4]) //[3]=[4]=*
 		pdelete(user, 3, 1);

@@ -683,9 +683,10 @@ _Skip:
 		case 465: //banned
 		case 491: //no O:
 			pstrcpy(from, (StringPtr)&ls.data[1]);
-			ls.len=3+ls.data[1];
+			ls.len=1+ls.data[1];
 			ls.data[1]='(';
-			*(short*)&ls.data[ls.len-1]=') ';
+			LSAppend1(ls, ')');
+			LSAppend1(ls, ' ');
 			LSConcatLSAndLS(&ls, rest, &ls);
 			SMPrefixLink(link, &ls, dsConsole);
 			break;
@@ -941,7 +942,8 @@ _Skip:
 			LSNextArgIRC(rest, s1); //channel
 			LSNextArgIRC(rest, s2); //ban;
 			
-			LSAppend2(*rest, ': ');
+			LSAppend1(*rest, ':');
+			LSAppend1(*rest, ' ');
 			LSConcatLSAndStr(rest, s2, rest);
 			ch=ChFind(s1, link);
 			if(ch)
@@ -960,7 +962,8 @@ _Skip:
 			//channel failedBan :Error Message
 			LSNextArgIRC(rest, s1); //silence
 			
-			LSAppend2(*rest, ': ');
+			LSAppend1(*rest, ':');
+			LSAppend1(*rest, ' ');
 			LSConcatLSAndStr(rest, s1, rest);
 			SMPrefixLink(link, rest, dsFrontWin);
 			break;
@@ -1026,7 +1029,8 @@ _Skip:
 			if(mainPrefs->showEndMessages)
 			{
 				LSNextArgIRC(rest, s1);
-				LSAppend2(*rest, ' (');
+				LSAppend1(*rest, ' ');
+				LSAppend1(*rest, '(');
 				LSConcatLSAndStr(rest, s1, rest);
 				LSAppend1(*rest, ')');
 				SMPrefixLink(link, rest, dsFrontWin);
