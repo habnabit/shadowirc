@@ -34,8 +34,8 @@
 #pragma internal on
 void main(void);
 
-pascal void initAppl(void);
-pascal void IRCInitAll(void);
+pascal void ToolboxInit(void);
+pascal void ApplicationInit(void);
 
 static pascal void RunStartupConnections(void)
 {
@@ -49,14 +49,15 @@ static pascal void RunStartupConnections(void)
 void main(void)
 {
 	EventRecord e;
-
+	
+	ToolboxInit();
+	
 	EventAvail(everyEvent, &e);
 	if(e.modifiers & controlKey)
 		return;
 	
 	GetDateTime(&now);
-	initAppl();
-	IRCInitAll();
+	ApplicationInit();
 
 	makePlugsDB();
 	UseResFile(gApplResFork);

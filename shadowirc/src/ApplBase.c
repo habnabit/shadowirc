@@ -1507,7 +1507,11 @@ static pascal void IdleTasks(EventRecord *e)
 			WEIdle(0, MWActive->we);
 		else
 			if(!inputLine.lock)
-				WEIdle(0, ILGetWE());
+			{
+				WEReference ilWE = ILGetWE();
+				if(ilWE)
+					WEIdle(0, ilWE);
+			}
 
 		checkCursorFocus(e); //perhaps this should be in a mouse moved event?
 		CMSetCursor();

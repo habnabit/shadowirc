@@ -50,7 +50,7 @@ pascal void fillServsList(ListHandle servs, short curNet, SLServHand servers[]);
 pascal void SetupServers(SLServHand *servers[]);
 pascal void ReleaseServers(SLServHand servers[], char save);
 
-pascal void write(short ref, StringPtr s);
+pascal void WriteString(short ref, StringPtr s);
 static pascal void ExportServers(SLServHand servers[], short ref);
 INLINE void DoExport(SLServHand servers[]);
 pascal char AddServer(SLServHand servers[], short curNet, short curServ);
@@ -268,7 +268,7 @@ pascal void ReleaseServers(SLServHand servers[], char save)
 
 #pragma mark -
 
-pascal void write(short ref, StringPtr s)
+pascal void WriteString(short ref, StringPtr s)
 {
 	long l;
 	
@@ -288,36 +288,36 @@ static pascal void ExportServers(SLServHand servers[], short ref)
 	SLServPtr sp;
 	
 	SetEOF(ref, 0);
-	write(ref, "\p#ShadowIRC Server List\n");
-	write(ref, "\p\nLIST-FORMAT 1\n");
+	WriteString(ref, "\p#ShadowIRC Server List\n");
+	WriteString(ref, "\p\nLIST-FORMAT 1\n");
 	for(x=0;x<n;x++)
 	{
-		write(ref, "\p\nBEGIN-NETWORK ");
-		write(ref, netsR->nets[x].name);
+		WriteString(ref, "\p\nBEGIN-NETWORK ");
+		WriteString(ref, netsR->nets[x].name);
 		s[0] = 0;
 		SAppend1(s, ' ');
 		SAppend4(s, netsR->nets[x].type);
 		SAppend1(s, '\n');
-		write(ref, s);
+		WriteString(ref, s);
 		
 		HLock((Handle)servers[x]);
 		sp = *servers[x];
 		m = sp->count;
 		for(y = 0;y<m;y++)
 		{
-			write(ref, sp->servs[y].name);
+			WriteString(ref, sp->servs[y].name);
 			NumToString(sp->servs[y].port, &s[1]);
 			s[0] = s[1]+2;
 			s[1] = ':';
 			s[s[0]] = '\n';
-			write(ref, s);
+			WriteString(ref, s);
 		}
 		HUnlock((Handle)servers[x]);
 		
-		write(ref, "\pEND-NETWORK\n");
+		WriteString(ref, "\pEND-NETWORK\n");
 	}
 	
-	write(ref, "\p\nEND-LIST\n");
+	WriteString(ref, "\p\nEND-LIST\n");
 }
 
 INLINE void DoExport(SLServHand servers[])

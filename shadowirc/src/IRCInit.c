@@ -54,8 +54,8 @@
 #pragma internal on
 inline void AppleMenuURLInit(void);
 inline void CheckPreferences(void);
-pascal void initAppl(void);
-pascal void IRCInitAll(void);
+pascal void ToolboxInit(void);
+pascal void ApplicationInit(void);
 inline void GetIcons(void);
 inline void SetupUPPs(void);
 
@@ -177,7 +177,7 @@ inline void SetupHelpMenu(void)
 
 #define GetStrN(sr) *(STRnHand)Get1Resource('STR#', sr)
 
-pascal void IRCInitAll(void)
+pascal void ApplicationInit(void)
 {
 	short i;
 	Str255 s;
@@ -199,6 +199,9 @@ pascal void IRCInitAll(void)
 	spWhois=GetStrN(srWhois);
 	
 	setVers();
+	
+	InstallAEHandlers();
+	
 	
 	InitCalcCRC();
 	
@@ -327,7 +330,7 @@ hasFloatingWindows = 0;
 		hasSpeech = (tempResult & (1 << gestaltSpeechMgrPresent)) != 0;
 }
 
-pascal void initAppl(void)
+pascal void ToolboxInit(void)
 {
 	long tempResult;
 	
@@ -355,7 +358,7 @@ pascal void initAppl(void)
 	MoreMasters();
 	MoreMasters();
 	
-	gApplResFork=CurResFile();
+	gApplResFork = CurResFile();
 	
 	GetCurrentProcess(&gPSN);
 
@@ -373,5 +376,4 @@ pascal void initAppl(void)
 	#if __POWERPC__
 	hasNav = NavServicesAvailable() && !NavLoad();
 	#endif
-	InstallAEHandlers();
 }

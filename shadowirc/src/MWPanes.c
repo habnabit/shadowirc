@@ -592,7 +592,8 @@ pascal mwPanePtr MWNewPane(MWPtr mw, long type, short align, short height, short
 	else
 	{
 		o->next = mw->paneList;
-		o->next->prev = o;
+		if(o->next)
+			o->next->prev = o;
 		mw->paneList = o;
 	}
 	o->prev = insertAfter;
