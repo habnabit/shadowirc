@@ -65,7 +65,18 @@ pascal void FormatMessage(ConstStr255Param nick, const LongString *text, ConstSt
 	
 	//First off, format the nick
 	if(nick[0])
+	{
 		FormatNick(nick, &o, nickC, type);
+		
+		//If it's an action, and the text starts with one of a few characters, trim the whitespace between.
+		if(text->len && (type & kNickAction))
+		{
+			char ch = text->data[1];
+			
+			if(ch == '\'')
+				o.len--;
+		}
+	}
 	else
 		o.len = 0;
 	
