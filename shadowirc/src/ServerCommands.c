@@ -361,6 +361,14 @@ static pascal void nPart(linkPtr link, LongString *target, StringPtr from, Strin
 		LSCopyString(target, 1, 255, channel);
 
 	p.channel=ChFind(channel, link);
+	
+	if(!p.channel) //it's _possible_ for the channel to not exist. e.g. muh messes up.
+	{
+		LSStrCat4(&tls, "\pPART for unknown channel ", channel, "\p by ", from);
+		LineMsg(&tls);
+		return;
+	}
+	
 	p.isMe=pstrcasecmp(from, link->CurrentNick);
 	p.link=link;
 	p.username=from;
