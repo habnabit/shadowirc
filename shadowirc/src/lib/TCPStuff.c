@@ -4,7 +4,8 @@
 	Re-written for MacOS X by:
 			Landon Fuller <landonf@fullers.org>
 			Chris Campbell <chris_campbell@mac.com>
-	Copyright (C) 2002 Landon Fuller, Chris Campbell, John Bafford
+			Sean McGovern <smcgovern@users.sourceforge.net>
+	Copyright (C) 2003 Landon Fuller, Chris Campbell, John Bafford, Sean McGovern
 	http://www.shadowirc.com
 
 	This program is free software; you can redistribute it and/or
