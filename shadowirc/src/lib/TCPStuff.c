@@ -901,7 +901,7 @@ OSErr FindAddress(connectionIndex *cp, ConstStr255Param hostname)
  * NewListenConnection
  * Create a new listen socket, once listening set state to T_Listening
  */
-OSErr NewListenConnection(connectionIndex *cp, u_short localport, int backlog)
+OSErr NewListenConnection(int af, connectionIndex *cp, u_short localport, int backlog)
 {
         int err;
 	connectionIndex cpi;
@@ -913,7 +913,7 @@ OSErr NewListenConnection(connectionIndex *cp, u_short localport, int backlog)
 		if(ValidConnection(&cpi))
 		{
 			cpi--;
-			connections[cpi].state = doTCPListenOpen(AF_INET, &connections[cpi].sockfd, localport, backlog);
+			connections[cpi].state = doTCPListenOpen(af, &connections[cpi].sockfd, localport, backlog);
 			connections[cpi].timeout = TickCount() + TO_ListenOpen;
 			connections[cpi].status = CS_Opening;
                         /*

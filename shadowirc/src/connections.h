@@ -223,7 +223,7 @@ pascal connectionPtr pluginNewConnection(char textOrBinary);
 
 pascal void ConnClose(connectionPtr conn);
 pascal char ConnNewActive(connectionPtr c);
-pascal char ConnNewListen(connectionPtr c, int backlog);
+char ConnNewListen(int af, connectionPtr c, int backlog);
 size_t ConnGetData(connectionPtr conn, Ptr d, size_t len);
 size_t ConnGetUntil(connectionPtr conn, Ptr d, char c, size_t len);
 int ConnGetLocalPort(connectionPtr conn);
