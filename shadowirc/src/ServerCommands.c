@@ -552,6 +552,7 @@ static void nNick(linkPtr link, LongString *ls, StringPtr from, StringPtr fromus
 
 static OSStatus KillWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
+#pragma unused(myHandler)
 	OSStatus result = eventNotHandledErr;
 	WindowRef killWin = (WindowRef)userData;
 	UInt32 eventClass, eventKind;

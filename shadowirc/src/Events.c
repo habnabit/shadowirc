@@ -64,6 +64,7 @@ enum {
 
 static OSStatus MWDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
 {
+#pragma unused(nextHandler)
 	OSStatus myErr = eventNotHandledErr;
 	Point mouseLoc;
 	EventMouseWheelAxis wheelAxis;
@@ -199,6 +200,7 @@ static void ServicePasteHandler(EventRef theEvent, MWPtr mw)
 
 static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
 {
+#pragma unused(nextHandler)
 	OSStatus result = eventNotHandledErr;
 	HICommand hiCommand;
 	UInt32 eventClass, eventKind;
@@ -300,6 +302,7 @@ static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef the
 
 static OSStatus MWConsoleEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
+#pragma unused(handlerCallRef, userData)
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
 	
@@ -326,6 +329,7 @@ static OSStatus MWConsoleEventHandler(EventHandlerCallRef handlerCallRef, EventR
 
 static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
+#pragma unused(handlerCallRef)
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
 	MWPtr mw = (MWPtr)userData;
@@ -485,6 +489,7 @@ void MWInstallEventHandlers(MWPtr mw)
 
 static OSStatus AboutWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
  {
+#pragma unused(myHandler)
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
 	WindowRef aboutWindow;
@@ -754,6 +759,7 @@ static void DoTileWindows(void)
 
 static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
 {
+#pragma unused(nextHandler, userData)
 	OSStatus myErr = eventNotHandledErr;
 	HICommand hiCommand;
 	

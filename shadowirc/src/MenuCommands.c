@@ -192,6 +192,7 @@ static void FindWindowSet(WindowPtr findWin)
 
 static OSStatus FindWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
+#pragma unused(myHandler)
 	WindowPtr findWin = (WindowPtr)userData;
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
@@ -469,6 +470,7 @@ typedef struct sqData {
 
 static OSStatus FontSizeEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
+#pragma unused(myHandler)
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
 	WindowRef aboutWindow;
@@ -658,6 +660,7 @@ pascal void MenuSignoffConnectionList(short item)
 
 static OSStatus DoShowFontsMenu(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
+#pragma unused(handlerCallRef, userData)
 	static int previousFontCheck = 0;
 	static int previousSizeCheck = 0;
 	Str255 s, s2;

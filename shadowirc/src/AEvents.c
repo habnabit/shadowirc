@@ -147,6 +147,7 @@ enum {
 
 static OSErr OpenURLString(LongString *url)
 {
+#pragma unused(url)
 	return paramErr;
 }
 

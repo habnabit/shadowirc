@@ -631,7 +631,6 @@ void MWStartLogging(MWPtr mw)
 {
 	OSStatus err = noErr;
 	FSRef linkRef, ref;
-	FSCatalogInfo catalogInfo;
 	HFSUniStr255 forkName;
 	CFStringRef string;
 	LongString ls;
@@ -640,19 +639,19 @@ void MWStartLogging(MWPtr mw)
 	UniCharCount nameBufLen = 0;
 	SInt16 position = 0;
 	
-	catalogInfo.textEncodingHint = kTextEncodingUnicodeDefault;
-	
 	if(!mw->logRefNum) //if we're already logging, then don't do anything.
 	{
 		if(FSRefValid(&logFolderRef))
 		{
-			FSCatalogInfo catalogInfo;
-			
 			linkRef = logFolderRef;
 			link = mw->link;
 			
 			if(link)
 			{
+				FSCatalogInfo catalogInfo;
+				
+				catalogInfo.textEncodingHint = kTextEncodingUnicodeDefault;
+				
 				string = CFStringCreateWithPascalString(NULL, link->linkPrefs->linkName, CFStringGetSystemEncoding());
 			
 				err = UseDirFSRef(&logFolderRef, string, TRUE, &linkRef);

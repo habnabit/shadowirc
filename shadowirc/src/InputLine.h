@@ -115,7 +115,7 @@ extern char noFloatingInput;
 
 
 #ifdef _MsgWindows_
-pascal void ILAddHistory(MWPtr mw, LongString *line);
+void ILAddHistory(MWPtr mw, LongString *line);
 
 inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw);
 #endif
@@ -135,8 +135,8 @@ void RecallLineUp(inputAreaDataPtr iad);
 void RecallLineDown(inputAreaDataPtr iad);
 
 
-pascal void IWLock();
-pascal void IWUnlock();
+void IWLock(void);
+void IWUnlock(void);
 
 pascal iwWidgetPtr IWNewWidget(long type, short align, short width);
 pascal void IWRecalculateRects(void);

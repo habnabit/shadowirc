@@ -1184,17 +1184,17 @@ char GetConnectionEvent(connectionEventRecord *cer)
 {
 	static connectionIndex connectionItem = 0;
 	connectionIndex oci;
-        fd_set rset, wset;
-        struct timeval time;
-        
-        FD_COPY(&readfds, &rset);
-        FD_COPY(&readfds, &wset);
-        bzero(&time, sizeof(time));
+	fd_set rset, wset;
+	struct timeval ts;
+	
+	FD_COPY(&readfds, &rset);
+	FD_COPY(&readfds, &wset);
+	bzero(&ts, sizeof(ts));
 	
 	cer->event = C_NoEvent;
 	oci = connectionItem;
         
-        select(fd_max + 1, &rset, &wset, NULL, &time);
+	select(fd_max + 1, &rset, &wset, NULL, &ts);
 	do {
 		if(connections[connectionItem].magic == TCPCMagic)
 			HandleConnection(&connections[connectionItem], cer, &rset, &wset);
@@ -1204,5 +1204,6 @@ char GetConnectionEvent(connectionEventRecord *cer)
 		else
 			connectionItem = 0;
 	} while(oci != connectionItem && cer->event == C_NoEvent);
+	
 	return cer->event != C_NoEvent;
 }

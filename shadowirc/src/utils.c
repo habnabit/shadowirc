@@ -30,6 +30,7 @@
 
 #define USE_SHADOWIRC_ASSEMBLY 0
 
+inline char inupc(char c);
 static char matchFrom(ConstStr255Param s, ConstStr255Param mask, int i,  int j);
 
 
@@ -692,10 +693,10 @@ pascal void LightenColor(RGBColor *rgb)
 	HSL2RGB(&hsl, rgb);
 }
 
-pascal void SetupModalDialog(DialogPtr d, short ok, short cancel)
+void SetupModalDialog(DialogPtr d, short okItem, short cancelItem)
 {
-	SetDialogDefaultItem(d, ok);
-	SetDialogCancelItem(d, cancel);
+	SetDialogDefaultItem(d, okItem);
+	SetDialogCancelItem(d, cancelItem);
 	SetDialogTracksCursor(d, true);
 	if(!IsWindowVisible(GetDialogWindow(d)))
 		ShowWindow(GetDialogWindow(d));

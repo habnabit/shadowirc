@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -36,6 +36,8 @@
 #include "IRCAux.h"
 #include "Floaters.h"
 #include "MenuCommands.h"
+
+inline char IsWS(char c);
 
 static void _CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key, short *id, MenuHandle *m);
 static void CMILAdd(cmmwData *d, ConstStr255Param item, menuCommand cmd, long key);
@@ -326,7 +328,6 @@ static void CMMWMake(cmmwData *d)
 	{
 		Handle text = WEGetText(mw->we);
 		Ptr p = *text;
-		int x;
 		
 		d->oneWord = true;
 		for(x = d->s0; x<d->s1; x++)
@@ -386,7 +387,7 @@ static void CMMWMake(cmmwData *d)
 
 	if(d->pane->creator == kApplicationSignature)
 	{
-		ConstStringPtr s;
+		ConstStringPtr sp;
 		
 		if(!d->oneWord)
 			CMILAdd(d, "\p-", mcNull, 0);
@@ -394,9 +395,9 @@ static void CMMWMake(cmmwData *d)
 		if(d->noSelection)
 		{
 			if(mw->logRefNum)
-				s = GetIntStringPtr(spCM, sStopLogging);
+				sp = GetIntStringPtr(spCM, sStopLogging);
 			else
-				s = GetIntStringPtr(spCM, sStartLogging);
+				sp = GetIntStringPtr(spCM, sStartLogging);
 			
 			CMILAdd(d, s, mcLog, 0);
 		}
@@ -404,10 +405,10 @@ static void CMMWMake(cmmwData *d)
 		if(!d->oneWord)
 		{
 			if(d->noSelection)
-				s = GetIntStringPtr(spCM, sSaveWindowTextToFile);
+				sp = GetIntStringPtr(spCM, sSaveWindowTextToFile);
 			else
-				s = GetIntStringPtr(spCM, sSaveSelectionToFile);
-			CMILAdd(d, s, mcSaveText, 0);
+				sp = GetIntStringPtr(spCM, sSaveSelectionToFile);
+			CMILAdd(d, sp, mcSaveText, 0);
 		}
 	}
 	

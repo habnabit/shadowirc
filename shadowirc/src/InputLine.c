@@ -287,6 +287,7 @@ static void IWClick(WindowRef ilWindow, EventRef event)
 
 static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
+#pragma unused(handlerCallRef, userData)
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
 	HICommand hiCommand;
@@ -392,7 +393,7 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 
 static OSErr IWDragTrackingHandler(DragTrackingMessage message, WindowPtr window, void* refCon, DragReference drag)
 {
-#pragma unused(refCon)
+#pragma unused(window, refCon)
 	OSErr ret = dragNotAcceptedErr;
 	
 	if(!inputLocked)
@@ -403,7 +404,7 @@ static OSErr IWDragTrackingHandler(DragTrackingMessage message, WindowPtr window
 
 static OSErr IWDragReceiveHandler(WindowPtr window, void* refCon, DragReference drag)
 {
-#pragma unused(refCon)
+#pragma unused(window, refCon)
 	OSErr err = dragNotAcceptedErr;
 	
 	if(!inputLocked)
@@ -791,7 +792,7 @@ inline void IWInternalDraw(iwWidgetPtr o)
 
 #pragma mark -
 
-pascal void ILAddHistory(MWPtr mw, LongString *line)
+void ILAddHistory(MWPtr mw, LongString *line)
 {
 	int i;
 	inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
@@ -970,7 +971,7 @@ char IADGetText(inputAreaDataPtr iad, LongString *ls)
 
 #pragma mark -
 
-pascal void IWLock()
+void IWLock(void)
 {
 	if(!noFloatingInput && !inputLine.lock)
 	{
@@ -982,7 +983,7 @@ pascal void IWLock()
 	}
 }
 
-pascal void IWUnlock()
+void IWUnlock(void)
 {
 	if(!noFloatingInput && inputLine.lock)
 	{

@@ -35,6 +35,7 @@
 #include "Shortcuts.h"
 #include "IRCCFPrefs.h"
 
+inline void RepeatMunger(Handle text, long offset, const void* ptr1, long len1, const void* ptr2, long len2);
 inline void PluginShortcutText(Handle lh);
 static void ParseShortcutText(ConstStr255Param s);
 
@@ -137,6 +138,7 @@ static void SetShortcutWindow(WindowRef shortcutsWin, int group)
 
 static OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
+#pragma unused(myHandler)
 	OSStatus result = eventNotHandledErr;
 	WindowRef shortcutsWin = (WindowRef)userData;
 	UInt32 eventClass, eventKind;

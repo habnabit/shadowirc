@@ -60,6 +60,9 @@ static void ApplExit(void);
 static void AsyncSoundCleanup(EventLoopTimerRef timer, void* data);
 static void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord);
 
+inline void checkConnections(void);
+inline void ProcessUserHosts(linkPtr link);
+
 typedef struct aspData {
 	long refcon;
 	SndListHandle sound;
@@ -78,6 +81,7 @@ static EventLoopTimerRef AsyncSoundTimer;
 
 static void AsyncSoundCleanup(EventLoopTimerRef timer, void* data)
 {
+#pragma unused(data)
 	aspDataPtr asp = aspList;
 	aspDataPtr next;
 	
@@ -187,6 +191,7 @@ typedef struct sqData {
 
 static OSStatus ConfirmQuitEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
+#pragma unused(myHandler)
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
 	WindowRef aboutWindow;
@@ -405,12 +410,14 @@ static void RetryConnections(void)
 
 static void MinuteTimer(EventLoopTimerRef timer, void* data)
 {
+#pragma unused(timer, data)
 	MBIdle();
 	RunNotify();
 }
 
 static void Timer20(EventLoopTimerRef timer, void* data)
 {
+#pragma unused(timer, data)
 	linkPtr curLink;
 	
 	linkfor(curLink, firstLink)
@@ -420,17 +427,20 @@ static void Timer20(EventLoopTimerRef timer, void* data)
 
 static void Timer5(EventLoopTimerRef timer, void* data)
 {
+#pragma unused(timer, data)
 	checkConnections();
 	UpdateStatusLine();
 }
 
 static void Timer1(EventLoopTimerRef timer, void* data)
 {
+#pragma unused(timer, data)
 	GetDateTime(&now);
 }
 
 static void TimerTick(EventLoopTimerRef timer, void* data)
 {
+#pragma unused(timer, data)
 	RetryConnections();
 }
 
@@ -438,6 +448,7 @@ EventLoopTimerRef NetworkTimer;
 
 static void NetworkProcess(EventLoopTimerRef timer, void* data)
 {
+#pragma unused(timer, data)
 	connectionEventRecord connEvt;
 	int x = -8;
 	
@@ -482,6 +493,7 @@ static void InitTimers()
 
 static OSStatus EventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
 {
+#pragma unused(handlerCallRef, data)
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
 	
@@ -547,6 +559,7 @@ static OSStatus EventHandler(EventHandlerCallRef handlerCallRef, EventRef event,
 
 static OSStatus DoModifierKeysChangedEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
 {
+#pragma unused(handlerCallRef, data)
 	UInt32 modifiers;
 	OSStatus result = eventNotHandledErr;
 	static UInt32 oldModifiers = 0;
@@ -567,6 +580,7 @@ static OSStatus DoModifierKeysChangedEvent(EventHandlerCallRef handlerCallRef, E
 
 static OSStatus DoResumeEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
 {
+#pragma unused(handlerCallRef, event, data)
 	pContextSwitchDataRec p;
 	
 	inBackground=0;
@@ -585,6 +599,7 @@ static OSStatus DoResumeEvent(EventHandlerCallRef handlerCallRef, EventRef event
 
 static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
 {
+#pragma unused(handlerCallRef, event, data)
 	pContextSwitchDataRec p;
 	
 	inBackground=1;

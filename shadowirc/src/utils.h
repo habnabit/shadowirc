@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -72,7 +72,7 @@ pascal void NextArg(StringPtr from, StringPtr arg);
 
 pascal void DeleteResourceType(short resFile, ResType type);
 
-pascal void SetupModalDialog(DialogPtr d, short ok, short cancel);
+void SetupModalDialog(DialogPtr d, short okItem, short cancelItem);
 pascal void FinishModalDialog(void);
 
 pascal void pstrcpyucase(ConstStr255Param src, Str255 dest);
