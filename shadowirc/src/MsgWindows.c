@@ -48,7 +48,6 @@
 #include "StringKeys.h"
 
 #define kLogFolderNameKey CFSTR("LogFolderName")
-#define kPrefLogFolder CFSTR("LogFolder")
 
 MWPtr mwl = 0;
 

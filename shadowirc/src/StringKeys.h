@@ -29,4 +29,7 @@
 
 #define kDCCSelectSaveLocKey CFSTR("DCCSelectSaveLocation")
 
+#define kPrefLogFolder CFSTR("LogFolder")
+#define kPrefDCCFolder CFSTR("DCCFolder")
+
 #endif

@@ -46,13 +46,13 @@
 #include "WindowList.h"
 #include "InetConfig.h"
 #include "IRCCFPrefs.h"
+#include "StringKeys.h"
 
 pascal long ShadowIRCVersion(StringPtr str);
 
 #define kShadowIRCChatCookie "\pcHaT"
 
 #define kDCCFolderNameKey CFSTR("DCCFolderName")
-#define kPrefDCCFolder CFSTR("DCCFolder")
 
 enum ShadowIRCCookies {
 	kShadowIRCChatCookie2 = 0xFDCBFDCB,
