@@ -201,7 +201,7 @@ inline void CMILDelete(cmmwData *d, short item)
 {
 	CMItemListH list = d->items;
 	
-	if(item == (**list).numItems)
+	if(list && (item == (**list).numItems))
 	{
 		SetHandleSize((Handle)list, sizeof(int) + (sizeof(CMItem) * item));
 		DeleteMenuItem(d->m, item);
@@ -213,19 +213,24 @@ inline void CMILStripEnd(cmmwData *d)
 {
 	CMItemListH list = d->items;
 	Str255 s;
-	int i = (**list).numItems;
+	int i;
 	
-	//Trash ll the separators at the end.
-	while(1)
-	{
-		GetMenuItemText(d->m, i, s);
-		if(*(short*)s == 0x012D) //-
+	 if(list)
+	 {
+		i= (**list).numItems;
+		
+		//Trash ll the separators at the end.
+		while(1)
 		{
-			CMILDelete(d, i);
-			i--;
+			GetMenuItemText(d->m, i, s);
+			if(*(short*)s == 0x012D) //-
+			{
+				CMILDelete(d, i);
+				i--;
+			}
+			else
+				break;
 		}
-		else
-			break;
 	}
 }
 
