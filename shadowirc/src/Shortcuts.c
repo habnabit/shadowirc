@@ -172,6 +172,22 @@ static pascal OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler
 					result = noErr;
 					break;
 			}
+			break;
+		}
+		
+		
+		case kEventClassCommand:
+		{
+			HICommand hiCommand;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
+			
+			switch(hiCommand.commandID)
+			{
+				case kHICommandClose:
+					return noErr;
+			}
+			break;
 		}
 	}
 	
@@ -200,7 +216,8 @@ void DoShortcutsEditor(void)
 	OSStatus status;
 	
 	const EventTypeSpec ctSpec[] = {
-		{ kEventClassControl, kEventControlHit }
+		{ kEventClassControl, kEventControlHit },
+		{ kEventClassCommand, kEventProcessCommand }
 	};
 	
 	if(++gShortcutsWindowCount > 1)
