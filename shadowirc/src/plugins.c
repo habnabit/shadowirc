@@ -521,7 +521,6 @@ pascal void idlePlugins(EventRecord *e)
 	RestorePluginState();
 }
 
-#define procUndocumentedAPI 0
 enum {
 	pUndocumentedAPIReply = 'BAD!'
 };
@@ -639,7 +638,6 @@ static pascal void InitPlugins(void)
 	LongString ls;
 	char b=0;
 	
-	_UndocumentedAPI;
 	v = ShadowIRCVersion(0);
 	
 	linkfor(p, firstPlugin)
