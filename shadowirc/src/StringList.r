@@ -26,7 +26,6 @@ resource 'STR#' (130, "Files", locked, preload)
 	{
 		"ShadowIRC",
 		"ShadowIRC Preferences",
-		"Plugins"
 	};
 };
 

@@ -22,7 +22,6 @@
 #include "WASTE.h"
 
 #include "inline.h"
-#include "StringList.h"
 #include "IRCGlobals.h"
 #include "connections.h" //for plugins
 #include "plugins.h"

@@ -48,7 +48,6 @@ enum stringResources {
 enum filesStrings {
 	sPreferencesFolder = 1,
 	sPreferencesFile,
-	sPluginsFolder
 };
 
 enum errorStrings {
