@@ -72,9 +72,9 @@ static pascal void DCCSendReposition(connectionPtr conn, long newpos);
 
 static pascal char DCCPutFile(connectionPtr x, char forceSave);
 static pascal void DCCSendFileChunk(connectionPtr *cn);
-static pascal void DCCGetLineChat(connectionPtr conn);
+static pascal void DCCGetLineChat(connectionPtr conn, CEPtr c);
 static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c);
-static pascal void DCCGetLineSend(connectionPtr conn);
+static pascal void DCCGetLineSend(connectionPtr conn, CEPtr c);
 static pascal void StartDCCGet(connectionPtr x);
 
 static void DCCSendFileNavHookMouseDown(NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
@@ -1333,7 +1333,7 @@ pascal void DCCConnOpened(connectionPtr *cn)
 
 #pragma mark -
 
-static pascal void DCCGetLineChat(connectionPtr conn)
+static pascal void DCCGetLineChat(connectionPtr conn, CEPtr c)
 {
 	int i;
 	long nn;
@@ -1621,26 +1621,24 @@ static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c)
 	};
 }
 
-static pascal void DCCGetLineSend(connectionPtr conn)
+static pascal void DCCGetLineSend(connectionPtr conn, CEPtr c)
 {
-	long nn, ack;
+	long nn = 0;
+        long ack;
+        size_t abytes = c->value;
 	dccSENDDataPtr dd = (dccSENDDataPtr)conn->dcc->dccData;
 	
 	while(conn)
 	 {
-                /*
-                 * XXX
-                 * replace with c->value
-                 */
-	 	//nn = ConnCharsAvail(conn);
-		if(nn<sizeof(long))
+		if(abytes<sizeof(long))
 			break;
-		if(nn>sizeof(long))
-			nn=sizeof(long);
+		if(abytes>sizeof(long))
+			abytes=sizeof(long);
 		
-		if(!ConnGetData(conn, (Ptr)&ack, nn))
+		if((nn = ConnGetData(conn, (Ptr)&ack, abytes)) > 0)
 		{
 			dd->acked = ack;
+                        abytes -= nn;
 			
 			if(ack==dd->sent)
 			{
