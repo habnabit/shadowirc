@@ -1,4 +1,8 @@
 _main
+_environ
+_NXArgv
+_NXArgc
+__mh_execute_header
 _LSCmp
 _LSCaseCmp
 _LSDelete
