@@ -113,7 +113,7 @@ static pascal void DoFind2(void)
 	Handle t;
 	long s0, s1;
 	long found;
-	MWPtr mw = MWActive;
+	MWPtr mw = GetActiveMW();
 	
 	if(find.searchFor[0] && mw)
 	{
@@ -226,6 +226,7 @@ pascal void HitEditMenu(short item)
 	WEReference we;
 	long s0, s1;
 	WindowPtr w = ActiveNonFloatingWindow();
+	MWPtr activeMW;
 	
 	if(w && IsDialog(w))
 	{
@@ -248,7 +249,8 @@ pascal void HitEditMenu(short item)
 		return;
 	}
 	
-	if(MWActive)
+	activeMW = GetActiveMW();
+	if(activeMW)
 	{
 		mwFront = 1;
 		otherFront = 0;
@@ -264,7 +266,7 @@ pascal void HitEditMenu(short item)
 	if(iwFront)
 		we=ILGetWE();
 	else if(mwFront)
-		we=MWActive->we;
+		we=activeMW->we;
 	else if(otherFront) //this was a dangerous assumption.
 	{
 		if(ContextWindow) //this isn't one of my windows. Is it a plugin's?
@@ -293,8 +295,8 @@ pascal void HitEditMenu(short item)
 			case 1:
 				if(we)
 				{
-					if(MWActive && MWActive->winType == textWin)
-						WEUndo(MWActive->we);
+					if(activeMW && activeMW->winType == textWin)
+						WEUndo(activeMW->we);
 					else if(!noFloatingInput)
 						WEUndo(ILGetWE());
 				}
@@ -303,7 +305,7 @@ pascal void HitEditMenu(short item)
 			case 3: //cut
 				if(iwFront)
 					WECut(ILGetWE());
-				else if(mwFront && MWActive->winType==textWin)
+				else if(mwFront && activeMW->winType==textWin)
 					WECut(we);
 				else if(otherFront)
 					TECut(te);
@@ -319,8 +321,8 @@ pascal void HitEditMenu(short item)
 			case 5: //paste
 				if(mwFront || iwFront)
 				{
-					if(!iwFront && MWActive->winType == textWin)
-						WEPaste(MWActive->we);
+					if(!iwFront && activeMW->winType == textWin)
+						WEPaste(activeMW->we);
 					else
 					{
 						WEReference il = ILGetWE();
@@ -328,7 +330,7 @@ pascal void HitEditMenu(short item)
 						if(il)
 						{
 							WEPaste(il);
-							processPaste(MWActive, false);
+							processPaste(activeMW, false);
 						}
 					}
 				}
@@ -405,9 +407,9 @@ static pascal void HitFontsMenu(short item)
 	long l;
 	DialogPtr d;
 	char b;
-	MWPtr mw = MWActive;
+	MWPtr mw = GetActiveMW();
 	
-	//We don't do anything if there's no ac
+	//We don't do anything if there's no active mw
 	if(!mw)
 		return;
 	
@@ -554,7 +556,7 @@ pascal void MenuBarClick(const EventRecord *e)
 	int x, y;
 	long l;
 	WindowPtr w;
-	MWPtr mw = MWActive;
+	MWPtr mw = GetActiveMW();
 	
 	//Update file menu
 	SetMenuItemText(gFileMenu, 6, GetIntStringPtr(spCM, smSavePreferences + (mw && mw->winType == textWin)));

@@ -374,7 +374,7 @@ pascal void Key(EventRecord *e, char dontProcess)
 	MWPtr mw;
 	c=e->message & 0xFF;
 	
-	mw = MWActive;
+	mw = GetActiveMW();
 	
 	if(!iwFront && (mw && mw->winType == textWin))
 	{

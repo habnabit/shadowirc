@@ -536,11 +536,15 @@ static void Timer5(EventLoopTimerRef timer, void* data)
 
 static void TimerTick(EventLoopTimerRef timer, void* data)
 {
+	MWPtr mw;
+	
 	//Stuff we need to do periodically when we're in the foreground
 	if(!inBackground)
 	{
-		if(MWActive && MWActive->winType == textWin && !iwFront)
-			WEIdle(0, MWActive->we);
+		mw = GetActiveMW();
+		
+		if(mw && mw->winType == textWin && !iwFront)
+			WEIdle(0, mw->we);
 		else
 			if(!inputLine.lock)
 			{

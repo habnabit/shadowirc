@@ -205,7 +205,7 @@ static void DoCycleCommand(char next)
 	if(!ActiveNonFloatingWindow()) //do nothing if no front window.
 		return;
 	
-	activeW=MWActive;
+	activeW = GetActiveMW();
 	if(!activeW) //no active mw. find one
 	{
 		return;
@@ -371,6 +371,7 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 {
 	OSStatus myErr = eventNotHandledErr;
 	HICommand hiCommand;
+	MWPtr mw;
 	
 	GetEventParameter(theEvent, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
 	
@@ -400,8 +401,9 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 			return noErr;
 		
 		case kHICommandSave:
-			if(MWActive && MWActive->winType == textWin)
-				TWSave(MWActive, false);
+			mw = GetActiveMW();
+			if(mw && mw->winType == textWin)
+				TWSave(mw, false);
 			else
 				writeAllFiles();
 			return noErr;

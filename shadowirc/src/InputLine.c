@@ -991,6 +991,7 @@ static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short mod
 	Str255 s;
 	short dashPoint;
 	char b;
+	MWPtr activeMW;
 	
 	if(where.h>=stats->nickStart && where.h<=stats->nickEnd)
 	{
@@ -1066,16 +1067,17 @@ static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short mod
 			else
 				dashPoint = 255;
 			
+			activeMW = GetActiveMW();
 			//Determine active target
-			if((MWActive==consoleWin) || !MWActive)
+			if(!activeMW || (activeMW == consoleWin))
 				curItem=0;
 			else
 			{
 				b=0;
-				if(MWActive->winType==chanWin)
+				if(activeMW->winType==chanWin)
 				{
 					for(x=0;x<wmItems.channelsLength;x++)
-						if(MWActive == (**wmItems.channels).mw[x])
+						if(activeMW == (**wmItems.channels).mw[x])
 						{
 							b=1;
 							curItem=x+3;
@@ -1087,7 +1089,7 @@ static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short mod
 				else
 				{
 					for(x=0;x<wmItems.restLength;x++)
-						if(MWActive == (**wmItems.rest).mw[x])
+						if(activeMW == (**wmItems.rest).mw[x])
 						{
 							curItem=x+dashPoint+1;
 							break;
@@ -1193,7 +1195,7 @@ static pascal void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short mod
 					i-=4; //link number
 					if(CurrentTarget.link->linkNum != i) //do nothing if current link
 					{
-						MWPtr w = MWActive;
+						MWPtr w = GetActiveMW();
 						linkPtr lnk = GetLinkNum(i);
 						
 						if(w->link == lnk)

@@ -1705,7 +1705,7 @@ void MWPart(MWPtr mw)
 		}
 	}
 	
-	if(!MWActive)
+	if(!GetActiveMW())
 		InvalTarget(&CurrentTarget);
 }
 
