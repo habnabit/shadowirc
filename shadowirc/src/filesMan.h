@@ -71,7 +71,9 @@ pascal void writeAllFiles(void);
 pascal char readMainPrefs(void); //Return true if the prefs were just created
 
 OSStatus UseDirFSRef(const FSRef *parentRef, CFStringRef string, Boolean create, FSRef *ref);
+OSStatus CreateFileRef(CFStringRef name, const FSRef *parentRef, OSType fileCreator, OSType fileType, Boolean replacing, FSRef *ref);
 
+OSStatus UnpackFSRefFromNavReply(const NavReplyRecord *reply, FSRef *ref);
 OSStatus GetFSRefForResourcesFolder(FSRef *ref);
 PicHandle LoadAppLogoFromResources(void);
 
@@ -83,11 +85,13 @@ pascal OSErr PFCreate(ConstStr255Param name, FourCharCode type, FourCharCode cre
 pascal OSErr PFClose(short refNum);
 pascal OSErr PFDelete(ConstStr255Param name);
 
+OSStatus DirectorySelectButtonRef(FSRef *ref);
 pascal char DirectorySelectButton(FSSpec *fss);
 pascal void CleanFolderFSp(FSSpec *fss);
 
 pascal void FileAdd(short fref, char res);
 pascal OSErr FileClose(short fref);
+OSStatus FileCloseFork(short fref);
 pascal short CreateUniqueFile(FSSpec *file, OSType creator, OSType type);
 pascal char ValidFSSpec(const FSSpec *f);
 pascal OSErr FindAppSpec(FSSpec *appSpec);

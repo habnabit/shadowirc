@@ -34,6 +34,7 @@
 #include "IRCCFPrefs.h"
 
 #include "MoreFiles.h"
+#include "MoreFilesX.h"
 #include "StringKeys.h"
 #include "MsgWindows.h"
 #include "DCC.h"
@@ -58,6 +59,8 @@ static void CreateNewPrefsLinks(void);
 static void CreateNewPrefs(void);
 static void AllocateNewPrefs(void);
 static void FolderErrorToConsole(CFStringRef errorKey);
+
+static pascal void DirSelRefNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
 
 static fileListPtr FileFind(short fref)
 {
@@ -127,6 +130,39 @@ pascal OSErr FileClose(short fref)
 	}
 	else
 		return FSClose(fref);
+}
+
+OSStatus FileCloseFork(short fref)
+{
+	fileListPtr f = FileFind(fref);
+	short err;
+	
+	if(f)
+	{
+		f->count--;
+		if(!f->count)
+		{
+			if(f->prev)
+				f->prev->next = f->next;
+			if(f->next)
+				f->next->prev = f->prev;
+			if(f==fileList)
+				fileList = f->next;
+			
+			if(f->res)
+			{
+				CloseResFile(fref);
+				err = ResError();
+			}
+			else
+				err = FSCloseFork(fref);
+			DisposePtr((Ptr)f);
+			return err;
+		}
+		return 0; //should return no such fref error
+	}
+	else
+		return FSCloseFork(fref);
 }
 
 #pragma mark -
@@ -230,6 +266,71 @@ pascal void CleanFolderFSp(FSSpec *fss)
 	fss->name[0] = 0;
 }
 
+static pascal void DirSelRefNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD)
+{
+	OSStatus err = noErr;
+
+	switch (callBackSelector)
+	{
+		case kNavCBUserAction:
+		{
+			NavReplyRecord reply;
+			NavUserAction userAction = 0;
+			
+			if((err = NavDialogGetReply(callBackParms->context, &reply)) == noErr)
+			{
+				userAction = NavDialogGetUserAction(callBackParms->context);
+				switch(userAction)
+				{
+					case kNavUserActionChoose:
+					{
+						FSRef *dirRef = (FSRef *)callBackUD;
+						err = UnpackFSRefFromNavReply(&reply, dirRef);
+						break;
+					}
+				}
+				err = NavDisposeReply(&reply);
+			}
+			break;
+		}
+		case kNavCBTerminate:	
+			NavDialogDispose(callBackParms->context);
+			break;
+	}
+}
+
+OSStatus DirectorySelectButtonRef(FSRef *ref)
+{
+	OSStatus err = noErr;
+	NavDialogRef dialog;
+	NavDialogCreationOptions dialogOptions;
+	NavEventUPP eventUPP;
+	
+	eventUPP = NewNavEventUPP(DirSelRefNavHook);
+	
+	err = NavGetDefaultDialogCreationOptions(&dialogOptions);
+	dialogOptions.preferenceKey = kNavGetFolder;
+	
+	dialogOptions.message = CFCopyLocalizedString(kDirSelKey, NULL);
+	
+	if((err = NavCreateChooseFolderDialog(&dialogOptions, eventUPP, NULL, ref, &dialog)) == noErr)
+	{
+		if(dialog != NULL)
+		{
+			if((err = NavDialogRun(dialog)) != noErr)
+			{
+				CFRelease(dialogOptions.message);
+				NavDialogDispose(dialog);
+			}
+		}
+	}
+	
+	CFRelease(dialogOptions.message);
+	DisposeNavEventUPP(eventUPP);
+	
+	return err;
+}
+
 pascal char DirectorySelectButton(FSSpec *fss)
 {
 	NavReplyRecord theReply;
@@ -265,6 +366,68 @@ pascal char DirectorySelectButton(FSSpec *fss)
 }
 
 #pragma mark -
+
+OSStatus CreateFileRef(CFStringRef name, const FSRef *parentRef, OSType fileCreator, OSType fileType, Boolean replacing, FSRef *ref)
+{
+	OSStatus err = noErr;
+	UniChar *nameBuf = NULL;
+	UniCharCount nameBufLen = 0;
+	
+	nameBufLen = (UniCharCount)CFStringGetLength(name);
+	nameBuf = (UniChar *)NewPtr(nameBufLen * sizeof(UniChar));
+	CFStringGetCharacters(name, CFRangeMake(0, nameBufLen), &nameBuf[0]);
+	
+	if(nameBuf != NULL)
+	{
+		FSCatalogInfo catalogInfo;
+		
+		if(replacing)
+		{
+			FSRef fileToDelete;
+			if((err = FSMakeFSRefUnicode(parentRef, nameBufLen, nameBuf, kTextEncodingUnicodeDefault, &fileToDelete)) == noErr)
+				err = FSDeleteObject(&fileToDelete);
+			
+			if(err != noErr) return err;
+		}
+		
+		catalogInfo.textEncodingHint = kTextEncodingUnicodeDefault;
+		
+		err = FSCreateFileUnicode(parentRef, nameBufLen, nameBuf, kFSCatInfoTextEncoding, &catalogInfo, ref, NULL);
+		
+		if(err == noErr)
+			FSChangeCreatorType(ref, fileCreator, fileType);
+		
+		DisposePtr((Ptr)nameBuf);
+	}
+	
+	return err;
+}
+
+OSStatus UnpackFSRefFromNavReply(const NavReplyRecord *reply, FSRef *ref)
+{
+	OSStatus err = noErr;
+	AEDesc actualDesc;
+	FSRef fileRefParent;
+	
+	if((err = AECoerceDesc(&reply->selection, typeFSRef, &actualDesc)) == noErr)
+	{
+		if(&actualDesc != NULL)
+			err = AEGetDescData(&actualDesc, (void *)&fileRefParent, sizeof(FSRef));
+		
+                if(err == noErr)
+		{
+			BlockMoveData(&fileRefParent, ref, sizeof(FSRef));
+			err = AEDisposeDesc(&actualDesc);
+		}
+                else
+		{
+			BlockZero(ref, sizeof(FSRef));
+			return err;
+		}
+	}
+        
+	return err;
+}
 
 OSStatus GetFSRefForResourcesFolder(FSRef *ref)
 {
