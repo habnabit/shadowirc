@@ -25,7 +25,6 @@
 pascal void OpenPreferencesWindow(short panelID);
 
 pascal short PMLAdd(ConstStr63Param name);
-pascal void InitColorPrefs(void);
 
 pascal void InitPrefs(void);
 #endif

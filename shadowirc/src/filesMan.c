@@ -562,10 +562,10 @@ enum PrefsData {
 	kShadowIRC10PreferencesVersion = 1,
 	kShadowIRC11OldPreferencesVersion = 2,
 	kShadowIRC11PreferencesVersion = 3,
-	kShadowIRC12PreferencesVersion = 3,
-	PreferencesVersion = kShadowIRC11PreferencesVersion,
-	PrefsUpdateLevel = 5,
-	SizeOfPrefsDataArea = sizeof(prefsRec) + (numSIColors * sizeof(RGBColor)) + (sizeof(linkPrefsRec)*maxLinks),
+	kShadowIRC20Alpha10PreferencesVersion = 3,
+	PreferencesVersion = kShadowIRC20Alpha10PreferencesVersion,
+	PrefsUpdateLevel = 0,
+	SizeOfPrefsDataArea = sizeof(prefsRec) + (sizeof(linkPrefsRec)*maxLinks),
 	SizeOfPrefs = sizeof(prefsStruct) + SizeOfPrefsDataArea
 };
 
@@ -581,7 +581,7 @@ pascal void writeMainPrefs(void)
 
 	p.version=PreferencesVersion;
 	p.prefsRecSize=sizeof(prefsRec);
-	p.numColors=numSIColors;
+	p.numColors = 0;
 	p.linkPrefsSize=sizeof(linkPrefsRec);
 	
 	p.prefsUpdate = PrefsUpdateLevel;
@@ -592,8 +592,6 @@ pascal void writeMainPrefs(void)
 	FSWrite(mainRefNum, &l, (Ptr)&p);
 	l=sizeof(prefsRec);
 	FSWrite(mainRefNum, &l, (Ptr)mainPrefs);
-	l=sizeof(RGBColor) * numSIColors;
-	FSWrite(mainRefNum, &l, (Ptr)shadowircColors);
 	l=sizeof(linkPrefsRec) * 10;
 	FSWrite(mainRefNum, &l, (Ptr)linkPrefsArray);
 	
@@ -604,6 +602,8 @@ pascal void writeAllFiles(void)
 {
 	writeMainPrefs();
 	runAllPlugins(pSavePreferencesMessage, 0);
+	
+	SaveColorsCFPrefs();
 	
 	// Sync the CFPrefs to the data store. 
 	// Currently we'll place this here. This might move in
@@ -622,7 +622,7 @@ static void ReadInPrefs(void)
 	linkPtr lp;
 	
 	FSRead(mainRefNum, &l, &p);
-	if(p.version==kShadowIRC10PreferencesVersion)
+	if(p.version < kShadowIRC11PreferencesVersion)
 	{
 		GetEOF(mainRefNum, &l2);
 		
@@ -641,16 +641,17 @@ static void ReadInPrefs(void)
 	//Prefs are ok.
 	l=sizeof(prefsRec);
 	FSRead(mainRefNum, &l, (Ptr)mainPrefs);
-	l=p.numColors * sizeof(RGBColor);
-	FSRead(mainRefNum, &l, (Ptr)shadowircColors);
+	
+	if(p.numColors)
+	{
+		l = p.numColors * sizeof(RGBColor);
+		FSRead(mainRefNum, &l, (Ptr)shadowircColors);
+	}
+	else
+		ReadColorCFPrefs(shadowircColors);
+	
 	l=sizeof(linkPrefsRec) * 10;
 	FSRead(mainRefNum, &l, (Ptr)linkPrefsArray);
-	
-	if(p.version <= kShadowIRC11OldPreferencesVersion)
-	{
-		mainPrefs->colorMethod++;
-		p.prefsUpdate = 2;
-	}
 	
 	if(p.version == kShadowIRC11PreferencesVersion)
 	{

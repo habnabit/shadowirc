@@ -1042,7 +1042,6 @@ static void HitPreferencesWindow(short windowNum, short item)
 							NumToString(p.port, p.serverName);
 							SetText(PrefsDlg, 6, p.serverName);
 							lp->networkID = p.network;
-							
 						}
 						break;
 					}
@@ -1563,29 +1562,3 @@ pascal void OpenPreferencesWindow(short panelID)
 	runPlugins(pPWClosedMessage, &pd);
 }
 
-#pragma mark -
-
-pascal void InitColorPrefs(void)
-{
-	RGBColor *sic=shadowircColors;
-	
-	SetRGBColor(sic[0], 28180, 15728, 0);
-	SetRGBColor(sic[1], 0, 0, 0);
-	SetRGBColor(sic[2], -1, 0, 0);
-	SetRGBColor(sic[sicCTCP], 0, 42281, 12684);
-	SetRGBColor(sic[4], 0, 0, -1);
-	SetRGBColor(sic[5], 28180, 15728, 0);
-	SetRGBColor(sic[6], -1, -1, -1);
-	SetRGBColor(sic[7], -1, 0, 0);
-	SetRGBColor(sic[8], 0, 51773, 17040);
-	SetRGBColor(sic[9], -1, 32768, 0);
-	SetRGBColor(sic[10], 0, 0, 0);
-	SetRGBColor(sic[11], 0, 0, 0);
-	SetRGBColor(sic[12], 18350, 26214, 1966);
-	
-	//notify
-	SetRGBColor(sic[13], 25368, 0, 25368);
-	
-	//timestamp color
-	SetRGBColor(sic[sicTimestampColor], 0, 0, 0);
-}
