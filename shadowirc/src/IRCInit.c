@@ -184,8 +184,6 @@ pascal void ApplicationInit(void)
 	
 	InstallAEHandlers();
 	
-		InitCalcCRC();
-	
 	readMainPrefs();
 	initLinks();
 	SetupUPPs();

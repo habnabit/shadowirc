@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -19,9 +19,5 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-typedef short CRCTablArray[256];
-typedef CRCTablArray *CRCTablArrayPtr, **CRCTablArrayHandle;
-
 pascal void CalcMBCRC(short *crc, short v);
 pascal void CalcMBCRCBlock(Ptr p, long len, short *crc);
-pascal OSStatus InitCalcCRC(void);
