@@ -435,13 +435,13 @@ static pascal void TextScrolled(WEReference we)
 
 void MWHitContent(MWPtr mw, EventRecord *e)
 {
-	ControlHandle c;
-	short pa;
+	ControlRef theControl;
+	ControlPartCode pa;
 	ControlActionUPP upp;
 	
 	GlobalToLocal(&e->where);
-	pa=FindControl(e->where, mw->w, &c);
-	if(c == mw->vscr) //kludge, since the only control I know about is the vscr.
+	theControl = FindControlUnderMouse(e->where, mw->w, &pa);
+	if(theControl == mw->vscr) //kludge, since the only control I know about is the vscr.
 	{
 		switch(pa)
 		{
@@ -450,7 +450,7 @@ void MWHitContent(MWPtr mw, EventRecord *e)
 			case kControlUpButtonPart:
 			case kControlDownButtonPart:
 				upp = NewControlActionUPP(MWVScrollTrack);
-				pa=TrackControl(c, e->where, upp);
+				pa = HandleControlClick(theControl, e->where, e->modifiers, upp);
 				DisposeControlActionUPP(upp);
 				break;
 			
