@@ -52,8 +52,8 @@ int main(int argc, char **argv) {
 	
 	memset(&hints, 0, sizeof(struct addrinfo));
 	
-	hints.ai_flags = AI_PASSIVE;
-	hints.ai_family = PF_INET6;
+	hints.ai_flags = AI_ADDRCONFIG | AI_PASSIVE;
+	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	
 	if (getaddrinfo(NULL, "ident", &hints, &res) != 0)

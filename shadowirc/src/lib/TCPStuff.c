@@ -630,7 +630,7 @@ TCPStateType doTCPListenOpen(int af, int *sockfd, u_short localport, int backlog
 	    
 	    memset(&hints, 0, sizeof(hints));
 	    hints.ai_family = af;
-	    hints.ai_flags = AI_PASSIVE;
+	    hints.ai_flags = AI_ADDRCONFIG | AI_PASSIVE;
 	    hints.ai_socktype = SOCK_STREAM;
 
 	    if (asprintf(&portstr, "%d", htons(localport)) == -1)
@@ -836,6 +836,7 @@ static void FindAddressDNR(DNRRecordPtr drp)
 	
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = PF_UNSPEC;
+	hints.ai_flags = AI_DEFAULT;
 	pthread_mutex_lock(&drp->lock);
 	error = getaddrinfo(str, NULL, &hints, &drp->addr_list); // where will we free the list?
 	free(str);
