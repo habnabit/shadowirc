@@ -99,7 +99,8 @@ typedef struct TopicWindowInfo {
 } TopicWindowInfo, *TopicWindowInfoPtr;
 
 enum {
-	kTopicWindowDataProperty = 'TOPC'
+	kTopicWindowDataProperty = 'TOPC',
+	kTopicWindowProperty = 'TOPW'
 };
 
 
@@ -336,11 +337,12 @@ inline char TrackTopicMouse(const Rect *cr)
 
 #pragma mark -
 
-static TopicWindowInfoPtr NewTopicWindowInfo(WindowPtr win, channelPtr ch)
+static TopicWindowInfoPtr NewTopicWindowInfo(WindowPtr parent, WindowPtr sheet, channelPtr ch)
 {
 	TopicWindowInfoPtr twi = (TopicWindowInfoPtr)NewPtrClear(sizeof(TopicWindowInfo));
 	
-	SetWindowProperty(win, kApplicationSignature, kTopicWindowDataProperty, sizeof(twi), &twi);
+	SetWindowProperty(sheet, kApplicationSignature, kTopicWindowDataProperty, sizeof(twi), &twi);
+	SetWindowProperty(parent, kApplicationSignature, kTopicWindowProperty, sizeof(WindowPtr), &sheet);
 	
 	twi->ch = ch;
 
@@ -362,20 +364,31 @@ static TopicWindowInfoPtr GetTopicWindowInfo(WindowPtr win)
 	return twi;
 }
 
-static void DeleteTopicWindowInfo(WindowPtr win)
+static void DeleteTopicWindowInfo(WindowPtr parent, WindowPtr sheet)
 {
-	TopicWindowInfoPtr twi = GetTopicWindowInfo(win);
+	TopicWindowInfoPtr twi = GetTopicWindowInfo(sheet);
 	
-	RemoveWindowProperty(win, kApplicationSignature, kTopicWindowDataProperty);
+	RemoveWindowProperty(sheet, kApplicationSignature, kTopicWindowDataProperty);
+	RemoveWindowProperty(parent, kApplicationSignature, kTopicWindowProperty);
 	
 	DisposePtr((void*)twi);
 }
 
-void CloseTopicWindow(WindowPtr win)
+void ChCloseTopicWindow(channelPtr ch)
 {
-	HideSheetWindow(win);
-	DeleteTopicWindowInfo(win);
-	DisposeWindow(win);
+	WindowPtr parent = ch->window->w;
+	WindowPtr sheet;
+	UInt32 actualSize;
+	OSStatus status;
+	
+	status = GetWindowProperty(parent, kApplicationSignature, kTopicWindowProperty, sizeof(WindowPtr), &actualSize, (void*)&sheet);
+	
+	if(!status && sheet)
+	{
+		HideSheetWindow(sheet);
+		DeleteTopicWindowInfo(parent, sheet);
+		DisposeWindow(sheet);
+	}
 }
 
 #pragma mark -
@@ -521,11 +534,11 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 			}
 
 		case kHICommandCancel:
-			CloseTopicWindow(sheet);
+			ChCloseTopicWindow(ch);
 			break;
 	}
 	
-	return(result);
+	return result;
 }
 
 void ChTopicWindow(channelPtr ch)
@@ -535,6 +548,7 @@ void ChTopicWindow(channelPtr ch)
 	static EventHandlerUPP ctUPP = NULL;
 	const EventTypeSpec ctSpec = { kEventClassControl, kEventControlHit };
 	OSStatus status;
+	WindowPtr parent;
 	
 	if(!ctUPP)
 		ctUPP = NewEventHandlerUPP(TopicWidgetDialogEventHandler);
@@ -550,10 +564,12 @@ void ChTopicWindow(channelPtr ch)
 	status = InstallWindowEventHandler(channelTopicSheet, ctUPP, 1, &ctSpec,(void *)channelTopicSheet, NULL);
 	require_noerr(status, CantInstallDialogHandler);
 	
-	NewTopicWindowInfo(channelTopicSheet, ch);
+	parent = ch->window->w;
+	
+	NewTopicWindowInfo(parent, channelTopicSheet, ch);
 	TopicWindowSet(channelTopicSheet, ch);
 
-	ShowSheetWindow(channelTopicSheet, ch->window->w);
+	ShowSheetWindow(channelTopicSheet, parent);
 	SelectWindow(channelTopicSheet);
 
 CantFindDialogNib:
@@ -1565,7 +1581,12 @@ void ChPart(MWPtr w)
 	
 	linkWinDel(w);
 	cc = MWGetChannel(w);
+	
+	if(cc)
+		ChCloseTopicWindow(cc);
+	
 	MWDelete(w);
+	
 	if(cc)
 	{
 		cc->window=0;
