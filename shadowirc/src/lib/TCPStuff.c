@@ -738,7 +738,6 @@ static void FindAddressDNR(DNRRecordPtr drp)
             bcopy(hp->h_addr_list[0], &drp->ip.s_addr, sizeof(drp->ip.s_addr));
             CopyCStringToPascal(hp->h_name, drp->name);
         }
-        pthread_mutex_unlock(&lock);
         /*
          * pop pthread_mutex_unlock off the cleanup stack and execute it
          * this unlocks our lock mutex lock
