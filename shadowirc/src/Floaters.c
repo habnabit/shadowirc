@@ -98,23 +98,6 @@ pascal void WSelect(WindowPtr w)
 	SelectWindow(w);
 }
 
-pascal void WSuspend(void) //hide all floaters and deactivate first non-floater
-{
-	WindowPtr fnf;
-	
-	HideFloatingWindows();
-	fnf=ActiveNonFloatingWindow();
-
-/*	This is expanded here rather than calling WDeactivate() to ensure that it gets called, even though the window
-		may already be deactivated.
-*/
- 	if(fnf)
-	{
-		HiliteWindow(fnf, 0);
-		ActivateWindowProcPtr(fnf, 0);
-	}
-}
-
 pascal void WResume(void)
 {
 	WindowPtr fnf;

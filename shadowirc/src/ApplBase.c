@@ -285,7 +285,7 @@ static pascal void WindowActivate(WindowPtr window, char activate)
 	
 	if(activate) //activatechannels
 	{
-		if(p && !inBackground && MWActive)
+		if(p && !inBackground && IsWindowActive(p->w))
 			SetTarget(p, &CurrentTarget);
 		else
 			InvalTarget(&CurrentTarget);
@@ -742,7 +742,8 @@ static OSStatus DoResumeEvent(EventHandlerCallRef handlerCallRef, EventRef event
 	
 	if(!noFloatingInput)
 		WEActivate(ILGetWE());
-	WResume();
+	
+	ShowFloatingWindows();
 	
 	NotifyRemove(); //Clear notification manager requests.
 
@@ -760,7 +761,8 @@ static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef even
 	
 	if(!noFloatingInput)
 		WEDeactivate(ILGetWE());
-	WSuspend();
+	
+	HideFloatingWindows();
 
 	p.inBackground=inBackground;
 	runPlugins(pContextSwitchMessage, &p);
