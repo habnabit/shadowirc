@@ -157,20 +157,12 @@ static OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler, Event
 			switch(eventKind)
 			{
 				case kEventWindowActivated:
-					if (!noFloatingInput)
-					{
-						WEDeactivate(ILGetWE());
-						HideFloatingWindows();
-					}
+					HideFloatingWindows();
 					result = noErr;
 					break;
 				case kEventWindowDeactivated:
 				case kEventWindowClosed:
-					if (!noFloatingInput)
-					{
-						WEActivate(ILGetWE());
-						ShowFloatingWindows();
-					}
+					ShowFloatingWindows();
 					result = noErr;
 					break;
 			}
