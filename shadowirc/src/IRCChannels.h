@@ -28,9 +28,7 @@ enum targtype {
 	targChannel,
 	targQuery,
 	targPlugin,
-	targHelp, //unused
-	targDCC,
-	targText
+	targDCC
 };
 
 typedef struct target target, *targetPtr;

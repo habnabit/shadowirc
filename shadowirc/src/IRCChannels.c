@@ -189,8 +189,6 @@ void SetTarget(MWPtr w, targetPtr targ)
 	switch(targ->type)
 	{
 		case targConsole:
-		case targHelp:
-		case targText:
 			targ->link = CurrentTarget.link;
 			if(targ->link == 0)
 				targ->link = firstLink;

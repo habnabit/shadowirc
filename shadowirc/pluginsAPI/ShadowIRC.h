@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x02000005
+#define _ShadowIRC_API_Version_ 0x02000006
 
 #include <Carbon/Carbon.h>
 
@@ -265,9 +265,7 @@ enum mwTypes {
 	chanWin,		//Channel
 	queryWin,		//query
 	pluginWin,		//window generated from a plugin
-	helpWin,		//help window
 	dccWin,			//dcc chat window
-	textWin			//text window
 };
 
 enum mwDefaultWidgets
@@ -342,16 +340,6 @@ struct MessageWindow {
 	const plugsRec*const pluginRef;	//A reference to the plugin that created this window. Nil if no plugin.
 };
 
-/*	A pointer to this data structure is stored in the refcon to a text MessageWindow.
-*/
-typedef struct textWinData {
-	FSSpec file;		//FSSpec to the file
-	short ref;			//refnum for data fork (or 0)
-	short res;			//refnum for res fork (or 0)
-	char saved;		//True if the file has been saved (file is valid).
-} textWinData, *textWinDataPtr;
-
-
 //Constants used by ShadowIRC for Navigation Services' preferenceKey.
 enum navPrefKey { 
 	kNavGetFile,	
@@ -371,6 +359,7 @@ enum navPrefKey {
 enum connTypeRec {
 	connNIL,				//no connection
 	connIRC,				//IRC server connection
+	connIDENTD,
 	connDCC,				//DCC connection
 	connDNSIP,			//DNS name -> IP lookup
 	connDNSNAME,		//DNS ip -> name lookup
@@ -419,6 +408,7 @@ typedef struct dccSENDData {
 struct dccRec {
 	short dccType;				//The type of dcc. (A dccTypeRec)
 	short dccFlags;				//DCC connection flags. (A dccFlagsRec)
+	Ptr DCCInputFunc;
 	Str255 dccUserName;	//The name of the user we're chatting with
 	Ptr dccData;					//Pointer to dcc data. If the dcc is a plugin dcc type, this is free for your own use.
 	long timeOpened;			//The time the connection was opened
@@ -510,6 +500,7 @@ enum linkStatus {
 */
 struct Link {
 	connectionPtr conn;					//The IRC connection for this link, or nil
+	connectionPtr identConn;
 	long connectedTime;					//The time the connection was established, in seconds.
 	
 	short serverStatus;					//Server status. see enum linkStatus
@@ -589,16 +580,16 @@ enum chModes {
 struct Channel {
 	const channelPtr next;			//Pointer to next channel
 	char PAD;
-	char active;							//(used internally)
-	char hasOps, hasVoice;			//True if you have ops or voice.
-	Str255 chName;					//The name of the channel.
+	const char active;					//(used internally)
+	const char hasOps, hasVoice;		//True if you have ops or voice.
+	const Str255 chName;				//The name of the channel.
 	Str255 topic;						//The topic.
 	char modes[8];						//Mode flags. True if on, false if not.
 	long limit;							//If +l, the limit.
 	Str255 key;							//If +k, the key.
 	const bansP bans;					//Pointer to first ban, or nil if no bans.
 	const UserListPtr userlist;	//Pointer to first entry in this channel's userlist.
-	short numUsers;					//Number of users in channel.
+	const short numUsers;				//Number of users in channel.
 	Str63 topicSetBy;					//Nickname of the person who set the topic.
 	long topicSetOn;					//The date and time the topic was set.
 	const MWPtr window;			//Window for this channel.
@@ -621,7 +612,6 @@ enum targtype {
 	targChannel,			//channel
 	targQuery,			//query window
 	targPlugin,			//plugin window
-	targHelp,				//help window
 	targDCC				//DCC Chat window
 };
 
@@ -699,7 +689,7 @@ typedef struct inputLineRec {
 	const short fontsize;						//The status line font size
 	
 	const iwWidgetPtr widgetList;		//Status line widget list
-	const Ptr reserved2, reserved3;
+	const Ptr reserved2;
 	const Ptr inputline;						//The WEReference for the inputline text field.
 
 	const short statusLinePos;
@@ -810,6 +800,7 @@ typedef struct linkPrefsRec {	//One of these for each link. There are ten links 
 	char modeI;								//Go +i on connect
 	char modeW;								//Go +w on connect
 	char modeS;								//Go +s on connect
+	char unused;
 	Str63 recentNicks[10];				//Ten most recently used nicks
 	Str255 recentChannels[10];		//Ten most recently joined channels
 	short onoticeMethod;					//Onotice method
@@ -822,8 +813,7 @@ typedef struct linkPrefsRec {	//One of these for each link. There are ten links 
 	Str255 userinfoMessage;			//CTCP userinfo message
 
 	char regainNick;
-	char isTalkCity;
-	char unusedC[2];
+	char unusedC[3];
 	long unused[2];
 	long networkID;							//Network ID for server list
 	
@@ -834,7 +824,8 @@ typedef struct linkPrefsRec {	//One of these for each link. There are ten links 
 enum firewallType {
 	fwNone,
 	fwSOCKS5,
-	fwSOCKS4A
+	fwSOCKS4A,
+	fwSOCKS4
 };
 
 enum autoQueryOpenFlags {
@@ -853,7 +844,7 @@ typedef struct prefsRec {
 	Str255 serverMessagePrefix;	//Prefix for server messages
 	Rect consoleLoc;						//Position and size of console window
 	Rect inputLoc;							//Position and size of inputline.
-	short inputLineMemoryDisplay;	//How the inputline should display the memory free counter
+	short unusedIW;
 	char consoleOpen;						//Is console window open?
 	char userListOpen;					//Is the userlist open?
 	Rect userListRect;					//Size and position of the userlist
@@ -870,8 +861,7 @@ typedef struct prefsRec {
 	char timestampSeconds;			//Include seconds in timstamps
 	char timestampWhenAway;		//Only display the timestamp when away
 	char escClearsInputline;			//Hitting the esc key clears the inputline
-	char cursorFocus;						//Activate windows if mouse is over it
-	char cursorFocusDontActivate;	//If cursor focusing is on, this stops it from activating the window, but still sets the target
+	short unused5;
 	char showEndMessages;			//Show end of command messages from server
 	char showUserHostsWithMsgs;	//Show userhosts with messages
 	char beepOnPrivmsgs;				//Do a system beep on private messages. **WILL go away with sound support.
@@ -890,7 +880,7 @@ typedef struct prefsRec {
 	char dontActivateNewWindowsIfInputlineText;
 	char quitAction;						//What do do when the user asks ShadowIRC to quit.
 	char dccWindowAutoOpen;			//Whether or not the dcc window is open.
-char unused4;
+	char dccUsePortRange;
 	char disableCTCP;						//Prevent responses to CTCP commands
 	char noCTCPUnknownErrMsg;	//Stops the sending of CTCP ERRMSGs on unknown CTCP commands
 	char disableCTCPMessages;		//Stop the display of CTCP messages.
@@ -902,9 +892,10 @@ char unused4;
 	char autoLogDCCChat;					//If true, automatically logs dcc chats
 	char autoQueryOpen;
 	char nonGlobalInput;
-char unused[68];
+	short dccPortRangeLow, dccPortRangeHigh;
+char unused[64];
 	Str255 shortcuts[30];				//The shortcuts
-	char unused2[70];
+char unused2[70];
 	char autoDCCGet;						//Automatically accept dcc gets?
 	char autoSaveDCC;					//Automatically save dcc gets?
 	Str63 socksHost;						//Host for SOCKS server
@@ -915,7 +906,7 @@ char unused[68];
 	char displayQuit;						//Display quit messages
 	char displayModes;					//Display mode change messages
 	char FastDCCSends;					//Faster DCC sends
-	long unused3[4];
+long unused3[4];
 	char displayNicks;						//Display nick change messages
 	char noModesWidget;					//show modes widget?
 	char ddToSameWin;					//Allow Drag and Drop to same window
@@ -933,15 +924,12 @@ char unused[68];
 	char userlistSortReverse;			//True if the userlist should be sorted in reverse order
 	short userlistInWindowWidth;	//Width of default in-window userlist
 	char userlistInWindow;				//True if the userlist should be displayed in channel windows.
-	char resenAwayMessage;			//Resets the away message on reconnect.
+	char resendAwayMessage;			//Resets the away message on reconnect.
 	char userlistInWindowRight;		//True if the in-window userlist should be on the right side of the window.
 	char userlistScrollbarLeft;		//True if the scrollbar is on the left
 } prefsRec, *prefsPtr;
 
 #pragma mark еее Miscelaneous
-
-
-typedef struct OpaqueDrawingState *DrawingState;	//Opaque structure for Appearance helper functions
 
 
 #pragma mark -

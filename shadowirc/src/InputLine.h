@@ -98,7 +98,7 @@ typedef struct inputLineRec {
 	CONST short fontnum, fontsize;
 	
 	CONST iwWidgetPtr objectList;
-	CONST iwWidgetPtr status, memory;
+	CONST iwWidgetPtr status;
 
 #ifndef _WASTE_
 	CONST Ptr _il;
