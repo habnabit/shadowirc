@@ -1,8 +1,8 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
-	Written for MacOS X by:
+	Written for Mac OS X by:
 			Michael Ledford <mledford@ugaalum.uga.edu>
 	Copyright (C) 2002 Michael Ledford, John Bafford
 	http://www.shadowirc.com

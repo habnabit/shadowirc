@@ -1,6 +1,6 @@
 /*
 	ShadowIRC Userlist
-	Copyright (C) 1997-2002 John Bafford
+	Copyright (C) 1997-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
