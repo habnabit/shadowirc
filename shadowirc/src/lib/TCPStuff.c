@@ -223,7 +223,7 @@ void ntohl_str(u_int32_t net32, StringPtr string)
     u_int32_t host32;
     
     host32 = ntohl(net32);
-    sprintf(cstr, "%ld", (long) host32);
+    sprintf(cstr, "%u", host32);
     CopyCStringToPascal(cstr, string);
 }
 
