@@ -178,6 +178,13 @@ enum{
 	C_SIColor=8
 };
 
+typedef struct FindInfo {
+	Str255 searchFor;
+	char caseSen;
+	char reverse;
+} FindInfo, *FindInfoPtr;
+
+int MWFSearchAndHilight(MWPtr mw, FindInfoPtr findInfo);
 
 MWPtr GetFrontMW(void);
 MWPtr GetActiveMW(void);

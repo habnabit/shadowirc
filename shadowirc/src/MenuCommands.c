@@ -44,110 +44,23 @@
 MenuHandle gAppleMenu, gFileMenu, gEditMenu, gShortcutsMenu, gWindowMenu;
 static MenuHandle gFontsMenu;
 
-static void DoFind2(MWPtr mw);
-
 static void FontsMenuInit(void);
 static void ApplicationURLMenuInit(void);
 
 static void ApplicationURLMenuInit(void);
 
-static long FindText(Handle t, long start, Str255 searchFor, char caseSen, char reverse)
-{
-	long x;
-	char b;
-	long max;
-	char* p;
-	long mag;
-	int (*compareFunc)(const char *s1, const char *s2, size_t count);
-	SInt8 hstate;
-	
-	max = GetHandleSize(t);
-	hstate = HGetState(t);
-	HLock(t);
-	p = *t;
-	
-	if(reverse)
-		mag = -1;
-	else
-		mag = 1;
-	
-	if(reverse && start + searchFor[0] > max)
-		x = max - searchFor[0] - 1;
-	else
-		x = start;
-	
-	if(caseSen)
-		compareFunc = strncmp;
-	else
-		compareFunc = strncasecmp;
-	
-	for(; x>=0 && x < max; x += mag)
-	{
-		b = compareFunc(&p[x], (char*)&searchFor[1], searchFor[0]);
-		
-		if(!b)
-		{
-			HSetState(t, hstate);
-			return x;
-		}
-	}
-	HSetState(t, hstate);
-
-	return -1;
-}
-
-static struct FindInformation {
-	Str255 searchFor;
-	char caseSen;
-	char reverse;
-} find = {"\p", 0, 1};
-
-static void DoFind2(MWPtr mw)
-{
-	Handle t;
-	long s0, s1;
-	long found;
-	
-	if(mw && find.searchFor[0])
-	{
-		t=WEGetText(mw->we);
-		WEGetSelection(&s0, &s1, mw->we);
-		if(s0==s1)
-		{
-			if(find.reverse)
-				s0 = GetHandleSize(t) + 1;
-			else
-				s0=-1;
-		}
-		if(t)
-		{
-			if(find.reverse)
-				s0--;
-			else
-				s0++;
-			found=FindText(t, s0, find.searchFor, find.caseSen, find.reverse);
-			if(found>=0)
-			{
-				WESetSelection(found, found+find.searchFor[0], mw->we);
-				WESelView(mw->we);
-			}
-			else
-				SysBeep(0);
-		}
-	}
-}
-
 #define kNibFind CFSTR("find")
 #define KNibWinFind CFSTR("Find")
-
-static int gFindWindowCount = 0;
-static WindowPtr gFindWin = NULL;
 
 enum {
 	kFindWinText = 4,
 	kFindWinCaseSensitive = 5,
 	kFindWinReverse = 6
 };
+
+static FindInfo find = {"\p", 0, 1};
+static int gFindWindowCount = 0;
+static WindowPtr gFindWin = NULL;
 
 static void FindWindowGet(WindowPtr findWin)
 {
@@ -218,7 +131,8 @@ static OSStatus FindWindowEventHandler(EventHandlerCallRef myHandler, EventRef e
 					gFindWindowCount--;
 					
 					if(cmd == kHICommandOK)
-						DoFind2(GetActiveMW());
+						if(!MWFSearchAndHilight(GetActiveMW(), &find))
+							SysBeep(0);
 					return noErr;
 			}
 		}
@@ -265,7 +179,10 @@ void DoFind(MWPtr mw, char again)
 	};
 	
 	if(again && find.searchFor[0])
-		DoFind2(mw);
+	{
+		if(!MWFSearchAndHilight(mw, &find))
+			SysBeep(0);
+	}
 	else //throw a dialog
 	{
 		if(++gFindWindowCount > 1)

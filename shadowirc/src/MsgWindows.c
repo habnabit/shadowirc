@@ -125,6 +125,91 @@ static void ScrollBarChanged(WEReference we, long val);
 static pascal void SelectLogFileNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
 static OSStatus SelectLogFile(MWPtr mw, const CFStringRef fileName, long s0, long s1);
 
+#pragma mark -
+
+static long FindText(Handle t, long start, Str255 searchFor, char caseSen, char reverse)
+{
+	long x;
+	char b;
+	long max;
+	char* p;
+	long mag;
+	int (*compareFunc)(const char *s1, const char *s2, size_t count);
+	SInt8 hstate;
+	
+	max = GetHandleSize(t);
+	hstate = HGetState(t);
+	HLock(t);
+	p = *t;
+	
+	if(reverse)
+		mag = -1;
+	else
+		mag = 1;
+	
+	if(reverse && start + searchFor[0] > max)
+		x = max - searchFor[0] - 1;
+	else
+		x = start;
+	
+	if(caseSen)
+		compareFunc = strncmp;
+	else
+		compareFunc = strncasecmp;
+	
+	for(; x>=0 && x < max; x += mag)
+	{
+		b = compareFunc(&p[x], (char*)&searchFor[1], searchFor[0]);
+		
+		if(!b)
+		{
+			HSetState(t, hstate);
+			return x;
+		}
+	}
+	HSetState(t, hstate);
+
+	return -1;
+}
+
+int MWFSearchAndHilight(MWPtr mw, FindInfoPtr findInfo)
+{
+	Handle t;
+	long s0, s1;
+	long found;
+	
+	if(mw && findInfo->searchFor[0])
+	{
+		t=WEGetText(mw->we);
+		WEGetSelection(&s0, &s1, mw->we);
+		if(s0==s1)
+		{
+			if(findInfo->reverse)
+				s0 = GetHandleSize(t) + 1;
+			else
+				s0=-1;
+		}
+		if(t)
+		{
+			if(findInfo->reverse)
+				s0--;
+			else
+				s0++;
+			found=FindText(t, s0, findInfo->searchFor, findInfo->caseSen, findInfo->reverse);
+			if(found>=0)
+			{
+				WESetSelection(found, found+findInfo->searchFor[0], mw->we);
+				WESelView(mw->we);
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+#pragma mark -
+
 /*
 	This function returns the frontmost message window.
 */
