@@ -223,7 +223,6 @@ enum {
 extern const RGBColor macColors[kMaxMacColors];
 extern const RGBColor mircColors[kMaxMircColors];
 
-pascal void MWLiveScroll(MWPtr mw, Point pt);
 pascal void MWPage(MWPtr mw, char up);
 pascal void MWScroll(MWPtr mw, long delta);
 

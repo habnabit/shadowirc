@@ -264,9 +264,10 @@ pascal char MWSetDCC(MWPtr mw, connectionPtr dcc, Str255 name)
 
 #pragma mark -
 
-pascal void MWLiveScroll(MWPtr mw, Point pt)
+static void MWLiveScroll(MWPtr mw, Point pt)
 {
 	IndicatorDragConstraint constraint;
+	MouseTrackingResult trackingResult;
 	Point mouse;
 	long initial, old, cur, max;
 	short range, delta;
@@ -282,14 +283,15 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 	range = constraint.limitRect.bottom - constraint.limitRect.top;
 	
 	initial=old=cur=GetControl32BitValue(bar);
-	max=GetControl32BitMaximum(bar);
 	
 	WEGetViewRect(&viewRect, we);
-	while(StillDown())
+	GetMouse(&mouse);
+	do
 	{
-		GetMouse(&mouse);
 		if(PtInRect(mouse, &constraint.slopRect))
 		{
+			max=GetControl32BitMaximum(bar); //Can't cache this because it might change.
+			
 			delta=mouse.v - pt.v;
 			
 			cur = initial + (float)max * (float)delta / (float)range;
@@ -306,7 +308,9 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 				old=cur;
 			}
 		}
-	}
+		
+		TrackMouseLocation(NULL, &mouse, &trackingResult);
+	} while(trackingResult != kMouseTrackingMouseReleased);
 	
 	HiliteControl(bar, kControlNoPart);
 }
