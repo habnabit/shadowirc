@@ -146,7 +146,6 @@ void ListSetWTitle(ULI ul)
 {
 	Str255 s;
 	Str255 s2;
-	char x;
 	channelPtr ch;
 	long num;
 	
@@ -168,14 +167,12 @@ void ListSetWTitle(ULI ul)
 	
 	GetDataBrowserItemCount(ul->browser, kDataBrowserNoItem, false, 0, &num);
 	
-	NumToString(num, &s[ch->chName[0]+2]);
+	NumToString(num, s2);
 	pstrcpy(ch->chName, s);
-	s[0] = ch->chName[0] + s[ch->chName[0]+2] + 2;
-	*(short*)&s[ch->chName[0]+1] = ': ';
-	pstrcpy("\pUsers", &s[s[0]+1]);
-	x = s[s[0]+1];
-	s[s[0]+1] = ' ';
-	s[0] += x + 1;
+	SAppend1(s, ':');
+	SAppend1(s, ' ');
+	pstrcat(s, s2, s);
+	pstrcat(s, "\p Users", s);
 	
 	if(ch->numUsers == 1)
 		s[0]--;

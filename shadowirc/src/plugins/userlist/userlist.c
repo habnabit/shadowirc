@@ -857,8 +857,6 @@ static void DBItemNotify(ControlRef browser, DataBrowserItemID item, DataBrowser
 	}
 }
 
-#define SAppend1(s,ch){(s)[++((s)[0])]=ch;}
-
 void DBCustomDrawItem(ControlRef browser, DataBrowserItemID item, DataBrowserPropertyID property, DataBrowserItemState itemState, const Rect* theRect, SInt16 gdDepth, Boolean colorDevice)
 {
 	UserListPtr user = (UserListPtr)item;

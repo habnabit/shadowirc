@@ -82,4 +82,6 @@ enum {
 	kIdleFast = 4
 };
 
+#define SAppend1(s,ch){(s)[++((s)[0])]=ch;}
+
 #endif
