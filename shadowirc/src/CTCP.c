@@ -35,10 +35,6 @@
 #include "Timer.h"
 #include "TextManip.h"
 
-#if !__POWERPC__
-#pragma dont_inline on
-#endif
-
 
 #pragma internal on
 static pascal void DisplayCTCP(linkPtr link, ConstStr255Param from, ConstStr255Param uah, ConstStr255Param target, LongString *ctcp, char ign);

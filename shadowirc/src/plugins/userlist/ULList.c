@@ -22,9 +22,7 @@
 #include "userlist.h"
 #include "ULList.h"
 
-#ifdef __POWERPC__
 #include "SmartScrollAPI.h"
-#endif
 
 #define SAppend1(s,ch){(s)[++((s)[0])]=ch;}
 

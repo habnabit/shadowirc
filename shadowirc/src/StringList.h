@@ -84,7 +84,7 @@ enum errorStrings {
 	sLogFolderThisConnIsFile,
 	sShadowIRCLowMem,
 	sShadowIRCLowMem2,
-	sOnlyOneShadowIRC,
+	sMinimumOSVersion,
 	sNoTopic,
 	sNoOpsCantTopic,
 	sLowOnMem,

@@ -45,20 +45,16 @@ short gApplResFork;
 TableChars ISOEncode, ISODecode;
 
 char hasCM=0;
-char has75=0;
 char hasSpeech;
 
-#if __POWERPC__
 char has85 = 0;
 char has86 = 0;
 char hasNav=0;
 char hasAppearance11 = 0;
 char hasWM11 = 0;
 char hasFloatingWindows = 0;
-#endif
 
 char hasDrag=0;
-char hasAppearance = 0;
 
 MenuHandle menuConnectionList, menuSignoffConnectionList;
 MenuHandle menuHelpWidget, helpMenu;

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -61,24 +61,14 @@ pascal void Notify(char mark, Handle icon, Handle sound, ConstStr255Param s)
 	if(!nmResponseProc)
 		nmResponseProc = NewNMProc(NotifyReply);	
 	n->nmResp = nmResponseProc;
-#if !__POWERPC__
-	n->nmRefCon = (long)LMGetCurrentA5();
-#endif
+	n->nmRefCon = 0;
 	NMInstall(n);
 }
 
 static pascal void NotifyReply(NMRec *n)
 {
-#if !__POWERPC__
-	long saveA5 = SetA5(n->nmRefCon);
-#endif
-
 	DisposePtr((Ptr)n->nmStr);
 	n->nmStr = 0;
-
-#if !__POWERPC__
-	SetA5(saveA5);
-#endif
 }
 
 pascal void NotifyRemove(void)

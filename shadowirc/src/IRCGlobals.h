@@ -276,23 +276,12 @@ extern char inBackground;
 
 extern TableChars ISOEncode, ISODecode;
 
-extern char hasCM, has75, hasDrag;
+extern char hasCM, hasDrag;
 extern char hasSpeech;
-
-extern char hasAppearance;
 
 extern char gTalkCityPlug;
 
-#if __POWERPC__
 extern char has85, has86, hasNav, hasAppearance11, hasWM11, hasFloatingWindows;
-#else
-#define has86 0
-#define has85 0
-#define hasNav 0
-#define hasAppearance11 0
-#define hasWM11 0
-#define hasFloatingWindows 0
-#endif
 
 extern MenuHandle menuConnectionList, menuSignoffConnectionList;
 extern MenuHandle menuHelpWidget, helpMenu;

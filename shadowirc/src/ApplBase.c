@@ -1113,11 +1113,9 @@ static pascal void doMouseDown(EventRecord *e)
 						inZoomInOutHandler(e, i);
 						break;
 
-#if __POWERPC__
 					case inProxyIcon:
 						inProxyHandler(e);
 						break;
-#endif					
 				}
 			}
 	}
@@ -1365,14 +1363,8 @@ pascal void ApplRun(void)
 static pascal long GrowZoneProc(long needed)
 {
 #pragma unused(needed)
-#if !__POWERPC__
-	long oldA5 = SetCurrentA5();
-#endif
 	char ret  = CheckMem();
 	
-#if !__POWERPC__
-	SetA5(oldA5);
-#endif
 	return ret;
 }
 
@@ -1402,10 +1394,8 @@ static pascal void ApplExit(void)
 	RemoveDragHandlers();
 	UnregisterAppearanceClient();
 	
-	#if __POWERPC__
 	if(hasNav)
 		NavUnload();
-	#endif
 	
 	#if !TARGET_CARBON
 	DisposeAllSmartScrolls();

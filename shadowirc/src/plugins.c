@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -19,11 +19,6 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#if TARGET_CPU_68K
-#include "plugins68k.h"
-#define _68kPlugs_ 1
-#endif
-
 #include <Navigation.h>
 
 #include "StringList.h"
@@ -41,19 +36,6 @@
 #include "TextManip.h"
 #include "filesMan.h"
 
-#if !__POWERPC__
-#include "AppearanceHelp.h"
-#include "IRCCommands.h"
-#include "CTCP.h"
-#include "IRCPreferences.h"
-#include "IRCNotify.h"
-#include "CMenus.h"
-#include "OffscreenDrawing.h"
-#include "MWPanes.h"
-#include "Shortcuts.h"
-#include "AEvents.h"
-#endif
-
 #include "plugins.h"
 
 #include "IRCAux.h"
@@ -65,10 +47,6 @@
 #include "DragDrop.h"
 #include "MenuCommands.h"
 #include "ApplBase.h"
-
-#if !__POWERPC__
-#pragma dont_inline on
-#endif
 
 #pragma internal on
 
@@ -82,7 +60,7 @@ enum serviceStrings {
 };
 
 inline void callIndPlugin(plugsPtr ref, void* msgD, short msg);
-inline char parsePlugFile(const FSSpec * spec, int isa);
+inline char parsePlugFile(const FSSpec * spec);
 static pascal void ProcessDirectory(FSSpec theSpec);
 inline void initSIDR(void);
 static pascal void AddService(FourCharCode serviceType, plugsPtr ref);
@@ -720,14 +698,8 @@ static pascal void InitPlugins(void)
 			}
 			b=1;
 			
-			if(version == pVersion11OldMessageReply)
-				LSConcatStrAndStrAndStr("\p\"", p->pluginName, "\p\" is a ShadowIRC 1.1 development plugin and is incompatible with this version of ShadowIRC.", &ls);
-			else if(version == pVersion10MessageReply)
-				LSConcatStrAndStrAndStr("\p\"", p->pluginName, "\p\" is a ShadowIRC 1.0 plugin and is incompatible with this version of ShadowIRC.", &ls);
-			else if(version == pVersion6MessageReply)
-				LSConcatStrAndStrAndStr("\p\"", p->pluginName, "\p\" is a ShadowIRC 0.6.x or ShadowIRC 0.7.0 plugin and is incompatible with this version of ShadowIRC.", &ls);
-			else if(version < pVersion6MessageReply)
-				LSConcatStrAndStrAndStr("\p\"", p->pluginName, "\p\" is a ShadowIRC 0.5.x plugin and is incompatible with this version of ShadowIRC", &ls);
+			if(version <= pVersion11MessageReply)
+				LSConcatStrAndStrAndStr("\p\"", p->pluginName, "\p\" is too old, and is incompatible with this version of ShadowIRC.", &ls);
 			else if(version > pVersionCheckMessageReply)
 				LSConcatStrAndStrAndStr("\p\"", p->pluginName, "\p\" can not run because it is too new for this version of ShadowIRC.", &ls);
 			LineMsg(&ls);
@@ -735,131 +707,51 @@ static pascal void InitPlugins(void)
 	}
 }
 
-inline char parsePlugFile(const FSSpec *spec, int isa)
+inline char parsePlugFile(const FSSpec *spec)
 {
 	LongString ls;
 	int x;
 	plugsPtr thisPlug;
 	
-	if(isa == kPowerPCISA)
+	CFragConnectionID cID; //save this in case 
+	Ptr cfgUPP;
+	Str255 errMsg;
+
+	if(!GetDiskFragment(spec, 0, 0, "\p", kLoadCFrag, &cID, &cfgUPP, errMsg))
 	{
-		if(GetCurrentISA() != kPowerPCISA)
+		thisPlug = (plugsPtr)NewPtr(sizeof(plugsRec));
+		thisPlug->proc = (pluginMain)cfgUPP;
+		thisPlug->captureMessages[pInitMessage]=1;
+		thisPlug->captureMessages[pQuitMessage]=1;
+		x=2;
+		do {
+			thisPlug->captureMessages[x++]=0;
+		} while(x<numMessages);
+		
+		pstrcpy(spec->name, thisPlug->pluginName);
+		thisPlug->idleThreshold=0;
+		thisPlug->lastIdleCall=0;
+		thisPlug->xpluginRef=(long)&thisPlug;
+		thisPlug->timesCalled=0;
+		thisPlug->resFileRefNum=FSpOpenResFile(spec, fsRdPerm);
+		
+		if(!firstPlugin)
 		{
-			LSConcatStrAndStrAndStr("\p\"", spec->name, "\p\" is a PowerPC plugin, and can not be run with the 68k version of ShadowIRC.", &ls);
-			LineMsg(&ls);
+			firstPlugin = lastPlugin = thisPlug;
+			thisPlug->next = 0;
 		}
 		else
 		{
-		#if __POWERPC__
-			CFragConnectionID cID; //save this in case 
-			Ptr cfgUPP;
-			Str255 errMsg;
-
-			if(!GetDiskFragment(spec, 0, 0, "\p", kLoadCFrag, &cID, &cfgUPP, errMsg))
-			{
-				thisPlug = (plugsPtr)NewPtr(sizeof(plugsRec));
-				thisPlug->proc = (pluginMain)cfgUPP;
-				thisPlug->captureMessages[pInitMessage]=1;
-				thisPlug->captureMessages[pQuitMessage]=1;
-				x=2;
-				do {
-					thisPlug->captureMessages[x++]=0;
-				} while(x<numMessages);
-				
-				pstrcpy(spec->name, thisPlug->pluginName);
-				thisPlug->idleThreshold=0;
-				thisPlug->lastIdleCall=0;
-				thisPlug->xpluginRef=(long)&thisPlug;
-				thisPlug->timesCalled=0;
-				thisPlug->resFileRefNum=FSpOpenResFile(spec, fsRdPerm);
-				
-				if(!firstPlugin)
-				{
-					firstPlugin = lastPlugin = thisPlug;
-					thisPlug->next = 0;
-				}
-				else
-				{
-					lastPlugin->next = thisPlug;
-					lastPlugin = thisPlug;
-					thisPlug->next = 0;
-				}
-			}
-			else
-			{
-				LSConcatStrAndStrAndStr("\pError loading PowerPC plugin \"", spec->name, "\p\": ", &ls);
-				LSConcatLSAndStr(&ls, errMsg, &ls);
-				LineMsg(&ls);
-			}
-		#endif //__POWERPC__ : don't need to call if ShadowIRC-68k.
+			lastPlugin->next = thisPlug;
+			lastPlugin = thisPlug;
+			thisPlug->next = 0;
 		}
 	}
-	else //if(isa == kM68kISA)
+	else
 	{
-		if(GetCurrentISA() != kM68kISA)
-		{
-			LSConcatStrAndStrAndStr("\p\"", spec->name, "\p\" is a 68k plugin, and can not be run with the PowerPC version of ShadowIRC.", &ls);
-			LineMsg(&ls);
-		}
-		else
-		{
-			#if !__POWERPC__
-			short rn;
-			Handle h;
-
-			rn=FSpOpenResFile(spec, fsRdPerm); //Open plugin resource fork read only
-			if(!ResError())
-			{
-				UseResFile(rn);
-				h=Get1Resource('PLUG', 10001);
-				if(h)
-				{
-					HLockHi(h);
-					HNoPurge(h);
-					thisPlug = (plugsPtr)NewPtr(sizeof(plugsRec));
-
-					thisPlug->proc=(pluginMain)*h;
-					
-					thisPlug->captureMessages[pInitMessage]=1;
-					thisPlug->captureMessages[pQuitMessage]=1;
-					x=2;
-					do {
-						thisPlug->captureMessages[x++]=0;
-					} while(x<numMessages);
-					
-					pstrcpy(spec->name, thisPlug->pluginName);
-					thisPlug->idleThreshold=0;
-					thisPlug->lastIdleCall=0;
-					thisPlug->xpluginRef=(long)thisPlug;
-					thisPlug->timesCalled=0;
-
-					thisPlug->resFileRefNum=rn;
-
-					if(!firstPlugin)
-					{
-						firstPlugin = lastPlugin = thisPlug;
-						thisPlug->next = 0;
-					}
-					else
-					{
-						lastPlugin->next = thisPlug;
-						lastPlugin = thisPlug;
-						thisPlug->next = 0;
-					}
-				}
-				else
-				{
-					LSConcatStrAndStrAndStr("\pNo 68k Plugin in \"", spec->name, "\p\"", &ls);
-					LineMsg(&ls);
-				}
-			}
-			else
-			{
-				LSConcatStrAndStrAndStr("\pUnable to open \"", spec->name, "\p\".", &ls);
-				LineMsg(&ls);
-			}
-		#endif
-		}
+		LSConcatStrAndStrAndStr("\pError loading PowerPC plugin \"", spec->name, "\p\": ", &ls);
+		LSConcatLSAndStr(&ls, errMsg, &ls);
+		LineMsg(&ls);
 	}
 	
 	return true;
@@ -874,7 +766,6 @@ static pascal void ProcessDirectory(FSSpec mySpec)
 	FInfo fndrInfo;
 	short numFiles;
 	LongString ls;
-	char ok;
 	
 	paramBlock.hFileInfo.ioCompletion=0;
 	paramBlock.hFileInfo.ioNamePtr=mySpec.name;
@@ -914,21 +805,9 @@ static pascal void ProcessDirectory(FSSpec mySpec)
 					FSpGetFInfo(&mySpec, &fndrInfo);
 					if(fndrInfo.fdCreator=='SIRC')
 					{
-						int x;
-						
-						if(fndrInfo.fdType=='shlb')
-							x = kPowerPCISA;
-						else if(fndrInfo.fdType=='PLUG')
-							x = kM68kISA;
-						else if(fndrInfo.fdType=='PPLG')
-							x = GetCurrentISA();
-						else x = -1;
-					
-						if(x>-1)
+						if(fndrInfo.fdType=='shlb' || fndrInfo.fdType=='PPLG')
 						{
-							ok = parsePlugFile(&mySpec, x);
-							
-							if(!ok) //failed, due to a memory allocation error
+							if(!parsePlugFile(&mySpec)) //failed, due to a memory allocation error
 							{
 								LSGetIntString(&ls, spError, sPlugsMemErr);
 								LineMsg(&ls);
@@ -957,11 +836,8 @@ inline void initSIDR(void)
 	sidr.inBackground=&inBackground;
 	sidr.lastInput=&lastInput;
 	sidr.lastKey=&lastKey;
-	sidr.canAE=1; //assume have AppleEvents
+	sidr.reserved = sidr.reserved2 = sidr.reserved3 = 1;
 	sidr.hasCM=hasCM;
-	sidr.has75=has75;
-	sidr._hasAppearance = hasAppearance;
-	sidr.shasNav = hasNav;
 	sidr.shasAppearance11 = hasAppearance11;
 	sidr.hasDrag = hasDrag;
 	sidr.shasWM11 = hasWM11;
@@ -980,292 +856,6 @@ inline void initSIDR(void)
 	
 	sidr.internetConfig = (Ptr)internetConfig;
 	sidr.ContextWindow = &ContextWindow;
-	
-	#if !__POWERPC__
-		sidr.procs[procUndocumentedAPI]=(ProcPtr)&_UndocumentedAPI;
-		sidr.procs[procLSDelete]=(ProcPtr)&LSDelete;
-		sidr.procs[procLSCopy]=(ProcPtr)&LSCopy;
-		sidr.procs[procLSCopyString]=(ProcPtr)&LSCopyString;
-		sidr.procs[procLSPosCustom]=(ProcPtr)&LSPosCustom;
-		sidr.procs[procLSPos]=(ProcPtr)&LSPos;
-		sidr.procs[procLSPosChar]=(ProcPtr)&LSPosChar;
-		sidr.procs[procLSNextArg]=(ProcPtr)&LSNextArg;
-		sidr.procs[procLSNextArgND]=(ProcPtr)&LSNextArgND;
-		sidr.procs[procLSStrLS]=(ProcPtr)&LSStrLS;
-		sidr.procs[procLSConcatLSAndStr]=(ProcPtr)&LSConcatLSAndStr;
-		sidr.procs[procLSConcatStrAndLS]=(ProcPtr)&LSConcatStrAndLS;
-		sidr.procs[procLSConcatStrAndStr]=(ProcPtr)&LSConcatStrAndStr;
-		sidr.procs[procLSConcatLSAndLS]=(ProcPtr)&LSConcatLSAndLS;
-		sidr.procs[procLSConcatLSAndStrAndLS]=(ProcPtr)&LSConcatLSAndStrAndLS;
-		sidr.procs[procLSConcatStrAndLSAndStr]=(ProcPtr)&LSConcatStrAndLSAndStr;
-		sidr.procs[procLSConcatStrAndStrAndStr]=(ProcPtr)&LSConcatStrAndStrAndStr;
-		sidr.procs[procLSStrCat]=(ProcPtr)&LSStrCat;
-		sidr.procs[procLSInsertStr]=(ProcPtr)&LSInsertStr;
-		sidr.procs[procSMPrefix]=(ProcPtr)&SMPrefix;
-		sidr.procs[procSMPrefixColor]=(ProcPtr)&SMPrefixColor;
-		sidr.procs[procLineMsg]=(ProcPtr)&LineMsg;
-		sidr.procs[procUpdateStatusLine]=(ProcPtr)&UpdateStatusLine;
-		sidr.procs[procSetInputLineCursorSelection]=(ProcPtr)&SetInputLineCursorSelection;
-		sidr.procs[procGetInputLine]=(ProcPtr)&GetInputLine;
-		sidr.procs[procGetLine]=(ProcPtr)&GetLine;
-		sidr.procs[procSetInputLine]=(ProcPtr)&SetInputLine;
-		sidr.procs[procChannelMsg]=(ProcPtr)&ChannelMsg;
-		sidr.procs[procMessage]=(ProcPtr)&Message;
-		sidr.procs[procNewPluginMWindow]=(ProcPtr)&NewPluginMWindow;
-		sidr.procs[procMWSetDimen]=(ProcPtr)&MWSetDimen;
-		sidr.procs[procMWSetFontSize]=(ProcPtr)&MWSetFontSize;
-		sidr.procs[procMWDelete]=(ProcPtr)&MWDelete;
-		sidr.procs[procMWMessage]=(ProcPtr)&MWMessage;
-		sidr.procs[procDoModeLWindow]=(ProcPtr)&DoModeLWindow;
-		sidr.procs[procEvtMW]=(ProcPtr)&MWFromWindow;
-		sidr.procs[procMWColor]=(ProcPtr)&MWColor;
-		sidr.procs[procPluginNewDialog]=(ProcPtr)&pluginNewDialog;
-		sidr.procs[procPluginDisposeDialog]=(ProcPtr)&pluginDisposeDialog;
-		sidr.procs[procIsChannel]=(ProcPtr)&IsChannel;
-		sidr.procs[procIsDCCName]=(ProcPtr)&IsDCCName;
-		sidr.procs[procMakeChannel]=(ProcPtr)&MakeChannel;
-		sidr.procs[procChFind]=(ProcPtr)&ChFind;
-		sidr.procs[procChFindBan]=(ProcPtr)&ChFindBan;
-		sidr.procs[procChMatchBan]=(ProcPtr)&ChMatchBan;
-		sidr.procs[procChGetBan]=(ProcPtr)&ChGetBan;
-		sidr.procs[procMWIrcleColor]=(ProcPtr)&MWIrcleColor;
-		sidr.procs[procChKillBan]=(ProcPtr)&ChKillBan;
-		sidr.procs[procChKillAllBans]=(ProcPtr)&ChKillAllBans;
-		sidr.procs[procULAddUser]=(ProcPtr)&ULAddUser;
-		sidr.procs[procULDeleteUser]=(ProcPtr)&ULDeleteUser;
-		sidr.procs[procULFindUserName]=(ProcPtr)&ULFindUserName;
-		sidr.procs[procChannelWindow]=(ProcPtr)&ChannelWindow;
-		sidr.procs[procChMsg]=(ProcPtr)&ChMsg;
-		sidr.procs[procParamString]=(ProcPtr)&ParamString;
-		sidr.procs[procSecsToHMS]=(ProcPtr)&SecsToHMS;
-		sidr.procs[procDeleteConnection]=(ProcPtr)&deleteConnection;
-		sidr.procs[procFindConnectionSock]=(ProcPtr)&findConnectionSock;
-		sidr.procs[procCMAddSubmenu]=(ProcPtr)&CMAddSubmenu;
-		sidr.procs[procPluginNewConnection]=(ProcPtr)&pluginNewConnection;
-		sidr.procs[procPutServer]=(ProcPtr)&putServer;
-		sidr.procs[procDoONotice]=(ProcPtr)&DoONotice;
-		sidr.procs[procSendCTCPReply]=(ProcPtr)&SendCTCPReply;
-		sidr.procs[procPMLAdd]=(ProcPtr)&PMLAdd;
-		sidr.procs[procNextArg]=(ProcPtr)&NextArg;
-		sidr.procs[procHandleCommand]=(ProcPtr)&HandleCommand;
-		sidr.procs[procWriteMainPrefs]=(ProcPtr)&writeMainPrefs;
-		sidr.procs[procWriteAllFiles]=(ProcPtr)&writeAllFiles;
-		sidr.procs[procUlongval]=(ProcPtr)&ulongval;
-		sidr.procs[procCMSetCheckmark]=(ProcPtr)&CMSetCheckmark;
-		sidr.procs[procUlongstr]=(ProcPtr)&ulongstr;
-		sidr.procs[procDccTypToStr]=(ProcPtr)&dccTypToStr;
-		sidr.procs[procDccFlagTypToStr]=(ProcPtr)&dccFlagTypToStr;
-		sidr.procs[procDccStrToTyp]=(ProcPtr)&DCCTypeFind;
-		sidr.procs[procHostToIPStr]=(ProcPtr)&hostToIPStr;
-		sidr.procs[procDCCFind]=(ProcPtr)&DCCFind;
-		sidr.procs[procDCCClose]=(ProcPtr)&DCCClose;
-		sidr.procs[procDCCWindowClose]=(ProcPtr)&DCCWindowClose;
-		sidr.procs[procDCCCreate]=(ProcPtr)&DCCCreate;
-		sidr.procs[procDCCRequest]=(ProcPtr)&DCCRequest;
-		sidr.procs[procDCCOpen]=(ProcPtr)&DCCOpen;
-		sidr.procs[procDCCCommand]=(ProcPtr)&DCCCommand;
-		sidr.procs[procDCCSSay]=(ProcPtr)&DCCSSay;
-		sidr.procs[procSendCommand]=(ProcPtr)&SendCommand;
-		sidr.procs[procDNSLookup]=(ProcPtr)&DNSLookup;
-		sidr.procs[procDoBroadcast]=(ProcPtr)&doBroadcast;
-		sidr.procs[procListIgnores]=(ProcPtr)&ListIgnores;
-		sidr.procs[procIsIgnored]=(ProcPtr)&IsIgnored;
-		sidr.procs[procDoIgnore]=(ProcPtr)&DoIgnore;
-		sidr.procs[procFindIgnore]=(ProcPtr)&findIgnore;
-		sidr.procs[procProcessShortcutText]=(ProcPtr)&ProcessShortcutText;
-		sidr.procs[procMBIdle]=(ProcPtr)&MBIdle;
-		sidr.procs[procMBFindNick]=(ProcPtr)&MBFindNick;
-		sidr.procs[procMBNewMessage]=(ProcPtr)&MBNewMessage;
-		sidr.procs[procUpc]=(ProcPtr)&upc;
-		sidr.procs[procUcase]=(ProcPtr)&ucase;
-		sidr.procs[procPdelete]=(ProcPtr)&pdelete;
-		sidr.procs[procPinsert]=(ProcPtr)&pinsert;
-		sidr.procs[procPstrcpy]=(ProcPtr)&pstrcpy;
-		sidr.procs[procPstrcmp]=(ProcPtr)&pstrcmp;
-		sidr.procs[procExistsService]=(ProcPtr)&ExistsService;
-		sidr.procs[procStandardDialogFilter]=(ProcPtr)&StandardDialogFilter;
-		sidr.procs[procPadEnd]=(ProcPtr)&padEnd;
-		sidr.procs[procPadBegin]=(ProcPtr)&padBegin;
-		sidr.procs[procMaskMatch]=(ProcPtr)&maskMatch;
-		sidr.procs[procMakeMask]=(ProcPtr)&makeMask;
-		sidr.procs[procCountChar]=(ProcPtr)&countChar;
-		sidr.procs[procRevPos]=(ProcPtr)&revPos;
-		sidr.procs[procIsNumber]=(ProcPtr)&isNumber;
-		sidr.procs[procIsIPNumber]=(ProcPtr)&isIPNumber;
-		sidr.procs[procGetText]=(ProcPtr)&GetText;
-		sidr.procs[procSetText]=(ProcPtr)&SetText;
-		sidr.procs[procSetCheckBox]=(ProcPtr)&setCheckBox;
-		sidr.procs[procGetCheckBox]=(ProcPtr)&getCheckBox;
-		sidr.procs[procSetButtonEnable]=(ProcPtr)&setButtonEnable;
-		sidr.procs[procGetControlHandle]=(ProcPtr)&GetControlHandle;
-		sidr.procs[procGetFirstSelectedCell]=(ProcPtr)&getFirstSelectedCell;
-		sidr.procs[procSelectOneCell]=(ProcPtr)&selectOneCell;
-		sidr.procs[procDrawListBorder]=(ProcPtr)&drawListBorder;
-		sidr.procs[procMakeCellVisible]=(ProcPtr)&makeCellVisible;
-		sidr.procs[procOpenConnection]=(ProcPtr)&OpenConnection;
-		sidr.procs[procDrawPlacard]=(ProcPtr)&DrawPlacard;
-		sidr.procs[procSetTextColor]=(ProcPtr)&SetTextColor;
-		sidr.procs[procSetDlogFont]=(ProcPtr)&SetDlogFont;
-		sidr.procs[procGetControlMenu]=(ProcPtr)&GetControlMenu;
-		sidr.procs[procLSPosCase]=(ProcPtr)&LSPosCase;
-		sidr.procs[procPos]=(ProcPtr)&pos;
-		sidr.procs[procShadowIRCVersion]=(ProcPtr)&ShadowIRCVersion;
-		sidr.procs[procPluginNewWindow]=(ProcPtr)&pluginNewWindow;
-		sidr.procs[procPluginDisposeWindow]=(ProcPtr)&pluginDisposeWindow;
-		sidr.procs[procNewService]=(ProcPtr)&NewService;
-		sidr.procs[procPFOpen]=(ProcPtr)&PFOpen;
-		sidr.procs[procPFExists]=(ProcPtr)&PFExists;
-		sidr.procs[procPFCreate]=(ProcPtr)&PFCreate;
-		sidr.procs[procPFWrite]=(ProcPtr)&PFWrite;
-		sidr.procs[procPFRead]=(ProcPtr)&PFRead;
-		sidr.procs[procPFSize]=(ProcPtr)&PFSize;
-		sidr.procs[procPFResize]=(ProcPtr)&PFResize;
-		sidr.procs[procPFSetPos]=(ProcPtr)&PFSetPos;
-		sidr.procs[procPFClose]=(ProcPtr)&PFClose;
-		sidr.procs[procPFDelete]=(ProcPtr)&PFDelete;
-		sidr.procs[procFrontNonFloater]=(ProcPtr)&FrontNonFloater;
-		sidr.procs[procGetPluginWindowOwner]=(ProcPtr)&GetPluginWindowOwner;
-		sidr.procs[procWIsFloater]=(ProcPtr)&WIsFloater;
-		sidr.procs[procWMoveToFront]=(ProcPtr)&WMoveToFront;
-		sidr.procs[procWSelect]=(ProcPtr)&WSelect;
-		sidr.procs[procWDrag]=(ProcPtr)&WDrag;
-		sidr.procs[procWShow]=(ProcPtr)&WShow;
-		sidr.procs[procWHide]=(ProcPtr)&WHide;
-		sidr.procs[procPstrcasecmp]=(ProcPtr)&pstrcasecmp;
-		sidr.procs[procPstrcasecmp2]=(ProcPtr)&pstrcasecmp2;
-		sidr.procs[procGetQD]=(ProcPtr)&GetQD;
-		sidr.procs[procWMove]=(ProcPtr)&WMove;
-		sidr.procs[procEnterModalDialog]=(ProcPtr)&EnterModalDialog;
-		sidr.procs[procExitModalDialog]=(ProcPtr)&ExitModalDialog;
-		sidr.procs[procLSConcatLSAndStrAndStr]=(ProcPtr)&LSConcatLSAndStrAndStr;
-		sidr.procs[procIPStringToLong]=(ProcPtr)&IPStringToLong;
-		sidr.procs[procSetSmartScrollInfo]=(ProcPtr)&SetSmartScrollInfo;
-		sidr.procs[procSetSmartScrollProp]=(ProcPtr)&SetSmartScrollProp;
-		sidr.procs[procGetSmartScrollProp]=(ProcPtr)&GetSmartScrollProp;
-		sidr.procs[procLCAttach]=(ProcPtr)&LCAttach;
-		sidr.procs[procLCDetach]=(ProcPtr)&LCDetach;
-		sidr.procs[procLCSetValue]=(ProcPtr)&LCSetValue;
-		sidr.procs[procLCSetMin]=(ProcPtr)&LCSetMin;
-		sidr.procs[procLCSetMax]=(ProcPtr)&LCSetMax;
-		sidr.procs[procLCGetValue]=(ProcPtr)&LCGetValue;
-		sidr.procs[procLCGetMin]=(ProcPtr)&LCGetMin;
-		sidr.procs[procLCGetMax]=(ProcPtr)&LCGetMax;
-		sidr.procs[procLCSynch]=(ProcPtr)&LCSynch;
-		sidr.procs[procIsChannelValid]=(ProcPtr)&IsChannelValid;
-		sidr.procs[procIsUserValid]=(ProcPtr)&IsUserValid;
-		sidr.procs[procConnPut]=(ProcPtr)&ConnPut;
-		sidr.procs[procConnPutText]=(ProcPtr)&ConnPutText;
-		sidr.procs[procConnPutLS]=(ProcPtr)&ConnPutLS;
-		sidr.procs[procStackModes]=(ProcPtr)&StackModes;
-		sidr.procs[procOpenPreferencesWindow]=(ProcPtr)&OpenPreferencesWindow;
-		sidr.procs[procSMPrefixIrcleColor]=(ProcPtr)&SMPrefixIrcleColor;
-		sidr.procs[procAsyncSoundPlay]=(ProcPtr)&AsyncSoundPlay;
-		sidr.procs[procLSCmp]=(ProcPtr)&LSCmp;
-		sidr.procs[procLSCaseCmp]=(ProcPtr)&LSCaseCmp;
-		sidr.procs[procLSGetIndString]=(ProcPtr)&LSGetIndString;
-		sidr.procs[procLSParamString]=(ProcPtr)&LSParamString;
-		sidr.procs[procLSParamLS]=(ProcPtr)&LSParamLS;
-		sidr.procs[procSMLink]=(ProcPtr)&SMLink;
-		sidr.procs[procSMPrefixLink]=(ProcPtr)&SMPrefixLink;
-		sidr.procs[procSMPrefixLinkColor]=(ProcPtr)&SMPrefixLinkColor;
-		sidr.procs[procSMPrefixLinkIrcleColor]=(ProcPtr)&SMPrefixLinkIrcleColor;
-		sidr.procs[procIPCRegister]=(ProcPtr)&IPCRegister;
-		sidr.procs[procIPCExists]=(ProcPtr)&IPCExists;
-		sidr.procs[procIPCCall]=(ProcPtr)&IPCSend;
-		sidr.procs[procDoNotify]=(ProcPtr)&DoNotify;
-		sidr.procs[procRunNotify]=(ProcPtr)&RunNotify;
-		sidr.procs[procListNotify]=(ProcPtr)&ListNotify;
-		sidr.procs[procfindNotify]=(ProcPtr)&findNotify;
-		sidr.procs[procdeleteNotify]=(ProcPtr)&deleteNotify;
-		sidr.procs[procaddNotify]=(ProcPtr)&addNotify;
-		sidr.procs[procDrawMWinStatus]=(ProcPtr)&DrawMWinStatus;
-		sidr.procs[procConnClose]=(ProcPtr)&ConnClose;
-		sidr.procs[procConnAbort]=(ProcPtr)&ConnAbort;
-		sidr.procs[procConnNewActive]=(ProcPtr)&ConnNewActive;
-		sidr.procs[procConnNewPassive]=(ProcPtr)&ConnNewPassive;
-		sidr.procs[procConnGetData]=(ProcPtr)&ConnGetData;
-		sidr.procs[procConnCharsAvail]=(ProcPtr)&ConnCharsAvail;
-		sidr.procs[procIWNewObject]=(ProcPtr)&IWNewWidget;
-		sidr.procs[procIWRecalculateRects]=(ProcPtr)&IWRecalculateRects;
-		sidr.procs[procIWPopUpMenu]=(ProcPtr)&IWPopUpMenu;
-		sidr.procs[procIWDeleteObject]=(ProcPtr)&IWDeleteWidget;
-		sidr.procs[procIWOverride]=(ProcPtr)&IWOverride;
-		sidr.procs[procMWNewWidget]=(ProcPtr)&MWNewWidget;
-		sidr.procs[procMWRecalculateRects]=(ProcPtr)&MWRecalculateRects;
-		sidr.procs[procMWDestroyWidget]=(ProcPtr)&MWDestroyWidget;
-		sidr.procs[procHMIAdd]=(ProcPtr)&HMIAdd;
-		sidr.procs[procMWFindWidget]=(ProcPtr)&MWFindWidget;
-		sidr.procs[procMWFindPane]=(ProcPtr)&MWFindPane;
-		sidr.procs[procMWNewPane]=(ProcPtr)&MWNewPane;
-		sidr.procs[procMWPaneRecalculate]=(ProcPtr)&MWPaneRecalculate;
-		sidr.procs[procMWPaneResize]=(ProcPtr)&MWPaneResize;
-		sidr.procs[procStartDrawingOffscreen]=(ProcPtr)&StartDrawingOffscreen;
-		sidr.procs[procEndDrawingOffscreen]=(ProcPtr)&EndDrawingOffscreen;
-		sidr.procs[procAbortDrawingOffscreen]=(ProcPtr)&AbortDrawingOffscreen;
-		sidr.procs[procMWDestroyPane]=(ProcPtr)&MWDestroyPane;
-		sidr.procs[procLSInsertChar]=(ProcPtr)&LSInsertChar;
-		sidr.procs[procLSInsertShort]=(ProcPtr)&LSInsertShort;
-		sidr.procs[procLSInsertLong]=(ProcPtr)&LSInsertLong;
-		sidr.procs[procLightenColor]=(ProcPtr)&LightenColor;
-		sidr.procs[procNavDialogFilter]=(ProcPtr)&NavDialogFilter;
-		sidr.procs[procDirectorySelectButton]=(ProcPtr)&DirectorySelectButton;
-		sidr.procs[procCleanFolderFSp]=(ProcPtr)&CleanFolderFSp;
-		sidr.procs[procDoDCCSend]=(ProcPtr)&DoDCCSend;
-		sidr.procs[procDoDCCSendFile]=(ProcPtr)&DoDCCSendFile;
-		sidr.procs[procDCCGetAFile]=(ProcPtr)&DCCGetAFile;
-		sidr.procs[procInputHandler]=(ProcPtr)&InputHandler;
-		sidr.procs[procOpenURL]=(ProcPtr)&OpenURL;
-		sidr.procs[procDCCTypeAdd]=(ProcPtr)&DCCTypeAdd;
-		sidr.procs[procDCCGetStatus]=(ProcPtr)&DCCGetStatus;
-		sidr.procs[procProcessLine]=(ProcPtr)&ProcessLine;
-		sidr.procs[procProcessInputHunk]=(ProcPtr)&ProcessInputHunk;
-		sidr.procs[procDragHilightRect]=(ProcPtr)&DragHilightRect;
-		sidr.procs[procDragHilightRectBG]=(ProcPtr)&DragHilightRectBG;
-		sidr.procs[procDragIsTypeAvail]=(ProcPtr)&DragIsTypeAvail;
-		sidr.procs[procDragGetType]=(ProcPtr)&DragGetType;
-		sidr.procs[procDragGetPtr]=(ProcPtr)&DragGetPtr;
-		sidr.procs[procDragAddPtr]=(ProcPtr)&DragAddPtr;
-		sidr.procs[procDCCSendCookie]=(ProcPtr)&DCCSendCookie;
-		sidr.procs[procDCCSendCookieReply]=(ProcPtr)&DCCSendCookieReply;
-		sidr.procs[procCMAdd]=(ProcPtr)&CMAdd;
-		sidr.procs[procIPCReply]=(ProcPtr)&IPCReply;
-		sidr.procs[procLSPosCaseCustom]=(ProcPtr)&LSPosCaseCustom;
-		sidr.procs[procSetBackground]=(ProcPtr)&SetBackground;
-		sidr.procs[procMySendControlMessage]=(ProcPtr)&MySendControlMessage;
-		sidr.procs[procSMPrefixRGBColor]=(ProcPtr)&SMPrefixRGBColor;
-		sidr.procs[procSMPrefixRGBLinkColor]=(ProcPtr)&SMPrefixRGBLinkColor;
-		sidr.procs[procpluginSetWRefCon]=(ProcPtr)&pluginSetWRefCon;
-		sidr.procs[procpluginGetWRefCon]=(ProcPtr)&pluginGetWRefCon;
-		sidr.procs[procMWPaneUpdate]=(ProcPtr)&MWPaneUpdate;
-		sidr.procs[procShadowIRCVersion2]=(ProcPtr)&ShadowIRCVersion2;
-		sidr.procs[procSetDlogItemTextHdl]=(ProcPtr)&SetDlogItemTextHdl;
-		sidr.procs[procDrawBorder]=(ProcPtr)&DrawBorder;
-		sidr.procs[procFileAdd]=(ProcPtr)&FileAdd;
-		sidr.procs[procFileClose]=(ProcPtr)&FileClose;
-		sidr.procs[procIsIgnoredNickUser]=(ProcPtr)&IsIgnoredNickUser;
-		sidr.procs[procWMSGetMenuItemNum]=(ProcPtr)&WMSGetMenuItemNum;
-		sidr.procs[procGetInputLineCursorSelection]=(ProcPtr)&GetInputLineCursorSelection;
-		sidr.procs[procLockInput]=(ProcPtr)&LockInput;
-		sidr.procs[procUnlockInput]=(ProcPtr)&UnlockInput;
-		sidr.procs[procDoServer]=(ProcPtr)&DoServer;
-		sidr.procs[procDoSignoff]=(ProcPtr)&DoSignoff;
-		sidr.procs[procMWGetName]=(ProcPtr)&MWGetName;
-		sidr.procs[procMWGetChannel]=(ProcPtr)&MWGetChannel;
-		sidr.procs[procMWGetDCC]=(ProcPtr)&MWGetDCC;
-		sidr.procs[procDoModeKWindow]=(ProcPtr)&DoModeKWindow;
-		sidr.procs[procConnGetLocalPort]=(ProcPtr)&ConnGetLocalPort;
-		sidr.procs[procRegisterAETE]=(ProcPtr)&RegisterAETE;
-		sidr.procs[procNickListAdd]=(ProcPtr)&NickListAdd;
-		sidr.procs[procChannelListAdd]=(ProcPtr)&ChannelListAdd;
-		sidr.procs[procGetDrawingState]=(ProcPtr)&GetDrawingState;
-		sidr.procs[procSetDrawingState]=(ProcPtr)&SetDrawingState;
-		sidr.procs[procNormalizeDrawingState]=(ProcPtr)&NormalizeDrawingState;
-		sidr.procs[procGetAppearanceListBoxHandle]=(ProcPtr)&GetAppearanceListBoxHandle;
-		sidr.procs[procCopyResource]=(ProcPtr)&CopyResource;
-		sidr.procs[procPstrcat]=(ProcPtr)&pstrcat;
-		sidr.procs[procMWPart]=(ProcPtr)&MWPart;
-		sidr.procs[procWindowClose]=(ProcPtr)&WindowClose;
-#endif
 }
 
 static pascal void CheckPluginPrefsFolder(void)

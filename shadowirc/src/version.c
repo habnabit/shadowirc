@@ -19,8 +19,8 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-unsigned char myVersion[] = "\p1.1";
-#define SIVersion 0x01010080
+unsigned char myVersion[] = "\p1.2d1";
+#define SIVersion 0x01020001
 
 #include "IRCGlobals.h"
 #include "utils.h"
@@ -60,19 +60,13 @@ pascal void setVers(void)
 		ExitToShell();
 	}
 
-	#if __POWERPC__
-		#if TARGET_CARBON
-			pstrcpy(myVersion, &CL_VERSION[5]);
-			*(long*)&CL_VERSION[1] = ' C4 ';
-			CL_VERSION[0] = 4 + myVersion[0];
-		#else
-			pstrcpy(myVersion, CL_VERSION);
-			*(long*)&CL_VERSION[CL_VERSION[0]+1]=' PPC';
-			CL_VERSION[0]+=4;
-		#endif
+	#if TARGET_CARBON
+		pstrcpy(myVersion, &CL_VERSION[5]);
+		*(long*)&CL_VERSION[1] = ' C4 ';
+		CL_VERSION[0] = 4 + myVersion[0];
 	#else
 		pstrcpy(myVersion, CL_VERSION);
-		*(long*)&CL_VERSION[CL_VERSION[0]+1]=' 68k';
+		*(long*)&CL_VERSION[CL_VERSION[0]+1]=' PPC';
 		CL_VERSION[0]+=4;
 	#endif
 	

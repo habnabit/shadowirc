@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -119,39 +119,11 @@ pascal void ShortcutsMenuUpdate(void)
 		if(!s[0])
 		{
 			*(short*)&s=0x0120; //' '
-			if(hasAppearance11)
-				DisableMenuItem(mh, 3+x);
-			else
-			{
-				if(x==29 && !hasAppearance)
-				{
-					if(CountMenuItems(mh)==32)
-						DeleteMenuItem(mh, 32);
-					break;
-				}
-				else
-					DisableMenuItem(mh, 3+x);
-			}
+			DisableMenuItem(mh, 3+x);
 		}
 		else
-		{
-			if(hasAppearance11)
-				EnableMenuItem(mh, 3+x);
-			else
-			{
-				if(x==29 && !hasAppearance)
-				{
-					if(CountMenuItems(mh)==31)
-					{
-						AppendMenu(mh, "\p-");
-						SetItemStyle(mh, 32, bold);
-						SetItemCmd(mh, 32, '0');
-					}
-				}
-				else
-					EnableMenuItem(mh, 3+x);
-			}
-		}
+			EnableMenuItem(mh, 3+x);
+		
 		if(s[0]>35)
 		{
 			s[0]=36;

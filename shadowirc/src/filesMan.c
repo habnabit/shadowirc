@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -35,10 +35,6 @@
 #include "IRCPreferences.h"
 
 #include "MoreFiles.h"
-
-#if !__POWERPC__
-#pragma dont_inline on
-#endif
 
 /*
 	Best way to get fsspec of something in the app's dir:

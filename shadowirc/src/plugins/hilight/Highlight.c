@@ -653,10 +653,6 @@ pascal void main(ShadowIRCDataRecord* sidrIN)
 {
 	unsigned long l;
 	
-	#if !__POWERPC__
-	EnterCodeResource();
-	#endif
-	
 	switch (sidrIN->message)
 	{
 		case pVersionCheckMessage:
@@ -724,8 +720,4 @@ pascal void main(ShadowIRCDataRecord* sidrIN)
 			ReleaseResource(((pAsyncSoundCompletionDataPtr)sidrIN->messageData)->sound);
 			break;
 		}
-	
-	#if !__POWERPC__
-	ExitCodeResource();
-	#endif
 }

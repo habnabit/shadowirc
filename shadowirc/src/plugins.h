@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -17,6 +17,10 @@
 	You should have received a copy of the GNU General Public License
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/
+
+/*
+	ShadowIRC requires Mac OS 8.1. This means the Appearance Manager must always be available.
 */
 
 #ifndef _Plugins
@@ -79,7 +83,7 @@ enum pVersionCheckMessageReply {
 	
 	pVersion6MessageReply = 3,
 	pVersion10MessageReply = 4,
-	pVersion11OldMessageReply = 5,
+	pVersion11MessageReply = 5,
 	pVersionCheckMessageReply = 5
 };
 
@@ -282,12 +286,12 @@ typedef struct ShadowIRCDataRecord {
 	char *inBackground;								//True if ShadowIRC is in the background, false if it's in the foreground.
 	long *lastInput;										//The time the user last hit return in the inputline, in seconds
 	long *lastKey;										//The time the user last input any text to the inputline, in seconds
-	char canAE;											//True if AppleEvents are available, false if not.
+char reserved3;
 	char hasCM;											//True if System-Wide Contextual Menu support exists. (OS 8 and later)
-	char has75;											//True if the user has MacOS 7.5 or later.
+char reserved;
 	char shasWM11;									//True if Window Manager 1.1 present
 	char hasDrag;										//True if the Drag Manager is pesent.
-	char _hasAppearance;							//True if the Appearance Manager is present.
+char reserved2;
 	char shasNav;										//True if Navigation Services are present
 	char shasAppearance11;						//True if Appearance 1.1 is present.
 	
@@ -320,11 +324,6 @@ typedef struct ShadowIRCDataRecord {
 	
 	Ptr internetConfig;								//The Internet Config component. Nil if IC is not installed. Typecast to internetConfigurationComponent.
 	WindowPtr* ContextWindow;
-	
-#ifdef _68kPlugs_
-	long unused[94];									//free space, so sidr can expand without breaking 68k plugs
-	ProcPtr procs[numProcs];
-#endif
 } ShadowIRCDataRecord;
 
 #pragma mark ¥ Structs

@@ -2213,9 +2213,6 @@ INLINE void setupMessages(char captureMessages[numMessages])
 pascal void main(ShadowIRCDataRecord* sidrIN)
 {
 	long l;
-	#if !__POWERPC__
-	EnterCodeResource();
-	#endif
 
 	switch(sidrIN->message)
 	{
@@ -2412,8 +2409,4 @@ pascal void main(ShadowIRCDataRecord* sidrIN)
 			ULContextualMenuProcess((pCMPopupsReturnDataPtr)sidrIN->messageData);
 			break;
 	}
-
-	#if !__POWERPC__
-	ExitCodeResource();
-	#endif
 }

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -622,9 +622,7 @@ inline OSErr MWReceiveDrag(MWPtr mw, DragReference drag)
 static pascal OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr window, void* homeA5, DragReference drag)
 {
 #pragma unused(homeA5)
-#if !__POWERPC__
-	long saveA5 = SetA5((long)homeA5);
-#endif
+
 	MWPtr mw;
 	pluginDlgInfoPtr pd;
 	pUIDragTrackData pt;
@@ -666,18 +664,12 @@ static pascal OSErr MyTrackingHandler(DragTrackingMessage message, WindowPtr win
 		}
 	}
 	
-#if !__POWERPC__
-	SetA5((long)saveA5);
-#endif
 	return ret;
 }
 
 static pascal OSErr MyReceiveHandler(WindowPtr window, void* homeA5, DragReference drag)
 {
 #pragma unused(homeA5)
-#if !__POWERPC__
-	long saveA5=SetA5((long)homeA5);
-#endif
 	MWPtr mw;
 	pluginDlgInfoPtr pd;
 	pUIDragReceiveData pr;
@@ -711,9 +703,6 @@ static pascal OSErr MyReceiveHandler(WindowPtr window, void* homeA5, DragReferen
 		}
 	}
 	
-#if !__POWERPC__
-	SetA5(saveA5);
-#endif
 	return err;
 }
 
@@ -781,11 +770,7 @@ pascal void InitDrag(void)
 	
 		if(hasDrag)
 		{
-#if __POWERPC__
 			void* l = 0;
-#else
-			char* l = LMGetCurrentA5();
-#endif
 			sPreTrackerUPP = NewWEPreTrackDragProc(PreDrag);
 			
 			//Install Handlers

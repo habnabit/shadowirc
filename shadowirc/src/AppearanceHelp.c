@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -341,7 +341,6 @@ pascal void NormalizeDrawingState()
 #pragma mark -
 
 #if !TARGET_CARBON
-#if __POWERPC__
 #pragma internal on
 //Glue necessary to call AppendDialogItemList.
 #define RESULT_OFFSET(type) ((sizeof(type) == 1) ? 3 : ((sizeof(type) == 2) ? 1 : 0))
@@ -366,5 +365,4 @@ AppendDialogItemList( DialogPtr dialog, SInt16 ditlID, DITLMethod method )
 	return *(((OSErr*)&private_result) + RESULT_OFFSET(OSErr));
 }
 #pragma internal off
-#endif
 #endif

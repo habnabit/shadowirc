@@ -161,7 +161,7 @@ resource 'STR#' (256, "Error Strings", locked, preload)
 		"ERROR: The log folder for this connection is a file!",
 		"ShadowIRC is running low on memory.",
 		"Please close some windows or extra IRC connections to free up memory.",
-		"ShadowIRC requires System 7.1 or later to run.",
+		"ShadowIRC requires System 8.1 or later to run.",
 		"There is no topic set.",
 		"You do not have ops, so you can not change the topic.",
 		"WARNING: ShadowIRC is running low on memory.",
@@ -172,8 +172,7 @@ resource 'STR#' (256, "Error Strings", locked, preload)
 		"DNS ^0: Not in userlist; can't lookup.",
 		"ShadowIRC ran out of memory.",
 		"^0 is not on channel ^1",
-		"The server thinks your nick is something other than what I think it is. Check your settings.",
-		"ShadowIRC requires the Appearance Manager (or Mac OS 8 or later) to run."
+		"The server thinks your nick is something other than what I think it is. Check your settings."
 	};
 };
 

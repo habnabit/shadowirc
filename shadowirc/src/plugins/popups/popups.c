@@ -620,9 +620,6 @@ pascal void displayTooOldMessage(void)
 pascal void main(ShadowIRCDataRecord* sidrIN)
 {
 	unsigned long l;
-	#if !__POWERPC__
-	EnterCodeResource();
-	#endif
 	
 	switch(sidrIN->message)
 	{
@@ -663,7 +660,4 @@ pascal void main(ShadowIRCDataRecord* sidrIN)
 			doCMItems((pCMPopupsReturnDataPtr)sidrIN->messageData);
 			break;
 	}
-	#if !__POWERPC__
-	ExitCodeResource();
-	#endif
 }

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -47,10 +47,6 @@
 #include "InetConfig.h"
 #include "TextManip.h"
 #include "filesMan.h"
-
-#if !__POWERPC__
-#pragma dont_inline on
-#endif
 
 #pragma internal on
 static pascal void doBanList(LongString *args, char e);

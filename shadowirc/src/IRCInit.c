@@ -250,16 +250,13 @@ static pascal void Gestalts(void)
 
 	if(!Gestalt(gestaltSystemVersion, &tempResult)) //this selector returns a short
 	{
-		if(tempResult < 0x0710)
+		if(tempResult < 0x0810)
 		{
-			ParamText(GetIntStringPtr(spError, sOnlyOneShadowIRC), "\p", "\p", "\p");
+			ParamText(GetIntStringPtr(spError, sMinimumOSVersion), "\p", "\p", "\p");
 			Alert(130, 0);
 			ExitToShell();
 		}
 		
-		has75=tempResult >= 0x0750;
-		
-		#if __POWERPC__
 		has85=tempResult >= 0x0850;
 		has86=tempResult >= 0x0860;
 
@@ -274,28 +271,13 @@ static pascal void Gestalts(void)
 hasFloatingWindows = 0;
 			}
 		}
-		#endif
 	}
 	
-	if(!Gestalt(gestaltAppearanceAttr, &tempResult))
-		hasAppearance = tempResult & 1;
-	#if __POWERPC__
-		if(hasAppearance)
-		{
-			hasAppearance = ((long)CreateRootControl != kUnresolvedCFragSymbolAddress);
-			if(hasAppearance && !Gestalt(gestaltAppearanceVersion, &tempResult))
-			{
-				if(tempResult >= 0x0110) //appearance 1.1
-					hasAppearance11 = true;
-			}
-		}
-		else
-		{
-			ParamText(GetIntStringPtr(spError, 48), "\p", "\p", "\p");
-			Alert(130, 0);
-			ExitToShell();
-		}
-	#endif
+	if(!Gestalt(gestaltAppearanceVersion, &tempResult))
+	{
+		if(tempResult >= 0x0110) //appearance 1.1
+			hasAppearance11 = true;
+	}
 	
 	//Assume AppleEvents are present since we require 7.1
 
@@ -340,8 +322,7 @@ pascal void ToolboxInit(void)
 
 	Gestalts();
 	
-	if(hasAppearance)
-		RegisterAppearanceClient();
+	RegisterAppearanceClient();
 	
 	if(!Gestalt(gestaltComponentMgr, &tempResult))
 		if(tempResult)
@@ -349,7 +330,5 @@ pascal void ToolboxInit(void)
 
 	InitDrag();
 	
-	#if __POWERPC__
 	hasNav = NavServicesAvailable() && !NavLoad();
-	#endif
 }
