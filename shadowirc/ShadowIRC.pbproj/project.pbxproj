@@ -31,8 +31,8 @@
 		05952DFDFFF02D1B11CA0E50 = {
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
-				DEPLOYMENT_LOCATION = YES;
-				DEPLOYMENT_POSTPROCESSING = YES;
+				DEPLOYMENT_LOCATION = NO;
+				DEPLOYMENT_POSTPROCESSING = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.2;
 				OPTIMIZATION_CFLAGS = "-Os";
@@ -142,6 +142,12 @@
 			path = src/ShadowIRC_Prefix.pch;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
+		};
+		14B760010688B95F0069164D = {
+			fileRef = 14B760000688B95F0069164D;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		14B760990688BB3E0069164D = {
 			fileRef = 14B760000688B95F0069164D;
@@ -525,7 +531,7 @@
 			sourceTree = "<group>";
 		};
 		14EEACA9044D95C800A80001 = {
-			fileEncoding = 30;
+			fileEncoding = 10;
 			isa = PBXFileReference;
 			lastKnownFileType = text.plist.strings;
 			name = English;
@@ -844,6 +850,12 @@
 			path = src/simpleList.c;
 			refType = 4;
 			sourceTree = "<group>";
+		};
+		F497A66106D0E28B00AACA2B = {
+			fileRef = F552BF1B0211030901A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 		F4BBC26B056EE75900BD6D17 = {
 			buildPhases = (
@@ -1282,6 +1294,7 @@
 				F4BBC2AE056EE75900BD6D17,
 				F4BBC2AF056EE75900BD6D17,
 				F424EAA805A5345400B68878,
+				14B760010688B95F0069164D,
 				14EB08CD0689648200B74698,
 				1401A78D069294AF0002FDCB,
 				1452304406B90D730041B2E3,
@@ -1381,7 +1394,6 @@
 				F4BBC2D1056EE75900BD6D17,
 				F4BBC2D2056EE75900BD6D17,
 				F4BBC2D3056EE75900BD6D17,
-				F4BBC2D4056EE75900BD6D17,
 				F4BBC2D5056EE75900BD6D17,
 				F4BBC2D6056EE75900BD6D17,
 				F4BBC2D7056EE75900BD6D17,
@@ -1394,7 +1406,6 @@
 				F4BBC2DE056EE75900BD6D17,
 				F4BBC2DF056EE75900BD6D17,
 				F4BBC2E0056EE75900BD6D17,
-				F4BBC2E1056EE75900BD6D17,
 				F4BBC2E2056EE75900BD6D17,
 				F4BBC2E3056EE75900BD6D17,
 				F4BBC2E4056EE75900BD6D17,
@@ -1415,6 +1426,8 @@
 				F40147C506C95EA200376EB2,
 				F40147ED06C965D200376EB2,
 				F40148B106CABC0800376EB2,
+				F4DB9CBB06CB359D00B575DC,
+				F497A66106D0E28B00AACA2B,
 			);
 			isa = PBXSourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1629,12 +1642,6 @@
 			settings = {
 			};
 		};
-		F4BBC2D4056EE75900BD6D17 = {
-			fileRef = F552BF1B0211030901A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
 		F4BBC2D5056EE75900BD6D17 = {
 			fileRef = F552BF1D0211030901A80061;
 			isa = PBXBuildFile;
@@ -1703,12 +1710,6 @@
 		};
 		F4BBC2E0056EE75900BD6D17 = {
 			fileRef = F552BF3A0211030901A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F4BBC2E1056EE75900BD6D17 = {
-			fileRef = F552BF400211030901A80061;
 			isa = PBXBuildFile;
 			settings = {
 			};
@@ -1885,6 +1886,12 @@
 			path = ShadowIRC.app;
 			refType = 3;
 			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		F4DB9CBB06CB359D00B575DC = {
+			fileRef = F552BF400211030901A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
 		};
 //F40
 //F41
@@ -2328,7 +2335,7 @@
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF1B0211030901A80061 = {
-			fileEncoding = 30;
+			fileEncoding = 4;
 			isa = PBXFileReference;
 			lastKnownFileType = sourcecode.c.c;
 			name = InputLine.c;
