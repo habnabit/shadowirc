@@ -274,7 +274,7 @@ pascal void connection2(connectionPtr conn)
 		{
 			CreateIdentdConn(conn);
 			LinkSetStage(conn->link, csOpeningConnection);
-			link->serverStatus=S_OPENING;
+			conn->link->serverStatus=S_OPENING;
 			UpdateStatusLine();
 		}
 	}
