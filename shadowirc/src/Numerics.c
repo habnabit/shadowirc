@@ -81,6 +81,10 @@ inline void n433nickInUse(linkPtr link, LongString *rest);
 	Dalnet:
 		WATCH=128 - serverside notify
 		SAFELIST - does /list in chunks
+
+
+//need to parse: PREFIX=(ov)@+ CHANMODES=b,k,l,imnpst CHARSET=rfc1459 NETWORK=Undernet :are supported by this server
+
 */
 
 static void n005ServerFeatures(linkPtr link, LongString *ls)
