@@ -252,7 +252,7 @@ static int fd_remove (int fd)
                 fd_max = fd;
         }
         
-        return -1;
+        return (0);
 }
 
 /*
