@@ -864,6 +864,8 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			goto failedWCreate;
 		else
 		{
+			const long translucencyTreshold = 200000;
+			
 			SetPortWindowPort(h->w);
 			TextFont(fontNum);
 			TextSize(mainPrefs->defaultFontSize);
@@ -879,6 +881,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			WESetInfo(weRefCon, &h, we);	//set the refcon to the MWPtr
 			WESetInfo(weScrollProc, &sScrollerUPP, we);
 			WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, we);
+			WESetInfo(weTranslucencyThreshold, &translucencyTreshold, we);
 		
 			h->magic=MW_MAGIC;
 			h->vscr=NewControl(h->w, &windowSize, "\p", true, 0, 0, 0, kControlScrollBarLiveProc, 0);
