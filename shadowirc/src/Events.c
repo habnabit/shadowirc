@@ -148,14 +148,11 @@ static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef even
 					ps.w = mw->w;
 					ps.mw = mw;
 					runService(pServiceActivateWin, &ps);
-					
-					result = noErr;
 					break;
 				}
 					
 				case kEventWindowDrawContent:
 					MWPaneUpdate(mw);
-					result = noErr;
 					break;
 				
 				case kEventWindowGetMinimumSize:
