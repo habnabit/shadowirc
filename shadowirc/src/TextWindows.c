@@ -334,7 +334,7 @@ static pascal unsigned char TWSaveWindowDialogFilter(DialogPtr d, EventRecord *e
 		return true;
 }
 
-pascal char TWClose(MWPtr mw, char lowMem, char force)
+pascal char TWClose(MWPtr mw, char lowMem)
 {
 	textWinDataPtr p =  (textWinDataPtr)mw->refCon;
 	DialogPtr d;
@@ -345,8 +345,6 @@ pascal char TWClose(MWPtr mw, char lowMem, char force)
 	if(WEGetModCount(mw->we)) //ask to save
 	{
 		d = GetNewDialog(137 + lowMem, 0, (WindowPtr)-1);
-		if(force)
-			setButtonEnable(d, 2, false);
 		if(p->saved)
 			pstrcpy(p->file.name, s);
 		else
@@ -388,7 +386,7 @@ pascal char TWClose(MWPtr mw, char lowMem, char force)
 	return 1;
 }
 
-pascal char TWCloseAll(char force)
+pascal char TWCloseAll(void)
 {
 	MWPtr mw, mw2;
 	char r = true;
@@ -398,7 +396,7 @@ pascal char TWCloseAll(char force)
 	{
 		mw2=mw->next;
 		if(mw->winType == textWin)
-			r=TWClose(mw, false, force);
+			r=TWClose(mw, false);
 		if(!r)
 			return false;
 		mw=mw2;

@@ -42,7 +42,7 @@ extern long sScrollStep;
 pascal void ApplRun(void);
 pascal void ApplInit(void);
 pascal void ApplExit(void);
-pascal char doQuit(char force, LongString *reason);
+pascal char doQuit(LongString *reason);
 
 pascal void menuEdit(short item);
 pascal void MenuConnectionList(short item);

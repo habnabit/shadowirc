@@ -384,15 +384,13 @@ static pascal void DoFind(char again)
 
 #pragma mark -
 
-pascal char doQuit(char force, LongString *reason)
+pascal char doQuit(LongString *reason)
 {
 	short i;
 	linkPtr link;
 	int save;
 	
-	//Force used to be if the program was quitting for unregistered timeout.
-	
-	if(TWCloseAll(force))
+	if(TWCloseAll())
 	{
 		if(mainPrefs->quitAction == qaAutoSave)
 			save = 1;
@@ -401,7 +399,7 @@ pascal char doQuit(char force, LongString *reason)
 			int sel = 0;
 
 			save = 0;
-			if(!force && mainPrefs->quitAction == qaConfirm)
+			if(mainPrefs->quitAction == qaConfirm)
 				sel = 1;
 
 			if(sel)
@@ -427,17 +425,7 @@ pascal char doQuit(char force, LongString *reason)
 		
 		linkfor(link, firstLink)
 			if(link->serverStatus==S_CONN)
-			{
-				LongString ls2;
-				
-				if(force)
-				{
-					LSStrLS("\pThis unregistered copy of ShadowIRC has expired.", &ls2);
-					DoSignoff(link, &ls2);
-				}
-				else
-					DoSignoff(link, reason);
-			}
+				DoSignoff(link, reason);
 		
 		QuitRequest=1;
 	}
@@ -568,7 +556,7 @@ static pascal char CheckMem(void)
 			//If no help window
 			linkfor(mw, mwl)
 				if(mw->winType == textWin)
-					if(TWClose(mw, true, false))
+					if(TWClose(mw, true))
 					{
 						purgedAnything = 1;
 						goto exitCheckMem;
@@ -1042,7 +1030,7 @@ static pascal void MenuFILE(int item)
 			break;
 
 		case 9:
-			doQuit(false, 0);
+			doQuit(0);
 			break;
 	}
 }

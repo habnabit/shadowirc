@@ -866,7 +866,7 @@ static pascal void TranslateCommand(linkPtr link, LongString *s)
 		}
 		else if(pstrcmp3(com, 'BYE') || (com[4]=='T' && (*(long*)com==0x04455849 || *(long*)com==0x04515549))) //BYE, EXIT, QUIT
 		{
-			doQuit(false, &rest);
+			doQuit(&rest);
 
 			s->len = 0;
 		}

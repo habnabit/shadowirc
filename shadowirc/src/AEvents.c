@@ -80,7 +80,7 @@ static pascal OSErr aeOApp(const AppleEvent *, AppleEvent *, unsigned long)
 
 static pascal OSErr aeQuit(const AppleEvent *, AppleEvent *, unsigned long)
 {
-	doQuit(false, 0);
+	doQuit(0);
 	return noErr;
 }
 

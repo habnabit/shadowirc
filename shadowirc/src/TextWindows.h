@@ -29,8 +29,8 @@ pascal void TWStatus(mwWidgetPtr o, char winActive);
 pascal MWPtr TWSelect(void);
 pascal MWPtr TWOpen(const FSSpec *f);
 pascal MWPtr NewTextWin(void);
-pascal char TWClose(MWPtr mw, char lowMem, char force);
-pascal char TWCloseAll(char force);
+pascal char TWClose(MWPtr mw, char lowMem);
+pascal char TWCloseAll(void);
 pascal void TWSave(MWPtr mw, char saveas);
 
 #pragma internal reset
