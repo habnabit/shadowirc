@@ -278,7 +278,7 @@ static pascal char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param 
 	else if(pstrcmp(co, "\pVERSION"))
 	{
 		LSConcatStrAndStrAndStr("\pShadowIRC ", CL_VERSION, "\p © John Bafford 1996-2002 (", &ls);
-		LSConcatLSAndStrAndStr(&ls, cdt, "\p), ", &ls);
+		LSConcatLSAndStrAndStr(&ls, cdt, "\p)", &ls);
 		SendCTCPReply(link, fr, co, &ls);
 	}
 	else
