@@ -73,30 +73,6 @@ inline void CheckPreferences(void)
 	}
 }
 
-inline void AppleMenuURLInit(void)
-{
-	MenuHandle m;
-	int x, y;
-	int num;
-	
-	m = NewMenu(AppleURLMenu, "\p");
-	InsertMenu(m, hierMenu);
-	// Tell it where to put the hierarchical URL menu
-	SetMenuItemHierarchicalID(gAppleMenu, 2, AppleURLMenu);
-	
-	num = *(short*)spAppleURL;
-	if(num>0)
-	{
-		y = 0;
-		for(x=1;x<=num;x+=2)
-		{
-			AppendMenu(m, "\p-");
-			y++;
-			SetMenuItemText(m, y, GetIntStringPtr(spAppleURL, x));
-		}
-	}
-}
-
 static pascal void AboutDlgVersion(DialogPtr d, short i);
 static pascal void AboutDlgVersion(DialogPtr d, short i)
 {

@@ -345,6 +345,18 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 				writeAllFiles();
 			return noErr;
 		
+		case 'CONO':
+			MenuConnectionList(hiCommand.menu.menuItemIndex);
+			return noErr;
+		
+		case 'CONC':
+			MenuSignoffConnectionList(hiCommand.menu.menuItemIndex);
+			return noErr;
+		
+		case 'CONX':
+			HitSelectConnectionMenu(hiCommand.menu.menuItemIndex);
+			return noErr;
+		
 		//Window Menu
 		case 'CONS':
 			if(FrontNonFloater() == consoleWin->w && IsVisible(consoleWin->w))
@@ -389,6 +401,11 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 		//Help Menu
 		case 'HWIN':
 			ShowHelp(hiCommand.menu.menuItemIndex - defaultHelpItems);
+			return noErr;
+		
+		//Apple URL Menu
+		case 'AURL':
+			HitAppleURLMenu(hiCommand.menu.menuItemIndex);
 			return noErr;
 	}
 	

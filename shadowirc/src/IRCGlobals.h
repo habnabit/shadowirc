@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -222,7 +222,8 @@ enum menuList {
 	
 	ConnectionListMenu = 205,
 	SignoffConnectionListMenu = 206,
-	AppleURLMenu = 207,
+	SelectConnectionListMenu = 207,
+	AppleURLMenu = 208,
 	
 	mHelpWidget = 202
 };
@@ -273,7 +274,7 @@ extern char hasAquaMenuMgr;
 
 extern char gTalkCityPlug;
 
-extern MenuHandle menuConnectionList, menuSignoffConnectionList;
+extern MenuHandle menuConnectionList, menuSignoffConnectionList, menuSelectConnectionList;
 extern MenuHandle menuHelpWidget, gHelpMenu;
 extern short defaultHelpItems, normHelpMenuItems;
 

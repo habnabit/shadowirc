@@ -1,6 +1,6 @@
 	/*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -641,7 +641,6 @@ static pascal void MWStatusLineClickInternal(mwWidgetPtr o, Point p)
 {
 	MWPtr mw;
 	short i;
-	long l;
 	
 	mw = o->mw;
 	switch(o->type)
@@ -672,10 +671,7 @@ static pascal void MWStatusLineClickInternal(mwWidgetPtr o, Point p)
 			LocalToGlobal(&p);
 
 			StandardIconWidget(o, &giHelpWidgetIcon[kIconWidgetDown]);
-			l=PopUpMenuSelect(menuHelpWidget, p.v, p.h, curHelpItem);
-			i = l & 0xFFFF;
-			if(i)
-				ShowHelp(i);
+			PopUpMenuSelect(menuHelpWidget, p.v, p.h, curHelpItem);
 			StandardIconWidget(o, giHelpWidgetIcon);
 			break;
 		
@@ -688,15 +684,9 @@ static pascal void MWStatusLineClickInternal(mwWidgetPtr o, Point p)
 			
 			LocalToGlobal(&p);
 			StandardIconWidget(o, &giLinkWidgetIcon[kIconWidgetDown]);
-			l=PopUpMenuSelect(menuSignoffConnectionList, p.v, p.h, i);
+			PopUpMenuSelect(menuSelectConnectionList, p.v, p.h, i);
 			
-			i = (l & 0xFFFF) - 1;
-			if(i >= 0)
-			{
-				CurrentTarget.link = GetLinkNum(i);
-				DrawMWinStatus(mw);
-				UpdateStatusLine();
-			}
+			DrawMWinStatus(mw);
 			StandardIconWidget(o, giLinkWidgetIcon);
 			break;
 	}
@@ -1617,4 +1607,5 @@ pascal void ShowHelp(short helpID)
 	}
 
 	WSelect(hel->w);
+	DrawMWinStatus(hel);
 }

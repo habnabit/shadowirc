@@ -22,6 +22,9 @@
 extern UserItemUPP AboutDlgVersionFilter;
 extern MenuHandle gAppleMenu, gFileMenu, gShortcutsMenu, gWindowMenu, gHelpMenu;
 
+void HitAppleURLMenu(short item);
+void HitSelectConnectionMenu(short item);
+
 pascal void MenuConnectionList(short item);
 pascal void MenuSignoffConnectionList(short item);
 pascal void HitWindowMenu(short item);
@@ -31,5 +34,6 @@ pascal void DoMenuEvent(long menuitem, const EventRecord *e);
 pascal void MenuBarClick(const EventRecord *e);
 
 pascal void MenuInit(void);
+void AppleMenuURLInit(void);
 
 void WindowClose(WindowPtr wp);

@@ -45,7 +45,7 @@ TableChars ISOEncode, ISODecode;
 
 char hasAquaMenuMgr;
 
-MenuHandle menuConnectionList, menuSignoffConnectionList;
+MenuHandle menuConnectionList, menuSignoffConnectionList, menuSelectConnectionList;
 MenuHandle menuHelpWidget, gHelpMenu;
 
 short defaultHelpItems = 0, normHelpMenuItems = 0;

@@ -45,8 +45,8 @@
 #include "CMenus.h"
 #include "MenuCommands.h"
 
-MenuHandle gAppleMenu, gEditMenu, gShortcutsMenu, gWindowMenu;
-static MenuHandle gFileMenu, gFontsMenu;
+MenuHandle gAppleMenu, gFileMenu, gEditMenu, gShortcutsMenu, gWindowMenu;
+static MenuHandle gFontsMenu;
 static short gFontSizeOtherItem;
 
 UserItemUPP AboutDlgVersionFilter;
@@ -55,7 +55,6 @@ static pascal void DoFind2(void);
 static pascal void DoFind(char again);
 
 static pascal void HitFontsMenu(short item);
-static pascal void MenuAppleURL(short item);
 
 void FontsMenuInit(void);
 static void HelpMenuInit(void);
@@ -199,6 +198,25 @@ static pascal void DoFind(char again)
 }
 
 #pragma mark -
+
+void HitAppleURLMenu(short item)
+{
+	Str255 url;
+	
+	if(internetConfig)
+	{
+		//get url
+		GetIntString(url, spAppleURL, item * 2);
+		
+		if(OpenURL(url))
+		{
+			//error
+		}
+	}
+	else
+	{
+	}
+}
 
 pascal void HitEditMenu(short item)
 {
@@ -466,6 +484,16 @@ static pascal void HitFontsMenu(short item)
 	}
 }
 
+void HitSelectConnectionMenu(short item)
+{
+	if(item > 0)
+	{
+		CurrentTarget.link = GetLinkNum(item - 1);
+		UpdateStatusLine();
+	}
+}
+
+
 #pragma mark -
 
 pascal void MenuConnectionList(short item)
@@ -508,25 +536,6 @@ pascal void MenuSignoffConnectionList(short item)
 	}
 }
 
-static pascal void MenuAppleURL(short item)
-{
-	Str255 url;
-	
-	if(internetConfig)
-	{
-		//get url
-		GetIntString(url, spAppleURL, item * 2);
-		
-		if(OpenURL(url))
-		{
-			//error
-		}
-	}
-	else
-	{
-	}
-}
-
 #pragma mark -
 
 pascal void DoMenuEvent(long menuitem, const EventRecord *e)
@@ -551,17 +560,6 @@ pascal void DoMenuEvent(long menuitem, const EventRecord *e)
 				break;
 			case fontsMenu:
 				HitFontsMenu(itemNum);
-				break;
-			
-			case ConnectionListMenu:
-				MenuConnectionList(itemNum);
-				break;
-			case SignoffConnectionListMenu:
-				MenuSignoffConnectionList(itemNum);
-				break;
-			
-			case AppleURLMenu:
-				MenuAppleURL(itemNum);
 				break;
 		}
 	}
@@ -648,6 +646,31 @@ pascal void MenuBarClick(const EventRecord *e)
 #pragma mark -
 
 
+void AppleMenuURLInit(void)
+{
+	MenuHandle m;
+	int x, y;
+	int num;
+	
+	m = NewMenu(AppleURLMenu, "\p");
+	InsertMenu(m, hierMenu);
+	// Tell it where to put the hierarchical URL menu
+	SetMenuItemHierarchicalID(gAppleMenu, 2, AppleURLMenu);
+	
+	num = *(short*)spAppleURL;
+	if(num>0)
+	{
+		y = 0;
+		for(x=1;x<=num;x+=2)
+		{
+			AppendMenu(m, "\p-");
+			y++;
+			SetMenuItemText(m, y, GetIntStringPtr(spAppleURL, x));
+			SetMenuItemCommandID(m, y, 'AURL');
+		}
+	}
+}
+
 void FontsMenuInit(void)
 {
 	if(mainPrefs->noFontsMenu)
@@ -683,6 +706,7 @@ static void HelpMenuInit(void)
 				AppendMenu(gHelpMenu, s);
 				SetMenuItemCommandID(gHelpMenu, x, 'HWIN');
 				AppendMenu(menuHelpWidget, s);
+				SetMenuItemCommandID(menuHelpWidget, x, 'HWIN');
 			}
 	}
 	
