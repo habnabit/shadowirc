@@ -265,7 +265,13 @@ pascal void MWPaneActivate(MWPtr mw, char activate)
 			else if(o->type == mwWidgetsPane)
 				DrawMWinStatus(mw);
 			else if(o->type == mwInputPane)
+			{
+				if(activate)
+					WEActivate(mw->il);
+				else
+					WEDeactivate(mw->il);
 				DrawInputPane(o);
+			}
 		}
 		else
 		{

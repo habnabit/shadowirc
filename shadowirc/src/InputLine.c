@@ -313,7 +313,12 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 			{
 				//For now, we do nothing as it is consistent with what we used to do. This will need to be fixed, however...
 				case kEventWindowActivated:
+					WEActivate(inputLine._il);
+					result = noErr;
+					break;
+					
 				case kEventWindowDeactivated:
+					WEDeactivate(inputLine._il);
 					result = noErr;
 					break;
 				
