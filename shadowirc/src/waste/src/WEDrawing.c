@@ -730,31 +730,26 @@ pascal void _WEDrawLines (SInt32 firstLine, SInt32 lastLine, Boolean doErase, WE
 
 	WEPtr pWE = *hWE;			// assume WE record is locked
 	struct SLDrawData cd;		// block of data we'll pass to SLDraw
+	RgnHandle visRgn;
+	Boolean ret;
 
 	BLOCK_CLR(cd);
 	cd.doErase = doErase;
 	cd.usingColor = (BTST(pWE->flags, weFHasColorQD) && !BTST(pWE->features, weFInhibitColor)) ? true : false;
 
 	// do nothing if our graphics port is not visible
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
-	{
-	RgnHandle visRgn;
+	ret = false;
+	
 	if ((visRgn = NewRgn()))
 	{
 		GetPortVisibleRegion(pWE->port, visRgn);
 		if (EmptyRgn(visRgn))
-		{
-			return;
-		}
+			ret = true;
 		DisposeRgn(visRgn);
+		
+		if(ret)
+			return;
 	}
-	}
-#else
-	if (EmptyRgn(pWE->port->visRgn))
-	{
-		return;
-	}
-#endif
 
 	// save graphics world
 	GetGWorld((GWorldPtr *) &cd.screenPort, &cd.screenDevice);
