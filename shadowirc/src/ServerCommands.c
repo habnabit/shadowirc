@@ -43,21 +43,26 @@
 #include "TextManip.h"
 
 #pragma internal on
-static pascal void nNotice(linkPtr link, LongString *ls, StringPtr fromuser, StringPtr target, StringPtr from);
-static pascal void nPrivmsg(linkPtr link, LongString *ls, StringPtr fromuser, StringPtr target, StringPtr from);
-inline pascal void nJoin(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser);
-inline pascal void nPart(linkPtr link, LongString *target, StringPtr from, StringPtr fromuser, StringPtr targ);
-inline pascal void nQuit(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target);
-inline pascal void nTopic(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target);
-inline pascal void nNick(linkPtr link, LongString *newNick, StringPtr from, StringPtr fromuser);
-inline pascal void nKill(linkPtr link, LongString *ls, StringPtr from);
 inline pascal void checkLimitKey(linkPtr link, char mode, channelPtr curChannel, StringPtr modeChange);
 inline pascal void checkOpsBans(linkPtr link, char up, char voice, StringPtr modeChange, channelPtr curChannel, ConstStringPtr setBy);
 pascal void doMODE(linkPtr link, ConstStringPtr channel, StringPtr modeChange, ConstStringPtr setBy, LongString *tls);
-inline pascal void nKick(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target);
-inline pascal void nInvite(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser);
-inline pascal void nRPong(linkPtr link, LongString *ls);
-inline pascal void nSilence(linkPtr link, LongString *ls);
+
+static pascal void nNotice(linkPtr link, LongString *ls, StringPtr fromuser, StringPtr target, StringPtr from);
+static pascal void nPrivmsg(linkPtr link, LongString *ls, StringPtr fromuser, StringPtr target, StringPtr from);
+static pascal void nJoin(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser);
+static pascal void nPart(linkPtr link, LongString *target, StringPtr from, StringPtr fromuser, StringPtr targ);
+static pascal void nQuit(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target);
+static pascal void nTopic(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target);
+static pascal void nNick(linkPtr link, LongString *newNick, StringPtr from, StringPtr fromuser);
+static pascal void nKill(linkPtr link, LongString *ls, StringPtr from);
+static pascal void nMode(linkPtr link, LongString *ls, StringPtr from, StringPtr target);
+static pascal void nKick(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target);
+static pascal void nInvite(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser);
+static pascal void nRPong(linkPtr link, LongString *ls);
+static pascal void nSilence(linkPtr link, LongString *ls);
+static pascal void nPing(linkPtr link, LongString *ls);
+static pascal void nWallops(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target);
+static pascal void nError(linkPtr link, LongString *ls, StringPtr target);
 pascal void ServerCommands(LongString *ls, linkPtr link);
 
 static pascal void AttemptNickRegainSignoff(linkPtr link, ConstStringPtr signedOff)
@@ -298,7 +303,7 @@ static pascal void nPrivmsg(linkPtr link, LongString *ls, StringPtr fromuser, St
 	}
 }
 
-inline pascal void nJoin(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser)
+static pascal void nJoin(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser)
 {
 	MWPtr dd;
 	pServerJOINDataRec p;
@@ -354,7 +359,7 @@ inline pascal void nJoin(linkPtr link, LongString *ls, StringPtr from, StringPtr
 		SoundService(sndJoin, p.isMe);
 }
 
-inline pascal void nPart(linkPtr link, LongString *target, StringPtr from, StringPtr fromuser, StringPtr targ)
+static pascal void nPart(linkPtr link, LongString *target, StringPtr from, StringPtr fromuser, StringPtr targ)
 {
 	Str255 channel;
 	pServerPARTDataRec p;
@@ -405,7 +410,7 @@ inline pascal void nPart(linkPtr link, LongString *target, StringPtr from, Strin
 		ULDeleteUser(p.userPtr);
 }
 
-inline pascal void nQuit(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target)
+static pascal void nQuit(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target)
 {
 	LongString signoffMessage;
 	UserListPtr ul;
@@ -449,7 +454,7 @@ inline pascal void nQuit(linkPtr link, LongString *ls, StringPtr from, StringPtr
 	AttemptNickRegainSignoff(link, from);
 }
 
-inline pascal void nTopic(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target)
+static pascal void nTopic(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target)
 {
 	pServerTOPICDataRec p;
 	LongString tls;
@@ -490,7 +495,7 @@ inline pascal void nTopic(linkPtr link, LongString *ls, StringPtr from, StringPt
 		SoundService(sndTopic, 0);
 }
 
-inline pascal void nNick(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser)
+static pascal void nNick(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser)
 {
 	pServerNICKDataRec p;
 	channelPtr x;
@@ -544,7 +549,7 @@ inline pascal void nNick(linkPtr link, LongString *ls, StringPtr from, StringPtr
 		AttemptNickRegainSignoff(link, from);
 }
 
-inline pascal void nKill(linkPtr link, LongString *ls, StringPtr from)
+static pascal void nKill(linkPtr link, LongString *ls, StringPtr from)
 {
 	LongString tls;
 	DialogPtr d;
@@ -837,7 +842,17 @@ mK:
 	}
 }
 
-inline pascal void nKick(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target)
+static pascal void nMode(linkPtr link, LongString *ls, StringPtr from, StringPtr target)
+{
+	LongString tls;
+	
+	LSMakeStr(*ls);
+	LSStrCat(6, &tls, "\pMode change \"", ls->data, "\p\" on ", target, "\p by ", from);
+
+	doMODE(link, target, ls->data, from, &tls);
+}
+
+static pascal void nKick(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target)
 {
 	Str63 kickedNick;
 	pServerKICKDataRec p;
@@ -898,7 +913,7 @@ inline pascal void nKick(linkPtr link, LongString *ls, StringPtr from, StringPtr
 		SoundService(sndKick, p.isMe);
 }
 
-inline pascal void nInvite(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser)
+static pascal void nInvite(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser)
 {
 	pServerINVITEDataRec p;
 	LongString tls;
@@ -937,7 +952,7 @@ inline pascal void nInvite(linkPtr link, LongString *ls, StringPtr from, StringP
 		SoundService(sndInvite, 0);
 }
 
-inline pascal void nRPong(linkPtr link, LongString *ls)
+static pascal void nRPong(linkPtr link, LongString *ls)
 {
 	Str255 server, num, st, st2;
 	unsigned long l1, l2, lo;
@@ -987,7 +1002,7 @@ inline pascal void nRPong(linkPtr link, LongString *ls)
 		SoundService(sndRPong, p.pingTime);
 }
 
-inline pascal void nSilence(linkPtr link, LongString *ls)
+static pascal void nSilence(linkPtr link, LongString *ls)
 {
 	pServerSILENCEData p;
 	Str255 silence;
@@ -1009,12 +1024,82 @@ inline pascal void nSilence(linkPtr link, LongString *ls)
 	SoundService(sndSilence, 0);
 }
 
-typedef unsigned char Str127[128];
+static pascal void nPing(linkPtr link, LongString *ls)
+{
+	LongString tls;
+	pServerPINGDataRec p;
+	
+	LSConcatStrAndLS("\pPONG ", ls, &tls);
+	SendCommand(link, &tls);
+
+	if(mainPrefs->displayPingsInConsole)
+	{
+		LSConcatStrAndLS("\pPING ", ls, &tls);
+		SMPrefix(&tls, dsConsole);
+	}
+	p.link=link;
+	p.source=ls;
+	runPlugins(pServerPINGMessage, &p);
+	SoundService(sndServerPing, 0);
+}
+
+static pascal void nPong(linkPtr link, StringPtr from)
+{
+	LongString tls;
+	pServerPONGDataRec p;
+	
+	LSConcatStrAndStr("\pGot PONG from ", from, &tls);
+	SMPrefixLink(link, &tls, dsConsole);
+	p.link=link;
+	p.source=from;
+	runPlugins(pServerPONGMessage, &p);
+}
+
+static pascal void nWallops(linkPtr link, LongString *ls, StringPtr from, StringPtr fromuser, StringPtr target)
+{
+	LongString tls;
+	pServerWALLOPSDataRec p;
+
+	LSStrLS(target, &tls);
+	LSAppend1(tls, ' ');
+	LSConcatLSAndLS(&tls, ls, &tls);
+
+	p.link=link;
+	p.username=from;
+	p.userhost=fromuser;
+	p.message=&tls;
+	p.ignore=0;
+	runPlugins(pServerWALLOPSMessage, &p);
+	
+	if(!p.ignore)
+	{
+		LSConcatStrAndStr("\pWALLOPS !", from, ls);
+		LSAppend2(*ls, '! ');
+		LSConcatLSAndLS(ls, &tls, ls);
+		SMPrefixLink(link, ls, (mainPrefs->wallopsToConsole?dsConsole:dsFrontWin));
+		SoundService(sndWallops, 0);
+	}
+}
+
+static pascal void nError(linkPtr link, LongString *ls, StringPtr target)
+{
+	LongString tls;
+	pServerERRORDataRec p;
+	
+	LSConcatStrAndStr("\pERROR: ", target, &tls);
+	LSAppend1(tls, ' ');
+	LSConcatLSAndLS(&tls, ls, &tls);
+	SMPrefixLink(link, &tls, dsConsole);
+	
+	p.link=link;
+	p.message=ls;
+	runPlugins(pServerERRORMessage, &p);
+}
 
 pascal void ServerCommands(LongString *ls, linkPtr link)
 {
 	Str255 target, fromuser;
-	Str127 from, comm;
+	Str255 from, comm;
 	short i;
 	LongString tls;
 	
@@ -1085,12 +1170,7 @@ pascal void ServerCommands(LongString *ls, linkPtr link)
 	else if(pstrcmpX(comm, 4, 'PAR'))
 		nPart(link, ls, from,fromuser, target);
 	else if(pstrcmpX(comm, 4, 'MOD')) //MODE
-	{
-		LSMakeStr(*ls);
-		LSStrCat(6, &tls, "\pMode change \"", ls->data, "\p\" on ", target, "\p by ", from);
-
-		doMODE(link, target, ls->data, from, &tls);
-	}
+		nMode(link, ls, from, target);
 	else if(pstrcmpX(comm, 5, 'TOP'))
 		nTopic(link, ls, from,fromuser, target);
 	else if(pstrcmpX(comm, 4, 'NIC'))
@@ -1098,32 +1178,9 @@ pascal void ServerCommands(LongString *ls, linkPtr link)
 	else if(pstrcmpX(comm, 4, 'QUI'))
 		nQuit(link, ls, from,fromuser, target);
 	else if(pstrcmpX(comm, 4, 'PIN')) //PING
-	{
-		pServerPINGDataRec p;
-		
-		LSConcatStrAndLS("\pPONG ", ls, &tls);
-		SendCommand(link, &tls);
-
-		if(mainPrefs->displayPingsInConsole)
-		{
-			LSConcatStrAndLS("\pPING ", ls, &tls);
-			SMPrefix(&tls, dsConsole);
-		}
-		p.link=link;
-		p.source=ls;
-		runPlugins(pServerPINGMessage, &p);
-		SoundService(sndServerPing, 0);
-	}
+		nPing(link, ls);
 	else if(pstrcmpX(comm, 4, 'PON')) //PONG
-	{
-		pServerPONGDataRec p;
-		
-		LSConcatStrAndStr("\pGot PONG from ", from, &tls);
-		SMPrefixLink(link, &tls, dsConsole);
-		p.link=link;
-		p.source=from;
-		runPlugins(pServerPONGMessage, &p);
-	}
+		nPong(link, from);
 	else if(pstrcmpX(comm, 4, 'KIL'))
 		nKill(link, ls,from);
 	else if(pstrcmpX(comm, 4, 'KIC'))
@@ -1135,42 +1192,9 @@ pascal void ServerCommands(LongString *ls, linkPtr link)
 	else if(pstrcmpX(comm, 7, 'SIL'))
 		nSilence(link, ls);
 	else if(pstrcmpX(comm, 7, 'WAL')) //WALLOPS
-	{
-		pServerWALLOPSDataRec p;
-
-		LSStrLS(target, &tls);
-		LSAppend1(tls, ' ');
-		LSConcatLSAndLS(&tls, ls, &tls);
-
-		p.link=link;
-		p.username=from;
-		p.userhost=fromuser;
-		p.message=&tls;
-		p.ignore=0;
-		runPlugins(pServerWALLOPSMessage, &p);
-		
-		if(!p.ignore)
-		{
-			LSConcatStrAndStr("\pWALLOPS !", from, ls);
-			LSAppend2(*ls, '! ');
-			LSConcatLSAndLS(ls, &tls, ls);
-			SMPrefixLink(link, ls, (mainPrefs->wallopsToConsole?dsConsole:dsFrontWin));
-			SoundService(sndWallops, 0);
-		}
-	}
+		nWallops(link, ls, from, fromuser, target);
 	else if(pstrcmpX(comm, 5, 'ERR') || pstrcmpX(comm, 6, 'ERR')) //ERROR
-	{
-		pServerERRORDataRec p;
-		
-		LSConcatStrAndStr("\pERROR: ", target, &tls);
-		LSAppend1(tls, ' ');
-		LSConcatLSAndLS(&tls, ls, &tls);
-		SMPrefixLink(link, &tls, dsConsole);
-		
-		p.link=link;
-		p.message=ls;
-		runPlugins(pServerERRORMessage, &p);
-	}
+		nError(link, ls, target);
 	else
 	{
 unprocessed:
