@@ -178,6 +178,18 @@ static pascal OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler
 	return result;
 }
 
+static void ActivateShortcutWindow(WindowRef shortcutsWin)
+{
+	ControlRef itemCtrl;
+	ControlID item = { kShortcutItemSignature, 1};
+	
+	GetControlByID(shortcutsWin, &item, &itemCtrl);
+
+	ShowWindow(shortcutsWin);
+	SelectWindow(shortcutsWin);
+	
+	SetKeyboardFocus(shortcutsWin, itemCtrl, kControlFocusNextPart);
+}
 
 void DoShortcutsEditor(void)
 {
@@ -196,7 +208,7 @@ void DoShortcutsEditor(void)
 		//Undo the change to the count and select the shortcuts window.
 		gShortcutsWindowCount--;
 		if(gShortcutsWin)
-			SelectWindow(gShortcutsWin);
+			ActivateShortcutWindow(gShortcutsWin);
 		return;
 	}
 	
@@ -220,8 +232,7 @@ void DoShortcutsEditor(void)
 	
 	SetShortcutWindow(shortcutsWin, 0);
 	
-	ShowWindow(shortcutsWin);
-	SelectWindow(shortcutsWin);
+	ActivateShortcutWindow(shortcutsWin);
 	
 	gShortcutsWin = shortcutsWin;
 	
