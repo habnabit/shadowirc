@@ -27,4 +27,6 @@
 
 #define kDirSelKey CFSTR("DirSelMessage")
 
+#define kDCCSelectSaveLocKey CFSTR("DCCSelectSaveLocation")
+
 #endif
