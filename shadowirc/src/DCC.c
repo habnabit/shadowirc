@@ -632,8 +632,6 @@ static pascal char DCCPutFile(connectionPtr x, char forceSave)
 
 static pascal void StartDCCGet(connectionPtr x)
 {
-	dccGETDataPtr 	dd=(dccGETDataPtr)x->dcc->dccData;
-	
 	if(x->dcc->dccFlags == opening || x->dcc->dccFlags == open) //already open!!
 		return;
 	
@@ -883,8 +881,6 @@ pascal void DCCOpen(connectionPtr *x)
 	{
 		d->dccFlags=offered;
 		//Make a fake
-		cc->private_socket = 0;
-		cc->port = 0;
 		cc->refCon = (void*)++dccSENDRevCount;
 		
 		args[0] = 0;

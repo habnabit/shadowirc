@@ -85,7 +85,7 @@ typedef pascal void (*DCCInputFuncPtr)(connectionPtr conn);
 
 struct Connection {
 	CONST connectionPtr next;
-	long private_socket;
+	CONST long private_socket;
 	CONST short connType;
 	CONST short realConnType;
 	
