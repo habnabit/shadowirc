@@ -46,7 +46,7 @@ long lastInput, lastKey;
 char iwFront=0;
 char inputLocked = 0;
 
-static char MWNavKey(MWPtr mw, UInt32 modifiers, long message);
+static char MWNavKey(MWPtr mw, UInt32 modifiers, char c);
 
 pascal void ServerCommands(LongString *ls, linkPtr link);
 inline void pluginMWGotText(LongString *ls, MWPtr win);
@@ -304,9 +304,8 @@ pascal void UnlockInput(void)
 
 #pragma mark -
 
-static char MWNavKey(MWPtr mw, UInt32 modifiers, long message)
+static char MWNavKey(MWPtr mw, UInt32 modifiers, char c)
 {
-	char c = message % 256;
 	char cmd = (modifiers & cmdKey) == cmdKey;
 	char opt = (modifiers & optionKey) == optionKey;
 	
@@ -364,7 +363,7 @@ static void BackwordDel(WEReference we)
 	WEDelete(we);
 }
 
-pascal void Key(EventRecord *e, char dontProcess)
+void Key(EventRef event, char dontRepeat)
 {
 	char c;
 	LongString ls;
@@ -372,12 +371,21 @@ pascal void Key(EventRecord *e, char dontProcess)
 	Str255 s;
 	WEReference il;
 	MWPtr mw;
-	c=e->message & 0xFF;
+	char dontProcess;
+	UInt32 modifiers;
+	
+	GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifiers);
+	GetEventParameter(event, kEventParamKeyMacCharCodes, typeChar, NULL, sizeof(char), NULL, &c);
+	
+	dontProcess = !!(modifiers & cmdKey);
+	
+	if(dontRepeat && dontProcess)
+		return;
 	
 	mw = GetActiveMW();
 	
 	p.character=&c;
-	p.e = e;
+	p.event = event;
 	runPlugins(pKeyDownMessage, &p);
 	
 	il = ILGetWE();
@@ -387,19 +395,19 @@ pascal void Key(EventRecord *e, char dontProcess)
 	if(!c)
 		return;
 	
-	if((mw && MWNavKey(mw, e->modifiers, e->message)) || dontProcess)
+	if((mw && MWNavKey(mw, modifiers, c)) || dontProcess)
 		return;
 	
 	iwFront = true;
 	lastKey=now;
-	if((c==3) && !(e->modifiers & controlKey)) //enter key
+	if((c==3) && !(modifiers & controlKey)) //enter key
 		c=13;
 	
 	switch(c)
 	{
 		case 13:	//return
 			SoundService(sndUserHitReturn, 0);
-			GetLine((e->modifiers & optionKey)==optionKey, CurrentTarget.mw);
+			GetLine((modifiers & optionKey)==optionKey, CurrentTarget.mw);
 			mbInput = false;
 			break;
 		
@@ -409,7 +417,7 @@ pascal void Key(EventRecord *e, char dontProcess)
 			long p1, p2;
 			
 			mbInput = true;
-			if(e->modifiers & shiftKey)
+			if(modifiers & shiftKey)
 			{
 				if(--mbnum < 0)
 				{
@@ -476,17 +484,17 @@ pascal void Key(EventRecord *e, char dontProcess)
 			break;
 		
 		case 30:
-			if(!mainPrefs->optionToMoveInputLine || (e->modifiers & optionKey)==optionKey)
+			if(!mainPrefs->optionToMoveInputLine || (modifiers & optionKey)==optionKey)
 				RecallLineUp();
 			else
-				WEKey(c, e->modifiers, il);
+				WEKey(c, modifiers, il);
 			break;
 		
 		case 31:
-			if(!mainPrefs->optionToMoveInputLine || (e->modifiers & optionKey)==optionKey)
+			if(!mainPrefs->optionToMoveInputLine || (modifiers & optionKey)==optionKey)
 				RecallLineDown();
 			else
-				WEKey(c, e->modifiers, il);
+				WEKey(c, modifiers, il);
 			break;
 		
 		case 0:
@@ -494,7 +502,7 @@ pascal void Key(EventRecord *e, char dontProcess)
 			break;
 		
 		default:
-			WEKey(c, e->modifiers, il);
+			WEKey(c, modifiers, il);
 			WESelView(il);
 	}
 }

@@ -32,7 +32,7 @@ pascal void ProcessLine(LongString* ls, char stackup, char action, MWPtr mw);
 pascal void LockInput(void);
 pascal void UnlockInput(void);
 
-pascal void Key(EventRecord *e, char dontProcess);
+void Key(EventRef event, char dontRepeat);
 pascal void parseShortcutText(ConstStr255Param s);
 pascal void processPaste(MWPtr mw, char dragAndDrop);
 #ifdef _IRCChannels

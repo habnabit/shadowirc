@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x02000007
+#define _ShadowIRC_API_Version_ 0x02000008
 
 #include <Carbon/Carbon.h>
 #include <netinet/in.h>
@@ -1018,7 +1018,7 @@ typedef struct pInputMessageDataRec {
 typedef struct pKeyDownDataRec {
 	char *character;					//The character pressed. Set to 0 to stop ShadowIRC from processing it.
 
-	EventRecord *e;					//The event record for the keypress.
+	EventRef event;					//The event record for the keypress.
 } pKeyDownDataRec, *pKeyDownDataPtr;
 
 /*	pNumericCommandDataRec

@@ -54,7 +54,6 @@
 #include "ApplBase.h"
 
 static void doTCPEvent(CEPtr message);
-static void ApplEvents(EventRecord *e);
 static void ApplExit(void);
 
 static void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord);
@@ -286,6 +285,8 @@ CantInstallDialogHandler:
 		if(link->serverStatus==S_CONN)
 			DoSignoff(link, reason);
 	
+	QuitApplicationEventLoop();
+	
 	QuitRequest = 1;
 	
 	return QuitRequest;
@@ -425,6 +426,11 @@ static void Timer5(EventLoopTimerRef timer, void* data)
 	UpdateStatusLine();
 }
 
+static void Timer1(EventLoopTimerRef timer, void* data)
+{
+	GetDateTime(&now);
+}
+
 static void TimerTick(EventLoopTimerRef timer, void* data)
 {
 	//Stuff we need to do periodically when we're in the foreground
@@ -459,17 +465,19 @@ static void NetworkProcess(EventLoopTimerRef timer, void* data)
 static void InitTimers()
 {
 	EventLoopRef mainLoop = GetMainEventLoop();
-	EventLoopTimerUPP mtu, t20u, t5u, AsyncSoundTimerProc, tick, net;
+	EventLoopTimerUPP mtu, t20u, t5u, t1u, AsyncSoundTimerProc, tick, net;
 	EventLoopTimerRef timer;
 	
 	mtu = NewEventLoopTimerUPP(MinuteTimer);
 	t20u = NewEventLoopTimerUPP(Timer20);
 	t5u = NewEventLoopTimerUPP(Timer5);
+	t1u = NewEventLoopTimerUPP(Timer1);
 	tick = NewEventLoopTimerUPP(TimerTick);
 	
 	InstallEventLoopTimer(mainLoop, 60 * kEventDurationSecond, 60 * kEventDurationSecond, mtu, NULL, &timer);
 	InstallEventLoopTimer(mainLoop, 20 * kEventDurationSecond, 20 * kEventDurationSecond, t20u, NULL, &timer);
 	InstallEventLoopTimer(mainLoop, 5 * kEventDurationSecond, 5 * kEventDurationSecond, t5u, NULL, &timer);
+	InstallEventLoopTimer(mainLoop, 1 * kEventDurationSecond, 1 * kEventDurationSecond, t1u, NULL, &timer);
 	InstallEventLoopTimer(mainLoop, TicksToEventTime(1), TicksToEventTime(1), tick, NULL, &timer);
 	
 	AsyncSoundTimerProc = NewEventLoopTimerUPP(AsyncSoundCleanup);
@@ -538,6 +546,17 @@ static OSStatus EventHandler(EventHandlerCallRef handlerCallRef, EventRef event,
 					result = noErr;
 					break;
 				}
+			}
+			break;
+		}
+		
+		case kEventClassKeyboard:
+		{
+			switch(eventKind)
+			{
+				case kEventRawKeyRepeat:
+				case kEventRawKeyDown:
+					Key(event, eventKind == kEventRawKeyRepeat);
 			}
 			break;
 		}
@@ -630,44 +649,9 @@ static void doTCPEvent(CEPtr c)
 	conn->InputFunc(c, conn);
 }
 
-static void ApplEvents(EventRecord *e)
-{
-	switch(e->what)
-	{
-		case kHighLevelEvent:
-			AEProcessAppleEvent(e);
-			break;
-			
-		case autoKey:
-			if(!(e->modifiers & cmdKey))
-		case keyDown:
-				Key(e, !!(e->modifiers & cmdKey));
-			break;
-			
-		case mouseDown:
-		{
-			short i;
-			WindowPtr p;
-			
-			i=FindWindow(e->where, &p);
-			if(i == inMenuBar)
-				MenuSelect(e->where);
-			break;
-		}
-	}
-}
-
 pascal void ApplRun(void)
 {
-	EventRecord e;
-	
-	while(!QuitRequest)
-	{
-		WaitNextEvent(everyEvent, &e, 60, mouseRgn);
-		GetDateTime(&now);
-		ApplEvents(&e);
-	}
-	
+	RunApplicationEventLoop();
 	ApplExit();
 }
 
@@ -685,6 +669,8 @@ static void InitLocalEventHandlers()
 		{kEventClassWindow, kEventWindowActivated},
 		{kEventClassWindow, kEventWindowDeactivated},
 		{kEventClassWindow, kEventWindowHandleContentClick},
+		{kEventClassKeyboard, kEventRawKeyDown},
+		{kEventClassKeyboard, kEventRawKeyRepeat},
 	};
 	
 	MyIAEH(kEventClassApplication, kEventAppActivated, DoResumeEvent);

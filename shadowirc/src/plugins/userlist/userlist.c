@@ -1812,7 +1812,7 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			shadowircColors = sidrIN->shadowircColors;
 			
 			l=((pVersionCheckDataPtr)sidrIN->messageData)->version;
-			if(l<0x02000007) //2.0a7
+			if(l<0x02000008) //2.0a8
 			{
 				((pVersionCheckDataPtr)sidrIN->messageData)->version = pVersionShadowIRCTooOld;
 				displayOldVersionMsg();

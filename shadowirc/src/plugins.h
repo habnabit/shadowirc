@@ -344,7 +344,7 @@ typedef struct pInputMessageDataRec{
 typedef struct pKeyDownDataRec {
 	char *character;					//The character pressed. Set to 0 to stop ShadowIRC from processing it.
 	
-	EventRecord *e;					//The event record for the keypress.
+	EventRef event;					//The event record for the keypress.
 } pKeyDownDataRec, *pKeyDownDataPtr;
 
 /*	pNumericCommandDataRec
