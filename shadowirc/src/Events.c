@@ -41,6 +41,10 @@
 #include "CommandsMenu.h"
 #include "IRCInput.h"
 
+static void ServiceGetTypesHandler(EventRef theEvent, MWPtr mw);
+static void ServiceCopyHandler(EventRef theEvent, MWPtr mw);
+static void ServicePasteHandler(EventRef theEvent, MWPtr mw);
+
 static void DoAbout(void);
 
 static void cascade2(WindowPtr w);
@@ -84,6 +88,114 @@ static OSStatus MWDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef th
 	return myErr;
 }
 
+static const OSType appServiceDataTypes[] =
+{
+    'TEXT'
+};
+
+static void ServiceGetTypesHandler(EventRef theEvent, MWPtr mw)
+{
+	CFMutableArrayRef copyTypes, pasteTypes;
+	short index, count;
+	SInt32 selStart, selEnd;
+	Boolean textSelection = FALSE;
+	
+	GetEventParameter (theEvent, kEventParamServiceCopyTypes, typeCFMutableArrayRef, NULL, sizeof (CFMutableArrayRef), NULL, &copyTypes);
+	GetEventParameter (theEvent, kEventParamServicePasteTypes, typeCFMutableArrayRef, NULL, sizeof (CFMutableArrayRef), NULL, &pasteTypes);
+	
+	WEGetSelection(&selStart, &selEnd, mw->we);
+	if (selStart != selEnd) textSelection = TRUE;
+	
+	count = sizeof (appServiceDataTypes) / sizeof (OSType);
+	for ( index = 0; index < count; index++ ) 
+	{
+		CFStringRef type = 
+			    CreateTypeStringWithOSType (appServiceDataTypes[index]);
+		if (type)
+		{
+			if (textSelection) CFArrayAppendValue (copyTypes, type);
+			CFArrayAppendValue (pasteTypes, type);
+			CFRelease (type);
+		}
+	}
+}
+
+static void ServiceCopyHandler(EventRef theEvent, MWPtr mw)
+{
+	SInt32 selStart, selEnd;
+	
+	WEGetSelection(&selStart, &selEnd, mw->we);
+	
+	if (selStart != selEnd) {
+		ScrapRef    currentScrap, specificScrap;
+		short       count, index;
+		
+		WECopy (mw->we);
+		
+		GetCurrentScrap (&currentScrap);
+		GetEventParameter (theEvent, kEventParamScrapRef, typeScrapRef, NULL, sizeof(ScrapRef), NULL, &specificScrap);
+		
+		count = sizeof (appServiceDataTypes) / sizeof (OSType);
+		for (index = 0; index <count; index++) {
+			Size        byteCount;
+			OSStatus    err;
+			
+			err = GetScrapFlavorSize(currentScrap, appServiceDataTypes[index], &byteCount); 
+			if (err == noErr) {
+				void*   buffer;
+				
+				buffer = malloc (byteCount);
+				
+				if (buffer != NULL) {
+					err = GetScrapFlavorData(currentScrap, appServiceDataTypes[index], &byteCount, buffer);
+					if (err == noErr)
+					    PutScrapFlavor(specificScrap, appServiceDataTypes[index], 0, byteCount, buffer);
+					
+					free (buffer);
+				}
+			}
+		}
+	}
+}
+
+static void ServicePasteHandler(EventRef theEvent, MWPtr mw)
+{
+	ScrapRef   specificScrap, currentScrap;
+	CFIndex     index, count;
+	
+	GetEventParameter (theEvent, kEventParamScrapRef, typeScrapRef, NULL, sizeof (ScrapRef), NULL, &specificScrap);
+	
+	ClearCurrentScrap ();
+	GetCurrentScrap (&currentScrap);
+	count = sizeof (appServiceDataTypes) / sizeof (OSType);
+	
+	for (index = 0; index <count; index++)
+	{
+		Size        byteCount;
+		OSStatus    err;
+		
+		err = GetScrapFlavorSize(specificScrap, appServiceDataTypes[index], &byteCount);
+
+		if (err == noErr) 
+		{
+			void*   buffer = malloc(byteCount);
+			
+			if (buffer != NULL) 
+			{
+				err = GetScrapFlavorData(specificScrap, appServiceDataTypes[index], &byteCount, buffer);
+				
+				if (err == noErr) 
+					PutScrapFlavor(currentScrap, appServiceDataTypes[index], 0, byteCount, buffer);
+
+				free (buffer);
+			}
+		}
+	}
+	
+	WEPaste(mw->we);
+	processPaste(mw, FALSE);
+}
+
 static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
@@ -96,6 +208,28 @@ static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef the
 	
 	switch(eventClass)
 	{
+		case kEventClassService:
+		{
+			switch(eventKind)
+			{
+				case kEventServiceGetTypes:
+					ServiceGetTypesHandler(theEvent, mw);
+					result = noErr;
+					break;
+				
+				case kEventServiceCopy:
+					ServiceCopyHandler(theEvent, mw);
+					result = noErr;
+					break;
+				
+				case kEventServicePaste:
+					ServicePasteHandler(theEvent, mw);
+					result = noErr;
+					break;
+			}
+			break;
+		}
+			
 		case kEventClassCommand:
 		{
 			GetEventParameter(theEvent, kEventParamDirectObject, typeHICommand, NULL, sizeof(hiCommand), NULL, &hiCommand);
@@ -299,6 +433,9 @@ void MWInstallEventHandlers(MWPtr mw)
 	static ControlActionUPP caction = NULL;
 	const EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
 	const EventTypeSpec commandType[] = {
+			{kEventClassService, kEventServiceGetTypes},
+			{kEventClassService, kEventServiceCopy}, 
+			{kEventClassService, kEventServicePaste}, 
 			{kEventClassCommand, kEventCommandUpdateStatus},
 			{kEventClassCommand, kEventProcessCommand}
 	};
