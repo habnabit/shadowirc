@@ -995,7 +995,7 @@ static ULI ULINew(WindowPtr w, long type)
 		dbColumn.headerBtnDesc.version= kDataBrowserListViewLatestHeaderDesc,
 		dbColumn.headerBtnDesc.minimumWidth = 55;
 		dbColumn.headerBtnDesc.maximumWidth = 500;
-		dbColumn.headerBtnDesc.titleOffset = 0;
+		dbColumn.headerBtnDesc.titleOffset = -7;
 		dbColumn.headerBtnDesc.titleString = CFSTR("User");
 		dbColumn.headerBtnDesc.initialOrder = kDataBrowserOrderIncreasing;
 		dbColumn.headerBtnDesc.btnFontStyle.flags = kControlUseSizeMask | kControlUseFontMask;
