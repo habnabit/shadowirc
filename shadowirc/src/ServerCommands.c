@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -136,10 +136,9 @@ static pascal void nNotice(linkPtr link, LongString *ls, StringPtr fromuser, Str
 				pstrcpy(from, dispFrom);
 				if(p.displayUserHost)
 				{
-					pstrcpy(fromuser, &dispFrom[dispFrom[0]+1]);
-					dispFrom[dispFrom[0]+1] = '[';
-					dispFrom[0]+=fromuser[0] + 2;
-					dispFrom[dispFrom[0]] = ']';
+					SAppend1(dispFrom, '[');
+					pstrcat(dispFrom, fromuser, dispFrom);
+					SAppend1(dispFrom, ']');
 				}
 			}
 			
@@ -185,12 +184,11 @@ static pascal void nPrivmsg(linkPtr link, LongString *ls, StringPtr fromuser, St
 	Str255 dispFrom;
 	pServerPRIVMSGDataRec p;
 	MWPtr mw;
-	unsigned char nickStyle[5];
-	unsigned char textStyle[5];
 	unsigned char p_nickStyle[10];
 	unsigned char p_textStyle[10];
-	char 	ign=IsIgnoredNickUser(from, fromuser);
+	char 	ign;
 	
+	ign = IsIgnoredNickUser(from, fromuser);
 	if(!doCTCP(from, fromuser, target, ls, false, ign, link))
 	{
 		p.fromServer=pos('.', from)>0;
@@ -206,29 +204,26 @@ static pascal void nPrivmsg(linkPtr link, LongString *ls, StringPtr fromuser, St
 		p.nickStyleP = p_nickStyle;
 		p.nickStyleP = p_nickStyle;
 		
-		if((p.targChan = ((p.chan=ChFind(target, link))!=0)) == 0) //not channel
+		if(!(p.targChan = (p.chan = ChFind(target, link)) != 0)) //not channel
 		{
 			if((p.targMe = pstrcasecmp(target, link->CurrentNick)) != 0)
 			{
 				if(mainPrefs->autoQuery && mainPrefs->autoQueryOpen != aqOutgoing)
 					p.autoQuery = 1;
 
-				*(long*)p_nickStyle = *(long*)nickStyle=
-				*(long*)p_textStyle = *(long*)textStyle=0x030F0802; //msg
+				*(long*)p_nickStyle = *(long*)p_textStyle = 0x030F0802; //msg
 			}
 			else
 			{
 				p.targOther=1;
-				*(short*)p_nickStyle = *(short*)nickStyle=
-				*(short*)p_textStyle = *(short*)textStyle=0x010E; //normal
+				*(short*)p_nickStyle = *(short*)p_textStyle = 0x010E; //normal
 			}
 		}
 		else //channel
 		{
 			p.targMe = 0;
 			
-			*(short*)p_nickStyle = *(short*)nickStyle=
-			*(short*)p_textStyle = *(short*)textStyle=0x010E; //normal
+			*(short*)p_nickStyle = *(short*)p_textStyle = 0x010E; //normal
 		}
 		
 		p.displayUserHost = p.targMe && mainPrefs->showUserHostsWithMsgs;
@@ -237,15 +232,12 @@ static pascal void nPrivmsg(linkPtr link, LongString *ls, StringPtr fromuser, St
 		runPlugins(pServerPRIVMSGMessage, &p);
 		if(!p.ignored)
 		{
-			char changedNickStyle = !pstrcmp(nickStyle, p_nickStyle);
-
 			pstrcpy(from, dispFrom);
 			if(p.displayUserHost)
 			{
-				pstrcpy(fromuser, &dispFrom[dispFrom[0]+1]);
-				dispFrom[dispFrom[0]+1] = '[';
-				dispFrom[0]+=fromuser[0] + 2;
-				dispFrom[dispFrom[0]] = ']';
+				SAppend1(dispFrom, '[');
+				pstrcat(dispFrom, fromuser, dispFrom);
+				SAppend1(dispFrom, ']');
 			}
 			
 			if(p.targChan)
@@ -347,7 +339,7 @@ static pascal void nJoin(linkPtr link, LongString *ls, StringPtr from, StringPtr
 
 	if(!p.isMe && !p.dontDisplay)
 	{
-		LSStrCat(5, ls, from, "\p (", fromuser, "\p) joined ", p.channel->chName);
+		LSParamString(ls, GetIntStringPtr(spServer, sNickJoinedChannel), from, fromuser, p.channel->chName, 0);
 		
 		SMPrefix(ls, dsNowhere);
 		ChMsg(p.channel, ls);
@@ -462,11 +454,11 @@ static pascal void nTopic(linkPtr link, LongString *ls, StringPtr from, StringPt
 	p.channel=ChFind(target, link);
 
 	p.link=link;
-	p.username=from;
-	p.userhost=fromuser;
-	p.channelName=target;
-	p.newtopic=ls;
-	p.isMe=pstrcmp(from, link->CurrentNick);
+	p.username = from;
+	p.userhost = fromuser;
+	p.channelName = target;
+	p.newtopic = ls;
+	p.isMe = pstrcmp(from, link->CurrentNick);
 	p.dontDisplay = false;
 	p.dontSound = false;
 	runPlugins(pServerTOPICMessage, &p);
@@ -788,10 +780,11 @@ pascal void doMODE(linkPtr link, ConstStringPtr channel, StringPtr modeChange, C
 				break;
 			case 'l':
 				ch->modes[modeL] = up;
-				goto mK;
+				
+			if(0) //skip the next instr without a goto
 			case 'k':
 				ch->modes[modeK] = up;
-mK:				
+
 				if(up)
 				{
 					checkLimitKey(link, modeChange[x], ch, modeChange);
@@ -847,7 +840,7 @@ static pascal void nMode(linkPtr link, LongString *ls, StringPtr from, StringPtr
 	LongString tls;
 	
 	LSMakeStr(*ls);
-	LSStrCat(6, &tls, "\pMode change \"", ls->data, "\p\" on ", target, "\p by ", from);
+	LSParamString(&tls, GetIntStringPtr(spServer, sModeChange), ls->data, target, from, 0);
 
 	doMODE(link, target, ls->data, from, &tls);
 }
@@ -938,7 +931,7 @@ static pascal void nInvite(linkPtr link, LongString *ls, StringPtr from, StringP
 	if(!p.dontDisplay)
 	{
 		LSMakeStr(*ls);
-		LSConcatStrAndStrAndStr(from, "\p invites you to channel ", ls->data, &tls);
+		LSParamString(&tls, GetIntStringPtr(spServer, sInvitesYouToChannel), from, ls->data, 0, 0);
 		SMPrefixLink(link, &tls, dsFrontWin);
 	}
 	
@@ -1048,7 +1041,7 @@ static pascal void nPong(linkPtr link, StringPtr from)
 	LongString tls;
 	pServerPONGDataRec p;
 	
-	LSConcatStrAndStr("\pGot PONG from ", from, &tls);
+	LSParamString(&tls, GetIntStringPtr(spServer, sGotPongFor), from, 0, 0, 0);
 	SMPrefixLink(link, &tls, dsConsole);
 	p.link=link;
 	p.source=from;

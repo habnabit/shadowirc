@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -19,8 +19,8 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-unsigned char myVersion[] = "\p1.1b2";
-#define SIVersion 0x01010045
+unsigned char myVersion[] = "\p1.1b3r1";
+#define SIVersion 0x01010046
 
 #include "IRCGlobals.h"
 #include "utils.h"

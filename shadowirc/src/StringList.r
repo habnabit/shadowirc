@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -92,6 +92,10 @@ resource 'STR#' (253, "Server Messages", locked, preload)
 		"Inviting ^0 to channel ^1",
 		"Topic for ^0: ",
 		"^0 is already on channel ^1",
+		"^0 (^1) joined ^2",
+		"Mode change \"^0\" on ^1 by ^2",
+		"Got PONG from ^0",
+		"^0 invites you to channel ^1",
 	};
 };
 
