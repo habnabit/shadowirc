@@ -1335,7 +1335,6 @@ static pascal void DCCGetLineChat(connectionPtr conn)
 	long nn;
 	LongString ls;
 	LongString cookie;
-	char b;
 	pDCCIncomingChatDataRec p;
 	
 	if((nn = ConnGetUntil(conn, (Ptr)&ls.data[1], '\n', 512)) != -1)
