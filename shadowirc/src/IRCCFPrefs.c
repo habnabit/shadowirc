@@ -111,6 +111,7 @@ OSStatus ReadDirURLRef(CFStringRef prefName, FSRef *ref)
 {
 	OSStatus err = noErr;
 	CFStringRef urlString;
+	FSRef localRef;
 	
 	if(ref == NULL)
 		return paramErr;	// break out here, stupid to go on.
@@ -124,7 +125,15 @@ OSStatus ReadDirURLRef(CFStringRef prefName, FSRef *ref)
 		url = CFURLCreateWithString(kCFAllocatorDefault, urlString, NULL);
 		
 		if(url)
-			CFURLGetFSRef(url, ref);
+		{
+			if(CFURLGetFSRef(url, &localRef))
+				BlockMoveData(&localRef, ref, sizeof(FSRef));
+			else
+			{
+				ref = NULL;
+				err = paramErr;
+			}
+		}
 		
 		CFRelease(urlString);
 		CFRelease(url);
