@@ -387,18 +387,20 @@ static char SplitCTCPCommand(const LongString *ls, Str255 cmd, LongString *text)
 	if(ls->data[1] != 1)
 		return 0;
 	
+	//endOfCTCP will now contain the index of the closing ^A (or one character past the end of the string if there's no closing ^A)
 	endOfCTCP = LSPosCustom(ctrlASearchString, ls, 2);
 	if(!endOfCTCP)
-		endOfCTCP = ls->len;
+		endOfCTCP = ls->len + 1;
 	
+	//endOfCmd will now contain the index of the space separating the command from the data (or the index of the trailing ^A)
 	endOfCmd = LSPosChar(' ', ls);
-	if(!endOfCmd)
-		endOfCmd = endOfCTCP + 1;
+	if(!endOfCmd || endOfCmd > endOfCTCP)
+		endOfCmd = endOfCTCP;
 	
 	LSCopyString(ls, 2, endOfCmd - 2, cmd);
 	ucase(cmd);
 	
-	LSCopy(ls, endOfCmd + 1, maxLSlen, text);
+	LSCopy(ls, endOfCmd + 1, endOfCTCP - (endOfCmd + 1), text);
 	CTCPUnquoteLS(text);
 	
 	return 1;
