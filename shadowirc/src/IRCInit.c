@@ -180,8 +180,6 @@ inline void SetupHelpMenu(void)
 
 pascal void ApplicationInit(void)
 {
-	short i;
-	Str255 s;
 	DialogPtr splashDlg;
 	LongString ls;
 	
@@ -246,15 +244,7 @@ pascal void ApplicationInit(void)
 	CheckPreferences();
 	DCCTypeInit();
 	
-	i=InitConnections();
-	if(!i)
-		allowConnections=1;
-	else
-	{
-		NumToString(i, s);
-		ParamText(s, "\p", "\p", "\p");
-		Alert(129, 0);
-	}
+	InitTCP();
 
 	launchTime = idleTime = lastKey = lastInput = now;
 	ISOEncode=*GetResource('Tabl', 256);

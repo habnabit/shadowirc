@@ -37,7 +37,6 @@
 #include "Inputline.h"
 #include "IRCInput.h"
 #include "windowList.h"
-#include "TCP.h"
 #include "IRCAux.h"
 #include "IRCCommands.h"
 #include "InetConfig.h"
@@ -741,26 +740,11 @@ inline void HitFontsMenu(short item)
 
 pascal void MenuConnectionList(short item)
 {
-	short i;
-	Str255 s;
 	linkPtr link;
 	
 	if(item)
 	{
-		if(!allowConnections)
-		{
-			i=InitConnections();
-			if(i)
-			{
-				NumToString(i, s);
-				ParamText(s, "\p", "\p", "\p");
-				Alert(129, 0);
-				allowConnections=0;
-				return;
-			}
-			else
-				allowConnections=1;
-		}
+		InitTCP();
 		
 		link = firstLink;
 		while(--item)
