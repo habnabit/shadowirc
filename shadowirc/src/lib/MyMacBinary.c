@@ -90,8 +90,8 @@ pascal void CatInfo2MBHeader(CInfoPBRec *pb, MBIIHeaderPtr header)
 	int i;
 	
 	folder = (pb->hFileInfo.ioFlAttrib & 0x10) != 0;
-	MFillLong(header, sizeof(MBIIHeader), 0);
-	MFill(&start, sizeof(start), 0);
+	bzero(header, sizeof(MBIIHeader));
+	bzero(&start, sizeof(start));
 	header->version = folder;
 	header->versionII = 130 + folder;
 	header->miniversionII = 129 + folder;
