@@ -46,7 +46,7 @@ void ILAddHistory(inputAreaDataPtr iad, LongString *line);
 
 #pragma mark Init/Destroy
 void IADDispose(inputAreaDataPtr iad);
-inputAreaDataPtr IADNew(WindowPtr window, Rect textRect, InputControlTextProc inputProc);
+inputAreaDataPtr IADNew(WindowPtr window, Rect textRect, InputControlTextProc inputProc, char globalIAD);
 
 
 void IADActivate(inputAreaDataPtr iad, char activate);

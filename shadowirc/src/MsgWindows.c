@@ -1234,7 +1234,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 					Rect zeroRect = {0, 0, 0, 0};
 					MWNewPane(h, mwInputPane, mwPaneBottom, 32, -1);
 					
-					h->inputData = IADNew(h->w, zeroRect, NewKey);
+					h->inputData = IADNew(h->w, zeroRect, NewKey, false);
 				}
 				else
 					h->inputData = 0;

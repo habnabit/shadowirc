@@ -36,6 +36,8 @@ struct inputAreaData {
 	WindowPtr window;
 	
 	CLPtr hist;
+	
+	char globalIAD;
 };
 
 #pragma mark Accessors
@@ -235,7 +237,10 @@ static OSStatus InputLineControlTextEventHandler(EventHandlerCallRef handlerCall
 
 OSStatus IADHandleTextEvent(inputAreaDataPtr iad, EventRef event)
 {
-	return SendEventToControl(event, iad->inputControl);
+	if(iad->globalIAD)
+		return SendEventToControl(event, iad->inputControl);
+	else
+		return eventNotHandledErr;
 }
 
 static const EventTypeSpec iadControlEventTypes[] = {
@@ -319,7 +324,7 @@ static void IADSetInputStyle(inputAreaDataPtr iad)
 	err = TXNSetTypeAttributes(iad->il, sizeof(attrs) / sizeof(TXNTypeAttributes), attrs, kTXNStartOffset, kTXNEndOffset);
 }
 
-inputAreaDataPtr IADNew(WindowPtr window, Rect textRect, InputControlTextProc inputProc)
+inputAreaDataPtr IADNew(WindowPtr window, Rect textRect, InputControlTextProc inputProc, char globalIAD)
 {
 	ControlRef inputLineControl;
 	Boolean b;
@@ -337,6 +342,7 @@ inputAreaDataPtr IADNew(WindowPtr window, Rect textRect, InputControlTextProc in
 	iad->inputControl = inputLineControl;
 	iad->window = window;
 	iad->inputProc = inputProc;
+	iad->globalIAD = globalIAD;
 	
 	iad->hist = CLNew(MAXHISTLINES);
 	

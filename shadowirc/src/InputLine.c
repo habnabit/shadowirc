@@ -1156,7 +1156,7 @@ void OpenInputLine()
 			textRect.right = (mainPrefs->inputLoc.right - mainPrefs->inputLoc.left) - 10; //local coord
 			textRect.bottom = (mainPrefs->inputLoc.bottom - mainPrefs->inputLoc.top); //local coord
 			
-			inputLine.inputData = IADNew(inputLine.w, textRect, NewKey);
+			inputLine.inputData = IADNew(inputLine.w, textRect, NewKey, true);
 			
 			statusControlRect.top = 0;
 			statusControlRect.left = 0;
