@@ -427,7 +427,6 @@ static void Timer5(EventLoopTimerRef timer, void* data)
 {
 #pragma unused(timer, data)
 	checkConnections();
-	UpdateStatusLine();
 }
 
 static void Timer1(EventLoopTimerRef timer, void* data)
