@@ -854,8 +854,17 @@ pascal void DCCOpen(connectionPtr *x)
 				* DCCCreate sets cc->localip to local IP address
 				* based off of connected sockfd
 			*/
-  			getnameinfo((struct sockaddr *)cc->localsas, cc->localsas->ss_len, hbuf, sizeof(hbuf), NULL, 0, NI_NUMERICHOST);
-  			CopyCStringToPascal(hbuf, ipa);
+			switch(cc->localsas->ss_family)
+			{
+				case AF_INET:
+					sprintf(hbuf, "%u", ((struct sockaddr_in *)cc->localsas)->sin_addr.s_addr);
+					CopyCStringToPascal(hbuf, ipa);
+					break;
+				default:
+					getnameinfo((struct sockaddr *)cc->localsas, cc->localsas->ss_len, hbuf, sizeof(hbuf), NULL, 0, NI_NUMERICHOST);
+					CopyCStringToPascal(hbuf, ipa);
+					break;
+			}
 			ntohl_str(cc->port, pn);
 			args[0]=0;
 			
