@@ -1,6 +1,6 @@
 /*
 	ShadowIRC Userlist
-	Copyright (C) 1997-2000 John Bafford
+	Copyright (C) 1997-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -26,13 +26,10 @@
 #include "headers.h"
 #endif
 
-#pragma internal on
-
-//extern CIconHandle gSortForwardIcon, gSortReverseIcon;
 extern CIconHandle gSortForwardIcon, gSortReverseIcon;
 
-pascal GrafPtr ULISetupDrawing(ULI ul);
-pascal void DrawWindowHeader(Rect *r, long state);
+GrafPtr ULISetupDrawing(ULI ul);
+void DrawWindowHeader(Rect *r, long state);
 
 #if enableinline
 INLINE void ULIFinishDrawing(ULI ul, GrafPtr gp) {
@@ -43,23 +40,23 @@ INLINE void ULIFinishDrawing(ULI ul, GrafPtr gp) {
 INLINE void ULIFinishDrawing(ULI ul, GrafPtr gp);
 #endif
 
-pascal void ListSetWTitle(ULI ul);
+void ListSetWTitle(ULI ul);
 
-pascal void ListHeader(ULI ul);
-pascal void ListDrawUser(ULI ul, int num, short po);
-pascal char ListCanDraw(ULI ul, long num);
-pascal void ListDrawOne(ULI ul, long num);
-pascal void ListDrawOneUser(ULI ul, UserListPtr u);
-pascal void ListDraw(ULI ul);
-pascal void ListGenerate(ULI ul, channelPtr ch);
-pascal char ListSortPart(ULI ul, MyList *one, MyList *two);
-pascal void ListSort(ULI ul, char locked);
-pascal void ListTrash(ULI ul);
-pascal void ListAdd(ULI ul, UserListPtr u);
-pascal void ListDel(ULI ul, UserListPtr u);
-pascal char ListDelName(ULI ul, Str255 nick);
-pascal long ListFind(ULI ul, UserListPtr u);
-pascal char ListResortInd(ULI ul, int num);
+void ListHeader(ULI ul);
+void ListDrawUser(ULI ul, int num, short po);
+char ListCanDraw(ULI ul, long num);
+void ListDrawOne(ULI ul, long num);
+void ListDrawOneUser(ULI ul, UserListPtr u);
+void ListDraw(ULI ul);
+void ListGenerate(ULI ul, channelPtr ch);
+char ListSortPart(ULI ul, MyList *one, MyList *two);
+void ListSort(ULI ul, char locked);
+void ListTrash(ULI ul);
+void ListAdd(ULI ul, UserListPtr u);
+void ListDel(ULI ul, UserListPtr u);
+char ListDelName(ULI ul, Str255 nick);
+long ListFind(ULI ul, UserListPtr u);
+char ListResortInd(ULI ul, int num);
 
 
 #endif

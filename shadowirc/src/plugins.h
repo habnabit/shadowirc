@@ -228,7 +228,7 @@ struct ShadowIRCDataRecord;
 
 /* plugsPtr
 */
-typedef pascal void(*pluginMain)(struct ShadowIRCDataRecord*);
+typedef void(*pluginMain)(struct ShadowIRCDataRecord*);
 typedef char CMArray[numMessages + (4 - (numMessages%4))]; //keeps array size divisible by four.
 typedef struct plugsRec plugsRec, *plugsPtr;
 struct plugsRec {
@@ -240,6 +240,7 @@ struct plugsRec {
 	short resFileRefNum;			//The File Manager refnum of your resource fork.
 	short idleThreshold;				//If you're recieving idle messages, how often to get them (minimally), in ticks.
 	CMArray captureMessages;	//The messages your plugin listens for.
+	CFBundleRef bundle;
 	
 	plugsPtr next;
 };

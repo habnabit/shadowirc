@@ -1,6 +1,6 @@
 /*
 	ShadowIRC Userlist
-	Copyright (C) 1997-2000 John Bafford
+	Copyright (C) 1997-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -26,16 +26,14 @@
 #include "ShadowIRC.h"
 #endif
 
-#pragma internal on
-
-#define scrollbarWidth 16
+enum { scrollbarWidth = 16 };
 
 #define enableinline 0
 
 #if enableinline
 	#define INLINE inline
 #else
-	#define INLINE pascal
+	#define INLINE
 #endif
 
 typedef struct MyList {
@@ -52,12 +50,6 @@ typedef struct UserList {
 	long num;
 	MyList u[1];
 } ulRec, *ulPtr, **ulHand;
-
-#if __POWERPC__
-	#define APPEARANCE11 hasAppearance11
-#else
-	#define APPEARANCE11 0
-#endif
 
 enum ulType {
 	ulGlobal = 'ulGl',
@@ -124,21 +116,16 @@ enum {
 extern ShadowIRCDataRecord* sidr;
 extern prefsPtr mainPrefs;
 extern RGBColor *shadowircColors;
-extern char hasAppearance, hasAppearance11;
 extern short genevaNum;
 extern int line;
 
 extern const RGBColor white, black, MedGrey, MDkGrey;
 
-#if __POWERPC__
-	#define PPC 1
-#else
-	#define PPC 0
-#endif
+#define PPC 1
 
-#define WInvalRect(w, r) {if(PPC && hasAppearance11)InvalWindowRect(w, r);else{GrafPtr g;GetPort(&g);if(g==w)InvalRect(r);else{SetPort(w);InvalRect(r);SetPort(g);}}}
-#define WInvalRgn(w, r) {if(PPC && hasAppearance11)InvalWindowRgn(w, r);else{GrafPtr g;GetPort(&g);if(g==w)InvalRgn(r);else{SetPort(w);InvalRgn(r);SetPort(g);}}}
-#define WValidRect(w, r) {if(PPC && hasAppearance11)ValidWindowRect(w, r);else{GrafPtr g;GetPort(&g);if(g==w)ValidRect(r);else{SetPort(w);ValidRect(r);SetPort(g);}}}
-#define WValidRgn(w, r) {if(PPC && hasAppearance11)ValidWindowRgn(w, r);else{GrafPtr g;GetPort(&g);if(g==w)ValidRgn(r);else{SetPort(w);ValidRgn(r);SetPort(g);}}}
+#define WInvalRect(w, r) InvalWindowRect(w, r)
+#define WInvalRgn(w, r) InvalWindowRgn(w, r)
+#define WValidRect(w, r) ValidWindowRect(w, r)
+#define WValidRgn(w, r) ValidWindowRgn(w, r)
 
 #endif

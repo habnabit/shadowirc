@@ -1,6 +1,6 @@
 /*
 	ShadowIRC Userlist
-	Copyright (C) 1997-2000 John Bafford
+	Copyright (C) 1997-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -22,24 +22,22 @@
 #include "userlist.h"
 #include "ULList.h"
 
-#include "SmartScrollAPI.h"
-
 #define SAppend1(s,ch){(s)[++((s)[0])]=ch;}
 
 CIconHandle gSortForwardIcon, gSortReverseIcon;
 
 inline char pstrgt(Str255 one, Str255 two);
-static pascal void pstrcpyucase(Str255 src, Str255 dest);
+static void pstrcpyucase(Str255 src, Str255 dest);
 inline char inupc(char c);
 
-static pascal void ListScrollbarSet(ULI ul);
+static void ListScrollbarSet(ULI ul);
 
-pascal GrafPtr ULISetupDrawing(ULI ul)
+GrafPtr ULISetupDrawing(ULI ul)
 {
 	GrafPtr gp;
 	
 	GetPort(&gp);
-	SetPort(ul->uwin);
+	SetPortWindowPort(ul->uwin);
 	if(ul->ulType == ulGlobal)
 	{
 		if(ul->scrollbarLeft)
@@ -70,24 +68,16 @@ INLINE void ULIFinishDrawing(ULI ul, GrafPtr gp)
 }
 #endif
 
-pascal void DrawWindowHeader(Rect *r, long state)
+void DrawWindowHeader(Rect *r, long state)
 {
-	if(APPEARANCE11)
-	{
-		DrawThemePlacard(r, state);
-	}
-	else //whether it has appearance 1.x or not, it looks the same...
-	{
-		DrawPlacard(r, state); //looks the same under platinum anyways
-	}
+	DrawThemePlacard(r, state);
 }
 
 #pragma mark -
 
-pascal void ListHeader(ULI ul)
+void ListHeader(ULI ul)
 {
 	Rect r;
-	Ptr offscreen;
 	GrafPtr gp;
 	Str255 s;
 	RGBColor back;
@@ -95,7 +85,7 @@ pascal void ListHeader(ULI ul)
 	char active;
 	int sortWidgetLeft;
 	
-	if(!WIsVisible(ul->uwin))
+	if(!IsWindowVisible(ul->uwin))
 		return;
 	
 	if(ul->ulType == ulMessageWindow)
@@ -126,9 +116,8 @@ pascal void ListHeader(ULI ul)
 	}
 
 	WValidRect(ul->uwin, &r);
-	StartDrawingOffscreen(&offscreen, &r, false);
 
-	active = WIsActive(ul->uwin);
+	active = IsWindowActive(ul->uwin);
 	
 	if(active)
 		state = kThemeStateActive;
@@ -227,11 +216,10 @@ pascal void ListHeader(ULI ul)
 
 	RGBBackColor(&back);
 	TextMode(srcOr);
-	EndDrawingOffscreen(offscreen);
 	ULIFinishDrawing(ul, gp);
 }
 
-pascal void ListDrawUser(ULI ul, int num, short po)
+void ListDrawUser(ULI ul, int num, short po)
 {
 	MyListPtr item = &(**ul->users).u[num];
 	UserListPtr user = item->u;
@@ -302,7 +290,7 @@ pascal void ListDrawUser(ULI ul, int num, short po)
 
 }
 
-pascal char ListCanDraw(ULI ul, long num)
+char ListCanDraw(ULI ul, long num)
 {
 	//Return true if the num is visible, false if not
 	int low = GetControlValue(ul->bar);
@@ -315,15 +303,14 @@ pascal char ListCanDraw(ULI ul, long num)
 	}
 }
 
-pascal void ListDrawOne(ULI ul, long num)
+void ListDrawOne(ULI ul, long num)
 {
 	GrafPtr gp;
-	Ptr offscreen;
 	Rect drawRect, sortRect;
 	int p;
 	RGBColor back;
 	
-	if(ListCanDraw(ul, num) && WIsVisible(ul->uwin))
+	if(ListCanDraw(ul, num) && IsWindowVisible(ul->uwin))
 	{
 		//Set up the graphics area and draw it
 		gp = ULISetupDrawing(ul);
@@ -341,8 +328,6 @@ pascal void ListDrawOne(ULI ul, long num)
 		if(num>0 && (**ul->users).u[num-1].u->userlistIsSelected)
 			drawRect.top++;
 		
-		StartDrawingOffscreen(&offscreen, &drawRect, false);
-
 		GetBackColor(&back);
 		SetBackground(kThemeBrushListViewBackground);
 		EraseRect(&drawRect);
@@ -357,13 +342,12 @@ pascal void ListDrawOne(ULI ul, long num)
 		EraseRect(&sortRect);
 
 		ListDrawUser(ul, num, p+1);
-		EndDrawingOffscreen(offscreen);
 		RGBBackColor(&back);
 		ULIFinishDrawing(ul, gp);
 	}
 }
 
-pascal void ListDrawOneUser(ULI ul, UserListPtr u)
+void ListDrawOneUser(ULI ul, UserListPtr u)
 {
 	long num = ListFind(ul, u);
 	
@@ -371,11 +355,10 @@ pascal void ListDrawOneUser(ULI ul, UserListPtr u)
 		ListDrawOne(ul, num);
 }
 
-pascal void ListDraw(ULI ul)
+void ListDraw(ULI ul)
 {
 	GrafPtr gp;
 	Rect drawRect, sortRect;
-	Ptr offscreen;
 	short bot;
 	int x, m, c, highVis;
 	ulPtr u;
@@ -385,7 +368,7 @@ pascal void ListDraw(ULI ul)
 	ul->updateList = 0;
 	ul->lastUpdate = TickCount();
 	
-	if(!WIsVisible(ul->uwin))
+	if(!IsWindowVisible(ul->uwin))
 		return;
 	
 	ListScrollbarSet(ul);
@@ -404,7 +387,6 @@ pascal void ListDraw(ULI ul)
 	bot = drawRect.bottom - kTopOffset;
 	
 	WValidRect(ul->uwin, &drawRect);
-	StartDrawingOffscreen(&offscreen, &drawRect, false);
 	
 	SetBackground(kThemeBrushListViewBackground);
 	EraseRect(&drawRect);
@@ -444,12 +426,11 @@ pascal void ListDraw(ULI ul)
 		HUnlock((Handle)ul->users);
 	}
 
-	EndDrawingOffscreen(offscreen);
 	RGBBackColor(&back);
 	ULIFinishDrawing(ul, gp);
 }
 
-pascal void ListGenerate(ULI ul, channelPtr ch)
+void ListGenerate(ULI ul, channelPtr ch)
 {
 	//Add everything to the list, then sort it. Prolly should do insertion sort.
 	long x, n;
@@ -525,7 +506,7 @@ inline char inupc(char c)
 	return c;
 }
 
-static pascal void pstrcpyucase(Str255 src, Str255 dest)
+static void pstrcpyucase(Str255 src, Str255 dest)
 {
 	int x;
 	int n = src[0];
@@ -536,7 +517,7 @@ static pascal void pstrcpyucase(Str255 src, Str255 dest)
 }
 
 
-pascal char ListSortPart(ULI ul, MyList *one, MyList *two)
+char ListSortPart(ULI ul, MyList *one, MyList *two)
 {
 	Str255 name, name2;
 	char ret;
@@ -568,7 +549,7 @@ enum {
 	kMoveRight
 };
 
-pascal char ListResortInd(ULI ul, int num)
+char ListResortInd(ULI ul, int num)
 {
 	MyList my;
 	int x;
@@ -632,7 +613,7 @@ pascal char ListResortInd(ULI ul, int num)
 	return cnt != 0;
 }
 
-pascal void ListSort(ULI ul, char locked)
+void ListSort(ULI ul, char locked)
 {
 	ulPtr u;
 	long i, j;
@@ -667,7 +648,7 @@ pascal void ListSort(ULI ul, char locked)
 		HUnlock((Handle)ul->users);
 }
 
-pascal void ListTrash(ULI ul)
+void ListTrash(ULI ul)
 {
 	if(ul && ul->users)
 	{
@@ -677,7 +658,7 @@ pascal void ListTrash(ULI ul)
 	}
 }
 
-pascal void ListAdd(ULI ul, UserListPtr u)
+void ListAdd(ULI ul, UserListPtr u)
 {
 	int i, max;
 	ulPtr us;
@@ -709,7 +690,7 @@ pascal void ListAdd(ULI ul, UserListPtr u)
 	HUnlock((Handle)ul->users);
 }
 
-pascal void ListDel(ULI ul, UserListPtr u)
+void ListDel(ULI ul, UserListPtr u)
 {
 	//Delete this user from the list.
 	ulPtr us;
@@ -741,7 +722,7 @@ pascal void ListDel(ULI ul, UserListPtr u)
 	SetHandleSize((Handle)ul->users, sizeof(UserListBegin) + (sizeof(MyList) * us->num)); //GetHandleSize((Handle)ul->users) - sizeof(MyList));
 }
 
-pascal char ListDelName(ULI ul, Str255 nick)
+char ListDelName(ULI ul, Str255 nick)
 {
 	//Find the nick, and then delete it.
 	if(ul->users && (**ul->users).ch)
@@ -757,7 +738,7 @@ pascal char ListDelName(ULI ul, Str255 nick)
 	return false;
 }
 
-pascal long ListFind(ULI ul, UserListPtr u)
+long ListFind(ULI ul, UserListPtr u)
 {
 	
 	if(ul->users && (**ul->users).ch)
@@ -811,17 +792,14 @@ pascal long ListFind(ULI ul, UserListPtr u)
 
 #pragma mark -
 
-static pascal void ListScrollbarSet(ULI ul)
+static void ListScrollbarSet(ULI ul)
 {
 	long total, extra;
 	//Set the maximum to the number of users in the list that aren't visible
 	
 	if(!ul->users || !(**ul->users).ch || !(**ul->users).num)
 	{
-		if(APPEARANCE11)
-			SetControl32BitMaximum(ul->bar, 0);
-		else
-			SetControlMaximum(ul->bar, 0);
+		SetControl32BitMaximum(ul->bar, 0);
 		return;
 	}
 	
@@ -829,28 +807,16 @@ static pascal void ListScrollbarSet(ULI ul)
 	total = (**ul->users).num * line;
 	extra = total - ul->uwinSize.bottom + kTopOffset + kBottomOffset;
 
-	if(APPEARANCE11)
-	{
-		 if(extra <= 0)
-		 	SetControl32BitMaximum(ul->bar, 0);
-		 else
-		 	SetControl32BitMaximum(ul->bar, extra / line + 1);
-		 
-		 SetControl32BitValue(ul->bar, GetControlValue(ul->bar));
-		 SetControlViewSize(ul->bar, ul->visLines);
-	}
+	if(extra <= 0)
+		SetControl32BitMaximum(ul->bar, 0);
 	else
-	{
-		 if(extra <= 0)
-		 	SetControlMaximum(ul->bar, 0);
-		 else
-		 	SetControlMaximum(ul->bar, extra / line + 1);
-
-		SetSmartScrollInfo(ul->bar, ul->visLines, total);
-	}
+		SetControl32BitMaximum(ul->bar, extra / line + 1);
+	
+	SetControl32BitValue(ul->bar, GetControlValue(ul->bar));
+	SetControlViewSize(ul->bar, ul->visLines);
 }
 
-pascal void ListSetWTitle(ULI ul)
+void ListSetWTitle(ULI ul)
 {
 	Str255 s;
 	Str255 s2;

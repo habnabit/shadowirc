@@ -1,6 +1,6 @@
 /*
 	ShadowIRC Userlist
-	Copyright (C) 1997-2000 John Bafford
+	Copyright (C) 1997-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -19,8 +19,7 @@
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#include <Appearance.h>
-#include <ControlDefinitions.h>
+//#include <Appearance.h>
 
 #include "userlist.h"
 #include "ULList.h"
@@ -28,7 +27,6 @@
 ShadowIRCDataRecord* sidr;
 prefsPtr mainPrefs;
 RGBColor *shadowircColors = 0;
-char hasAppearance11 = 0;
 short genevaNum = 0;
 int line = 0;
 
@@ -46,31 +44,31 @@ const RGBColor MDkGrey = {cMDkGrey, cMDkGrey, cMDkGrey};
 #pragma internal on
 
 INLINE ULI ULIFromMW(MWPtr mw);
-static pascal ULI ULIFromChannel(channelPtr ch);
-static pascal ULI ULIFromWindow(WindowPtr w);
+static ULI ULIFromChannel(channelPtr ch);
+static ULI ULIFromWindow(WindowPtr w);
 
-static pascal void ULDoubleClick(ULI ul, long num);
+static void ULDoubleClick(ULI ul, long num);
 INLINE char IsDoubleClick(long time);
 
-static pascal void ULHitHeader(ULI ul, const EventRecord *e);
-static pascal void ULHitList(ULI ul, const EventRecord *e);
+static void ULHitHeader(ULI ul, const EventRecord *e);
+static void ULHitList(ULI ul, const EventRecord *e);
 INLINE void ULInContentHit(ULI ul, const EventRecord *e);
 
-static pascal void ULScrollbarLive(ULI ul, const EventRecord *e);
-static pascal void ULScrollbarActionProc(ControlHandle vscr, short part);
+static void ULScrollbarLive(ULI ul, const EventRecord *e);
+static void ULScrollbarActionProc(ControlHandle vscr, short part);
 INLINE void ULScrollbarHit(ULI ul, short part, const EventRecord *e);
 INLINE void ULGotNamesList(pServiceULNamesEndData *p);
 INLINE void ULSActivateWin(pServiceActivateWinData *p);
-static pascal char MouseInWindow(ULI ul);
+static char MouseInWindow(ULI ul);
 
-static pascal void ULDragTrack(pUIDragTrackData *p);
-static pascal void ULDragReceive(pUIDragReceiveData *p);
+static void ULDragTrack(pUIDragTrackData *p);
+static void ULDragReceive(pUIDragReceiveData *p);
 INLINE void ULPaneDragTrack(pMWPaneDragTrackData *p);
 INLINE void ULPaneDragReceive(pMWPaneDragReceiveData *p);
 
-static pascal void ULContextualMenu(pCMPopupsData *p);
-static pascal void ULContextualMenuProcess(pCMPopupsReturnData *p);
-static pascal void ProcessShortcuts(pShortcutProcessData *p);
+static void ULContextualMenu(pCMPopupsData *p);
+static void ULContextualMenuProcess(pCMPopupsReturnData *p);
+static void ProcessShortcuts(pShortcutProcessData *p);
 
 INLINE void IdleCursor(EventRecord *e);
 INLINE void CreateGlobalUserlistWindow(void);
@@ -79,15 +77,15 @@ INLINE void ULMoveWindow(pUIWindowMoveDataRec *p);
 INLINE void ULCloseWindow(pUIWindowCloseDataRec *p);
 INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p);
 INLINE void ULGrowWindow(pUIInGrowData *p);
-static pascal void ULResizeWin(ULI ul, short height, short wid);
+static void ULResizeWin(ULI ul, short height, short wid);
 INLINE void ULUpdateWin(pUIUpdateData *p);
 INLINE void ULMouse(pUIMouseUpDownData *p);
 
 INLINE void ULNewMessageWindow(pMWNewData *p);
-static pascal void SULPaneUpdate(pMWPaneUpdateData *p);
-static pascal void SULPaneDestroy(pMWPaneDestroyData *p);
-static pascal void ULPaneResize(ULI ul, mwPanePtr o, const EventRecord *e);
-static pascal void SULPaneClick(pMWPaneClickData *p);
+static void SULPaneUpdate(pMWPaneUpdateData *p);
+static void SULPaneDestroy(pMWPaneDestroyData *p);
+static void ULPaneResize(ULI ul, mwPanePtr o, const EventRecord *e);
+static void SULPaneClick(pMWPaneClickData *p);
 INLINE void SULPaneActivate(pMWPaneActivateData *p);
 INLINE void SULPaneResize(pMWPaneResizeData *p);
 
@@ -101,20 +99,41 @@ INLINE void STrashChannel(pServiceULTrashChannelData *p);
 INLINE void SULUserHosts(pServiceULUserhostsData *p);
 INLINE void SIdle(pIdleMessageData *p);
 
-static pascal ULI ULINew(WindowPtr w, long type);
-static pascal void ULIDestroy(ULI ul);
-static pascal void ULIPaneDrawBorder(ULI ul, mwPanePtr pane, char pressed);
-static pascal void ULIKillAll(void);
-static pascal void ULIAddAll(void);
+static ULI ULINew(WindowPtr w, long type);
+static void ULIDestroy(ULI ul);
+static void ULIPaneDrawBorder(ULI ul, mwPanePtr pane, char pressed);
+static void ULIKillAll(void);
+static void ULIAddAll(void);
 
 INLINE void PWSet(pPWSetWindowData *p);
 INLINE void PWGet(pPWGetWindowData  *p);
 INLINE void PWHit(pPWItemHitData *p);
 INLINE void PWClosed(void);
 
-static pascal void displayOldVersionMsg(void);
-static pascal void displayMultipleUserlistsMsg(void);
+static void displayOldVersionMsg(void);
+static void displayMultipleUserlistsMsg(void);
 INLINE void setupMessages(char captureMessages[numMessages]);
+
+enum {
+	kUserlistSignature = 'ULST',
+	kUserlistWindow = 'WIND'
+};
+
+static void ULSetWindowProperty(ULI ul)
+{
+	SetWindowProperty(ul->uwin, kUserlistSignature, kUserlistWindow, sizeof(ul), &ul);
+}
+
+static ULI ULGetWindowProperty(WindowPtr w)
+{
+	ULI ul;
+	long actualSize;
+	
+	GetWindowProperty(w, kUserlistSignature, kUserlistWindow, sizeof(ul), &actualSize, &ul);
+	
+	return ul;
+}
+		
 
 INLINE ULI ULIFromMW(MWPtr mw)
 {
@@ -128,7 +147,7 @@ INLINE ULI ULIFromMW(MWPtr mw)
 	return 0;
 }
 
-static pascal ULI ULIFromChannel(channelPtr ch)
+static ULI ULIFromChannel(channelPtr ch)
 {
 	if(globalUserlist) //global userlist
 		return gUserlist;
@@ -141,9 +160,9 @@ static pascal ULI ULIFromChannel(channelPtr ch)
 	}
 }
 
-static pascal ULI ULIFromWindow(WindowPtr w)
+static ULI ULIFromWindow(WindowPtr w)
 {
-	ULI ul = (ULI)pluginGetWRefCon(w);
+	ULI ul = ULGetWindowProperty(w);
 	MWPtr mw;
 	
 	if(ul)
@@ -168,7 +187,7 @@ INLINE char IsDoubleClick(long time)
 	return TickCount() - time <= GetDblTime();
 }
 
-static pascal void ULDoubleClick(ULI ul, long num)
+static void ULDoubleClick(ULI ul, long num)
 {
 	LongString ls;
 	
@@ -180,7 +199,7 @@ static pascal void ULDoubleClick(ULI ul, long num)
 	}
 }
 
-static pascal void ULHitHeader(ULI ul, const EventRecord *e)
+static void ULHitHeader(ULI ul, const EventRecord *e)
 {
 	if((ul->scrollbarLeft && e->where.h <= scrollbarWidth) || (!ul->scrollbarLeft && e->where.h > ul->uwinSize.right-scrollbarWidth))
 	{
@@ -204,7 +223,6 @@ static pascal void ULHitHeader(ULI ul, const EventRecord *e)
 		if(e->where.h >= divider - 3 && e->where.h <= divider + 3)
 		{
 			Point pt;
-			short loc = e->where.h;
 			Rect r = ul->uwinSize;
 			short min;
 			
@@ -264,8 +282,8 @@ static pascal void ULHitHeader(ULI ul, const EventRecord *e)
 	}
 }
 
-pascal void DragOneUser(ULI ul, int u, const EventRecord *e);
-pascal void DragOneUser(ULI ul, int u, const EventRecord *e)
+void DragOneUser(ULI ul, int u, const EventRecord *e);
+void DragOneUser(ULI ul, int u, const EventRecord *e)
 {
 #pragma unused(ul, u, e)
 /*
@@ -330,7 +348,7 @@ pascal void DragOneUser(ULI ul, int u, const EventRecord *e)
 */
 }
 
-static pascal void ULHitList(ULI ul, const EventRecord *e)
+static void ULHitList(ULI ul, const EventRecord *e)
 {
 	static int clickAnchor = 0;
 	
@@ -442,10 +460,7 @@ static pascal void ULHitList(ULI ul, const EventRecord *e)
 				clickAnchor = p;
 				ListDrawOne(ul, p);
 				
-				if(sidr->hasDrag)
-				{
-					DragOneUser(ul, p, e);
-				}
+				DragOneUser(ul, p, e);
 			}
 			else //if it's selected
 			{
@@ -514,7 +529,7 @@ INLINE void ULInContentHit(ULI ul, const EventRecord *e)
 
 static ULI gULILiveScrollbar;
 
-static pascal void ULScrollbarActionProc(ControlHandle bar, short part)
+static void ULScrollbarActionProc(ControlHandle bar, short part)
 {
 	short val;
 	
@@ -562,7 +577,7 @@ static pascal void ULScrollbarActionProc(ControlHandle bar, short part)
 	}
 }
 
-static pascal void ULScrollbarLive(ULI ul, const EventRecord *e)
+static void ULScrollbarLive(ULI ul, const EventRecord *e)
 {
 	IndicatorDragConstraint constraint;
 	Point mouse;
@@ -572,7 +587,7 @@ static pascal void ULScrollbarLive(ULI ul, const EventRecord *e)
 	HiliteControl(ul->bar, kControlIndicatorPart);
 
 	*(Point*)&constraint.limitRect = e->where;
-	MySendControlMessage(ul->bar, thumbCntl, (long)&constraint);
+	SendControlMessage(ul->bar, thumbCntl, &constraint);
 	
 	range = constraint.limitRect.bottom - constraint.limitRect.top;
 	
@@ -616,9 +631,9 @@ INLINE void ULScrollbarHit(ULI ul, short part, const EventRecord *e)
 		case kControlDownButtonPart:
 		case kControlPageUpPart:
 		case kControlPageDownPart:
-			upp = NewControlActionProc(ULScrollbarActionProc);
-			TrackControl(ul->bar, e->where, upp);
-			DisposeRoutineDescriptor(upp);
+			upp = NewControlActionUPP(ULScrollbarActionProc);
+			part = HandleControlClick(ul->bar, e->where, e->modifiers, upp);
+			DisposeControlActionUPP(upp);
 			break;
 		
 		case kControlIndicatorPart:
@@ -672,25 +687,25 @@ INLINE void ULSActivateWin(pServiceActivateWinData *p)
 		int i = WMSGetMenuItemNum(userlistServiceType);
 		if(i>0)
 		{
-			CheckItem(GetMenuHandle(260), i, ul != 0);
+			CheckMenuItem(GetMenuHandle(260), i, ul != 0);
 			if(p->mw && p->mw->winType == chanWin)
-				EnableItem(GetMenuHandle(260), i);
+				EnableMenuItem(GetMenuHandle(260), i);
 			else
-				DisableItem(GetMenuHandle(260), i);
+				DisableMenuItem(GetMenuHandle(260), i);
 		}
 	}
 }
 
-static pascal char MouseInWindow(ULI ul)
+static char MouseInWindow(ULI ul)
 {
 	GrafPtr gp;
 	Point pt;
 	
 	GetPort(&gp);
-	SetPort(ul->uwin);
+	SetPortWindowPort(ul->uwin);
 	GetMouse(&pt);
 	SetPort(gp);
-	return WIsVisible(ul->uwin) && PtInRect(pt, &ul->uwinSize);
+	return IsWindowVisible(ul->uwin) && PtInRect(pt, &ul->uwinSize);
 }
 
 #pragma mark -
@@ -923,7 +938,7 @@ INLINE void SULUserHosts(pServiceULUserhostsData *p)
 
 static int hiliteUser = -1;
 
-static pascal void ULDragTrack(pUIDragTrackData *p)
+static void ULDragTrack(pUIDragTrackData *p)
 {
 	int top, loc;
 	int mouseOver;
@@ -1006,7 +1021,7 @@ static pascal void ULDragTrack(pUIDragTrackData *p)
 	}
 }
 
-static pascal void ULDragReceive(pUIDragReceiveData *p)
+static void ULDragReceive(pUIDragReceiveData *p)
 {
 	ULI ul = ULIFromWindow(p->window);
 
@@ -1077,7 +1092,7 @@ INLINE void ULPaneDragReceive(pMWPaneDragReceiveData *p)
 
 #pragma mark -
 
-static pascal void ULContextualMenu(pCMPopupsData *p)
+static void ULContextualMenu(pCMPopupsData *p)
 {
 	//Find the userlist that applies.
 	ULI ul = ULIFromWindow(p->w);
@@ -1096,7 +1111,7 @@ static pascal void ULContextualMenu(pCMPopupsData *p)
 		return;
 	
 	GetPort(&gp);
-	SetPort(ul->uwin);
+	SetPortWindowPort(ul->uwin);
 	
 	top = GetControlValue(ul->bar);
 
@@ -1138,7 +1153,7 @@ static pascal void ULContextualMenu(pCMPopupsData *p)
 	SetPort(gp);
 }
 
-static pascal void ULContextualMenuProcess(pCMPopupsReturnData *p)
+static void ULContextualMenuProcess(pCMPopupsReturnData *p)
 {
 	p=p;
 }
@@ -1151,7 +1166,7 @@ inline void RepeatMunger(Handle text, long offset, const void* ptr1, long len1, 
 	} while(i >= 0);
 }
 
-static pascal void ProcessShortcuts(pShortcutProcessData *p)
+static void ProcessShortcuts(pShortcutProcessData *p)
 {
 	ConstStringPtr s;
 	int x;
@@ -1163,7 +1178,7 @@ static pascal void ProcessShortcuts(pShortcutProcessData *p)
 	if(globalUserlist)
 		ul = gUserlist;
 	else
-		ul = ULIFromMW(*sidr->MWActive);
+		ul = ULIFromMW(GetActiveMW());
 	
 	if(!ul)
 		return;
@@ -1221,7 +1236,7 @@ static pascal void ProcessShortcuts(pShortcutProcessData *p)
 
 #pragma mark -
 
-static pascal void ULIDestroy(ULI ul)
+static void ULIDestroy(ULI ul)
 {
 	if(ul)
 	{
@@ -1242,7 +1257,7 @@ static pascal void ULIDestroy(ULI ul)
 	}
 }
 
-static pascal ULI ULINew(WindowPtr w, long type)
+static ULI ULINew(WindowPtr w, long type)
 {
 	ULI ul = (ULI)NewPtrClear(sizeof(UserListInstance));
 	short ctrlProc;
@@ -1272,8 +1287,8 @@ static pascal ULI ULINew(WindowPtr w, long type)
 			SetRect(&mainPrefs->userListRect, 40, 40, 300, 300);
 		
 		ul->uwin = pluginNewWindow(&mainPrefs->userListRect, "\pUserlist", -1, pnwHasCloseBox | pnwHasGrowBox | pnwFloaterWindow | pnwFIsFloater);
-		pluginSetWRefCon(ul->uwin, (long)ul);
-		
+		ULSetWindowProperty(ul);
+
 		ul->uwinSize.right = mainPrefs->userListRect.right - mainPrefs->userListRect.left;
 		ul->uwinSize.bottom =  mainPrefs->userListRect.bottom - mainPrefs->userListRect.top;
 
@@ -1346,11 +1361,11 @@ static pascal ULI ULINew(WindowPtr w, long type)
 	}
 
 	ul->bar=NewControl(ul->uwin, &r, "\p", true, 0, 0, 0, ctrlProc, 0);
-	if(type != ulGlobal && !WIsActive(ul->uwin))
+	if(type != ulGlobal && !IsWindowActive(ul->uwin))
 		DeactivateControl(ul->bar);
 	
 	GetPort(&gp);
-	SetPort(ul->uwin);
+	SetPortWindowPort(ul->uwin);
 
 	if(!line)
 	{
@@ -1371,23 +1386,23 @@ static pascal ULI ULINew(WindowPtr w, long type)
 	if(type == ulMessageWindow)
 	{
 		MWPaneResize(mw);
-		if(WIsVisible(mw->w))
+		if(IsWindowVisible(mw->w))
 			MWPaneUpdate(mw);
 	}
 	
 	return ul;
 }
 
-static pascal void ULIPaneDrawBorder(ULI ul, mwPanePtr o, char pressed)
+static void ULIPaneDrawBorder(ULI ul, mwPanePtr o, char pressed)
 {
-	if(ul->ulType == ulMessageWindow && o && WIsVisible(ul->uwin))
+	if(ul->ulType == ulMessageWindow && o && IsWindowVisible(ul->uwin))
 	{
 		Rect r;
 		long state;
 		RGBColor front;
 
 		GetForeColor(&front);
-		if(WIsActive(ul->uwin))
+		if(IsWindowActive(ul->uwin))
 			RGBForeColor(&black);
 		else
 			RGBForeColor(&MDkGrey);
@@ -1408,7 +1423,7 @@ static pascal void ULIPaneDrawBorder(ULI ul, mwPanePtr o, char pressed)
 
 		if(pressed)
 			state = kThemeStatePressed;
-		else if(WIsActive(ul->uwin))
+		else if(IsWindowActive(ul->uwin))
 			state = kThemeStateActive;
 		else
 			state = kThemeStateInactive;
@@ -1478,7 +1493,7 @@ INLINE void ULNewMessageWindow(pMWNewData *p)
 
 static char resizingPane;
 
-static pascal void SULPaneUpdate(pMWPaneUpdateData *p)
+static void SULPaneUpdate(pMWPaneUpdateData *p)
 {
 	if(p->pane->type == kUserlistPane)
 	{
@@ -1493,7 +1508,7 @@ static pascal void SULPaneUpdate(pMWPaneUpdateData *p)
 	}
 }
 
-static pascal void ULPaneResize(ULI ul, mwPanePtr o, const EventRecord *e)
+static void ULPaneResize(ULI ul, mwPanePtr o, const EventRecord *e)
 {
 #pragma unused(ul)
 	Rect r;
@@ -1606,7 +1621,7 @@ static pascal void ULPaneResize(ULI ul, mwPanePtr o, const EventRecord *e)
 	ULIPaneDrawBorder(ul, o, false);
 }
 
-static pascal void SULPaneClick(pMWPaneClickData *p)
+static void SULPaneClick(pMWPaneClickData *p)
 {
 	if(p->pane->type == kUserlistPane)
 	{
@@ -1684,7 +1699,7 @@ INLINE void SULPaneResize(pMWPaneResizeData *p)
 		}
 		r.bottom = o->drawArea.bottom + 1;
 		
-		if(!WIsActive(ul->uwin) || o->givenWidth < scrollbarWidth + kInWindowBorder)
+		if(!IsWindowActive(ul->uwin) || o->givenWidth < scrollbarWidth + kInWindowBorder)
 			DeactivateControl(ul->bar);
 		else
 			ActivateControl(ul->bar);
@@ -1694,7 +1709,7 @@ INLINE void SULPaneResize(pMWPaneResizeData *p)
 	}
 }
 
-static pascal void SULPaneDestroy(pMWPaneDestroyData *p)
+static void SULPaneDestroy(pMWPaneDestroyData *p)
 {
 	if(p->pane->type == kUserlistPane)
 	{
@@ -1705,7 +1720,7 @@ static pascal void SULPaneDestroy(pMWPaneDestroyData *p)
 	}
 }
 
-static pascal void ULIKillAll(void)
+static void ULIKillAll(void)
 {
 	MWPtr mw = *sidr-> mwList;
 	
@@ -1726,7 +1741,7 @@ static pascal void ULIKillAll(void)
 	} 
 }
 
-static pascal void ULIAddAll(void)
+static void ULIAddAll(void)
 {
 	MWPtr mw = *sidr->mwList;
 	ULI ul;
@@ -1751,7 +1766,7 @@ static pascal void ULIAddAll(void)
 
 INLINE void IdleCursor(EventRecord *e)
 {
-	static inSep = 0;
+	static int inSep = 0;
 	GrafPtr gp;
 	Point pt;
 	ULI ul = 0;
@@ -1769,7 +1784,7 @@ INLINE void IdleCursor(EventRecord *e)
 	else
 	{
 		FindWindow(e->where, &w);
-		if(!w || !WIsActive(w))
+		if(!w || !IsWindowActive(w))
 			in = 0;
 		else
 		{
@@ -1794,7 +1809,7 @@ INLINE void IdleCursor(EventRecord *e)
 	{
 		short divider;
 		
-		if(!ul || !w || !WIsActive(w))
+		if(!ul || !w || !IsWindowActive(w))
 			in = 0;
 		else
 		{
@@ -1832,22 +1847,12 @@ INLINE void IdleCursor(EventRecord *e)
 		if(!inSep && in)
 		{
 			inSep = 1;
-			if(APPEARANCE11)
-				SetThemeCursor(kThemeResizeLeftRightCursor);
-			else
-			{
-				SetCursor(*GetCursor(512));
-			}
+			SetThemeCursor(kThemeResizeLeftRightCursor);
 		}
 		else if(inSep && !in)
 		{
 			inSep = 0;
-			if(APPEARANCE11)
-				SetThemeCursor(kThemeArrowCursor);
-			else
-			{
-				InitCursor();
-			}
+			SetThemeCursor(kThemeArrowCursor);
 		}
 		
 		if(ul)
@@ -1919,7 +1924,7 @@ INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p)
 		{
 			if(gUserlist)
 			{
-				if(WIsVisible(gUserlist->uwin)) //hide it
+				if(IsWindowVisible(gUserlist->uwin)) //hide it
 				{
 					mainPrefs->userListOpen = false;
 					HideWindow(gUserlist->uwin);
@@ -1930,7 +1935,7 @@ INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p)
 					ShowWindow(gUserlist->uwin);
 				}
 
-				CheckItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType), mainPrefs->userListOpen);
+				CheckMenuItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType), mainPrefs->userListOpen);
 			}
 			else //make it?
 			{
@@ -1938,11 +1943,12 @@ INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p)
 		}
 		else //in-window
 		{
-			MWPtr mw = (*sidr->MWActive);
+			MWPtr mw = GetActiveMW();
 			
 			if(mw && mw->winType == chanWin)
 			{
 				mwPanePtr o = MWFindPane(mw, kUserlistPane);
+				char check;
 				
 				if(o) //kill it
 				{
@@ -1950,7 +1956,7 @@ INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p)
 					MWDestroyPane(o);
 					MWPaneResize(mw);
 					MWPaneUpdate(mw);
-					o = 0;
+					check = 0;
 				}
 				else //add it
 				{
@@ -1958,17 +1964,17 @@ INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p)
 					MWPaneRecalculate(mw);
 					MWPaneUpdate(mw);
 					ListGenerate(ul, MWGetChannel(mw));
-					o = (mwPanePtr)1;
+					check = 1;
 				}
 				
-				CheckItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType), (char)o);
+				CheckMenuItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType), check);
 			}
 		}
 	}
 }
 
 //This is always going to be used for the global list
-static pascal void ULResizeWin(ULI ul, short height, short wid)
+static void ULResizeWin(ULI ul, short height, short wid)
 {
 	short ctrlHeight;
 	
@@ -2045,7 +2051,7 @@ INLINE void ULMouse(pUIMouseUpDownData *p)
 			//This is an inContent mouse press, so deal accordingly...
 			
 			GetPort(&gp);
-			SetPort(ul->uwin);
+			SetPortWindowPort(ul->uwin);
 			
 			GlobalToLocal(&p->e->where);
 			pa = FindControl(p->e->where, ul->uwin, &c);
@@ -2122,6 +2128,7 @@ INLINE void PWClosed(void)
 	if(mainPrefs->userlistInWindow == globalUserlist) //it changed!
 	{
 		globalUserlist = !mainPrefs->userlistInWindow;
+		MWPtr mw;
 		
 		if(globalUserlist) //kill all in-windows and turn off message
 		{
@@ -2129,10 +2136,11 @@ INLINE void PWClosed(void)
 			ULIKillAll();
 			mainPrefs->userListOpen = 1;
 			CreateGlobalUserlistWindow();
-			if((*sidr->MWActive) && (*sidr->MWActive)->winType == chanWin)
-				ListGenerate(gUserlist, MWGetChannel(*sidr->MWActive));
+			mw = GetActiveMW();
+			if(mw && mw->winType == chanWin)
+				ListGenerate(gUserlist, MWGetChannel(mw));
 			
-			EnableItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType));
+			EnableMenuItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType));
 		}
 		else
 		{
@@ -2174,22 +2182,22 @@ INLINE void PWClosed(void)
 
 #pragma mark -
 
-static pascal void displayOldVersionMsg(void)
+static void displayOldVersionMsg(void)
 {
 	LongString ls;
 	
 	LSStrLS("\pThe userlist plugin requires ShadowIRC 1.1 or later.", &ls);
-	if(!WIsVisible((*sidr->consoleWin)->w))
+	if(!IsWindowVisible((*sidr->consoleWin)->w))
 		ShowWindow((*sidr->consoleWin)->w);
 	SMPrefixIrcleColor(&ls, dsConsole, '2');
 }
 
-static pascal void displayMultipleUserlistsMsg(void)
+static void displayMultipleUserlistsMsg(void)
 {
 	LongString ls;
 	
 	LSStrLS("\pYou have more than one userlist plugin installed.", &ls);
-	if(!WIsVisible((*sidr->consoleWin)->w))
+	if(!IsWindowVisible((*sidr->consoleWin)->w))
 		ShowWindow((*sidr->consoleWin)->w);
 	SMPrefix(&ls, dsConsole);
 }
@@ -2210,7 +2218,7 @@ INLINE void setupMessages(char captureMessages[numMessages])
 }
 #pragma internal off
 
-pascal void main(ShadowIRCDataRecord* sidrIN)
+void pluginMain(ShadowIRCDataRecord* sidrIN)
 {
 	long l;
 
@@ -2220,7 +2228,6 @@ pascal void main(ShadowIRCDataRecord* sidrIN)
 			sidr=sidrIN;
 			mainPrefs = sidrIN->mainPrefs;
 			shadowircColors = sidrIN->shadowircColors;
-			hasAppearance11 = sidrIN->hasAppearance11;
 			
 			l=((pVersionCheckDataPtr)sidrIN->messageData)->version;
 			if(l<0x0101003c) //1.1d60
@@ -2248,8 +2255,6 @@ pascal void main(ShadowIRCDataRecord* sidrIN)
 				
 				gSortForwardIcon = (CIconHandle)Get1IndResource('cicn', 500);
 				gSortReverseIcon = (CIconHandle)Get1IndResource('cicn', 501);
-//				gSortForwardIcon = Get1IndResource('ICON', 128);
-//				gSortReverseIcon = Get1IndResource('ICON', 129);
 				dInWindowRight = mainPrefs->userlistInWindowRight;
 				dScrollbarLeft = mainPrefs->userlistScrollbarLeft;
 				prefsPanel = PMLAdd("\pUserlist");
@@ -2259,7 +2264,7 @@ pascal void main(ShadowIRCDataRecord* sidrIN)
 				if(globalUserlist)
 					CreateGlobalUserlistWindow();
 				else
-					DisableItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType));
+					DisableMenuItem(GetMenuHandle(260), WMSGetMenuItemNum(userlistServiceType));
 			}
 			else
 				displayMultipleUserlistsMsg();

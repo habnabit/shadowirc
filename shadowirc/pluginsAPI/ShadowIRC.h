@@ -29,6 +29,9 @@
 #define _ShadowIRC_API_Version_ 0x02000006
 
 #include <Carbon/Carbon.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
 
 #pragma mark еее ShadowIRC Message Definitions
 /*	------------------------------------------------------------------------------------------
@@ -813,7 +816,7 @@ typedef struct linkPrefsRec {	//One of these for each link. There are ten links 
 
 	char regainNick;
 	char unusedC[3];
-	long unused[2];
+	long unused1[2];
 	long networkID;							//Network ID for server list
 	
 	Str255 kickMessage;
@@ -2455,18 +2458,6 @@ pascal void WSelect(WindowPtr w);
 		Output:	none
 */
 
-pascal void EnterModalDialog(void);
-/*	Hides the floaters and disables the front non-floating window before you put up a modal dialog
-		Input:	none
-		Output: none
-*/
-
-pascal void ExitModalDialog(void);
-/*	Restores the floaters and activates the front non-dloating window after you tear down a modal dialog.
-		Input:	none
-		Output: none
-*/
-
 Rect WGetBBox(WindowPtr w);
 /*	Gets the bounding rectangle for a valid window, including titlebar
 		Input:	w - window
@@ -2966,21 +2957,13 @@ pascal void ConnClose(connectionPtr conn);
 		Output:	none
 */
 
-pascal void ConnAbort(connectionPtr conn);
-/*	Immediately closes the TCP/IP connection.
-		Input:	conn - connection to close
-		Output:	none
-		Note:	е If you use this, you can assume that the connection was aborted and does not exist.
-					conn is still valid, but no data can pass through it until it is reopened.
-*/
-
 pascal char ConnNewActive(connectionPtr conn);
 /*	Attempts to open a TCP/IP connection. Uses the ip and port values in the connection.
 		Input:	conn - connection to open
 		Output:	return value: true if the attempt to open was successful, false if the attempt failed for one reason or another.
 */
 
-pascal char ConnNewPassive(connectionPtr conn);
+pascal char ConnNewListen(connectionPtr conn);
 /*	Attempts to open a passive (incoming) TCP/IP connection. Uses the ip and port values in the connection.
 		Input:	conn - connection to open
 		Output:	return value: true if the attempt to open was successful, false if the attempt failed for one reason or another.
@@ -3010,13 +2993,6 @@ pascal void ConnPutLS(connectionPtr *conn, LongString *ls);
 		Input:	conn - ptr to conection to send over
 					ls - LongString containing text to send
 		Output:	none
-*/
-
-pascal long ConnCharsAvail(connectionPtr conn);
-/*	Count the amount of data waiting for a connection.
-		Input:	conn - The connection
-		Output:	return value - number of characters waiting
-		Note:	е Don't use this function unless you recieved a pDataConnectionMessage with a C_CharsAvailable event.
 */
 
 pascal OSErr ConnGetData(connectionPtr conn, Ptr data, short len);

@@ -58,13 +58,11 @@ enum serviceStrings {
 
 inline void callIndPlugin(plugsPtr ref, void* msgD, short msg);
 inline char parsePlugFile(const FSSpec * spec);
-static pascal void ProcessDirectory(FSSpec theSpec);
 inline void initSIDR(void);
 static pascal void AddService(FourCharCode serviceType, plugsPtr ref);
 static pascal void InitPlugins(void);
 
 pascal OSErr FSpGetDirectoryID(FSSpec*, long*, char*);
-static pascal void CheckPluginPrefsFolder(void);
 
 pascal long _UndocumentedAPI(long type, long data);
 
@@ -689,6 +687,89 @@ static pascal void InitPlugins(void)
 	}
 }
 
+static int LoadPluginFromBundle(CFBundleRef pluginBundle, CFStringRef pluginName)
+{
+	LongString ls;
+	int x;
+	plugsPtr thisPlug;
+	Boolean didLoad;
+	pluginMain mainFunction = NULL;
+
+	didLoad = CFBundleLoadExecutable(pluginBundle);
+
+	if (didLoad)
+		mainFunction = (void*)CFBundleGetFunctionPointerForName(pluginBundle, CFSTR("pluginMain") );
+
+	if(mainFunction != NULL)
+	{
+		CFArrayRef resourceURLs;
+		CFURLRef   resFile;
+		FSRef	  fsref;
+
+		thisPlug = (plugsPtr)NewPtr(sizeof(plugsRec));
+		thisPlug->bundle = pluginBundle;
+		thisPlug->proc = mainFunction;
+		thisPlug->captureMessages[pInitMessage]=1;
+		thisPlug->captureMessages[pQuitMessage]=1;
+		x=2;
+		do {
+			thisPlug->captureMessages[x++]=0;
+		} while(x<numMessages);
+
+		CFStringGetPascalString (pluginName, thisPlug->pluginName, 31, kCFStringEncodingMacRoman);
+
+		// pstrcpy(spec->name, thisPlug->pluginName);
+		thisPlug->idleThreshold=0;
+		thisPlug->lastIdleCall=0;
+		thisPlug->xpluginRef=(long)&thisPlug;
+		thisPlug->timesCalled=0;
+
+		// Open the resource file
+		// 1. Get an array of .rsrc files from the plugin's bundle
+		resourceURLs = CFBundleCopyResourceURLsOfType(pluginBundle, CFSTR("rsrc"), NULL);
+
+		// 2. Get the first element in the array, and get an
+		//	FSRef from it.
+		if(resourceURLs != NULL && (CFArrayGetCount(resourceURLs) > 0))
+		{
+			resFile = (CFURLRef)CFArrayGetValueAtIndex(resourceURLs, 0);
+			if(CFURLGetFSRef(resFile, &fsref))
+			{
+				OSErr err;
+				short refNum;
+
+				// 3. Pass the FSRef to FSOpenResourceFile
+				err = FSOpenResourceFile(&fsref, 0, NULL, fsRdPerm, &refNum);
+				if(err == noErr)
+					thisPlug->resFileRefNum = refNum;
+			}
+			CFRelease(resFile);
+		}
+
+		if(resourceURLs != NULL)
+			CFRelease(resourceURLs);
+
+		if(!firstPlugin)
+		{
+			firstPlugin = lastPlugin = thisPlug;
+			thisPlug->next = 0;
+		}
+		else
+		{
+			lastPlugin->next = thisPlug;
+			lastPlugin = thisPlug;
+			thisPlug->next = 0;
+		}
+		return 0;
+	}
+	else
+	{
+		LSStrLS("\pError loading plugin.", &ls);
+		LineMsg(&ls);
+		return -1;
+	}
+}
+
 inline char parsePlugFile(const FSSpec *spec)
 {
 	LongString ls;
@@ -739,70 +820,51 @@ inline char parsePlugFile(const FSSpec *spec)
 	return true;
 }
 
-static pascal void ProcessDirectory(FSSpec mySpec)
+/*
+ * Loads the plugins in the ShadowIRC application bundle.
+ */
+static void ProcessApplicationPlugins()
 {
+	CFBundleRef mainBundle;
+	CFArrayRef pluginURLs;
+	CFURLRef pluginURL;
+	CFBundleRef pluginBundle;
+	CFStringRef pluginName;
 	int i;
-	long dir;
-	CInfoPBRec paramBlock;
-	Str255 name;
-	FInfo fndrInfo;
-	short numFiles;
-	LongString ls;
-	
-	paramBlock.hFileInfo.ioCompletion=0;
-	paramBlock.hFileInfo.ioNamePtr=mySpec.name;
-	paramBlock.hFileInfo.ioVRefNum=mySpec.vRefNum;
-	paramBlock.hFileInfo.ioDirID=mySpec.parID;
-	paramBlock.hFileInfo.ioFDirIndex=-1;
-	
-	i=PBGetCatInfoSync(&paramBlock);
-	if(i)
+
+	// Get the main bundle for the app
+	mainBundle = CFBundleGetMainBundle();
+
+	// Get a list of URLs for all the bundles in the Plugins directory
+	pluginURLs = CFBundleCopyResourceURLsOfType(mainBundle, CFSTR("bundle"), CFSTR("Plugins"));
+	if(pluginURLs != NULL)
 	{
-		LSGetIntString(&ls, spError, sNoPluginsFolder);
-		LineMsg(&ls);
-		return;
-	}
-	
-	dir=paramBlock.dirInfo.ioDrDirID;
-	if(paramBlock.dirInfo.ioDrNmFls==0)
-	{
-		LSGetIntString(&ls, spError, sPlugsFolderEmpty);
-		LineMsg(&ls);
-	}
-	else
-	{
-		numFiles=paramBlock.dirInfo.ioDrNmFls;
-		for(i=1;i<=numFiles;i++)
+		int pluginCount = CFArrayGetCount(pluginURLs);
+		// Loop through the CFArray and load each plugin
+		for(i=0; i < pluginCount; i++)
 		{
-			paramBlock.hFileInfo.ioNamePtr=name;
-			paramBlock.hFileInfo.ioVRefNum=mySpec.vRefNum;
-			paramBlock.hFileInfo.ioDirID=dir;
-			paramBlock.hFileInfo.ioFDirIndex=i;
-			if(PBGetCatInfoSync(&paramBlock))
-				return;
-			if(!(paramBlock.hFileInfo.ioFlAttrib & 16))
-			{
-				if(!FSMakeFSSpec(mySpec.vRefNum, mySpec.parID, name, &mySpec))
-				{
-					FSpGetFInfo(&mySpec, &fndrInfo);
-					if(fndrInfo.fdCreator=='SIRC')
-					{
-						if(fndrInfo.fdType=='shlb' || fndrInfo.fdType=='PPLG')
-						{
-							if(!parsePlugFile(&mySpec)) //failed, due to a memory allocation error
-							{
-								LSGetIntString(&ls, spError, sPlugsMemErr);
-								LineMsg(&ls);
-								break;
-							}
-						}
-					}
-				}
-			}
+			pluginURL = (CFURLRef)CFArrayGetValueAtIndex(pluginURLs, i);
+
+			// Make a bundle instance using the URLRef
+			pluginBundle = CFBundleCreate(kCFAllocatorDefault, pluginURL);
+			pluginName = CFURLCopyLastPathComponent(pluginURL);
+			if(LoadPluginFromBundle(pluginBundle, pluginName) != 0) // Couldn't load the plugin
+				CFRelease(pluginBundle);
+			
+			CFRelease(pluginName);
+			CFRelease(pluginURL);
 		}
+
+		CFRelease(pluginURLs);
 		UseResFile(gApplResFork);
 	}
 }
+
+/*
+		LSGetIntString(&ls, spError, sNoPluginsFolder);
+		LSGetIntString(&ls, spError, sPlugsFolderEmpty);
+								LSGetIntString(&ls, spError, sPlugsMemErr);
+*/
 
 inline void initSIDR(void)
 {
@@ -832,101 +894,20 @@ inline void initSIDR(void)
 	sidr.internetConfig = (Ptr)internetConfig;
 }
 
-static pascal void CheckPluginPrefsFolder(void)
-{
-	char isDir;
-	LongString ls;
-	long dirid;
-	OSErr err;
-	short vref;
-	FSSpec ShadowIRCFolder;
-	long ShadowIRCFolderDirID, PreferencesFolderDirID;
-	
-	//Get preferences folder
-	err = FindFolder(kOnSystemDisk, 'pref', false, &vref, &PreferencesFolderDirID);
-	//Get ShadowIRC Ä
-	err = FSMakeFSSpec(vref, PreferencesFolderDirID, GetIntStringPtr(spFiles, sPreferencesFolder), &ShadowIRCFolder);
-	
-	//Assume ShadowIRC Ä Exists. Get its id.
-	err = FSpGetDirectoryID(&ShadowIRCFolder, &ShadowIRCFolderDirID, &isDir);
-	
-	//Make the FSp for the Plugins dir
-	err = FSMakeFSSpec(vref, ShadowIRCFolderDirID, GetIntStringPtr(spFiles, sPluginsFolder), &pluginPrefsFSSpec);
-
-	if(err) //this means that there's no preferences folder
-	{
-		if(FSpDirCreate(&pluginPrefsFSSpec, 0, &dirid))
-		{
+/*
 			LSGetIntString(&ls, spError, spCantCreatPluginPrefsFldr);
-			pluginPrefsFSSpec.parID=pluginPrefsFSSpec.vRefNum=*(short*)pluginPrefsFSSpec.name[0]=0xFDDF;
-			LineMsg(&ls);
-		}
-		else
-		{
-			pluginPrefsFSSpec.parID=dirid;
-			pluginPrefsFSSpec.name[0]=0;
-		}
-	}
-	else //it exists
-	{
-		FSpGetDirectoryID(&pluginPrefsFSSpec, &pluginPrefsFSSpec.parID, &isDir);
-		if(!isDir)
-		{
 			LSGetIntString(&ls, spError, sPlugsPrefsFolderIsFile);
-			pluginPrefsFSSpec.parID=pluginPrefsFSSpec.vRefNum=*(short*)pluginPrefsFSSpec.name[0]=0xFDDF;
-			LineMsg(&ls);
-		}
-		//else it's ok, do nothing.
-	}
-}
+*/
 
 pascal void makePlugsDB(void)
 {
-	FSSpec tempFSSpec;
-	char isDir;
-	LongString ls;
-	long dirid;
-	
-	initSIDR();
-	
-	hmiList=(hmiListHand)NewHandleClear(sizeof(long));
-	
-	FindAppSpec(&pluginsFolderFSSpec); //Get the app spec
-	if(FSMakeFSSpec(pluginsFolderFSSpec.vRefNum, pluginsFolderFSSpec.parID, GetIntStringPtr(spFiles, sPluginsFolder), &pluginsFolderFSSpec))
-	{
-		//no plugins folder, so make it
-		if(FSpDirCreate(&pluginsFolderFSSpec, 0, &dirid))
-		{
+/*
 			LSGetIntString(&ls, spError, sNoPluginsFolder);
-			pluginsFolderFSSpec.parID=pluginsFolderFSSpec.vRefNum=*(short*)pluginsFolderFSSpec.name[0]=0xFDDF;
-			LineMsg(&ls);
-			isDir=0;
-		}
-		else
-		{
-			pluginsFolderFSSpec.parID=dirid;
-			pluginsFolderFSSpec.name[0]=0;
-			isDir=1;
-		}
-	}
-	else
-	{
-		FSpGetDirectoryID(&pluginsFolderFSSpec, &pluginsFolderFSSpec.parID, &isDir);
-		if(!isDir)
-		{
 			LSGetIntString(&ls, spError, sPlugsFldrIsFile);
-			pluginsFolderFSSpec.parID=pluginsFolderFSSpec.vRefNum=*(short*)pluginsFolderFSSpec.name[0]=0xFDDF;
-			LineMsg(&ls);
-		}
-	}
-	
-	if(isDir)
-	{
-		tempFSSpec=pluginsFolderFSSpec;
-		CheckPluginPrefsFolder();
-		ProcessDirectory(tempFSSpec);
-	}
-
+*/
+	initSIDR();
+	hmiList=(hmiListHand)NewHandleClear(sizeof(long));
+	ProcessApplicationPlugins();
 	InitPlugins();
 }
 
