@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -77,7 +77,6 @@ pascal void FinishModalDialog(void);
 
 pascal void pstrcpyucase(ConstStr255Param src, Str255 dest);
 pascal void myCopy(ConstStr255Param s, short first, short last, StringPtr out);
-pascal char rectcmp(const Rect *r1, const Rect *r2);
 pascal void ulong64val(ConstStr255Param s, unsigned long long *out);
 
 #ifdef _stringlist_

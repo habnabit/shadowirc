@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -767,15 +767,6 @@ pascal void SetDlogFont(DialogPtr d)
 	TextFont(fontNum);
 	TextSize(10);
 	SetPort(p);
-}
-
-pascal char rectcmp(const Rect *r1, const Rect *r2)
-{
-	if(	*(long*)&r1->top == *(long*)&r2->top &&
-				*(long*)&r1->bottom == *(long*)&r2->bottom)
-		return 1;
-	else
-		return 0;
 }
 
 pascal char upc(unsigned char c)
