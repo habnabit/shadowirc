@@ -304,9 +304,9 @@ static char MWNavKey(MWPtr mw, UInt32 modifiers, char c)
 	else if((modifiers & controlKey) == controlKey)
 	{
 		if(c == 30)
-			MWPage(mw, kMWScrollLineDown);
-		else if(c==31)
 			MWPage(mw, kMWScrollLineUp);
+		else if(c==31)
+			MWPage(mw, kMWScrollLineDown);
 		else
 			proc = 0;
 	}
