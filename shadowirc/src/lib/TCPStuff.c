@@ -586,7 +586,7 @@ int TCPRemoteIP(int sockfd, struct sockaddr *ip)
     if(getpeername(sockfd, (struct sockaddr *) &ss, &len) < 0)
         return (-1);
     
-    memcpy(ip, &ss, sizeof(struct sockaddr_storage));
+    memcpy(ip, &ss, sizeof(struct sockaddr));
     return (0);
 }
 
