@@ -292,13 +292,13 @@ static int fd_remove (int fd)
         if (FD_ISSET(fd, &readfds))
                 FD_CLR(fd, &readfds);
         
+        close(fd);
         if (fd == fd_max && fd_max != 0) {
                 do
                     fd--;
                 while(!FD_ISSET(fd, &readfds) && fd > 0);
                 fd_max = fd;
         }
-        close(fd);
         
         return -1;
 }
