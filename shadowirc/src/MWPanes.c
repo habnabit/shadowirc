@@ -385,10 +385,7 @@ pascal void MWPaneUpdate(MWPtr mw)
 				r.bottom = o->drawArea.bottom+1;
 				
 				GetForeColor(&rgb);
-				if(IsWindowHilited(mw->w))
-					RGBForeColor(&black);
-				else
-					RGBForeColor(&VDkGrey);
+				RGBForeColor(&VDkGrey);
 				FrameRect(&r);
 				RGBForeColor(&rgb);
 			}
