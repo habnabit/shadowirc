@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -22,12 +22,12 @@
 #ifndef _IRCInputPrivate_
 #define _IRCInputPrivate_
 
-pascal void processSOCKS(CEPtr c, connectionPtr conn);
-pascal void processIdentd(CEPtr c, connectionPtr conn);
-pascal void processServer(CEPtr c, connectionPtr conn);
-pascal void processPlugin(CEPtr c, connectionPtr conn);
-pascal void dnsEvent(CEPtr c, connectionPtr conn);
-pascal void processStale(CEPtr c, connectionPtr conn);
-pascal void dccEvent(CEPtr c, connectionPtr conn);
+void processSOCKS(CEPtr c, connectionPtr conn);
+void processIdentd(CEPtr c, connectionPtr conn);
+void processServer(CEPtr c, connectionPtr conn);
+void processPlugin(CEPtr c, connectionPtr conn);
+void dnsEvent(CEPtr c, connectionPtr conn);
+void processStale(CEPtr c, connectionPtr conn);
+void dccEvent(CEPtr c, connectionPtr conn);
 
 #endif
