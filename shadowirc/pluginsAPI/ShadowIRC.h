@@ -742,15 +742,6 @@ enum cmPopupsTypes {
 	cmPlugin = 'cmpl'			//Plugin window
 };
 
-/*	This stuff is here so that the headers will still work if you don't have Drag Manager stuff in
-		your precompiled headers. It's right from drag.h.
-*/
-#ifndef __DRAG__
-typedef struct OpaqueDragReference* 	DragReference;
-typedef UInt32 							ItemReference;
-typedef SInt16 							DragTrackingMessage;
-#endif
-
 #pragma mark еее Color List
 /*	Internal ShadowIRC color numbers
 		Internal ShadowIRC color codes are similar to Ircle color codes. A hex character 0x08 followed
@@ -2632,13 +2623,6 @@ pascal void WindowClose(WindowPtr w);
 		------------------------------------------------------------------------------------------
 */
 
-pascal void DrawPlacard(Rect *r, long state);
-/*	Draws a placard. If Appearance is present, calls DrawThemePlacard(). Otherwise, emulates Apple Platinum appearance.
-		Input:	r - Rect to draw in.
-					state - ThemeDrawState for the placard.
-		Output:	None.
-*/
-
 pascal void SetTextColor(short color);
 /*	Emulates SetThemeTextColor() if Appearance is not present, or calls through if it is.
 		Input:	color - Appearance Manager text color
@@ -2657,19 +2641,6 @@ pascal void DrawBorder(const Rect *r, long state, char draggable);
 					state - kThemeStateActive, kThemeStatePressed, kThemeStateInactive
 					draggable - if true, draw border with dragging indicator
 		Output:	none
-*/
-
-pascal void GetDrawingState(DrawingState* state);
-/*	Equivilant to GetThemeDrawingState, which does not exist prior to Appearance 1.1.
-		Input:	state - pointer to a DrawingState
-		Output:	state becomes a new copy of the drawing state of the current window
-		Note:	Call SetDrawingState() when done to dispose of the state.
-*/
-
-pascal void SetDrawingState(DrawingState state);
-/*	Equivilant to SetThemeDrawingState(state, true), which does not exist prior to Appearance 1.1.
-		Input:	The state returned by GetDrawingState(). This function disposes of the state.
-		Output:	none.
 */
 
 pascal void NormalizeDrawingState();
