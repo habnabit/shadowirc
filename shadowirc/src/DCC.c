@@ -74,7 +74,7 @@ static pascal char DCCPutFile(connectionPtr x, char forceSave);
 static pascal void DCCSendFileChunk(connectionPtr *cn);
 //¥NOTE: chat is the only one still usint tcpc because there's no func available. When it is, zap tcpc from the def'n
 static pascal void DCCGetLineChat(connectionPtr conn);
-static pascal void DCCGetLineGet(connectionPtr conn);
+static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c);
 static pascal void DCCGetLineSend(connectionPtr conn);
 static pascal void StartDCCGet(connectionPtr x);
 
@@ -1443,9 +1443,9 @@ static pascal void DCCGetLineChat(connectionPtr conn)
 	}
 }
 
-static pascal void DCCGetLineGet(connectionPtr conn)
+static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c)
 {
-	long nn;
+	long nn = 0;
 	short pt;
 	char b;
 	long curpos;
@@ -1453,28 +1453,26 @@ static pascal void DCCGetLineGet(connectionPtr conn)
 	long cnt;
 	long paddedLenOfDFork;
 	int readfromoffset;
+        size_t abytes = c->value;
 	dccPtr d = conn->dcc;
 	dccGETDataPtr dd = (dccGETDataPtr)d->dccData;
 	Ptr getbuf;
 
 	while(conn)
 	 {
-                /*
-                 * XXX replace with c->value
-                 */
-		//nn = ConnCharsAvail(conn);
-		if(nn<1)
+		if(abytes<1)
 			break;
 			
 		cnt = FreeMem();
-		while(cnt - nn < 20000) //20k is overkill, but just to be reeeealy safe.
-			nn -= 1024;
+		while(cnt - abytes < 20000) //20k is overkill, but just to be reeeealy safe.
+			abytes -= 1024;
 
-		if(!nn)
+		if(!abytes)
 			return;
-		getbuf = NewPtr(nn);
-		if(!ConnGetData(conn, getbuf, nn))
+		getbuf = NewPtr(abytes);
+		if((nn = ConnGetData(conn, getbuf, abytes)) > 0)
 		{
+                        abytes -= nn;
 			if(!dd->macB) //if this isn't a MacB file, or we haven't gotten the entire header yet...
 			{
 				SetEOF(dd->gfref, dd->gotten+nn);
@@ -1693,7 +1691,7 @@ pascal void dccEvent(CEPtr c, connectionPtr conn)
 			break;
 		
 		case C_CharsAvailable:
-			conn->DCCInputFunc(conn);
+			conn->DCCInputFunc(conn, c);
 			break;
 			
 		case C_Found:

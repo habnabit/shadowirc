@@ -87,7 +87,7 @@ typedef pascal void (*ConnInputFuncPtr)(void*, connectionPtr conn);
 typedef pascal void (*ConnInputFuncPtr)(CEPtr, connectionPtr conn);
 #endif
 
-typedef pascal void (*DCCInputFuncPtr)(connectionPtr conn);
+typedef pascal void (*DCCInputFuncPtr)(connectionPtr conn, CEPtr c);
 
 struct Connection {
 	CONST connectionPtr next;
