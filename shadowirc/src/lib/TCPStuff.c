@@ -1000,7 +1000,7 @@ OSErr NewActiveConnection(connectionIndex *cp, struct in_addr remotehost, u_shor
 			connections[cpi].timeout = TickCount() + TO_ActiveOpen;
 			connections[cpi].status = CS_Opening;
                         /*
-                         * If doTCPListenOpen failed, deallocate cp
+                         * If doTCPActiveOpen failed, deallocate cp
                          * Set state accordingly.
                          */
 			if(connections[cpi].state == T_Failed) {
