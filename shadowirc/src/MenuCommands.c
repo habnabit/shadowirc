@@ -108,10 +108,7 @@ static void DoFind2(MWPtr mw)
 	long s0, s1;
 	long found;
 	
-	if(!mw)
-		mw = GetActiveMW();
-	
-	if(find.searchFor[0] && mw)
+	if(mw && find.searchFor[0])
 	{
 		t=WEGetText(mw->we);
 		WEGetSelection(&s0, &s1, mw->we);
@@ -221,7 +218,7 @@ static OSStatus FindWindowEventHandler(EventHandlerCallRef myHandler, EventRef e
 					gFindWindowCount--;
 					
 					if(cmd == kHICommandOK)
-						DoFind2(0);
+						DoFind2(GetActiveMW());
 					return noErr;
 			}
 		}
