@@ -336,7 +336,7 @@ INLINE void SQuit(pServerQUITDataRec *p)
 	//Find the userlist that applies. This means, the global one, or the one in all the channels in the link
 	ULI ul;
 	long l;
-	channelPtr ch;
+	channelPtr ch = NULL;
 	
 	if(globalUserlist)
 		ul = gUserlist;
@@ -380,7 +380,7 @@ INLINE void SNick(pServerNICKDataRec *p)
 	//Find the userlist that applies. In this case, it might be more than one, so this may need to be rewritten.
 	ULI ul;
 	UserListPtr u;
-	channelPtr ch;
+	channelPtr ch = NULL;
 	
 	if(globalUserlist)
 		ul = gUserlist;
@@ -1017,7 +1017,7 @@ static ULI ULINew(WindowPtr w, long type)
 	ULI ul = (ULI)NewPtrClear(sizeof(UserListInstance));
 	Rect r; //pos for scrollbar
 	GrafPtr gp;
-	MWPtr mw;
+	MWPtr mw = NULL;
 	
 	if(mainPrefs->userlistNickWidth < 10)
 		mainPrefs->userlistNickWidth = 80;
