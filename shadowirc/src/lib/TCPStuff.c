@@ -148,7 +148,7 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 
 static void FindAddressDNR(DNRRecordPtr);
 
-TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short remoteport);
+TCPStateType doTCPActiveOpen(int *sockfd, struct sockaddr *remotehost, u_short remoteport);
 TCPStateType doTCPListenOpen(int af, int *sockfd, u_short localport, int backlog);
 
 int GetConnectionSocket(long cp);
@@ -583,23 +583,33 @@ int TCPRemoteIP(int sockfd, struct sockaddr *sa)
  * Socket is set blocking after connect() is called
  */
 
-TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short remoteport)
+TCPStateType doTCPActiveOpen(int *sockfd, struct sockaddr *remotehost, u_short remoteport)
 {
         int n;
-        struct sockaddr_in servaddr;
+        u_short net_port;
         
-        if((*sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        if((*sockfd = socket(remotehost->sa_family, SOCK_STREAM, 0)) == -1)
                 return (T_Failed);
                 
         set_nblk(*sockfd);
-                
-        bzero(&servaddr, sizeof(servaddr));
-        servaddr.sin_family = AF_INET;
-        bcopy(&remotehost, &servaddr.sin_addr, sizeof(servaddr.sin_addr));
-        servaddr.sin_port = htons(remoteport);
+        
+        net_port = htons(remoteport);
+        
+        switch(remotehost->sa_family)
+        {
+                case AF_INET6:
+                        memcpy(&((struct sockaddr_in6 *)remotehost)->sin6_port, &net_port, sizeof(net_port));
+                        break;
+                case AF_INET:
+                        memcpy(&((struct sockaddr_in *)remotehost)->sin_port, &net_port, sizeof(net_port));
+                        break;
+                default:
+                        /* NOTE: This should never happen! */
+                        break;
+        }
         
         fd_add(*sockfd);
-        n = connect(*sockfd, (SA *) &servaddr, sizeof(servaddr));
+        n = connect(*sockfd, remotehost, remotehost->sa_len);
 
         if((set_blk(*sockfd)) == -1)
                 return(T_Failed);
@@ -947,7 +957,7 @@ OSErr NewListenConnection(connectionIndex *cp, int af, u_short localport, int ba
  * Create a new socket and start a non-blocking connect
  * Set state to T_Opening
  */
-OSErr NewActiveConnection(connectionIndex *cp, struct in_addr remotehost, u_short remoteport)
+OSErr NewActiveConnection(connectionIndex *cp, struct sockaddr *remotehost, u_short remoteport)
 {
 	OSErr err;
 	connectionIndex cpi;

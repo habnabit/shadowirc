@@ -2848,7 +2848,7 @@ pascal void ConnClose(connectionPtr conn);
 		Output:	none
 */
 
-pascal char ConnNewActive(connectionPtr conn);
+char ConnNewActive(connectionPtr conn);
 /*	Attempts to open a TCP/IP connection. Uses the ip and port values in the connection.
 		Input:	conn - connection to open
 		Output:	return value: true if the attempt to open was successful, false if the attempt failed for one reason or another.

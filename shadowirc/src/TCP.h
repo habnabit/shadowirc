@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -69,7 +69,7 @@ typedef struct connectionEventRecord {
 // XXX landonf: These will be reworked for TCP sockets
 // First long * argument is a connectionIndex
 OSErr NewListenConnection (long * cp, int af, u_short localport, int backlog);
-pascal OSErr NewActiveConnection (long * cp, struct in_addr remotehost, u_short remoteport);
+OSErr NewActiveConnection (long * cp, struct sockaddr *remotehost, u_short remoteport);
 
 pascal OSErr InitConnections(void);
 pascal OSErr FindAddress(long*, ConstStr255Param);

@@ -222,7 +222,7 @@ pascal connectionPtr findConnectionSock(long sock);
 pascal connectionPtr pluginNewConnection(char textOrBinary);
 
 pascal void ConnClose(connectionPtr conn);
-pascal char ConnNewActive(connectionPtr c);
+char ConnNewActive(connectionPtr c);
 char ConnNewListen(connectionPtr c, int af, int backlog);
 size_t ConnGetData(connectionPtr conn, Ptr d, size_t len);
 size_t ConnGetUntil(connectionPtr conn, Ptr d, char c, size_t len);

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -456,9 +456,16 @@ pascal void ConnClose(connectionPtr conn)
 		CloseTCPConnection(conn->private_socket);
 }
 
-pascal char ConnNewActive(connectionPtr c)
+char ConnNewActive(connectionPtr c)
 {
-	return NewActiveConnection(&c->private_socket, c->ip, c->port)==0;
+	struct sockaddr_in sin;
+	
+	sin.sin_len = sizeof(struct sockaddr_in);
+	sin.sin_family = PF_INET;
+	sin.sin_port = 0;
+	memcpy(&sin.sin_addr, &c->ip, sizeof(struct in_addr));
+	
+	return NewActiveConnection(&c->private_socket, (struct sockaddr *)&sin, c->port)==0;
 }
 
 char ConnNewListen(connectionPtr c, int af, int backlog)
