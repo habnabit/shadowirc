@@ -575,11 +575,7 @@ pascal char DCCGetAFile(FSSpec *f, char *macbinary)
 			{
 				if ((theErr = AEGetNthDesc(&(theReply.selection),index,typeFSS, &key ,&resultDesc)) == noErr)
 				{
-				#if TARGET_CARBON
 					AEGetDescData(&resultDesc, f, sizeof(FSSpec));
-				#else
-					BlockMoveData(*resultDesc.dataHandle, f, sizeof(FSSpec));
-				#endif
 
 					b = 1;
 					theErr = AEDisposeDesc(&resultDesc);

@@ -298,7 +298,7 @@ pascal void SetColorsPanel(void)
 	{
 		GetDialogItem(PrefsDlg, 4+x, &itemType, &(Handle)item, &box);
 		rgbc=(RGBColorHdl)GetControlDataHandle(item);
-		**rgbc=shadowircColors[x];
+		**rgbc = shadowircColors[x];
 		Draw1Control(item);
 	}
 }
@@ -328,7 +328,7 @@ static pascal char ColorFileSelect(FSSpec *out)
 
 		theErr = NavGetFile(0, &theReply, &dialogOptions, StdNavFilter, 0, 0, openList, 0);
 		
-		if (openList)
+		if(openList)
 			ReleaseResource((Handle)openList);
 		
 		retVal = 0;
@@ -344,11 +344,7 @@ static pascal char ColorFileSelect(FSSpec *out)
 				theErr = AEGetNthDesc(&(theReply.selection),index,typeFSS, &key, &resultDesc);
 				if(theErr == noErr)
 				{
-					#if TARGET_CARBON
 					AEGetDescData(&resultDesc, out, sizeof(FSSpec));
-					#else
-					BlockMoveData(*resultDesc.dataHandle, out,sizeof(FSSpec));
-					#endif
 					
 					theErr = FSpGetFInfo(out,&fileInfo);
 					if(theErr == noErr)
@@ -1320,31 +1316,26 @@ static pascal void ClosePreferencesWindow(short windowNum, char finished)
 static short currentPrefsWindowNum;
 static pascal void LoadPreferencesWindow(short windowNum)
 {
-	short rf;
-	plugsPtr pn;
+	short oldRes;
 	int ok;
 	PreferencesMenuItemPtr pp;
+	
+	oldRes = CurResFile();
 	
 	pp = &(**pmlList).list[windowNum];
 	
 	if(!pp->pluginRef) //internal
 	{
 		ok = 1;
-		rf = CurResFile();
 		UseResFile(gApplResFork);
-		
-		AppendDialogItemList(PrefsDlg, pp->dlgID, 0);
-
-		if(pp->hasConnList)
-			PDConnectionsInit();
-		UseResFile(rf);
 	}
 	else
 	{
+		plugsPtr pn;
 		pPWActivateData p;
 		
-		p.id=windowNum;
-		pn=pp->pluginRef;
+		p.id = windowNum;
+		pn = pp->pluginRef;
 		p.ditlNum = 0;
 		p.hasConnectionsList = false;
 		runIndPlugin(pn, pPWActivateMessage, &p);
@@ -1352,25 +1343,23 @@ static pascal void LoadPreferencesWindow(short windowNum)
 		ok = p.ditlNum != 0;
 		if(ok)
 		{
-			pp = &(**pmlList).list[windowNum];
 			pp->dlgID = p.ditlNum;
 			pp->hasConnList = p.hasConnectionsList;
 			
-			rf=CurResFile();
 			UseResFile(pn->resFileRefNum);
-
-			AppendDialogItemList(PrefsDlg,  p.ditlNum, 0);
-
-			if(p.hasConnectionsList)
-				PDConnectionsInit();
-
-			UseResFile(rf);
 		}
 	}
-
+	
 	if(ok)
 	{
-		currentPrefsWindowNum=windowNum;
+		AppendDialogItemList(PrefsDlg,  pp->dlgID, 0);
+		
+		if(pp->hasConnList)
+			PDConnectionsInit();
+
+		UseResFile(oldRes);
+		
+		currentPrefsWindowNum = windowNum;
 		SetPreferencesWindow(windowNum, 0);
 	}
 }

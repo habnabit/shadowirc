@@ -352,11 +352,7 @@ INLINE void DoExport(SLServHand servers[])
 			// retrieve the returned selection:
 			if((err = AEGetNthDesc(&(theReply.selection),1,typeFSS, &key,&resultDesc)) == noErr)
 			{
-				#if TARGET_CARBON
-					AEGetDescData(&resultDesc, &fs, sizeof(FSSpec));
-				#else
-					BlockMoveData(*resultDesc.dataHandle, &fs, sizeof(FSSpec));
-				#endif
+				AEGetDescData(&resultDesc, &fs, sizeof(FSSpec));
 
 				if(theReply.replacing)
 				{

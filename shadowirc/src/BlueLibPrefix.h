@@ -76,4 +76,9 @@ inline Rect* GetPortBounds(CGrafPtr port, Rect* bounds)
 
 #define GetWindowList() LMGetWindowList()
 
+inline void AEGetDescData(AEDesc *desc, void* out, int size)
+{
+	BlockMoveData(*(desc->dataHandle), out, size);
+}
+
 #include "CarbonLibTransitional.h"

@@ -271,11 +271,7 @@ pascal MWPtr TWSelect(void)
 				resultDesc.dataHandle = 0L;
 				if ((theErr = AEGetNthDesc(&(theReply.selection),index,typeFSS, &key,&resultDesc)) == noErr)
 				{
-				#if TARGET_CARBON
 					AEGetDescData(&resultDesc, &finalFSSpec, sizeof(FSSpec));
-				#else
-					BlockMoveData(*resultDesc.dataHandle,&finalFSSpec,sizeof(FSSpec));
-				#endif
 				
 					// decide if the doc we are opening is a 'PICT' or 'TEXT':
 					if ((theErr = FSpGetFInfo(&finalFSSpec,&fileInfo)) == noErr)
