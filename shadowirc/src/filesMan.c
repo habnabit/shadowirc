@@ -260,9 +260,15 @@ pascal void CleanFolderFSp(FSSpec *fss)
 	fss->name[0] = 0;
 }
 
+typedef struct DirSelRec {
+	FSRef *ref;
+	Boolean cancel;
+} DirSelRec, *DirSelRecPtr;
+
 static pascal void DirSelRefNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD)
 {
 	OSStatus err = noErr;
+	DirSelRecPtr dsRecP = (DirSelRecPtr)callBackUD;
 
 	switch (callBackSelector)
 	{
@@ -277,11 +283,12 @@ static pascal void DirSelRefNavHook(NavEventCallbackMessage callBackSelector, Na
 				switch(userAction)
 				{
 					case kNavUserActionChoose:
-					{
-						FSRef *dirRef = (FSRef *)callBackUD;
-						err = UnpackFSRefFromNavReply(&reply, dirRef);
+						err = UnpackFSRefFromNavReply(&reply, dsRecP->ref);
 						break;
-					}
+					
+					case kNavUserActionCancel:
+						dsRecP->cancel = TRUE;
+						break;
 				}
 				err = NavDisposeReply(&reply);
 			}
@@ -299,6 +306,7 @@ OSStatus DirectorySelectButtonRef(FSRef *ref)
 	NavDialogRef dialog;
 	NavDialogCreationOptions dialogOptions;
 	NavEventUPP eventUPP;
+	DirSelRecPtr dsRecP;
 	
 	eventUPP = NewNavEventUPP(DirSelRefNavHook);
 	
@@ -307,22 +315,36 @@ OSStatus DirectorySelectButtonRef(FSRef *ref)
 	
 	dialogOptions.message = CFCopyLocalizedString(kDirSelKey, NULL);
 	
-	if((err = NavCreateChooseFolderDialog(&dialogOptions, eventUPP, NULL, ref, &dialog)) == noErr)
+	dsRecP = (DirSelRecPtr)NewPtr(sizeof(DirSelRec));
+	if(dsRecP != NULL)
+	{
+		dsRecP->ref = ref;
+		dsRecP->cancel = FALSE;
+	}
+	
+	if((err = NavCreateChooseFolderDialog(&dialogOptions, eventUPP, NULL, dsRecP, &dialog)) == noErr)
 	{
 		if(dialog != NULL)
 		{
 			if((err = NavDialogRun(dialog)) != noErr)
 			{
-				CFRelease(dialogOptions.message);
+				if(dialogOptions.message)
+					CFRelease(dialogOptions.message);
+				if(dsRecP)
+					DisposePtr((Ptr)dsRecP);
 				NavDialogDispose(dialog);
+				DisposeNavEventUPP(eventUPP);
 			}
 			
-			if((NavDialogGetUserAction(dialog)) == kNavUserActionCancel)
+			if(dsRecP->cancel == TRUE)
 				err = paramErr;
 		}
 	}
 	
-	CFRelease(dialogOptions.message);
+	if(dialogOptions.message)
+		CFRelease(dialogOptions.message);
+	if(dsRecP)
+		DisposePtr((Ptr)dsRecP);
 	DisposeNavEventUPP(eventUPP);
 	
 	return err;
