@@ -472,12 +472,18 @@ pascal void DoONotice(channelPtr ch, const LongString *text)
 	UserListPtr ul;
 	linkPtr link=ch->link;
 	int cnt;
-	//display
+	int method;
+	
+	//Determine method to use based on server settings
+	if(HTIsSet(link->serverOptions, "\pWALLCHOPS"))
+		method = 3;
+	else //use the prefs
+		method = link->linkPrefs->onoticeMethod;
 	
 	//output
 	LSConcatStrAndStrAndStr("\p[WALLOPS/", ch->chName, "\p] ", &wallopstext);
 	LSConcatLSAndLS(&wallopstext, text, &wallopstext);
-	switch(link->linkPrefs->onoticeMethod)
+	switch(method)
 	{
 		case 1: //standard
 			//Ok, this sucks. Gotta put together a list of names, and make sure the bitch isn't too long and all that fun crap...

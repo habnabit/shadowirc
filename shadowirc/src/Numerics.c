@@ -67,24 +67,27 @@ inline void n433nickInUse(linkPtr link, LongString *rest);
 /*
 	005 Server options
 	http://www.irc.org/tech_docs/005.html
+	http://www.irc.org/tech_docs/draft-brocklesby-irc-isupport-02.txt
 	
 	Used now:
 		TOPICLEN=160
 		MODES=6
+		WALLCHOPS
 	
 	Use later:
-		WHOX WALLCHOPS USERIP CPRIVMSG CNOTICE MAP
+		WHOX WALLVOICES USERIP CPRIVMSG CNOTICE MAP
 		SILENCE=15
 		MAXCHANNELS=10
 		MAXBANS=30
 		NICKLEN=9
 		KICKLEN=160
+		AWAYLEN=160
 		CHANTYPES=+#&
 		PREFIX=(ov)@+
 		CHANMODES=b,k,l,imnpst
-		CHARSET=rfc1459
-		NETWORK=Undernet
-		CASEMAPPING=ascii
+		CHARSET=UTF=8
+		NETWORK=Undernet (EFNet, IRCNet, DALNet)
+		CASEMAPPING=ascii (rfc1459)
 	
 	Dalnet:
 		WATCH=128 - serverside notify
@@ -98,14 +101,21 @@ inline void n433nickInUse(linkPtr link, LongString *rest);
 			d = mode changes a setting. (never has param)
 */
 
+static HTPtr ServerOptionsDefaults = NULL;
+
 static HTPtr DefaultServerOptions(void)
 {
-	HTPtr so = HTCreate(DEFAULT_HASHSIZE);
+	if(!ServerOptionsDefaults)
+	{
+		HTPtr dso = HTCreate(DEFAULT_HASHSIZE);
+		
+		HTAdd(dso, "\pCHANTYPES", "\p#&", htTypeString);
+		HTAdd(dso, "\pPREFIX", "\p(ov)@+", htTypeString);
+		
+		ServerOptionsDefaults = dso;
+	}
 	
-	HTAdd(so, "\pCHANTYPES", "\p#&", htTypeString);
-	HTAdd(so, "\pPREFIX", "\p(ov)@+", htTypeString);
-	
-	return so;
+	return HTCreateDuplicate(ServerOptionsDefaults);
 }
 
 static void n005ServerFeatures(linkPtr link, LongString *ls)
@@ -149,7 +159,14 @@ static void n005ServerFeatures(linkPtr link, LongString *ls)
 			feature[0] = x-1;
 		}
 		
-		HTAdd(link->serverOptions, feature, data, dt);
+		if(feature[1] == '-') //remove the feature (reset to the default value)
+		{
+			pdelete(feature, 1, 1);
+			HTDelete(link->serverOptions, feature);
+			HTCopyElt(link->serverOptions, ServerOptionsDefaults, feature);
+		}
+		else
+			HTAdd(link->serverOptions, feature, data, dt);
 	}
 }
 
@@ -464,13 +481,9 @@ pascal char NumericComm(short comm, StringPtr from, ConstStringPtr target, LongS
 			UpdateStatusLine();
 			break;
 		
-		case 5: //map
-			//This is a supports command at connect.
-			if(!link->gotMOTD)
-			{
-				n005ServerFeatures(link, rest);
-				break;
-			}
+		case 5:
+			n005ServerFeatures(link, rest);
+			break;
 			
 		case 2:
 		case 3:

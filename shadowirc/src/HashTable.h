@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -26,8 +26,8 @@
 
 enum dataType
 {
-htTypeNull = 0, //implement later
-	htTypeInt = 0,
+	htTypeNull,
+	htTypeInt,
 	htTypeString
 };
 
@@ -51,14 +51,18 @@ typedef struct HashTable
 } HashTable, *HTPtr;
 
 HTPtr HTCreate(int hashSize);
+HTPtr HTCreateDuplicate(HTPtr table);
 void HTInit(HTPtr table, int hashSize);
 void HTClear(HTPtr table);
 void HTDestroy(HTPtr table);
 
 void HTAdd(HTPtr table, ConstStr255Param name, void* data, htDataType type);
+void HTCopyElt(HTPtr table, HTPtr srcTable, ConstStr255Param name);
+char HTDelete(HTPtr table, ConstStr255Param name);
 
 char HTFind(HTPtr table, ConstStr255Param name, htDataType* type, void** found);
 char HTFindNumeric(HTPtr table, ConstStr255Param name, long *num);
 long HTFindNumericDefault(HTPtr table, ConstStr255Param name, long def);
+char HTIsSet(HTPtr table, ConstStr255Param name);
 
 #endif

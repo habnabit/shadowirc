@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -24,11 +24,23 @@
 
 #include "HashTable.h"
 
+static void _HTCopyList(HTPtr table, HTPtr srcTable);
+
+
 HTPtr HTCreate(int hashSize)
 {
 	HTPtr ht = (HTPtr)NewPtr(sizeof(HashTable));
 	
 	HTInit(ht, hashSize);
+	
+	return ht;
+}
+
+HTPtr HTCreateDuplicate(HTPtr table)
+{
+	HTPtr ht = HTCreate(table->hashSize);
+	
+	_HTCopyList(ht, table);
 	
 	return ht;
 }
@@ -49,7 +61,7 @@ static void _HTClearList(htEltPtr e)
 	linkfor(e, e)
 	{
 		DisposePtr((Ptr)e->name);
-		if(e->type != htTypeInt)
+		if(e->type == htTypeString)
 			DisposePtr((Ptr)e->data);
 	}
 }
@@ -89,24 +101,51 @@ static int _HTHash(HTPtr table, ConstStr255Param name)
 	return key % table->hashSize;
 }
 
-static char _HTFind(htEltPtr current, ConstStr255Param find, htDataType* type, void** found)
+static htEltPtr _HTFindEltFromSublist(htEltPtr list, ConstStr255Param name)
 {
-	linkfor(current, current)
-		if(pstrcmp(current->name, find))
-		{
-			if(type)
-				*type = current->type;
-			if(found)
-				*found = current->data;
-			return true;
-		}
+	linkfor(list, list)
+		if(pstrcmp(list->name, name))
+			return list;
 	
-	return false;
+	return NULL;
+}
+
+static htEltPtr _HTFindEltAndPrevFromSublist(htEltPtr list, ConstStr255Param name, htEltPtr *prevElt)
+{
+	htEltPtr pe = NULL;
+	
+	linkfor(list, list)
+		if(pstrcmp(list->name, name))
+		{
+			*prevElt = pe;
+			return list;
+		}
+		else
+			pe = list;
+	
+	return NULL;
+}
+
+static htEltPtr _HTFindElt(HTPtr table, ConstStr255Param name)
+{
+	return _HTFindEltFromSublist(table->hashes[_HTHash(table, name)], name);
 }
 
 char HTFind(HTPtr table, ConstStr255Param name, htDataType* type, void** found)
 {
-   return _HTFind(table->hashes[_HTHash(table, name)], name, type, found);
+	htEltPtr elt = _HTFindElt(table, name);
+	
+	if(elt)
+	{
+		if(type)
+			*type = elt->type;
+		if(found)
+			*found = elt->data;
+		
+		return true;
+	}
+	else
+		return false;
 }
 
 char HTFindNumeric(HTPtr table, ConstStr255Param name, long *num)
@@ -144,8 +183,10 @@ static void _HTSetElt(htEltPtr elt, void* newData, int type)
 	elt->type = type;
 	if(type == htTypeInt)
 		elt->data = newData;
-	else
+	else if(type == htTypeString)
 		_HTStrDup(newData, (StringPtr*)&elt->data);
+	else
+		elt->data = 0;
 }
 
 
@@ -160,9 +201,23 @@ static htEltPtr _HTNewElt(ConstStr255Param newName, void* newData, htDataType ty
 	return elt;
 }
 
+static void _HTDisposeElt(htEltPtr elt)
+{
+	elt->next = NULL;
+	
+	DisposePtr(elt->name);
+	elt->name = NULL;
+	
+	if(elt->type == htTypeString)
+		DisposePtr(elt->data);
+	elt->data = NULL;
+	
+	DisposePtr((Ptr)elt);
+}
+
 static void _HTModElt(htEltPtr elt, void* newData, htDataType type)
 {
-	if(elt->type != htTypeInt)
+	if(elt->type == htTypeString)
 		DisposePtr(elt->data);
 	
 	_HTSetElt(elt, newData, type);
@@ -170,20 +225,67 @@ static void _HTModElt(htEltPtr elt, void* newData, htDataType type)
 
 static void _HTInsert(htEltPtr *first, ConstStr255Param newName, void* newData, htDataType type)
 {
-	htEltPtr list;
+	htEltPtr list = _HTFindEltFromSublist(*first, newName);
 	
-	linkfor(list, *first)
-		if(pstrcmp(list->name, newName)) //modification of old thing
-		{
-			_HTModElt(list, newData, type);
-			return;
-		}
+	if(list) //modification of old element
+	{
+		_HTModElt(list, newData, type);
+		return;
+	}
 	
 	//Else new thing
 	*first = _HTNewElt(newName, newData, type, *first);
 }
 
+static void _HTCopyList(HTPtr table, HTPtr srcTable)
+{
+	int x, max = srcTable->hashSize;
+	htEltPtr list;
+	
+	for(x = 0; x < max; x++)
+		linkfor(list, srcTable->hashes[x])
+			table->hashes[x] = _HTNewElt(list->name, list->data, list->type, table->hashes[x]);
+}
+
 void HTAdd(HTPtr table, ConstStr255Param name, void* data, htDataType type)
 {
 	_HTInsert(&table->hashes[_HTHash(table, name)], name, data, type);
+}
+
+char HTDelete(HTPtr table, ConstStr255Param name)
+{
+	htEltPtr *list;
+	htEltPtr elt, prevElt;
+	
+	list = &table->hashes[_HTHash(table, name)];
+	
+	elt = _HTFindEltAndPrevFromSublist(*list, name, &prevElt);
+	
+	if(elt)
+	{
+		//if prevElt is NULL, then elt is the first element
+		if(!prevElt)
+			*list = elt->next;
+		else
+			prevElt->next = elt->next;
+		
+		_HTDisposeElt(elt);
+		
+		return true;
+	}
+	else
+		return false;
+}
+
+void HTCopyElt(HTPtr table, HTPtr srcTable, ConstStr255Param name)
+{
+	htEltPtr srcElt = _HTFindElt(srcTable, name);
+	
+	if(srcElt)
+		HTAdd(table, name, srcElt->data, srcElt->type);
+}
+
+char HTIsSet(HTPtr table, ConstStr255Param name)
+{
+	return HTFind(table, name, NULL, NULL);
 }
