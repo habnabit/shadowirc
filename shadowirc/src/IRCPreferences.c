@@ -567,7 +567,7 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				NumToString(mp->defaultFontSize, s);
 				SetText(PrefsDlg, 18, s);
 				item=GetControlHandle(PrefsDlg, 16);
-				mh=GetControlMenu(item);
+				mh= GetControlPopupMenuHandle(item);
 				y=CountMenuItems(mh);
 				for(x=1;x<=y;x++)
 				{
@@ -811,7 +811,7 @@ static pascal char GetPreferencesWindow(short windowNum, StringPtr errorString, 
 			StringToNum(s, &l);
 			mp->defaultFontSize=l;
 			ch=GetControlHandle(PrefsDlg, 16);
-			GetMenuItemText(GetControlMenu(ch), GetControlValue(ch), mp->defaultFontName);
+			GetMenuItemText(GetControlPopupMenuHandle(ch), GetControlValue(ch), mp->defaultFontName);
 			mainPrefs->colorMethod=GetControlValue(GetControlHandle(PrefsDlg, 21));
 			mainPrefs->ircIIDisplay=getCheckBox(PrefsDlg, 22);
 			mainPrefs->displayJoin=getCheckBox(PrefsDlg, 24);
