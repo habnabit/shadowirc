@@ -1414,6 +1414,21 @@ pascal void strp2c(unsigned char *pstr)
 	pstr[len] = 0;
 }
 
+pascal StringPtr NewPString(const unsigned char *pstr)
+{
+	StringPtr str;
+	
+	if(pstr)
+	{
+		str = (StringPtr)NewPtr(pstr[0] + 1);
+		pstrcpy(pstr, str);
+	}
+	else
+		str = 0;
+	
+	return str;
+}
+
 #if !TARGET_CARBON
 pascal void GetQD(QDGlobals* *qdg)
 {

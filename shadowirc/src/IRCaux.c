@@ -468,18 +468,11 @@ pascal void connection2(connectionPtr conn)
 					SMPrefixLink(link, &ls, 1);
 					
 					identConn->outgoing=false;
+					identConn->ip = conn->ip;
 					if(mainPrefs->firewallType == fwSOCKS4A || mainPrefs->firewallType == fwSOCKS4)
-					{
-						identConn->ip =conn->ip;
-						identConn->refCon = NewPtr(mainPrefs->socksUser[0] + 1);
-						pstrcpy(mainPrefs->socksUser, (StringPtr)identConn->refCon);
-					}
+						identConn->refCon = NewPString(mainPrefs->socksUser);
 					else
-					{
-						identConn->ip=conn->ip;
-						identConn->refCon = NewPtr(conn->link->linkPrefs->user[0] + 1);
-						pstrcpy(conn->link->linkPrefs->user, (StringPtr)identConn->refCon);
-					}
+						identConn->refCon = NewPString(conn->link->linkPrefs->user);
 					
 					identConn->port = 113;
 					ConnNewPassive(identConn);

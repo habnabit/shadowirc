@@ -23,6 +23,7 @@
 
 #include "Notify.h"
 #include "inline.h"
+#include "utils.h"
 
 typedef struct NotifyRec {
 	struct NotifyRec *next;
@@ -56,8 +57,7 @@ pascal void Notify(char mark, Handle icon, Handle sound, ConstStr255Param s)
 		n->nmIcon = icon;
 	
 	n->nmSound = sound;
-	n->nmStr = (StringPtr)NewPtr(s[0]+1);
-	pstrcpy(s, n->nmStr);
+	n->nmStr = NewPString(s);
 	if(!nmResponseProc)
 		nmResponseProc = NewNMProc(NotifyReply);	
 	n->nmResp = nmResponseProc;

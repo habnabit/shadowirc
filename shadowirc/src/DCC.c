@@ -26,12 +26,12 @@
 #include "IRCGlobals.h"
 #include "MsgWindows.h"
 #include "MacBinary.h"
+#include "TCP.h"
 #include "DCC.h"
 #include "connections.h"
 #include "utils.h"
 #include "IRCChannels.h"
 #include "IRCAux.h"
-#include "TCP.h"
 #include "CTCP.h"
 #include "InputLine.h"
 #include "plugins.h"
@@ -74,9 +74,9 @@ static pascal void DCCSendReposition(connectionPtr conn, long newpos);
 
 static pascal char DCCPutFile(connectionPtr x, char forceSave);
 static pascal void DCCSendFileChunk(connectionPtr *cn);
-static pascal void DCCGetLineChat(connectionPtr conn, CEPtr c);
-static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c);
-static pascal void DCCGetLineSend(connectionPtr conn, CEPtr c);
+static pascal void DCCGetLineChat(connectionPtr conn, TCPConnectionPtr tcpc);
+static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr tcpc);
+static pascal void DCCGetLineSend(connectionPtr conn, TCPConnectionPtr tcpc);
 static pascal void StartDCCGet(connectionPtr x, char autoSave);
 
 static pascal short DCCSendFileHook(short item, DialogPtr d, dccsendbitPtr info);
@@ -353,6 +353,19 @@ pascal char DCCCreate(linkPtr link, short typ, ConstStr255Param fr, connectionPt
 			dccGETData *dd = (dccGETData*)NewPtrClear(sizeof(dccGETData));
 			dd->bufSiz = mainPrefs->dccSendPacketSize;
 			d->dccData = dd;
+		}
+		
+		switch(typ)
+		{
+			case dccCHAT:
+				(*c)->DCCInputFunc = DCCGetLineChat;
+				break;
+			case dccGET:
+				(*c)->DCCInputFunc = DCCGetLineGet;
+				break;
+			case dccSEND:
+				(*c)->DCCInputFunc = DCCGetLineSend;
+				break;
 		}
 		
 		p.connection = *c;
@@ -1386,7 +1399,7 @@ pascal void DCCConnOpened(connectionPtr *cn)
 
 #pragma mark -
 
-static pascal void DCCGetLineChat(connectionPtr conn, CEPtr c)
+static pascal void DCCGetLineChat(connectionPtr conn, TCPConnectionPtr tcpc)
 {
 	int i;
 	long nn;
@@ -1396,7 +1409,7 @@ static pascal void DCCGetLineChat(connectionPtr conn, CEPtr c)
 	pDCCIncomingChatDataRec p;
 	
 	nn=0;
-	if(!TCPReceiveUpTo(c->tcpc, 10, readTimeout, (Ptr)&ls.data[1], 512, &nn, &b))
+	if(!TCPReceiveUpTo(tcpc, 10, readTimeout, (Ptr)&ls.data[1], 512, &nn, &b))
 	{
 		while((nn>0) && ((ls.data[nn]==10) || (ls.data[nn]==13)))
 			nn--;
@@ -1497,7 +1510,7 @@ static pascal void DCCGetLineChat(connectionPtr conn, CEPtr c)
 	}
 }
 
-static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c)
+static pascal void DCCGetLineGet(connectionPtr conn, TCPConnectionPtr tcpc)
 {
 	long nn;
 	short pt;
@@ -1513,7 +1526,7 @@ static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c)
 
 	while(conn)
 	 {
-		nn=TCPCharsAvailable(c->tcpc);
+		nn=TCPCharsAvailable(tcpc);
 		if(nn<1)
 			break;
 			
@@ -1524,7 +1537,7 @@ static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c)
 		if(!nn)
 			return;
 		getbuf = NewPtr(nn);
-		if(!TCPReceiveChars(c->tcpc, getbuf, nn))
+		if(!TCPReceiveChars(tcpc, getbuf, nn))
 		{
 			if(!dd->macB) //if this isn't a MacB file, or we haven't gotten the entire header yet...
 			{
@@ -1658,7 +1671,7 @@ static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c)
 					}
 				}
 				
-				if(TCPSendAsync(c->tcpc, (Ptr)&dd->gotten, sizeof(long), true))
+				if(TCPSendAsync(tcpc, (Ptr)&dd->gotten, sizeof(long), true))
 					DCCFailed(&conn, GetIntStringPtr(spDCC, sLostAckErr));
 			}
 			else
@@ -1675,20 +1688,20 @@ static pascal void DCCGetLineGet(connectionPtr conn, CEPtr c)
 	};
 }
 
-static pascal void DCCGetLineSend(connectionPtr conn, CEPtr c)
+static pascal void DCCGetLineSend(connectionPtr conn, TCPConnectionPtr tcpc)
 {
 	long nn, ack;
 	dccSENDDataPtr dd = (dccSENDDataPtr)conn->dcc->dccData;
 	
 	while(conn)
 	 {
-		nn=TCPCharsAvailable(c->tcpc);
+		nn=TCPCharsAvailable(tcpc);
 		if(nn<sizeof(long))
 			break;
 		if(nn>sizeof(long))
 			nn=sizeof(long);
 		
-		if(!TCPReceiveChars(c->tcpc, (Ptr)&ack, nn))
+		if(!TCPReceiveChars(tcpc, (Ptr)&ack, nn))
 		{
 			dd->acked = ack;
 			
@@ -1726,31 +1739,22 @@ pascal void dccEvent(CEPtr c, connectionPtr conn)
 		case C_Established:
 			DCCConnOpened(&conn);
 			break;
+		
 		case C_SearchFailed:
 			DCCFailed(&conn, "\pCouldn't lookup host");
 			break;
+		
 		case C_FailedToOpen:
 			DCCFailed(&conn, GetIntStringPtr(spDCC, sFailedToOpen));
 			break;
+		
 		case C_Closing:
-			DCCFailed(&conn, "\pClosing");
-			break;
 		case C_Closed:
 			DCCFailed(&conn, "\pClosed");
 			break;
+		
 		case C_CharsAvailable:
-			switch(conn->dcc->dccType)
-			{
-				case dccCHAT:
-					DCCGetLineChat(conn, c);
-					break;
-				case dccGET:
-					DCCGetLineGet(conn, c);
-					break;
-				case dccSEND:
-					DCCGetLineSend(conn, c);
-					break;
-			}
+			conn->DCCInputFunc(conn, c->tcpc);
 			break;
 			
 		case C_Found:

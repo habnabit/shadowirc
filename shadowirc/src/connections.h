@@ -77,8 +77,10 @@ enum lineTermList {
 
 #ifndef _TCP
 typedef pascal void (*ConnInputFuncPtr)(void*, connectionPtr conn);
+typedef pascal void (*DCCInputFuncPtr)(connectionPtr conn, void*);
 #else
 typedef pascal void (*ConnInputFuncPtr)(CEPtr, connectionPtr conn);
+typedef pascal void (*DCCInputFuncPtr)(connectionPtr conn, TCPConnectionPtr);
 #endif
 
 struct Connection {
@@ -110,6 +112,7 @@ struct Connection {
 	
 	//Not in API
 	CONST ConnInputFuncPtr InputFunc;
+	DCCInputFuncPtr DCCInputFunc; //Should be CONST...
 	struct plugsRec* pluginRef;
 	
 	Str63 socksName;

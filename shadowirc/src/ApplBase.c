@@ -1997,11 +1997,9 @@ inline pascal void checkCursorFocus(EventRecord *e)
 	MWPtr mw;
 	WindowPtr p;
 	
-	if(mainPrefs->cursorFocus &&!(e->modifiers & cmdKey))
+	//If we're doing cursor focus, the command key isn't down, and the mouse has moved
+	if(mainPrefs->cursorFocus &&!(e->modifiers & cmdKey) && (*(long*)&prevLoc != *(long*)&e->where))
 	{
-		if(*(long*)&prevLoc == *(long*)&e->where)
-			return;
-		
 		prevLoc = e->where;
 		
 		FindWindow(e->where, &p);

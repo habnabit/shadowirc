@@ -180,6 +180,7 @@ pascal void deleteConnection(connectionPtr *c)
 	cc->next = 0;
 	cc->connType = connNIL;
 	cc->InputFunc = 0;
+	cc->DCCInputFunc = 0;
 	DisposePtr((Ptr)cc);
 	*c=0;
 }

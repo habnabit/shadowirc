@@ -136,8 +136,7 @@ long HTFindNumericDefault(HTPtr table, ConstStr255Param name, long def)
 
 static void _HTStrDup(ConstStringPtr str, void** dest)
 {
-	*dest = (StringPtr)NewPtr(str[0] + 1);
-	pstrcpy(str, *dest);
+	*dest = NewPString(str);
 }
 
 static void _HTSetElt(htEltPtr elt, void* newData, int type)

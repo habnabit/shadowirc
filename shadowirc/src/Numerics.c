@@ -688,8 +688,7 @@ _Skip:
 			
 			if(link->umodes)
 				DisposePtr((Ptr)link->umodes);
-			link->umodes = (StringPtr)NewPtr(s1[0]+1);
-			pstrcpy(s1, link->umodes);
+			link->umodes = NewPString(s1);
 
 			if(link->yourUmodes)
 				DisposePtr((Ptr)link->yourUmodes);
@@ -698,8 +697,7 @@ _Skip:
 			
 			if(link->chModes)
 				DisposePtr((Ptr)link->chModes);
-			link->chModes = (StringPtr)NewPtr(s2[0] + 1);
-			pstrcpy(s2, link->chModes);
+			link->chModes = NewPString(s2);
 			
 			UpdateStatusLine();
 			break;

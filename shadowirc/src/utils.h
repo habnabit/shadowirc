@@ -107,6 +107,8 @@ pascal ConstStr255Param GetIntStringPtr(STRnPtr list, short elt);
 pascal void LSGetIntString(LongString *ls, STRnPtr list, short elt);
 #endif
 
+pascal StringPtr NewPString(const unsigned char *pstr);
+
 #pragma internal reset
 
 #define SAppend1(s,ch){(s)[++((s)[0])]=ch;}

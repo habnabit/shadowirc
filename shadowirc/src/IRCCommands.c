@@ -1291,10 +1291,7 @@ static pascal void TranslateCommand(linkPtr link, LongString *s)
 				if(link->awayString)
 					DisposePtr((Ptr)link->awayString);
 				if(rest.data[0])
-				{
-					link->awayString = (StringPtr)NewPtr(rest.data[0]+1);
-					pstrcpy(rest.data, link->awayString);
-				}
+					link->awayString = NewPString(rest.data);
 				else
 					link->awayString = 0;
 			}
