@@ -24,8 +24,6 @@
 #include "MoreFilesX.h"
 #include "IRCCFPrefs.h"
 
-#define kPrefDCCFolder CFSTR("DCCFolder")
-
 ICInstance internetConfig;
 
 void StartupIC(void)
@@ -98,8 +96,6 @@ OSStatus GetFSRefForDownloadsFolder(FSRef *ref)
 							err = FSResolveAlias(NULL, fsAliasHdl, ref, &changed);
 							if(!FSRefValid(ref))
 								err = paramErr;
-							else
-								err = WriteDirURLRef(kPrefDCCFolder, ref);
 						}
 					}
 				}
