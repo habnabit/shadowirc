@@ -37,73 +37,193 @@
 inline void PluginShortcutText(Handle lh);
 static pascal void ParseShortcutText(ConstStr255Param s);
 
+#define kNibShortcuts CFSTR("shortcuts")
+#define kNibWinShortcuts CFSTR("Shortcuts")
+
+enum {
+	kShortcutItemSignature = 'SHOR',
+	kShortcutDataProperty = 'SHOR',
+	
+	kShortcutSelectCommand = 'SSET'
+};
+
+static int gShortcutsWindowCount = 0;
+
+typedef struct ShortcutWindowData {
+	int curSet;
+	Str255 shorts[30];
+} ShortcutWindowData, *ShortcutWindowDataPtr;
+
+static ShortcutWindowDataPtr NewShortcutWindowData(void)
+{
+	ShortcutWindowDataPtr sdp = (ShortcutWindowDataPtr)NewPtr(sizeof(ShortcutWindowData));
+	
+	sdp->curSet = 0;
+	BlockMoveData(mainPrefs->shortcuts, sdp->shorts, 30 * 256);
+	
+	return sdp;
+}
+
+static ShortcutWindowDataPtr GetShortcutWindowData(WindowRef shortcutsWin)
+{
+	ShortcutWindowDataPtr shorts;
+	UInt32 actualSize;
+	
+	GetWindowProperty(shortcutsWin, kApplicationSignature, kShortcutDataProperty, sizeof(shorts), &actualSize, &shorts);
+	
+	return shorts;
+}
+
+static void SaveShortcutWindow(WindowRef shortcutsWin)
+{
+	ShortcutWindowDataPtr sdp = GetShortcutWindowData(shortcutsWin);
+	
+	BlockMoveData(sdp->shorts, mainPrefs->shortcuts, sizeof(sdp->shorts));
+	ShortcutsMenuUpdate();
+}
+
+static void ReadShortcutWindow(WindowRef shortcutsWin)
+{
+	ControlRef itemCtrl;
+	ControlID item = { kShortcutItemSignature, 0};
+	CFStringRef theStr;
+	int x;
+	ShortcutWindowDataPtr sdp;
+	int group;
+	
+	sdp = GetShortcutWindowData(shortcutsWin);
+	group = sdp->curSet * 10;
+	
+	for(x = 1; x <= 10; x++)
+	{
+		item.id = x;
+		GetControlByID(shortcutsWin, &item, &itemCtrl);
+		
+		GetControlData(itemCtrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theStr, NULL);
+		CFStringGetPascalString(theStr, sdp->shorts[x + group - 1], sizeof(Str255), CFStringGetSystemEncoding());
+	}
+}
+
+static void SetShortcutWindow(WindowRef shortcutsWin, int group)
+{
+	ControlRef itemCtrl;
+	ControlID item = { kShortcutItemSignature, 0};
+	CFStringRef theStr;
+	int x;
+	ShortcutWindowDataPtr sdp = GetShortcutWindowData(shortcutsWin);
+	
+	sdp->curSet = group;
+	group *= 10;
+	for(x = 1; x <= 10; x++)
+	{
+		item.id = x;
+		GetControlByID(shortcutsWin, &item, &itemCtrl);
+		
+		theStr = CFStringCreateWithPascalString(NULL, sdp->shorts[x + group - 1], kCFStringEncodingMacRoman);
+		SetControlData(itemCtrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theStr);
+		CFRelease(theStr);
+		DrawOneControl(itemCtrl);
+	}
+}
+
+static pascal OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
+{
+	OSStatus result = eventNotHandledErr;
+	WindowRef shortcutsWin = (WindowRef)userData;
+	UInt32 eventClass, eventKind;
+	ShortcutWindowDataPtr sdp;
+	UInt32 menuItem;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	switch(eventClass)
+	{
+		case kEventClassControl:
+		{
+			ControlRef theControl = NULL;
+			UInt32 cmd;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &theControl);
+			GetControlCommandID(theControl, &cmd);
+			
+			switch(cmd)
+			{
+				case kShortcutSelectCommand:
+					ReadShortcutWindow(shortcutsWin);
+					
+					menuItem = GetControl32BitValue(theControl);
+					
+					SetShortcutWindow(shortcutsWin, menuItem - 1);
+					break;
+				
+				case kHICommandOK:
+					ReadShortcutWindow(shortcutsWin);
+					SaveShortcutWindow(shortcutsWin);
+					
+				case kHICommandCancel:
+					sdp = GetShortcutWindowData(shortcutsWin);
+					DisposePtr((Ptr)sdp);
+					DisposeWindow(shortcutsWin);
+					
+					gShortcutsWindowCount--;
+					result = noErr;
+					break;
+			}
+		}
+	}
+	
+	return result;
+}
+
 
 void DoShortcutsEditor(void)
 {
-	short x;
-	DialogPtr shortcutsDlg;
-	short num=0;
-	short num2;
-	Str255 s;
-	Handle sct;
-	Str255 *shorts=(Str255*)NewPtr(30 * 256);
+	static EventHandlerUPP swUPP = NULL;
+	static WindowRef shortcutsWin = 0;
+	ShortcutWindowDataPtr sdp;
+	IBNibRef shortcutsNib;
+	OSStatus status;
 	
-	if(!shorts) //not enough memory
-		return;
+	const EventTypeSpec ctSpec[] = {
+		{ kEventClassControl, kEventControlHit }
+	};
 	
-	BlockMoveData(mainPrefs->shortcuts, shorts, 30 * 256);
-	
-	shortcutsDlg=GetNewDialog(1003, 0, (WindowPtr)-1);
-	
-	for(x=0;x<=9;x++)
-		SetText(shortcutsDlg, 14+x, shorts[x]);
-	
-	sct = GetResource('TEXT', 127);
-	if(sct)
+	if(++gShortcutsWindowCount > 1)
 	{
-		SetDlogItemTextHdl(shortcutsDlg, 24, *sct, GetHandleSize(sct));
-		ReleaseResource(sct);
+		if(shortcutsWin)
+			SelectWindow(shortcutsWin);
+		return;
 	}
 	
-	SetupModalDialog(shortcutsDlg, 1, 2);
-	do
-	{
-		ModalDialog(StdDlgFilter, &x);
-		
-		if(x==1)
-		{
-			for(x=0;x<=9;x++)
-				GetText(shortcutsDlg, 14+x, shorts[x + (num * 10)]);
-
-			BlockMoveData(shorts, mainPrefs->shortcuts, 30 * 256);
-			ShortcutsMenuUpdate();
-			break;
-		}
-		else if(x==2)
-			break;
-		else  if(x==25)
-		{
-			num2=GetControlValue(GetControlHandle(shortcutsDlg, 25))-1;
-			if(num2!=num)
-			{
-				for(x=0;x<=9;x++)
-					GetText(shortcutsDlg, 14+x, shorts[x + (num * 10)]);
-				num=num2;
-				
-				for(x=0;x<=9;x++)
-				{
-					NumToString(x+1 + (num*10), s);
-					SAppend1(s, ':');
-					SetText(shortcutsDlg, 4+x, s);
-					SetText(shortcutsDlg, 14+x, shorts[x + (num * 10)]);
-				}
-			}
-		}
-	} while(1);
+	sdp = NewShortcutWindowData();
 	
-	DisposePtr((Ptr)shorts);
-	DisposeDialog(shortcutsDlg);
-	FinishModalDialog();
+	if(!swUPP)
+		swUPP = NewEventHandlerUPP(ShortcutsEditorEventHandler);
+	
+	status = CreateNibReference(kNibShortcuts, &shortcutsNib);
+	require_noerr(status, CantFindDialogNib);
+	
+	status = CreateWindowFromNib(shortcutsNib, kNibWinShortcuts, &shortcutsWin);
+	require_noerr(status, CantCreateDialogWindow);
+	
+	DisposeNibReference(shortcutsNib);
+	
+	SetWindowProperty(shortcutsWin, kApplicationSignature, kShortcutDataProperty, sizeof(sdp), &sdp);
+	
+	status = InstallWindowEventHandler(shortcutsWin, swUPP, GetEventTypeCount(ctSpec), ctSpec,(void *)shortcutsWin, NULL);
+	require_noerr(status, CantInstallDialogHandler);
+	
+	SetShortcutWindow(shortcutsWin, 0);
+	
+	ShowWindow(shortcutsWin);
+	SelectWindow(shortcutsWin);
+	
+	
+CantFindDialogNib:
+CantCreateDialogWindow:
+CantInstallDialogHandler:
+	return;
 }
 
 pascal void ShortcutsMenuUpdate(void)
