@@ -704,7 +704,7 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 			{
 				ConnDeSOCKS(conn);
 				if(conn->connType == connIRC)
-					connection3(conn->link, true);
+					LinkSuccessfulConnection(conn->link, true);
 				else if(conn->connType == connDCC)
 					DCCConnOpened(&conn);
 			}

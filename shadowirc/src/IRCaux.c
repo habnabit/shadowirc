@@ -275,28 +275,27 @@ pascal char ValidPrefs(linkPtr link)
 	return c;
 }
 
-pascal char connection3(linkPtr link, char reg)
+pascal void LinkSuccessfulConnection(linkPtr link, char reg)
 {
 	pServiceCWLinkStateChangeData p;
 	
 	p.link = link;
-	if(link->conn->ip!=-1)
-	{
-		link->serverStatus=S_CONN;
-		p.connectStage = link->conn->connectStage=csConnected;
-		runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
-		UpdateStatusLine();
-		if(reg)
-			RegUser(link);
-		return true;
-	}
-	else
-	{
-		p.connectStage = link->conn->connectStage=csFailedToConnect;
-		runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
-		ServerOK(C_FailedToOpen, link);
-		return false;
-	}
+	link->serverStatus = S_CONN;
+	p.connectStage = link->conn->connectStage=csConnected;
+	runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
+	UpdateStatusLine();
+	if(reg)
+		RegUser(link);
+}
+
+pascal void LinkFailedConnection(linkPtr link)
+{
+	pServiceCWLinkStateChangeData p;
+	
+	p.link = link;
+	p.connectStage = link->conn->connectStage=csFailedToConnect;
+	runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
+	ServerOK(C_FailedToOpen, link);
 }
 
 static pascal void CreateIdentdConn(connectionPtr conn)
@@ -326,6 +325,8 @@ static pascal void CreateIdentdConn(connectionPtr conn)
 	}
 }
 
+//We found the IP for the server we're trying to connect to.
+//connect to the server, and then open the identd connection
 pascal void connection2(connectionPtr conn)
 {
 	if(conn->ip!=-1)
