@@ -169,7 +169,7 @@ char SFDeleteFeature(IRCSFeaturesPtr sf, StringPtr name)
 	
 	if(kf)
 	{
-		void* data;
+		void* data = NULL;
 		void* srcLoc = kf->def;
 		
 		if(kf->type == featureBool)
