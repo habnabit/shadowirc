@@ -158,20 +158,20 @@ int GetConnectionSocket(long cp);
     #define BUFLEN 256
 #endif
 
-void inet_ntop_str(struct sockaddr *addr, StringPtr string)
+void inet_ntop_str(int af, const struct sockaddr *addr, StringPtr string)
 {
     char cstr[BUFLEN];
     
-    switch(addr->sa_family)
+    switch(af)
     {
 	    case AF_INET6:
-		    inet_ntop(addr->sa_family, &((struct sockaddr_in6 *)addr)->sin6_addr, cstr, BUFLEN);
+		    inet_ntop(af, &((struct sockaddr_in6 *)addr)->sin6_addr, cstr, BUFLEN);
 		    break;
 	    case AF_INET:
-		    inet_ntop(addr->sa_family, &((struct sockaddr_in *)addr)->sin_addr, cstr, BUFLEN);
+		    inet_ntop(af, &((struct sockaddr_in *)addr)->sin_addr, cstr, BUFLEN);
 		    break;
 	    default:
-		    memset(addr, 0, sizeof(struct sockaddr));
+		    sprintf(cstr, "%s", "");
 		    break;
     }
 

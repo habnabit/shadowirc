@@ -75,7 +75,7 @@ pascal OSErr InitConnections(void);
 pascal OSErr FindAddress(long*, ConstStr255Param);
 pascal OSErr FindName(long*, long);
 
-void inet_ntop_str(struct sockaddr *addr, StringPtr string);
+void inet_ntop_str(int af, const struct sockaddr *addr, StringPtr string);
 void inet_ntoa_str(struct in_addr addr, StringPtr string);
 void ntohl_str(u_int32_t net32, StringPtr string);
 u_int32_t str_htonl(StringPtr string);
