@@ -228,7 +228,7 @@ static void DoCycleCommand(char next)
 			else if(!mw)
 				mw=consoleWin;
 		}
-		MWActive=mw;
+		
 		WSelect(mw->w);
 	}
 	else //exact same as above, except prev instead of next
@@ -248,7 +248,7 @@ static void DoCycleCommand(char next)
 			else if(!mw)
 				mw = mwl;
 		}
-		MWActive=mw;
+		
 		WSelect(mw->w);
 	}
 }
