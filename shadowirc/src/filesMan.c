@@ -381,31 +381,6 @@ pascal OSErr PFCreate(ConstStr255Param name, FourCharCode type, FourCharCode cre
 	}
 }
 
-pascal OSErr PFWrite(short refNum, const void* p, long *size)
-{
-	return FSWrite(refNum, size, p);
-}
-
-pascal OSErr PFRead(short refNum, void* p, long *size)
-{
-	return FSRead(refNum, size, p);
-}
-
-pascal OSErr PFSize(short refNum, long *size)
-{
-	return GetEOF(refNum, size);
-}
-
-pascal OSErr PFResize(short refNum,  long newSize)
-{
-	return SetEOF(refNum, newSize);
-}
-
-pascal OSErr PFSetPos(short refNum, long pos)
-{
-	return SetFPos(refNum, fsFromStart, pos);
-}
-
 pascal OSErr PFClose(short refNum)
 {
 	return FileClose(refNum);

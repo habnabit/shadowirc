@@ -3421,52 +3421,6 @@ pascal OSErr PFCreate(ConstStr255Param name, FourCharCode type, FourCharCode cre
 		Output:	return value: File Manager/Resource Manager error code
 */
 
-pascal OSErr PFWrite(short refNum, const void* p, long *size);
-/*	Writes data to a data fork starting at the current file position.
-		Input:	refNum - reference number of the data fork you want to write data to
-					p - pointer to data to write
-					size - length of data to write
-		Output:	size - length of data written
-					return value: File Manager error code
-		Notes:	¥ Don't give PFWrite() a resource fork.
-					¥ Equivilant to err = FSWrite(refNum, &size, p);
-*/
-
-pascal OSErr PFRead(short refNum, void* p, long *size);
-/*	Reads data from a data fork starting at the current file position.
-		Input:	refNum - reference number of the data fork you want to read from
-					p - pointer to location where data will be read to
-					size - amount of data to read
-		Output:	size - amound of data actually read in
-					return value: File Manager error code
-		Notes:	¥ Don't give PFRead() a resource fork.
-					¥ Equivilant to err = FSRead(refNum, &size, p);
-*/
-
-pascal OSErr PFSize(short refNum, long *size);
-/*	Gets the size of a file
-		Input:	refNum - file reference number
-		Output:	size - size of file
-					return value: File Manager error code
-		Note:	¥ Equivilant to err = GetEOF(refNum, &size);
-*/
-
-pascal OSErr PFResize(short refNum,  long newSize);
-/*	Sets the size of a file
-		Input:	refNum - file reference number
-					newSize - the new size of the file
-		Output:	return value: File Manager error code
-		Note:	¥ Equivilant to err = SetEOF(refNum, newSize);
-*/
-
-pascal OSErr PFSetPos(short refNum, long pos);
-/*	Sets the file positon (where data is read/written from)
-		Input:	refNum - file reference number
-					pos - distance from start of file, in bytes
-		Output:	return value: File Manager error code
-		Note:	¥ Equivilant to err = SetFPos(refNum, fsFromStart, pos);
-*/
-
 pascal OSErr PFClose(short refNum);
 /*	Closes a file.
 		Input:	refNum - file reference number

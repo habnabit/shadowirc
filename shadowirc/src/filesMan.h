@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -80,11 +80,6 @@ extern NavEventUPP StdNavFilter;
 pascal OSErr PFOpen(ConstStr255Param name, char resFork, short *refNum, FSSpec *fss);
 pascal char PFExists(ConstStr255Param name);
 pascal OSErr PFCreate(ConstStr255Param name, FourCharCode type, FourCharCode creator, char resFork);
-pascal OSErr PFWrite(short refNum, const void* p, long *size);
-pascal OSErr PFRead(short refNum, void* p, long *size);
-pascal OSErr PFSize(short refNum, long *size);
-pascal OSErr PFResize(short refNum,  long newSize);
-pascal OSErr PFSetPos(short refNum, long pos);
 pascal OSErr PFClose(short refNum);
 pascal OSErr PFDelete(ConstStr255Param name);
 
