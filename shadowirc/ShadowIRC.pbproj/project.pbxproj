@@ -53,9 +53,9 @@
 //143
 //144
 		14A4B95F04509C190066CC43 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 4;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = StringKeys.h;
 			path = src/StringKeys.h;
 			refType = 2;
@@ -72,9 +72,9 @@
 			sourceTree = "<group>";
 		};
 		14EEACA9044D95C800A80001 = {
-			expectedFileType = text.plist.strings;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = text.plist.strings;
 			name = English;
 			path = English.lproj/Localizable.strings;
 			refType = 4;
@@ -210,6 +210,7 @@
 				F552BF490211030901A80061,
 				F552BF4F0211030901A80061,
 				F5059DA302A5C0930132A983,
+				F424EAA605A5345400B68878,
 				14EEACA8044D95C800A80001,
 				F5D4BE900323C8880132A983,
 				F5BA629F030FFFCA0132A983,
@@ -236,9 +237,9 @@
 			sourceTree = "<group>";
 		};
 		20286C33FDCF999611CA2CEA = {
-			expectedFileType = wrapper.framework;
 			fallbackIsa = PBXFileReference;
 			isa = PBXFrameworkReference;
+			lastKnownFileType = wrapper.framework;
 			name = Carbon.framework;
 			path = /System/Library/Frameworks/Carbon.framework;
 			refType = 0;
@@ -275,19 +276,44 @@
 			remoteGlobalIDString = F59209370317839001A80166;
 			remoteInfo = ident_tool;
 		};
-		F47F2277056B37EE00A7C307 = {
-			expectedFileType = sourcecode.c.h;
+		F424EAA605A5345400B68878 = {
+			children = (
+				F424EAA705A5345400B68878,
+			);
+			isa = PBXVariantGroup;
+			name = ApplicationMenuURLs.plist;
+			path = "";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F424EAA705A5345400B68878 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = text.plist.xml;
+			name = English;
+			path = English.lproj/ApplicationMenuURLs.plist;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		F424EAA805A5345400B68878 = {
+			fileRef = F424EAA605A5345400B68878;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F47F2277056B37EE00A7C307 = {
+			fileEncoding = 30;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = simpleList.h;
 			path = src/simpleList.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F47F2278056B37EE00A7C307 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = simpleList.c;
 			path = src/simpleList.c;
 			refType = 4;
@@ -738,6 +764,7 @@
 				F4BBC2AD056EE75900BD6D17,
 				F4BBC2AE056EE75900BD6D17,
 				F4BBC2AF056EE75900BD6D17,
+				F424EAA805A5345400B68878,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1351,14 +1378,14 @@
 			};
 		};
 		F4BBC2FF056EE75A00BD6D17 = {
-			expectedFileType = text.plist;
 			isa = PBXFileReference;
+			lastKnownFileType = text.plist;
 			path = "Info-ShadowIRC.plist";
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F4BBC300056EE75A00BD6D17 = {
-			expectedFileType = wrapper.application;
+			explicitFileType = wrapper.application;
 			includeInIndex = 0;
 			isa = PBXFileReference;
 			path = ShadowIRC.app;
@@ -1386,25 +1413,25 @@
 			sourceTree = "<group>";
 		};
 		F5059D9502A3470A0132A983 = {
-			expectedFileType = wrapper.nib;
 			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
 			name = English;
 			path = English.lproj/main.nib;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F5059DA302A5C0930132A983 = {
-			expectedFileType = sourcecode.rez;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
 			name = irc.r;
 			path = rsrc/irc.r;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F5059DA802A5C0C70132A983 = {
-			expectedFileType = image.icns;
 			isa = PBXFileReference;
+			lastKnownFileType = image.icns;
 			name = ShadowIRC.icns;
 			path = rsrc/Icons/ShadowIRC.icns;
 			refType = 4;
@@ -1509,7 +1536,7 @@
 ";
 		};
 		F50FA70E0358BD880132A983 = {
-			expectedFileType = folder;
+			explicitFileType = wrapper.cfbundle;
 			fallbackIsa = PBXFileReference;
 			isa = PBXBundleReference;
 			path = Userlist.plugin;
@@ -1547,18 +1574,18 @@
 			};
 		};
 		F50FA7160358BEB70132A983 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = ShadowIRC.h;
 			path = pluginsAPI/ShadowIRC.h;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F50FA7170358BEB70132A983 = {
-			expectedFileType = sourcecode.exports;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.exports;
 			name = shadowirc.exp;
 			path = pluginsAPI/shadowirc.exp;
 			refType = 4;
@@ -1630,72 +1657,72 @@
 			sourceTree = "<group>";
 		};
 		F510A8AC021CBBCE0132A983 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = CMenus.h;
 			path = src/CMenus.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F510A8AE021CBBDB0132A983 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = Floaters.h;
 			path = src/Floaters.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F510A8AF021CBBDB0132A983 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = filesMan.h;
 			path = src/filesMan.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F510A8B2021CBBEB0132A983 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCAux.h;
 			path = src/IRCAux.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F510A8B4021CBBF70132A983 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCInputPrivate.h;
 			path = src/IRCInputPrivate.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F510A8B6021CBC000132A983 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = TextManip.h;
 			path = src/TextManip.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F531989F033827950132A983 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = IRCCFPrefs.c;
 			path = src/IRCCFPrefs.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F53198A1033827A00132A983 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCCFPrefs.h;
 			path = src/IRCCFPrefs.h;
 			refType = 2;
@@ -1708,729 +1735,729 @@
 			};
 		};
 		F552BEF60211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = AEvents.c;
 			path = src/AEvents.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BEF70211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = AEvents.h;
 			path = src/AEvents.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BEF80211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = AppearanceHelp.c;
 			path = src/AppearanceHelp.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BEF90211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = AppearanceHelp.h;
 			path = src/AppearanceHelp.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BEFA0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = ApplBase.c;
 			path = src/ApplBase.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BEFB0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = ApplBase.h;
 			path = src/ApplBase.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF010211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = channels.c;
 			path = src/channels.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF020211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = channels.h;
 			path = src/channels.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF030211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = CMenus.c;
 			path = src/CMenus.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF050211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = CommandsMenu.c;
 			path = src/CommandsMenu.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF060211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = CommandsMenu.h;
 			path = src/CommandsMenu.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF070211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = connections.c;
 			path = src/connections.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF080211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = connections.h;
 			path = src/connections.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF090211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = CTCP.c;
 			path = src/CTCP.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF0A0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = CTCP.h;
 			path = src/CTCP.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF0B0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = DCC.c;
 			path = src/DCC.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF0C0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = DCC.h;
 			path = src/DCC.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF0F0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = DragDrop.c;
 			path = src/DragDrop.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF100211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = DragDrop.h;
 			path = src/DragDrop.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF110211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = filesMan.c;
 			path = src/filesMan.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF130211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = Floaters.c;
 			path = src/Floaters.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF150211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = HashTable.c;
 			path = src/HashTable.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF160211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = HashTable.h;
 			path = src/HashTable.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF170211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = InetConfig.c;
 			path = src/InetConfig.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF180211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = InetConfig.h;
 			path = src/InetConfig.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF190211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = Inline.c;
 			path = src/Inline.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF1A0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = Inline.h;
 			path = src/Inline.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF1B0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = InputLine.c;
 			path = src/InputLine.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF1C0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = InputLine.h;
 			path = src/InputLine.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF1D0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = IRCaux.c;
 			path = src/IRCaux.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF1F0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = IRCChannels.c;
 			path = src/IRCChannels.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF200211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCChannels.h;
 			path = src/IRCChannels.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF210211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = IRCCommands.c;
 			path = src/IRCCommands.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF220211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCCommands.h;
 			path = src/IRCCommands.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF230211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = IRCGlobals.c;
 			path = src/IRCGlobals.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF240211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCGlobals.h;
 			path = src/IRCGlobals.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF250211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = IRCIgnore.c;
 			path = src/IRCIgnore.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF260211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCIgnore.h;
 			path = src/IRCIgnore.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF270211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = IRCInit.c;
 			path = src/IRCInit.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF280211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = IRCInput.c;
 			path = src/IRCInput.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF290211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCInput.h;
 			path = src/IRCInput.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF2B0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCNComm.h;
 			path = src/IRCNComm.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF2C0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = IRCNotify.c;
 			path = src/IRCNotify.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF2D0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCNotify.h;
 			path = src/IRCNotify.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF2E0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = IRCPreferences.c;
 			path = src/IRCPreferences.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF2F0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = IRCPreferences.h;
 			path = src/IRCPreferences.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF300211030901A80061 = {
-			expectedFileType = sourcecode.rez;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
 			name = IRCPreferences.r;
 			path = src/IRCPreferences.r;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF320211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = MacBinary.h;
 			path = src/MacBinary.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF330211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = MasterTypes.h;
 			path = src/MasterTypes.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF340211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = MenuCommands.c;
 			path = src/MenuCommands.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF350211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = MenuCommands.h;
 			path = src/MenuCommands.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF360211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = MoreFiles.c;
 			path = src/MoreFiles.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF370211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = MoreFiles.h;
 			path = src/MoreFiles.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF380211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = MsgBuffer.c;
 			path = src/MsgBuffer.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF390211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = MsgBuffer.h;
 			path = src/MsgBuffer.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF3A0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = MsgWindows.c;
 			path = src/MsgWindows.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF3B0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = MsgWindows.h;
 			path = src/MsgWindows.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF3C0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = MWPanes.c;
 			path = src/MWPanes.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF3D0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = MWPanes.h;
 			path = src/MWPanes.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF3E0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = Notify.c;
 			path = src/Notify.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF3F0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = Notify.h;
 			path = src/Notify.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF400211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = Numerics.c;
 			path = src/Numerics.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF410211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = plugins.c;
 			path = src/plugins.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF420211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = plugins.h;
 			path = src/plugins.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF450211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = ServerCommands.c;
 			path = src/ServerCommands.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF460211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = ServerList.c;
 			path = src/ServerList.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF470211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = ServerList.h;
 			path = src/ServerList.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF480211030901A80061 = {
-			expectedFileType = sourcecode.rez;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
 			name = ServerList.r;
 			path = src/ServerList.r;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF490211030901A80061 = {
-			expectedFileType = sourcecode.rez;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
 			name = servers.r;
 			path = src/servers.r;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF4B0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = ShadowIRC.c;
 			path = src/ShadowIRC.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF4C0211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = Shortcuts.c;
 			path = src/Shortcuts.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF4D0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = Shortcuts.h;
 			path = src/Shortcuts.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF4E0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = StringList.h;
 			path = src/StringList.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF4F0211030901A80061 = {
-			expectedFileType = sourcecode.rez;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
 			name = StringList.r;
 			path = src/StringList.r;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF500211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = TCP.h;
 			path = src/TCP.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF510211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = TextManip.c;
 			path = src/TextManip.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF550211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = utils.c;
 			path = src/utils.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF560211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = utils.h;
 			path = src/utils.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F552BF570211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = version.c;
 			path = src/version.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF590211030901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = WindowList.c;
 			path = src/WindowList.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BF5A0211030901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = WindowList.h;
 			path = src/WindowList.h;
 			refType = 2;
@@ -2461,9 +2488,9 @@
 			sourceTree = "<group>";
 		};
 		F552BFC2021103B901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = Highlight.c;
 			refType = 4;
 			sourceTree = "<group>";
@@ -2480,16 +2507,16 @@
 			sourceTree = "<group>";
 		};
 		F552BFC5021103B901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = popups.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFC6021103B901A80061 = {
-			expectedFileType = archive.rsrc;
 			isa = PBXFileReference;
+			lastKnownFileType = archive.rsrc;
 			path = popups.rsrc;
 			refType = 4;
 			sourceTree = "<group>";
@@ -2509,33 +2536,33 @@
 			sourceTree = "<group>";
 		};
 		F552BFC8021103B901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = ULList.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFC9021103B901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			path = ULList.h;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFCA021103B901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = userlist.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFCB021103B901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			path = userlist.h;
 			refType = 4;
 			sourceTree = "<group>";
@@ -2562,9 +2589,9 @@
 			sourceTree = "<group>";
 		};
 		F552BFDD0211060D01A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			path = WASTEIntf.h;
 			refType = 4;
 			sourceTree = "<group>";
@@ -2580,17 +2607,17 @@
 			sourceTree = "<group>";
 		};
 		F552BFDF0211060D01A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			path = LongCoords.h;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFE00211060D01A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			path = WASTE.h;
 			refType = 4;
 			sourceTree = "<group>";
@@ -2621,137 +2648,137 @@
 			sourceTree = "<group>";
 		};
 		F552BFE40211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEAccessors.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFE50211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEBirthDeath.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFE60211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEDebug.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFE70211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEDrawing.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFE80211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEFontTables.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFE90211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEHighLevelEditing.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFEA0211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEInlineInput.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFEB0211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WELineLayout.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFEC0211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WELongCoords.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFED0211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WELowLevelEditing.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFEE0211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEMouse.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFEF0211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEObjects.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFF00211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEScraps.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFF10211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WESelecting.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFF20211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WESelectors.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFF30211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEUserSelectors.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F552BFF40211060D01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = WEUtilities.c;
 			refType = 4;
 			sourceTree = "<group>";
@@ -2767,17 +2794,17 @@
 			sourceTree = "<group>";
 		};
 		F57375F203205FE90132A983 = {
-			expectedFileType = wrapper.nib;
 			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
 			name = find.nib;
 			path = English.lproj/find.nib;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F5755EBC03907F110132A983 = {
-			expectedFileType = sourcecode.rez;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
 			path = Highlight.r;
 			refType = 4;
 			sourceTree = "<group>";
@@ -2890,7 +2917,7 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F580515A03905D880132A983 = {
-			expectedFileType = folder;
+			explicitFileType = wrapper.cfbundle;
 			fallbackIsa = PBXFileReference;
 			isa = PBXBundleReference;
 			path = Highlight.plugin;
@@ -2958,7 +2985,7 @@
 			productReference = F59209380317839001A80166;
 		};
 		F59209380317839001A80166 = {
-			expectedFileType = "compiled.mach-o.executable";
+			explicitFileType = "compiled.mach-o.executable";
 			fallbackIsa = PBXFileReference;
 			isa = PBXExecutableFileReference;
 			path = ident_tool;
@@ -2976,9 +3003,9 @@
 			sourceTree = "<group>";
 		};
 		F592093B031783DF01A80166 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = ident_tool.c;
 			refType = 4;
 			sourceTree = "<group>";
@@ -2990,18 +3017,18 @@
 			};
 		};
 		F599D6520217A8B901A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = Events.h;
 			path = src/Events.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F599D6530217A8B901A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			name = Events.c;
 			path = src/Events.c;
 			refType = 4;
@@ -3018,25 +3045,25 @@
 			sourceTree = "<group>";
 		};
 		F5A6AF1F032111060132A983 = {
-			expectedFileType = wrapper.nib;
 			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
 			name = English;
 			path = English.lproj/kill.nib;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F5B67A94033CA8700132A983 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = MoreFilesX.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F5B67A95033CA8700132A983 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = MoreFilesX.h;
 			path = src/lib/MoreFilesX.h;
 			refType = 2;
@@ -3053,10 +3080,10 @@
 			sourceTree = "<group>";
 		};
 		F5BA62A0030FFFCA0132A983 = {
-			expectedFileType = folder;
 			fallbackIsa = PBXFileReference;
 			includeInIndex = 1;
 			isa = PBXFolderReference;
+			lastKnownFileType = folder;
 			name = English;
 			path = "English.lproj/ShadowIRC Help";
 			refType = 4;
@@ -3073,16 +3100,16 @@
 			sourceTree = "<group>";
 		};
 		F5BA63C80315E9C70132A983 = {
-			expectedFileType = wrapper.nib;
 			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
 			name = English;
 			path = English.lproj/shortcuts.nib;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F5D4BE900323C8880132A983 = {
-			expectedFileType = image.pict;
 			isa = PBXFileReference;
+			lastKnownFileType = image.pict;
 			name = ShadowIRCSplash.pict;
 			path = rsrc/ShadowIRCSplash.pict;
 			refType = 4;
@@ -3103,68 +3130,68 @@
 			sourceTree = "<group>";
 		};
 		F5DB413D0213AAFA01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = CalcCRC.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F5DB413E0213AAFA01A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = CalcCRC.h;
 			path = src/lib/CalcCRC.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F5DB413F0213AAFA01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = LongStrings.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F5DB41400213AAFA01A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = LongStrings.h;
 			path = src/lib/LongStrings.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F5DB41430213AAFA01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = MyMacBinary.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F5DB41480213AAFA01A80061 = {
-			expectedFileType = sourcecode.c.c;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.c;
 			path = TCPStuff.c;
 			refType = 4;
 			sourceTree = "<group>";
 		};
 		F5DB41490213AAFA01A80061 = {
-			expectedFileType = sourcecode.c.h;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
 			name = TCPStuff.h;
 			path = src/lib/TCPStuff.h;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
 		F5DC0A3D0358CBA30132A983 = {
-			expectedFileType = sourcecode.rez;
 			fileEncoding = 30;
 			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.rez;
 			path = userlist.r;
 			refType = 4;
 			sourceTree = "<group>";
@@ -3186,8 +3213,8 @@
 			sourceTree = "<group>";
 		};
 		F5F61A3002A02E380132A988 = {
-			expectedFileType = wrapper.nib;
 			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
 			name = English;
 			path = English.lproj/channel.nib;
 			refType = 4;

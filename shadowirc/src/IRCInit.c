@@ -54,7 +54,6 @@
 #include "plugins.h"
 
 
-inline void AppleMenuURLInit(void);
 inline void CheckPreferences(void);
 static void ToolboxInit(void);
 void ApplicationInit(void);
@@ -63,7 +62,7 @@ inline void SetupUPPs(void);
 void ApplInit();
 void setVers(void);
 
-STRnPtr spFiles, spCM, spError, spInfo, spDCC,  spTopic, spAppleURL, spServices, spSOCKS, spServer, spFile, spWhois;
+STRnPtr spFiles, spCM, spError, spInfo, spDCC,  spTopic, spServices, spSOCKS, spServer, spFile, spWhois;
 
 enum {
     kSIRCVersionInfoID = 3
@@ -125,7 +124,6 @@ void ApplicationInit(void)
 	spInfo=GetStrN(srInfo);
 	spDCC=GetStrN(srDCC);
 	spTopic=GetStrN(srTopic);
-	spAppleURL=GetStrN(srAppleURL);
 	spServices=GetStrN(srServices);
 	spSOCKS=GetStrN(srSOCKS);
 	spServer=GetStrN(srServer);
@@ -204,7 +202,6 @@ void ApplicationInit(void)
 	MBInit();
 	ConnectionMenuInit();
 	
-	AppleMenuURLInit();
 	AppleHelpInit();
 	
 	if(splashWindow)

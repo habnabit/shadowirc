@@ -858,7 +858,7 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 		
 		//Apple URL Menu
 		case 'AURL':
-			HitAppleURLMenu(hiCommand.menu.menuItemIndex);
+			HitApplicationURLMenu(hiCommand.menu.menuItemIndex);
 			return noErr;
 	}
 	

@@ -265,20 +265,6 @@ resource 'STR#' (260, "Topic Widget", locked, preload)
 	};
 };
 
-resource 'STR#' (261, "URL Menu", locked, preload)
-{
-	{
-		"ShadowIRC Home Page", "http://www.shadowirc.com/",
-		"SourceForge Project Page", "http://sourceforge.net/projects/shadowirc/",
-		"ShadowIRC Support", "http://www.shadowirc.com/support.phtml",
-		"ShadowIRC Plugins", "http://plugins.shadowirc.com/",
-		"-", "-",
-		"GNU GPL License", "http://www.gnu.org/copyleft/gpl.html",
-		"-", "-",
-		"Email ShadowIRC's Author", "mailto:dshadow@shadowirc.com"
-	};
-};
-
 resource 'STR#' (262, "File Dialog Strings", locked, preload)
 {
 	{

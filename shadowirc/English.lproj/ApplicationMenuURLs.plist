@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<string>ShadowIRC Home Page</string>
+	<string>http://www.shadowirc.com/</string>
+	
+	<string>SourceForge Project Page</string>
+	<string>http://sourceforge.net/projects/shadowirc/</string>
+	
+	<string>ShadowIRC Support</string>
+	<string>http://www.shadowirc.com/support.phtml</string>
+	
+	<string>ShadowIRC Plugins</string>
+	<string>http://plugins.shadowirc.com/</string>
+	
+	<string>-</string>
+	<string>-</string>
+	
+	<string>GNU GPL License</string>
+	<string>http://www.gnu.org/copyleft/gpl.html</string>
+	
+	<string>-</string>
+	<string>-</string>
+	
+	<string>Email ShadowIRC's Author</string>
+	<string>mailto:dshadow@shadowirc.com</string>
+</array>
+</plist>

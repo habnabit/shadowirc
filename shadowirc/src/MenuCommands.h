@@ -34,7 +34,6 @@ void DoFind(char again);
 void DoFontSizeWindow(void);
 void HitFontsMenu(short item);
 
-void HitAppleURLMenu(short item);
 void HitSelectConnectionMenu(short item);
 
 pascal void MenuConnectionList(short item);
@@ -45,8 +44,9 @@ int HitWindowSelectWindowMenu(const short item);
 
 pascal void HitEditMenu(short item);
 
+void HitApplicationURLMenu(short item);
+
 pascal void MenuInit(void);
-void AppleMenuURLInit(void);
 void ConnectionMenuInit(void);
 void ConnectionMenuHilites(void);
 

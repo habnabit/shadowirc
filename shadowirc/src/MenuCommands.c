@@ -38,7 +38,6 @@
 #include "windowList.h"
 #include "IRCAux.h"
 #include "IRCCommands.h"
-#include "InetConfig.h"
 #include "Shortcuts.h"
 #include "CMenus.h"
 #include "MenuCommands.h"
@@ -49,6 +48,8 @@ static MenuHandle gFontsMenu;
 static void DoFind2(MWPtr mw);
 
 void FontsMenuInit(void);
+
+static void ApplicationURLMenuInit(void);
 
 static long FindText(Handle t, long start, Str255 searchFor, char caseSen, char reverse)
 {
@@ -324,26 +325,6 @@ char ToggleConsoleWindow(void)
 
 #pragma mark -
 
-void HitAppleURLMenu(short item)
-{
-	Str255 url;
-	
-	if(internetConfig)
-	{
-		//get url
-		GetIntString(url, spAppleURL, item * 2);
-		
-		if(OpenURL(url))
-		{
-			//error
-		}
-	}
-	else
-	{
-	}
-}
-
-			
 pascal void HitEditMenu(short item)
 {
 	char mwFront, otherFront;
@@ -720,9 +701,21 @@ static OSStatus DoShowFontsMenu(EventHandlerCallRef handlerCallRef, EventRef eve
 
 #pragma mark -
 
+static CFURLRef *ApplicationMenuURLs;
 
-void AppleMenuURLInit(void)
+void HitApplicationURLMenu(short item)
 {
+	LSOpenCFURLRef(ApplicationMenuURLs[item - 1], NULL);
+}
+			
+static void ApplicationURLMenuInit(void)
+{
+	CFPropertyListRef plist;
+	CFStringRef *plistItems;
+	CFURLRef fileURL;
+	CFDataRef resData;
+	Boolean status;
+	SInt32 err;
 	MenuHandle m;
 	int x, y;
 	int num;
@@ -732,19 +725,39 @@ void AppleMenuURLInit(void)
 	// Tell it where to put the hierarchical URL menu
 	SetMenuItemHierarchicalID(gAppleMenu, 2, AppleURLMenu);
 	
-	num = *(short*)spAppleURL;
-	if(num>0)
+	fileURL = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("ApplicationMenuURLs"), CFSTR("plist"), NULL);
+	status = CFURLCreateDataAndPropertiesFromResource(NULL, fileURL, &resData, NULL, NULL, &err);
+	plist = CFPropertyListCreateFromXMLData(NULL, resData, kCFPropertyListImmutable, NULL);
+	
+	num = CFArrayGetCount(plist);
+	if(num > 0)
 	{
+		CFRange range = {0, num};
+		
+		plistItems = malloc(sizeof(CFStringRef) * num);
+		ApplicationMenuURLs = malloc(sizeof(CFURLRef) * (num / 2));
+		
+		CFArrayGetValues(plist, range, plistItems);
+		
 		y = 0;
-		for(x=1;x<=num;x+=2)
+		for(x = 0; x < num; x+= 2)
 		{
+			ApplicationMenuURLs[y] = CFURLCreateWithString(NULL, plistItems[x+1], NULL);
+			
 			AppendMenu(m, "\p-");
 			y++;
-			SetMenuItemText(m, y, GetIntStringPtr(spAppleURL, x));
+			SetMenuItemTextWithCFString(m, y, plistItems[x]);
 			SetMenuItemCommandID(m, y, 'AURL');
 		}
+		
+		free(plistItems);
 	}
+	
+	CFRelease(plist);
+	CFRelease(fileURL);
 }
+
+#pragma mark -
 
 void FontsMenuInit(void)
 {
@@ -882,4 +895,6 @@ pascal void MenuInit(void)
 		GetIndMenuItemWithCommandID(NULL, kHICommandPreferences, 1, &menu, &index);
 		SetMenuItemCommandKey(menu, index, false, ',');
 	}
+	
+	ApplicationURLMenuInit();
 }
