@@ -636,7 +636,7 @@
 	<key>CFBundleSignature</key>
 	<string>SIRC</string>
 	<key>CFBundleVersion</key>
-	<string>2.0d6</string>
+	<string>2.0a7</string>
 </dict>
 </plist>
 ";
