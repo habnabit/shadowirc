@@ -1314,35 +1314,6 @@ static pascal void CheckPluginPrefsFolder(void)
 		}
 		//else it's ok, do nothing.
 	}
-	
-/*
-	if(FSMakeFSSpec(pluginsFolderFSSpec.vRefNum, pluginsFolderFSSpec.parID,"\pPreferences", &pluginPrefsFSSpec))
-	{
-		//no prefs folder, so make it
-		if(FSpDirCreate(&pluginPrefsFSSpec, 0, &dirid))
-		{
-			LSGetIntString(&ls, spError, spCantCreatPluginPrefsFldr);
-			pluginPrefsFSSpec.parID=pluginPrefsFSSpec.vRefNum=*(short*)pluginPrefsFSSpec.name[0]=0xFDDF;
-			LineMsg(&ls);
-		}
-		else
-		{
-			pluginPrefsFSSpec.parID=dirid;
-			pluginPrefsFSSpec.name[0]=0;
-		}
-	}
-	else
-	{
-		FSpGetDirectoryID(&pluginPrefsFSSpec, &pluginPrefsFSSpec.parID, &isDir);
-		if(!isDir)
-		{
-			LSGetIntString(&ls, spError, sPlugsPrefsFolderIsFile);
-			pluginPrefsFSSpec.parID=pluginPrefsFSSpec.vRefNum=*(short*)pluginPrefsFSSpec.name[0]=0xFDDF;
-			LineMsg(&ls);
-		}
-		//else it's ok, do nothing.
-	}
-*/
 }
 
 pascal void makePlugsDB(void)
