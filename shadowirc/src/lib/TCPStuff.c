@@ -78,8 +78,6 @@ enum {
         inProgress = 1
 };
 
-typedef struct TCPiopb TCPControlBlock, *TCPControlBlockPtr;
-
 typedef struct TCPConnection {
 	OSType magic;
 	Ptr incomingPtr;
@@ -90,22 +88,11 @@ typedef struct TCPConnection {
 
 OSErr TCPReceiveUpTo(connectionPtr conn, char term, long timeout, Ptr readPtr, long readSize, long *readPos, char *gotterm);
 
-typedef struct IPParamBlock IPControlBlock, *IPControlBlockPtr;
-
-/*
-inline OSErr ipPBSync(IPControlBlockPtr cb) {return PBControlSync((ParamBlockRec*)cb);}
-inline OSErr PBSync(TCPControlBlockPtr cb) {return PBControlSync((ParamBlockRec*)cb);}
-inline OSErr PBAsync(TCPControlBlockPtr cb) {return PBControlAsync((ParamBlockRec*)cb);}
-*/
-
 static void TCPFinish(void);
 
 #pragma mark -
 #pragma mark ¥¥¥ÊTCPConnections
 #pragma mark -
-
-
-#define maxlongint 0x7FFFFFFF
 
 enum {
     tooManyConnections = -23099,
@@ -740,7 +727,7 @@ static OSErr CreateConnection(connectionIndex *cp)
 		c->sockfd = 0;
 		c->status = CS_None;
 		c->dnrrp = 0;
-		c->timeout = maxlongint;
+		c->timeout = LONG_MAX;
 		*cp += connectionmagic;
 		return noErr;
 	}
@@ -1009,7 +996,7 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 				case T_Established:
 					cer->event = C_Established;
 					c->status = CS_Established;
-					c->timeout = maxlongint;
+					c->timeout = LONG_MAX;
 					break;
 				case T_Closed:
 					c->status = CS_Closing;
