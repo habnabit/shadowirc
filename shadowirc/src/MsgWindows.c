@@ -389,7 +389,7 @@ static void TextScrolled(WEReference we)
 
 #pragma mark -
 
-pascal OSErr MWLogToFSp(MWPtr mw, const FSSpec *fs, long s0, long s1)
+OSErr MWLogToFSp(MWPtr mw, const FSSpec *fs, long s0, long s1)
 {
 	short err;
 	short refNum;
@@ -422,7 +422,7 @@ pascal OSErr MWLogToFSp(MWPtr mw, const FSSpec *fs, long s0, long s1)
 	return err;
 }
 
-pascal void MWLogToFile(MWPtr mw, long s0, long s1)
+void MWLogToFile(MWPtr mw, long s0, long s1)
 {
 	Str255 s;
 	Str255 s2;
@@ -497,7 +497,7 @@ OSStatus SetupLogFolder(FSRef *ref)
  	return err;
 }
 
-pascal void MWStopLogging(MWPtr mw)
+void MWStopLogging(MWPtr mw)
 {
 	if(mw->logRefNum)
 	{
@@ -522,7 +522,7 @@ pascal void MWStopLogging(MWPtr mw)
 	}
 }
 
-pascal void MWStartLogging(MWPtr w)
+void MWStartLogging(MWPtr mw)
 {
 	LongString ls;
 	FSSpec f;
@@ -535,10 +535,10 @@ pascal void MWStartLogging(MWPtr w)
 	OSErr err;
 	short p;
 	
-	if(!w->logRefNum) //if we're already logging, then don't do anything.
+	if(!mw->logRefNum) //if we're already logging, then don't do anything.
 	{
 		f=logFolderFSp;
-		link = w->link;
+		link = mw->link;
 		
 		if(link)
 		{
@@ -549,7 +549,7 @@ pascal void MWStartLogging(MWPtr w)
 				if(FSpDirCreate(&f, 0, &dirID)) //couldn't create
 				{
 					LSGetIntString(&ls, spError, sCantMakeLogFolderThisConn);
-					MWMessage(w, &ls);
+					MWMessage(mw, &ls);
 					return;
 				}
 				else
@@ -564,7 +564,7 @@ pascal void MWStartLogging(MWPtr w)
 				if(!exists)
 				{
 					LSGetIntString(&ls, spError, sLogFolderThisConnIsFile);
-					MWMessage(w, &ls);
+					MWMessage(mw, &ls);
 					return;
 				}
 			}
@@ -579,7 +579,7 @@ pascal void MWStartLogging(MWPtr w)
 		
 		f.parID = pb.hFileInfo.ioDirID;
 		
-		GetWTitle(w->w, ls.data);
+		GetWTitle(mw->w, ls.data);
 		if(ls.data[0] == '(')
 		{
 			ls.data[0]--;
@@ -604,18 +604,18 @@ pascal void MWStartLogging(MWPtr w)
 		}
 		
 		//open the file and set te position to the end and make a note in the log that it was opened
-		if(!FSpOpenDF(&f, fsRdWrPerm, &w->logRefNum))
+		if(!FSpOpenDF(&f, fsRdWrPerm, &mw->logRefNum))
 		{
-			FileAdd(w->logRefNum, false);
+			FileAdd(mw->logRefNum, false);
 			DateString(now, longDate, s1, 0);
 			SAppend1(s1, ' ');
 			TimeString(now, true, s2, 0);
 			LSParamString(&ls, GetIntStringPtr(spInfo, sOpeningLogFile), s, s1, s2, 0);
 			SMPrefix(&ls, dsNowhere);
-			MWMessage(w, &ls);
+			MWMessage(mw, &ls);
 		}
 		else
-			w->logRefNum = 0;
+			mw->logRefNum = 0;
 	}
 }
 

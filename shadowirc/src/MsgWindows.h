@@ -234,11 +234,11 @@ pascal void InitMsgWindows(void);
 pascal void MWUnquote(MWPtr mw);
 pascal void MWQuote(MWPtr mw);
 
-pascal OSErr MWLogToFSp(MWPtr mw, const FSSpec *fs, long s0, long s1);
+OSErr MWLogToFSp(MWPtr mw, const FSSpec *fs, long s0, long s1);
 OSStatus SetupLogFolder(FSRef *ref);
-pascal void MWLogToFile(MWPtr mw, long s0, long s1);
-pascal void MWStopLogging(MWPtr mw);
-pascal void MWStartLogging(MWPtr w);
+void MWLogToFile(MWPtr mw, long s0, long s1);
+void MWStopLogging(MWPtr mw);
+void MWStartLogging(MWPtr mw);
 
 pascal void MWReposition(MWPtr win);
 
