@@ -575,20 +575,6 @@ int GetConnectionSocket(long cp)
 		return 0;
 }
 
-inline void AddBlock(void* p)
-{
-    /*
-	int i;
-	
-	for(i=0;i<dispose_block_max;i++)
-		if(!disposeblocks[i])
-		{
-			disposeblocks[i] = (char*)p;
-			return;
-		}
-     */
-}
-
 /*
  * InitConnections
  * Set up connections
