@@ -792,7 +792,7 @@ void ConnectionMenuInit(void)
 		InsertMenu(menuSignoffConnectionList, hierMenu);
 
 		SetMenuItemHierarchicalID(gFileMenu, 1, ConnectionListMenu);
-		SetMenuItemHierarchicalID(gFileMenu, 8, SignoffConnectionListMenu);
+		SetMenuItemHierarchicalID(gFileMenu, 6, SignoffConnectionListMenu);
 		
 		y = 0;
 	}
