@@ -26,7 +26,7 @@
 #include "ShadowIRC.h"
 #endif
 
-enum { scrollbarWidth = 16 };
+#define linkfor(list, init) for((list) = (init); (list); (list)=(list)->next)
 
 #define enableinline 0
 
@@ -35,21 +35,6 @@ enum { scrollbarWidth = 16 };
 #else
 	#define INLINE
 #endif
-
-typedef struct MyList {
-	UserListPtr u;
-} MyList, *MyListPtr;
-
-typedef struct UserListBegin {
-	channelPtr ch;
-	long num;
-} UserListBegin;
-
-typedef struct UserList {
-	channelPtr ch;
-	long num;
-	MyList u[1];
-} ulRec, *ulPtr, **ulHand;
 
 enum ulType {
 	ulGlobal = 'ulGl',
@@ -64,8 +49,9 @@ typedef struct UserListInstance {
 	long ulType;
 	WindowPtr uwin;
 	ControlHandle bar;
+	ControlRef browser;
 	Rect uwinSize;
-	ulHand users;
+	channelPtr ch;
 	long visLines;
 	long lastClick;
 	long lastClickTime;
@@ -77,20 +63,12 @@ typedef struct UserListInstance {
 	short sort;
 	char sortReverse;
 	char rightSide;
-	char scrollbarLeft;
 	char updateList;
 	long lastUpdate;
 } UserListInstance, *ULI;
 
 enum {
-	kShitSort = -1
-};
-
-enum {
-	kHeaderSize  = 14,
-	kHeaderText = 10,
-	
-	kTopOffset = 1 + kHeaderSize,
+	kTopOffset = 1 + 14,
 	kBottomOffset = 2,
 	kLeftOffset = 4,
 	kRightOffset = 14 + 4,
@@ -108,20 +86,11 @@ enum {
 	kIdleFast = 4
 };
 
-enum {
-	cMedGrey = 44395,
-	cMDkGrey = 35939
-};
-
 extern ShadowIRCDataRecord* sidr;
 extern prefsPtr mainPrefs;
 extern RGBColor *shadowircColors;
 extern short genevaNum;
 extern int line;
-
-extern const RGBColor white, black, MedGrey, MDkGrey;
-
-#define PPC 1
 
 #define WInvalRect(w, r) InvalWindowRect(w, r)
 #define WInvalRgn(w, r) InvalWindowRgn(w, r)

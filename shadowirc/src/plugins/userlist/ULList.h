@@ -26,37 +26,20 @@
 #include "headers.h"
 #endif
 
-extern CIconHandle gSortForwardIcon, gSortReverseIcon;
-
-GrafPtr ULISetupDrawing(ULI ul);
-void DrawWindowHeader(Rect *r, long state);
-
-#if enableinline
-INLINE void ULIFinishDrawing(ULI ul, GrafPtr gp) {
-	#pragma unused(ul)
-	SetOrigin(0,0); SetPort(gp);
-}
-#else
-INLINE void ULIFinishDrawing(ULI ul, GrafPtr gp);
-#endif
-
 void ListSetWTitle(ULI ul);
 
-void ListHeader(ULI ul);
 void ListDrawUser(ULI ul, int num, short po);
-char ListCanDraw(ULI ul, long num);
-void ListDrawOne(ULI ul, long num);
+void ListDrawOne(ULI ul, UserListPtr u);
 void ListDrawOneUser(ULI ul, UserListPtr u);
-void ListDraw(ULI ul);
 void ListGenerate(ULI ul, channelPtr ch);
-char ListSortPart(ULI ul, MyList *one, MyList *two);
-void ListSort(ULI ul, char locked);
+void ListSort(ULI ul);
 void ListTrash(ULI ul);
 void ListAdd(ULI ul, UserListPtr u);
 void ListDel(ULI ul, UserListPtr u);
 char ListDelName(ULI ul, Str255 nick);
-long ListFind(ULI ul, UserListPtr u);
-char ListResortInd(ULI ul, int num);
+void ListResortInd(ULI ul, UserListPtr u);
+
+char pstrgt(Str255 one, Str255 two);
 
 
 #endif

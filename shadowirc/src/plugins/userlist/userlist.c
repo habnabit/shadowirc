@@ -37,6 +37,11 @@ static char globalUserlist = 0;
 
 static ULI gUserlist = 0;
 
+enum {
+	cMedGrey = 44395,
+	cMDkGrey = 35939
+};
+
 const RGBColor white = {-1, -1, -1};
 const RGBColor black = {0, 0, 0};
 const RGBColor MedGrey = {cMedGrey, cMedGrey, cMedGrey};
@@ -45,13 +50,6 @@ const RGBColor MDkGrey = {cMDkGrey, cMDkGrey, cMDkGrey};
 INLINE ULI ULIFromMW(MWPtr mw);
 static ULI ULIFromChannel(channelPtr ch);
 static ULI ULIFromWindow(WindowPtr w);
-
-static void ULDoubleClick(ULI ul, long num);
-INLINE char IsDoubleClick(long time);
-
-static void ULHitHeader(ULI ul, const EventRecord *e);
-static void ULHitList(ULI ul, const EventRecord *e);
-INLINE void ULInContentHit(ULI ul, const EventRecord *e);
 
 static void ULScrollbarLive(ULI ul, const EventRecord *e);
 static void ULScrollbarActionProc(ControlHandle vscr, short part);
@@ -65,19 +63,16 @@ static void ULDragReceive(pUIDragReceiveData *p);
 INLINE void ULPaneDragTrack(pMWPaneDragTrackData *p);
 INLINE void ULPaneDragReceive(pMWPaneDragReceiveData *p);
 
-static void ULContextualMenu(pCMPopupsData *p);
-static void ULContextualMenuProcess(pCMPopupsReturnData *p);
+//static void ULContextualMenu(pCMPopupsData *p);
+//static void ULContextualMenuProcess(pCMPopupsReturnData *p);
 static void ProcessShortcuts(pShortcutProcessData *p);
 
 INLINE void IdleCursor(void);
 INLINE void CreateGlobalUserlistWindow(void);
 INLINE void DestroyGlobalUserlistWindow(void);
-INLINE void ULMoveWindow(pUIWindowMoveDataRec *p);
 INLINE void ULCloseWindow(pUIWindowCloseDataRec *p);
 INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p);
-INLINE void ULGrowWindow(pUIInGrowData *p);
 static void ULResizeWin(ULI ul, short height, short wid);
-INLINE void ULUpdateWin(pUIUpdateData *p);
 INLINE void ULMouse(pUIMouseUpDownData *p);
 
 INLINE void ULNewMessageWindow(pMWNewData *p);
@@ -183,109 +178,6 @@ static ULI ULIFromWindow(WindowPtr w)
 
 #pragma mark -
 
-INLINE char IsDoubleClick(long time)
-{
-	return TickCount() - time <= GetDblTime();
-}
-
-static void ULDoubleClick(ULI ul, long num)
-{
-	LongString ls;
-	
-	//whois user
-	if(num >=0 && ul->users && num<(**ul->users).num)
-	{
-		LSConcatStrAndStr("\pWHOIS ", (**ul->users).u[num].u->nick, &ls);
-		HandleCommand((**ul->users).ch->link, &ls);
-	}
-}
-
-static void ULHitHeader(ULI ul, const EventRecord *e)
-{
-	if((ul->scrollbarLeft && e->where.h <= scrollbarWidth) || (!ul->scrollbarLeft && e->where.h > ul->uwinSize.right-scrollbarWidth))
-	{
-		ul->sortReverse = !ul->sortReverse;
-		if(globalUserlist || e->modifiers & shiftKey)
-			mainPrefs->userlistSortReverse = ul->sortReverse;
-		ListHeader(ul);
-		ListSort(ul, false);
-		ListDraw(ul);
-	}
-	else //it's not a hit on the flip widget
-	{
-		//see if it's the divider
-		short divider = ul->nickListWidth - 4;
-
-		if(ul->scrollbarLeft)
-			divider+=scrollbarWidth;
-		if(ul->rightSide)
-			divider+=kInWindowBorder;
-		
-		if(e->where.h >= divider - 3 && e->where.h <= divider + 3)
-		{
-			Point pt;
-			Rect r = ul->uwinSize;
-			short min;
-			MouseTrackingResult trackingResult;
-			
-			if(ul->scrollbarLeft)
-				min = 55 + scrollbarWidth;
-			else
-				min = 55;
-
-			r.right -= 10;
-			GetMouse(&pt);
-			do
-			{
-				if(ul->ulType == ulMessageWindow)
-				{
-					pt.h-=ul->pane->drawArea.left + (ul->rightSide?kInWindowBorder:0) + (ul->scrollbarLeft?scrollbarWidth:0);
-					pt.v-=ul->pane->drawArea.top;
-				}
-				else if(ul->ulType==ulGlobal && ul->scrollbarLeft)
-					pt.h-=scrollbarWidth;
-				if(pt.h > min && pt.v > -20 && pt.h < r.right - 20 && pt.v < r.bottom)
-				{
-					if(pt.h != ul->nickListWidth)
-					{
-						ul->nickListWidth = pt.h +4;
-						if(e->modifiers & shiftKey)
-							mainPrefs->userlistNickWidth  = ul->nickListWidth;
-						ListHeader(ul);
-						ListDraw(ul);
-					}
-				}
-				
-				TrackMouseLocation(NULL, &pt, &trackingResult);
-			} while(trackingResult != kMouseTrackingMouseReleased);
-		}
-		else if(e->where.h < divider) //nick
-		{
-			if(ul->sort != kSortNick)
-			{
-				ul->sort = kSortNick;
-				if(globalUserlist || e->modifiers & shiftKey)
-					mainPrefs->userlistSort = ul->sort;
-				ListSort(ul, false);
-				ListHeader(ul);
-				ListDraw(ul);
-			}
-		}
-		else //host
-		{
-			if(ul->sort != kSortUserhost)
-			{
-				ul->sort = kSortUserhost;
-				if(globalUserlist || e->modifiers & shiftKey)
-					mainPrefs->userlistSort = ul->sort;
-				ListSort(ul, false);
-				ListHeader(ul);
-				ListDraw(ul);
-			}
-		}
-	}
-}
-
 void DragOneUser(ULI ul, int u, const EventRecord *e);
 void DragOneUser(ULI ul, int u, const EventRecord *e)
 {
@@ -352,183 +244,6 @@ void DragOneUser(ULI ul, int u, const EventRecord *e)
 */
 }
 
-static void ULHitList(ULI ul, const EventRecord *e)
-{
-	static int clickAnchor = 0;
-	
-	int x, p;
-	ulPtr us;
-	int cnt;
-	int top;
-	char dblClick = 0;
-	
-	HLock((Handle)ul->users);
-	us = *ul->users;
-	//Select cell
-	//Figure out what line was hit
-	top = GetControlValue(ul->bar);
-	//Do bot...
-	p = (e->where.v - kTopOffset - 2) / line + top;
-	
-	if(p>=us->num) //click in empty space, deselect everything unless shift/cmd down
-	{
-		if(!(e->modifiers & cmdKey) && !(e->modifiers & shiftKey))
-		{
-			cnt = 0;
-			for(p=0;p<us->num;p++)
-			{
-				us->u[p].u->userlistIsSelected = false;
-				if(p>=top)
-					cnt++;
-			}
-			
-			if(cnt)
-				ListDraw(ul); //Pretty inefficient if only a few users are selected...
-			
-			goto finished;
-		}
-	}
-	else //click on cell. Do Something.
-	{
-		//p is the cell that was selected. Toggle it's selection and redraw.
-		//if the shift key is down, we have to do range checking.
-		
-		if(e->modifiers & shiftKey)
-		{
-			for(cnt=0,x=0;x<us->num;x++)
-				if(us->u[x].u->userlistIsSelected)
-					cnt++;
-			
-			//If no cells are selected, select this and do nothing else.
-			if(!cnt)
-			{
-				us->u[p].u->userlistIsSelected = true;
-				ListDrawOne(ul, p);
-				clickAnchor = p;
-			}
-			else if(cnt == 1) //If one cell is selected extend the range.
-			{
-				for(x=0;x<us->num;x++)
-					if(us->u[x].u->userlistIsSelected)
-						break;
-				//x is now the selected cell.
-				
-				if(x>p)
-				{
-					top = p;
-					cnt = x;
-				}
-				else if(p>x)
-				{
-					top = x;
-					cnt = p;
-				}
-				else //p==x
-				{
-					us->u[p].u->userlistIsSelected = false;
-					ListDrawOne(ul, p);
-					goto finished;
-				}
-				
-				for(; top <= cnt; top++)
-					us->u[top].u->userlistIsSelected = true;
-				ListDraw(ul);
-			}
-			else
-			{
-				//Select everything between clickAnchor and p, deselect everything else.
-				
-				if(clickAnchor > p)
-				{
-					top = p;
-					cnt = clickAnchor;
-				}
-				else
-				{
-					top = clickAnchor;
-					cnt = p;
-				}
-				
-				for(x=0;x<us->num;x++)
-					us->u[x].u->userlistIsSelected = (x>=top && x<=cnt);
-				
-				ListDraw(ul);
-				
-			}
-		}
-		else //not shift key
-		{
-			if(!us->u[p].u->userlistIsSelected)
-			{
-				us->u[p].u->userlistIsSelected = true;
-				clickAnchor = p;
-				ListDrawOne(ul, p);
-				
-				DragOneUser(ul, p, e);
-			}
-			else //if it's selected
-			{
-				if(e->modifiers & cmdKey)
-				{
-					us->u[p].u->userlistIsSelected = false;
-					ListDrawOne(ul, p);
-					goto finished;
-				}
-				else //handle double clicks
-				{
-					if(IsDoubleClick(ul->lastClickTime))
-					{
-						dblClick = 1;
-						ULDoubleClick(ul, p);
-					}
-					goto finished;
-				}
-			}
-		}
-	}
-	
-	//If not shift or command key, deselect other cells
-	if(!(e->modifiers & cmdKey) && !(e->modifiers & shiftKey))
-	{
-		cnt = 0;
-		for(x=0;x<us->num;x++)
-			if(x!=p)
-			{
-				us->u[x].u->userlistIsSelected = false;
-				if(x>=top)
-					cnt++;
-			}
-			
-		if(cnt)
-			ListDraw(ul);
-	}
-	
-finished:
-	if(!dblClick)
-	{
-		ul->lastClick = p;
-		ul->lastClickTime = TickCount();
-	}
-	else
-		ul->lastClick = ul->lastClickTime = 0;
-	
-	HUnlock((Handle)ul->users);
-}
-
-INLINE void ULInContentHit(ULI ul, const EventRecord *e)
-{
-	//The GrafPort is set and e->where is local
-	//Determine where clicked.
-	
-	if(e->where.v <= kHeaderSize)
-		ULHitHeader(ul, e);
-	else
-		if(ul->users)
-			ULHitList(ul, e);
-	
-	HUnlock((Handle)ul->users);
-}
-
 #pragma mark -
 
 static void ULScroll(ULI ul, long delta)
@@ -540,15 +255,19 @@ static void ULScroll(ULI ul, long delta)
 	if(((value<max) && (delta>0)) || ((value>0) && (delta<0)))
 	{
 		SetControl32BitValue(bar, value+delta);
-		ListDraw(ul);
 	}
 }
-
-static ULI gULILiveScrollbar;
 
 static void ULScrollbarActionProc(ControlHandle bar, short part)
 {
 	long scrollStep = 0;
+	long actualSize;
+	ULI ul = 0;
+	
+	//-30599 error
+	GetControlProperty(bar, kUserlistSignature, kUserlistSignature, sizeof(ULI), &actualSize, &ul);
+	if(!ul)
+		return;
 	
 	switch(part)
 	{
@@ -561,16 +280,19 @@ static void ULScrollbarActionProc(ControlHandle bar, short part)
 			break;
 
 		case kControlPageUpPart:
-			scrollStep = -gULILiveScrollbar->visLines;
+			scrollStep = -ul->visLines;
 			break;
 		
 		case kControlPageDownPart:
-			scrollStep = gULILiveScrollbar->visLines;
+			scrollStep = ul->visLines;
+			break;
+		
+		case kControlIndicatorPart:
 			break;
 	}
 	
 	if(scrollStep)
-		ULScroll(gULILiveScrollbar, scrollStep);
+		ULScroll(ul, scrollStep);
 }
 
 static void ULScrollbarLive(ULI ul, const EventRecord *e)
@@ -608,7 +330,6 @@ static void ULScrollbarLive(ULI ul, const EventRecord *e)
 		if(cur != old)
 		{
 			SetControl32BitValue(ul->bar, cur);
-			ListDraw(ul);
 			old=cur;
 		}
 		
@@ -621,32 +342,31 @@ static void ULScrollbarLive(ULI ul, const EventRecord *e)
 INLINE void ULScrollbarHit(ULI ul, short part, const EventRecord *e)
 {
 	#pragma unused(e)
-	ControlActionUPP upp;
+	static ControlActionUPP ulScrollbarActionUPP = NULL;
 	
-	gULILiveScrollbar = ul;
+	if(!ulScrollbarActionUPP)
+		ulScrollbarActionUPP = NewControlActionUPP(ULScrollbarActionProc);
+	
 	switch(part)
 	{
 		case kControlUpButtonPart:
 		case kControlDownButtonPart:
 		case kControlPageUpPart:
 		case kControlPageDownPart:
-			upp = NewControlActionUPP(ULScrollbarActionProc);
-			part = HandleControlClick(ul->bar, e->where, e->modifiers, upp);
-			DisposeControlActionUPP(upp);
+			HandleControlClick(ul->bar, e->where, e->modifiers, ulScrollbarActionUPP);
 			break;
 		
 		case kControlIndicatorPart:
 			ULScrollbarLive(ul, e);
 			break;
 	}
-	gULILiveScrollbar=0;
 }
 
 INLINE void ULGotNamesList(pServiceULNamesEndData *p)
 {
 	ULI ul = ULIFromChannel(p->channel);
 
-	if(ul && (!ul->users || (**ul->users).ch == p->channel))
+	if(ul && (!ul->ch || ul->ch == p->channel))
 		ListGenerate(ul, p->channel);
 }
 
@@ -673,7 +393,6 @@ INLINE void ULSActivateWin(pServiceActivateWinData *p)
 			{
 				ListTrash(ul);
 				ListSetWTitle(ul);
-				ListDraw(ul);
 			}
 		}
 	}
@@ -713,18 +432,14 @@ INLINE void SJoin(pServerJOINDataRec *p)
 {
 	ULI ul = ULIFromChannel(p->channel);
 	
-	if(ul && ul->users && p->channel == (**ul->users).ch)
+	if(ul && ul->ch && p->channel == ul->ch)
 	{
 		ListAdd(ul, p->userPtr);
 		
-		if(MouseInWindow(ul))
-			ListDraw(ul);
-		else
+		if(!MouseInWindow(ul))
 		{
 			if(TickCount() - ul->lastUpdate < 30)
 				ul->updateList = 1;
-			else
-				ListDraw(ul);
 		}
 	}
 }
@@ -733,18 +448,14 @@ INLINE void SPart(pServerPARTDataRec *p)
 {
 	ULI ul = ULIFromChannel(p->channel);
 	
-	if(ul && ul->users && p->channel == (**ul->users).ch)
+	if(ul && ul->ch && p->channel == ul->ch)
 	{
 		ListDel(ul, p->userPtr);
 
-		if(MouseInWindow(ul))
-			ListDraw(ul);
-		else
+		if(!MouseInWindow(ul))
 		{
 			if(TickCount() - ul->lastUpdate < 30)
 				ul->updateList = 1;
-			else
-				ListDraw(ul);
 		}
 	}
 }
@@ -753,7 +464,7 @@ INLINE void SMode(pServerMODEData *p)
 {
 	ULI ul = ULIFromChannel(p->ch);
 
-	if(ul && ul->users && p->ch && p->ch == (**ul->users).ch && !p->done && !ul->updateList)
+	if(ul && ul->ch && p->ch && p->ch == ul->ch && !p->done && !ul->updateList)
 	{
 		//It's a mode change in my channel
 		if(p->mode == 'v' || p->mode == 'o' || p->mode == 'h')
@@ -783,18 +494,14 @@ INLINE void SQuit(pServerQUITDataRec *p)
 	
 	l = TickCount();
 	do {
-		if(ul && ul->users)
+		if(ul && ul->ch)
 		{
 			if(ListDelName(ul, p->username))
 			{
-				if(MouseInWindow(ul))
-					ListDraw(ul);
-				else
+				if(!MouseInWindow(ul))
 				{
 					if(l - ul->lastUpdate < 30)
 						ul->updateList = 1;
-					else
-						ListDraw(ul);
 				}
 			}
 		}
@@ -817,9 +524,7 @@ INLINE void SNick(pServerNICKDataRec *p)
 	//Find the userlist that applies. In this case, it might be more than one, so this may need to be rewritten.
 	ULI ul;
 	UserListPtr u;
-	int num;
 	channelPtr ch;
-	short sort;
 	
 	if(globalUserlist)
 		ul = gUserlist;
@@ -833,21 +538,11 @@ INLINE void SNick(pServerNICKDataRec *p)
 	
 	while(1)
 	{
-		if(ul && ul->users && (**ul->users).ch)
+		if(ul && ul->ch)
 		{
-			u = ULFindUserName((**ul->users).ch, p->newnick);
+			u = ULFindUserName(ul->ch, p->newnick);
 			if(u)
-			{
-				sort = ul->sort;
-				ul->sort = kShitSort;
-				num = ListFind(ul, u);
-				ul->sort = sort;
-				if(num != -1)
-				{
-					ListResortInd(ul, num);
-					ListDraw(ul);
-				}
-			}
+				ListResortInd(ul, u);
 		}
 
 		if(globalUserlist)
@@ -867,25 +562,20 @@ INLINE void SKick(pServerKICKDataRec *p)
 {
 	ULI ul = ULIFromChannel(p->channel);
 
-	if(ul && ul->users && p->channel == (**ul->users).ch)
+	if(ul && ul->ch && p->channel == ul->ch)
 	{
 		if(p->isMe)
 		{
 			ListTrash(ul);
-			ListDraw(ul);
 		}
 		else
 		{
 			ListDelName(ul, p->kickedNick);
 
-			if(MouseInWindow(ul))
-				ListDraw(ul);
-			else
+			if(!MouseInWindow(ul))
 			{
 				if(TickCount() - ul->lastUpdate < 30)
 					ul->updateList = 1;
-				else
-					ListDraw(ul);
 			}
 		}
 	}
@@ -895,10 +585,9 @@ INLINE void STrashChannel(pServiceULTrashChannelData *p)
 {
 	ULI ul = ULIFromChannel(p->channel);
 
-	if(ul && ul->users && p->channel == (**ul->users).ch)
+	if(ul && ul->ch && p->channel == ul->ch)
 	{
 		ListTrash(ul);
-		ListDraw(ul);
 		ListSetWTitle(ul);
 	}
 }
@@ -907,11 +596,10 @@ INLINE void SULUserHosts(pServiceULUserhostsData *p)
 {
 	if(globalUserlist)
 	{
-		if((gUserlist->users) && (**gUserlist->users).ch->link == p->link)
+		if((gUserlist->ch) && gUserlist->ch->link == p->link)
 		{
 			if(gUserlist->sort == kSortUserhost)
-				ListSort(gUserlist, false);
-			ListDraw(gUserlist);
+				ListSort(gUserlist);
 		}
 	}
 	else
@@ -925,8 +613,7 @@ INLINE void SULUserHosts(pServiceULUserhostsData *p)
 			if(ul)
 			{
 				if(ul->sort == kSortUserhost)
-					ListSort(ul, false);
-				ListDraw(ul);
+					ListSort(ul);
 			}
 			ch=ch->next;
 		}
@@ -935,10 +622,12 @@ INLINE void SULUserHosts(pServiceULUserhostsData *p)
 
 #pragma mark -
 
-static int hiliteUser = -1;
+//static int hiliteUser = -1;
 
 static void ULDragTrack(pUIDragTrackData *p)
 {
+return;
+/*
 	int top, loc;
 	int mouseOver;
 	Point pt;
@@ -1018,10 +707,12 @@ static void ULDragTrack(pUIDragTrackData *p)
 			ULIFinishDrawing(ul, gp);
 		}
 	}
+*/
 }
 
 static void ULDragReceive(pUIDragReceiveData *p)
 {
+/*
 	ULI ul = ULIFromWindow(p->window);
 
 	p->returnVal = dragNotAcceptedErr;
@@ -1064,10 +755,12 @@ static void ULDragReceive(pUIDragReceiveData *p)
 			}
 		}
 	}
+*/
 }
 
 INLINE void ULPaneDragTrack(pMWPaneDragTrackData *p)
 {
+/*
 	pUIDragTrackData p2;
 	
 	p2.window = p->pane->mw->w;
@@ -1075,10 +768,12 @@ INLINE void ULPaneDragTrack(pMWPaneDragTrackData *p)
 	p2.message = p->message;
 	
 	ULDragTrack(&p2);
+*/
 }
 
 INLINE void ULPaneDragReceive(pMWPaneDragReceiveData *p)
 {
+/*
 	pUIDragReceiveData p2;
 	
 	p2.window = p->pane->mw->w;
@@ -1087,75 +782,11 @@ INLINE void ULPaneDragReceive(pMWPaneDragReceiveData *p)
 	ULDragReceive(&p2);
 	
 	p->received = (p2.returnVal == 0);
+*/
 }
 
 #pragma mark -
 
-static void ULContextualMenu(pCMPopupsData *p)
-{
-	//Find the userlist that applies.
-	ULI ul = ULIFromWindow(p->w);
-	int top, num, x;
-	int cnt;
-	ulPtr u;
-	GrafPtr gp;
-	Point pt;
-	char unsel;
-	int offset;
-	
-	if(!ul || !ul->users)
-		return;
-	
-	if(ul->ulType == ulMessageWindow && (!p->pane || p->pane != ul->pane))
-		return;
-	
-	GetPort(&gp);
-	SetPortWindowPort(ul->uwin);
-	
-	top = GetControlValue(ul->bar);
-
-	//num is the thing clicked on.
-	pt = p->where;
-	GlobalToLocal(&pt);
-	if(ul->ulType == kUserlistPane)
-		offset = ul->pane->drawArea.top;
-	else
-		offset = 0;
-	num = (pt.v - kTopOffset - offset) / line + top;
-	
-	HLock((Handle)ul->users);
-	u = *ul->users;
-	
-	if(num < u->num)
-	{
-		for(cnt=0,x=0;x<u->num;x++)
-			if(u->u[x].u->userlistIsSelected)
-				cnt++;
-		
-		//if it's not selected and there's no other selection, hilight it, perform the operation, and deselect it.
-		//else perform operation on selection
-		
-		if(cnt==0 && !u->u[num].u->userlistIsSelected && num<u->num) //select
-		{
-			unsel = 1;
-			u->u[num].u->userlistIsSelected = true;
-			ListDrawOne(ul, num);
-		}
-		else
-			unsel = 0;
-		
-		//Create the menu. This is going to look suspiciously like what the popups plugin does.
-		
-	}
-	
-	HUnlock((Handle)ul->users);
-	SetPort(gp);
-}
-
-static void ULContextualMenuProcess(pCMPopupsReturnData *p)
-{
-	p=p;
-}
 
 inline void RepeatMunger(Handle text, long offset, const void* ptr1, long len1, const void* ptr2, long len2)
 {
@@ -1167,6 +798,7 @@ inline void RepeatMunger(Handle text, long offset, const void* ptr1, long len1, 
 
 static void ProcessShortcuts(pShortcutProcessData *p)
 {
+/*
 	ConstStringPtr s;
 	int x;
 	int n;
@@ -1182,10 +814,9 @@ static void ProcessShortcuts(pShortcutProcessData *p)
 	if(!ul)
 		return;
 	
-	if(ul->users)
+	if(ul->ch)
 	{
 		//Get first selected user
-		HLock((Handle)ul->users);
 		u = *ul->users;
 		
 		n = u->num;
@@ -1213,7 +844,7 @@ static void ProcessShortcuts(pShortcutProcessData *p)
 		s = user->userhost;
 	
 	RepeatMunger(p->textH, 0, "$selecteduserhost", 17, &s[1], s[0]);
-	
+*/	
 /*
 	do {
 		x = Munger(p->textH, 0, "$selecteduname", 13, &s[1], s[0]);
@@ -1228,9 +859,6 @@ static void ProcessShortcuts(pShortcutProcessData *p)
 		x = Munger(p->textH, 0, "$selectedmask", 13, &s[1], s[0]);
 	} while(x >= 0);
 */
-	
-	if(ul->users)
-		HUnlock((Handle)ul->users);
 }
 
 #pragma mark -
@@ -1245,6 +873,12 @@ static void ULIDestroy(ULI ul)
 			pluginDisposeWindow(ul->uwin);
 		else //ulMessageWindow
 		{
+			if(ul->browser)
+			{
+				DisposeControl(ul->browser);
+				ul->browser = 0;
+			}
+			
 			if(ul->bar)
 			{
 				DisposeControl(ul->bar);
@@ -1276,8 +910,8 @@ static OSStatus ULDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef th
 		float lineValue;
 		long adjustedDelta;
 		
-		if(ul->users)
-			numLines = (**ul->users).num;
+		if(ul->ch)
+			numLines = ul->ch->numUsers;
 		else
 			numLines = 0;
 		
@@ -1292,21 +926,146 @@ static OSStatus ULDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef th
 	return myErr;
 }
 
+static OSStatus UlDoWindowEventHandler(EventHandlerCallRef nextHandler, EventRef event, void *userData)
+{
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	WindowRef ilWindow;
+	ULI ul = userData;
+	
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
+	switch(eventClass)
+	{
+		case kEventClassWindow:
+			GetEventParameter (event, kEventParamDirectObject, typeWindowRef, NULL, sizeof (WindowRef), NULL, &ilWindow);
+			
+			switch (eventKind)
+			{
+				case kEventWindowActivated:
+					break;
+				
+				case kEventWindowGetMinimumSize:
+				{
+					Point minSize;
+					minSize.h = kULMinimumHeight;
+					minSize.v = kULMininumWidth;
+					SetEventParameter(event, kEventParamDimensions, typeQDPoint, sizeof(minSize), &minSize);
+					result = noErr;
+					break;
+				}
+				case kEventWindowBoundsChanged:
+				{
+					Rect r;
+					GetEventParameter(event, kEventParamCurrentBounds, typeQDRectangle, NULL, sizeof(Rect), NULL, &r);
+					ULResizeWin(ul, r.bottom - r.top, r.right - r.left);
+					mainPrefs->userListRect = r;
+					result = noErr;
+					break;
+				}
+			}
+			break;
+	}
+	
+	return result;
+}
+
 static void ULInstallWindowHandlers(ULI ul)
 {
 	static EventHandlerUPP mouseWheelHandler = NULL;
 	const EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
+	static EventHandlerUPP ulWindowHandler = NULL;
+	const EventTypeSpec ulWindowTypes[] = {
+		{kEventClassWindow, kEventWindowActivated},
+		{kEventClassWindow, kEventWindowGetMinimumSize},
+		{kEventClassWindow, kEventWindowBoundsChanged}
+	};
 	
 	if(!mouseWheelHandler)
 		mouseWheelHandler = NewEventHandlerUPP(ULDoMouseWheelEvent);
+	if(!ulWindowHandler)
+		ulWindowHandler = NewEventHandlerUPP(UlDoWindowEventHandler);
 	
-	InstallWindowEventHandler(ul->uwin, mouseWheelHandler, 1, &wheelType, ul, NULL);
+	InstallWindowEventHandler(ul->uwin, mouseWheelHandler, GetEventTypeCount(wheelType), &wheelType, ul, NULL);
+	InstallWindowEventHandler(ul->uwin, ulWindowHandler, GetEventTypeCount(ulWindowTypes), ulWindowTypes, ul, NULL);
+}
+
+static OSStatus DBGetSetItem(ControlRef browser, DataBrowserItemID item, DataBrowserPropertyID prop, DataBrowserItemDataRef itemData, Boolean setValue)
+{
+	CFStringRef sr;
+	UserListPtr u = (UserListPtr)item;
+	
+	if(prop == 'name')
+	{
+		sr = CFStringCreateWithPascalString(NULL, u->nick, kCFStringEncodingMacRoman);
+		SetDataBrowserItemDataText(itemData, sr);
+		CFRelease(sr);
+	}
+	else if(prop == 'host')
+	{
+		sr = CFStringCreateWithPascalString(NULL, u->userhost, kCFStringEncodingMacRoman);
+		SetDataBrowserItemDataText(itemData, sr);
+		CFRelease(sr);
+	}
+	else
+		return errDataBrowserPropertyNotSupported;
+	
+	return noErr;
+}
+
+static char inupc(char c)
+{
+	if((c>='a') && (c<='z'))
+		c-=32;
+	return c;
+}
+
+static void pstrcpyucase(Str255 src, Str255 dest)
+{
+	int x;
+	int n = src[0];
+	
+	dest[0]=src[0];
+	for(x=1;x<=n;x++)
+		dest[x]=inupc(src[x]);
+}
+
+static Boolean DBItemCompare(ControlRef browser, DataBrowserItemID itemOne, DataBrowserItemID itemTwo, DataBrowserPropertyID sortProperty)
+{
+	UserListPtr a, b;
+	Str255 s1, s2;
+	
+	a = (UserListPtr)itemOne;
+	b = (UserListPtr)itemTwo;
+	
+	if(sortProperty == 'name')
+	{
+		pstrcpyucase(a->nick, s1);
+		pstrcpyucase(b->nick, s2);
+	}
+	else if(sortProperty == 'host')
+	{
+		pstrcpyucase(a->userhost, s1);
+		pstrcpyucase(b->userhost, s2);
+	}
+	
+	return !pstrgt(s1, s2);
+}
+
+static void DBItemNotify(ControlRef browser, DataBrowserItemID item, DataBrowserItemNotification message)
+{
+	switch(message)
+	{
+		case kDataBrowserItemDoubleClicked:
+			
+			break;
+	}
 }
 
 static ULI ULINew(WindowPtr w, long type)
 {
 	ULI ul = (ULI)NewPtrClear(sizeof(UserListInstance));
-	short ctrlProc;
 	Rect r; //pos for scrollbar
 	GrafPtr gp;
 	FontInfo genevaInfo;
@@ -1320,11 +1079,8 @@ static ULI ULINew(WindowPtr w, long type)
 	ul->sortReverse = mainPrefs->userlistSortReverse;
 	ul->sort = mainPrefs->userlistSort;
 	ul->nickListWidth = mainPrefs->userlistNickWidth;
-	ul->scrollbarLeft = mainPrefs->userlistScrollbarLeft;
 	ul->updateList = false;
 	
-	ctrlProc = kControlScrollBarProc;
-
 	ul->uwinSize.top = ul->uwinSize.left = 0;
 	if(type == ulGlobal)
 	{
@@ -1332,37 +1088,23 @@ static ULI ULINew(WindowPtr w, long type)
 			!RectInRgn(&mainPrefs->userListRect, GetGrayRgn())) //then it's displaying offscreen.
 			SetRect(&mainPrefs->userListRect, 40, 40, 300, 300);
 		
-		//, pnwHasCloseBox | pnwHasGrowBox
-		ul->uwin = pluginNewWindow(&mainPrefs->userListRect, "\pUserlist", kWindowResizableAttribute, true);
-		ULSetWindowProperty(ul);
-		
-		ULInstallWindowHandlers(ul);
-		
 		ul->uwinSize.right = mainPrefs->userListRect.right - mainPrefs->userListRect.left;
 		ul->uwinSize.bottom =  mainPrefs->userListRect.bottom - mainPrefs->userListRect.top;
 
 		ul->rightSide = false;
-		r.top = kHeaderSize;
-		if(ul->scrollbarLeft)
-		{
-			r.left = -1;
-			r.right = scrollbarWidth - 1;
-			r.bottom = (mainPrefs->userListRect.bottom - mainPrefs->userListRect.top) + 1;
-		}
-		else
-		{
-			r.left = (mainPrefs->userListRect.right - mainPrefs->userListRect.left) -14;
-			r.right = r.left + scrollbarWidth;
-			r.bottom = (mainPrefs->userListRect.bottom - mainPrefs->userListRect.top) - 13;
-		}
-		
-		if(mainPrefs->userListOpen)
-			ShowWindow(ul->uwin);
-		else
-			SendBehind(ul->uwin, 0); //Throw it behind everything else so it doesn't pop up at fg/bg switch if hidden.
+		r.top = 0;
+		r.left = 0;
+		r.bottom = ul->uwinSize.bottom;
+		r.right = ul->uwinSize.right;
 		
 		ul->mw = 0;
 		ul->pane = 0;
+		
+		//Create the window after fully setting up the ULI.
+		ul->uwin = pluginNewWindow(&mainPrefs->userListRect, "\pUserlist", kWindowResizableAttribute | kWindowLiveResizeAttribute | kWindowStandardHandlerAttribute, true);
+		ULSetWindowProperty(ul);
+		
+		ULInstallWindowHandlers(ul);
 	}
 	else if(type == ulMessageWindow)
 	{
@@ -1389,29 +1131,76 @@ static ULI ULINew(WindowPtr w, long type)
 		ul->uwinSize.right = o->drawArea.right - o->drawArea.left - kInWindowBorder;
 		ul->uwinSize.bottom = o->drawArea.bottom - o->drawArea.top;
 		
-		r.top = kHeaderSize + o->drawArea.top;
-		r.bottom = o->drawArea.bottom + 1;
+		r = o->drawArea;
 		
-		if(ul->scrollbarLeft)
-		{
-			r.left= o->drawArea.left -1;
-			if(ul->rightSide)
-				r.left+= kInWindowBorder+1;
-			r.right = r.left + scrollbarWidth;
-		}
+		if(ul->rightSide)
+			r.left += kInWindowBorder;
 		else
-		{
-			if(ul->rightSide)
-				r.left = o->drawArea.right - 15;
-			else
-				r.left = o->drawArea.right - 15 + kInWindowBorder;
-			r.right = r.left + scrollbarWidth;
-		}
+			r.right -= kInWindowBorder;
 	}
+	
+	CreateDataBrowserControl(ul->uwin, &r, kDataBrowserListView, &ul->browser);
+	{
+		DataBrowserListViewColumnDesc dbColumn;
+		DataBrowserCallbacks dcb;
+		static DataBrowserItemDataUPP dbIDUPP = NULL;
+		static DataBrowserItemCompareUPP dbICUPP = NULL;
+		static DataBrowserItemNotificationUPP dbINUPP = NULL;
+		
+		dbColumn.propertyDesc.propertyID = 'name';
+		dbColumn.propertyDesc.propertyType = kDataBrowserTextType;
+		dbColumn.propertyDesc.propertyFlags = kDataBrowserDefaultPropertyFlags;
+		dbColumn.headerBtnDesc.version= kDataBrowserListViewLatestHeaderDesc,
+		dbColumn.headerBtnDesc.minimumWidth = 55;
+		dbColumn.headerBtnDesc.maximumWidth = 500;
+		dbColumn.headerBtnDesc.titleOffset = 0;
+		dbColumn.headerBtnDesc.titleString = CFSTR("User");
+		dbColumn.headerBtnDesc.initialOrder = kDataBrowserOrderIncreasing;
+		dbColumn.headerBtnDesc.btnFontStyle.flags = kControlUseSizeMask;
+		dbColumn.headerBtnDesc.btnFontStyle.size = 9;
+		dbColumn.headerBtnDesc.btnContentInfo.contentType = kControlContentTextOnly;
+		
+		AddDataBrowserListViewColumn(ul->browser, &dbColumn, ULONG_MAX);
 
-	ul->bar=NewControl(ul->uwin, &r, "\p", true, 0, 0, 0, ctrlProc, 0);
-	if(type != ulGlobal && !IsWindowActive(ul->uwin))
-		DeactivateControl(ul->bar);
+		dbColumn.propertyDesc.propertyID = 'host';
+		dbColumn.propertyDesc.propertyType = kDataBrowserTextType;
+		dbColumn.propertyDesc.propertyFlags = kDataBrowserDefaultPropertyFlags;
+		dbColumn.headerBtnDesc.version= kDataBrowserListViewLatestHeaderDesc,
+		dbColumn.headerBtnDesc.minimumWidth = 55;
+		dbColumn.headerBtnDesc.maximumWidth = 500;
+		dbColumn.headerBtnDesc.titleOffset = 0;
+		dbColumn.headerBtnDesc.titleString = CFSTR("Hostname");
+		dbColumn.headerBtnDesc.initialOrder = kDataBrowserOrderIncreasing;
+		dbColumn.headerBtnDesc.btnFontStyle.flags = kControlUseSizeMask;
+		dbColumn.headerBtnDesc.btnFontStyle.size = 9;
+		dbColumn.headerBtnDesc.btnContentInfo.contentType = kControlContentTextOnly;
+		
+		AddDataBrowserListViewColumn(ul->browser, &dbColumn, ULONG_MAX);
+		
+		SetDataBrowserSortProperty(ul->browser, 'name');
+		SetDataBrowserSortOrder(ul->browser, kDataBrowserOrderIncreasing);
+		
+		InitializeDataBrowserCallbacks(&dcb, kDataBrowserLatestCallbacks);
+		
+		if(!dbIDUPP)
+			dbIDUPP = NewDataBrowserItemDataUPP(DBGetSetItem);
+		dcb.u.v1.itemDataCallback = dbIDUPP;
+		
+		if(!dbICUPP)
+			dbICUPP = NewDataBrowserItemCompareUPP(DBItemCompare);
+		dcb.u.v1.itemCompareCallback = dbICUPP;
+		
+		if(!dbINUPP)
+			dbINUPP = NewDataBrowserItemNotificationUPP(DBItemNotify);
+		dcb.u.v1.itemNotificationCallback = dbINUPP;
+		
+		SetDataBrowserCallbacks(ul->browser, &dcb);
+		SetDataBrowserHasScrollBars(ul->browser, false, true);
+		SetDataBrowserTableViewNamedColumnWidth(ul->browser, 'name', ul->nickListWidth);
+		SetDataBrowserTableViewNamedColumnWidth(ul->browser, 'host', ul->uwinSize.right - ul->nickListWidth);
+		
+		SetDataBrowserSelectionFlags(ul->browser, kDataBrowserDragSelect | kDataBrowserCmdTogglesSelection);
+	}
 	
 	GetPort(&gp);
 	SetPortWindowPort(ul->uwin);
@@ -1437,6 +1226,12 @@ static ULI ULINew(WindowPtr w, long type)
 		MWPaneResize(mw);
 		if(IsWindowVisible(mw->w))
 			MWPaneUpdate(mw);
+	}
+	
+	if(type == ulGlobal) //don't show the window until it's completely set up.
+	{
+		if(mainPrefs->userListOpen)
+			ShowWindow(ul->uwin);
 	}
 	
 	return ul;
@@ -1491,31 +1286,15 @@ static void ULIPaneDrawBorder(ULI ul, mwPanePtr o, char pressed)
 		}
 		
 /* ¥¥¥ */
-		if(ul->scrollbarLeft)
+		if(ul->rightSide)
 		{
-			if(ul->rightSide)
-			{
-				r.left += kInWindowBorder;
-				r.right = r.left + scrollbarWidth - 1;
-			}
-			else
-			{
-				r.right -= kInWindowBorder;
-				r.left--;
-			}
+			r.left += kInWindowBorder;
 		}
 		else
 		{
-			if(ul->rightSide)
-			{
-				r.left += kInWindowBorder;
-			}
-			else
-			{
 //¥¥¥FIXME!!
-				r.right -= kInWindowBorder;
-				r.left--;
-			}
+			r.right -= kInWindowBorder;
+			r.left--;
 		}
 
 		
@@ -1550,8 +1329,6 @@ static void SULPaneUpdate(pMWPaneUpdateData *p)
 		
 		if(ul)
 		{
-			ListDraw(ul);
-			ListHeader(ul);
 			ULIPaneDrawBorder(ul, p->pane, resizingPane);
 		}
 	}
@@ -1621,51 +1398,6 @@ static void ULPaneResize(ULI ul, mwPanePtr o, const EventRecord *e)
 		MWPaneUpdate(o->mw);
 	}
 	
-/*
-	int offset;
-	short old;
-	Point pt;
-
-	pt = e->where;
-	if(ul->rightSide)
-		offset = o->drawArea.left - pt.h;
-	else
-		offset = pt.h - o->drawArea.right;
-	
-	while(StillDown())
-	 {
-		GetMouse(&pt);
-		if(ul->rightSide)
-			pt.h = o->drawArea.right - pt.h;
-		else
-			pt.h -= o->drawArea.left;
-		
-		pt.h -= offset;
-		
-		if(pt.h != o->givenWidth && pt.h > kMinimumPaneWidth)
-		{
-			if(o->givenWidth < scrollbarWidth + kInWindowBorder)
-				HideControl(ul->bar);
-			else
-				ShowControl(ul->bar);
-			if(pt.h >= kMinimumPaneWidth && pt.h < r.right)
-			{
-				o->askedWidth = pt.h;
-				old = (o->drawArea.right - o->drawArea.left);
-				MWPaneRecalculate(o->mw);
-				if(o->drawArea.right - o->drawArea.left != old) //only update if something happened
-				{
-					if(e->modifiers & shiftKey)
-						mainPrefs->userlistInWindowWidth = pt.h - kInWindowBorder;
-
-					MWPaneResize(o->mw);
-					MWPaneUpdate(o->mw, 0);
-				}
-			}
-		}
-	}
-*/
-	
 	resizingPane = false;
 	ULIPaneDrawBorder(ul, o, false);
 }
@@ -1693,7 +1425,6 @@ static void SULPaneClick(pMWPaneClickData *p)
 			{
 				p->e->where.h -= p->pane->drawArea.left;
 				p->e->where.v -= p->pane->drawArea.top;
-				ULInContentHit(ul, p->e);
 			}
 		}
 	}
@@ -1707,13 +1438,11 @@ INLINE void SULPaneActivate(pMWPaneActivateData *p)
 		
 		if(ul)
 		{
-			if(p->activate && p->pane->givenWidth > scrollbarWidth + kInWindowBorder)
-				ActivateControl(ul->bar);
+			if(p->activate)
+				ActivateControl(ul->browser);
 			else
-				DeactivateControl(ul->bar);
+				DeactivateControl(ul->browser);
 
-			ListHeader(ul);
-			ListDraw(ul);
 			ULIPaneDrawBorder(ul, p->pane, false);
 		}
 	}
@@ -1730,28 +1459,17 @@ INLINE void SULPaneResize(pMWPaneResizeData *p)
 		
 		ul->uwinSize.right = o->drawArea.right - o->drawArea.left - kInWindowBorder;
 		ul->uwinSize.bottom =  o->drawArea.bottom - o->drawArea.top;
-
-		r.top = kHeaderSize + o->drawArea.top;
-		if(ul->scrollbarLeft)
-		{
-			r.left = o->drawArea.left -1;
-			if(ul->rightSide)
-				r.left+= kInWindowBorder +1;
-			r.right = r.left + scrollbarWidth;
-		}
-		else
-		{
-			if(ul->rightSide)
-				r.left = o->drawArea.right - 15;
-			else
-				r.left = o->drawArea.right - 15 - kInWindowBorder;
-		}
-		r.bottom = o->drawArea.bottom + 1;
 		
-		if(!IsWindowActive(ul->uwin) || o->givenWidth < scrollbarWidth + kInWindowBorder)
-			DeactivateControl(ul->bar);
+		r = o->drawArea;
+		if(ul->rightSide)
+			r.left += kInWindowBorder;
 		else
-			ActivateControl(ul->bar);
+			r.right -= kInWindowBorder;
+		
+		if(!IsWindowActive(ul->uwin))
+			DeactivateControl(ul->browser);
+		else
+			ActivateControl(ul->browser);
 
 		SizeControl(ul->bar, 16, r.bottom - r.top);
 		MoveControl(ul->bar, r.left, r.top);
@@ -1816,7 +1534,6 @@ static void ULIAddAll(void)
 INLINE void IdleCursor(void)
 {
 	static int inSep = 0;
-	GrafPtr gp;
 	Point pt;
 	ULI ul = 0;
 	char in = 0;
@@ -1857,69 +1574,9 @@ INLINE void IdleCursor(void)
 
 	if(in || inSep)
 	{
-		short divider;
-		
-		if(!ul || !w || !IsWindowActive(w))
-			in = 0;
-		else
-		{
-			divider = ul->nickListWidth - 4;
-			SetIdleThreshold(kIdleFast);
-			
-			if(ul->updateList && TickCount() - ul->lastUpdate > 10)
-				ListDraw(ul);
-			
-			gp = ULISetupDrawing(ul);
-			GetMouse(&pt);
-			in = (pt.v >= 0 && pt.v <= kHeaderSize) && (pt.h >= divider - 3 && pt.h <= divider + 3);
-			
-			if(!in && ul->ulType == ulMessageWindow) //not in nick divider. see if it's in the pane divider
-			{
-				if(ul->rightSide)
-				{
-					if(ul->scrollbarLeft)
-						divider = -scrollbarWidth - (kInWindowBorder / 2);
-					else
-						divider = - (kInWindowBorder / 2);
-				}
-				else
-				{
-					if(ul->scrollbarLeft)
-						divider = ul->uwinSize.right - scrollbarWidth + (kInWindowBorder/2);
-					else
-						divider = ul->uwinSize.right + (kInWindowBorder/2);
-				}
-		
-				in = (pt.v >= 0 && pt.v <= ul->uwinSize.bottom) &&  (pt.h >= divider - (kInWindowBorder/2) && pt.h <= divider + (kInWindowBorder/2));
-			}
-		}
-		
-		if(!inSep && in)
-		{
-			inSep = 1;
-			SetThemeCursor(kThemeResizeLeftRightCursor);
-		}
-		else if(inSep && !in)
-		{
-			inSep = 0;
-			SetThemeCursor(kThemeArrowCursor);
-		}
-		
-		if(ul)
-			ULIFinishDrawing(ul, gp);
 	}
 	else
 		SetIdleThreshold(kIdleNormal);
-}
-
-INLINE void ULMoveWindow(pUIWindowMoveDataRec *p)
-{
-	ULI ul = ULIFromWindow(p->w);
-	
-	if(ul) //then it's the global window
-	{
-		mainPrefs->userListRect = p->newpos;
-	}
 }
 
 INLINE void ULCloseWindow(pUIWindowCloseDataRec *p)
@@ -1994,64 +1651,11 @@ INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p)
 //This is always going to be used for the global list
 static void ULResizeWin(ULI ul, short height, short wid)
 {
-	short ctrlHeight;
-	
-	SizeWindow(ul->uwin, wid, height, false);
-	
-	//Update prefs
-	mainPrefs->userListRect.right = mainPrefs->userListRect.left + wid;
-	mainPrefs->userListRect.bottom = mainPrefs->userListRect.top + height;
-	
-	if(ul->scrollbarLeft)
-	{
-		ctrlHeight = height - kHeaderSize + 1;
-	}
-	else
-	{
-		ctrlHeight = height - 13 - kHeaderSize;
-	}
-	
-	//r.bottom is now the size of the window
-	if(ul->scrollbarLeft)
-		MoveControl(ul->bar, -1, kHeaderSize);
-	else
-		MoveControl(ul->bar, wid-scrollbarWidth+2, kHeaderSize);
-	SizeControl(ul->bar, scrollbarWidth, ctrlHeight);
+	MoveControl(ul->browser, 0, 0);
+	SizeControl(ul->browser, wid, height);
 
 	ul->uwinSize.bottom = height;
 	ul->uwinSize.right = wid;
-	
-	ListHeader(ul);
-	ListDraw(ul);
-}
-
-INLINE void ULGrowWindow(pUIInGrowData *p)
-{
-	long l;
-	Rect r;
-	ULI ul= ULIFromWindow(p->window);
-	
-	if(ul)
-	{
-		SetRect(&r, kULMininumWidth, kULMinimumHeight, 32767, 32767);
-		l = GrowWindow(p->window, p->e->where, &r);
-		if(l)
-		{
-			ULResizeWin(ul, *(short*)&l, l & 0xFFFF);
-		}
-	}
-}
-
-INLINE void ULUpdateWin(pUIUpdateData *p)
-{
-	ULI ul = ULIFromWindow((WindowPtr)p->e->message);
-
-	if(ul)
-	{
-		DrawControls(ul->uwin);
-		ListDraw(ul);
-		ListHeader(ul);
-	}
 }
 
 INLINE void ULMouse(pUIMouseUpDownData *p)
@@ -2078,8 +1682,6 @@ INLINE void ULMouse(pUIMouseUpDownData *p)
 			{
 				ULScrollbarHit(ul, pa, p->e);
 			}
-			else if(!c) //not a control - mouse was clicked in the content
-				ULInContentHit(ul, p->e);
 			
 			SetPort(gp);
 		}
@@ -2105,7 +1707,7 @@ INLINE void DestroyGlobalUserlistWindow(void)
 
 #pragma mark -
 
-char dInWindowRight, dScrollbarLeft;
+char dInWindowRight;
 
 INLINE void PWSet(pPWSetWindowData *p)
 {
@@ -2113,7 +1715,6 @@ INLINE void PWSet(pPWSetWindowData *p)
 	{
 		setCheckBox(p->PrefsDlg, 4, mainPrefs->userlistInWindow);
 		setCheckBox(p->PrefsDlg, 5, mainPrefs->userlistInWindowRight);
-		setCheckBox(p->PrefsDlg, 6, mainPrefs->userlistScrollbarLeft);
 	}
 }
 
@@ -2123,7 +1724,6 @@ INLINE void PWGet(pPWGetWindowData *p)
 	{
 		mainPrefs->userlistInWindow = getCheckBox(p->PrefsDlg, 4);
 		mainPrefs->userlistInWindowRight = getCheckBox(p->PrefsDlg, 5);
-		mainPrefs->userlistScrollbarLeft = getCheckBox(p->PrefsDlg, 6);
 	}
 }
 
@@ -2178,24 +1778,9 @@ INLINE void PWClosed(void)
 				ULIAddAll();
 			}
 		}
-		else if(mainPrefs->userlistScrollbarLeft != dScrollbarLeft)
-		{
-			if(globalUserlist)
-			{
-				Rect r = WGetBBox(gUserlist->uwin);
-				gUserlist->scrollbarLeft = mainPrefs->userlistScrollbarLeft;
-				ULResizeWin(gUserlist, r.bottom - r.top, r.right - r.left);
-			}
-			else
-			{
-				ULIKillAll();
-				ULIAddAll();
-			}
-		}
 	}
 	
 	dInWindowRight = mainPrefs->userlistInWindowRight;
-	dScrollbarLeft = mainPrefs->userlistScrollbarLeft;
 }
 
 #pragma mark -
@@ -2222,7 +1807,6 @@ static void displayMultipleUserlistsMsg(void)
 
 INLINE void setupMessages(char captureMessages[numMessages])
 {
-	captureMessages[pIdleMessage]=
 	captureMessages[pServerJOINMessage]=
 	captureMessages[pServerPARTMessage]=
 	captureMessages[pServerQUITMessage]=
@@ -2237,33 +1821,6 @@ INLINE void setupMessages(char captureMessages[numMessages])
 
 static void ULDoIdle(EventLoopTimerRef timer, void* data)
 {
-	if(globalUserlist)
-	{
-		if(gUserlist->updateList && TickCount() - gUserlist->lastUpdate > 15)
-			ListDraw(gUserlist);
-	}
-	else
-	{
-		long x = TickCount() - 15;
-		MWPtr mw = *sidr->mwList;
-		ULI ul;
-
-		while(mw)
-		{
-			if(mw->winType == chanWin)
-			{
-				mwPanePtr o = MWFindPane(mw, kUserlistPane);
-				if(o)
-				{
-					ul = (ULI)o->data;
-					if(ul->updateList && ul->lastUpdate <= x)
-						ListDraw(ul);
-				}
-			}
-			mw=mw->next;
-		} 
-	}
-	
 	IdleCursor();
 }
 
@@ -2298,7 +1855,7 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			shadowircColors = sidrIN->shadowircColors;
 			
 			l=((pVersionCheckDataPtr)sidrIN->messageData)->version;
-			if(l<0x0101003c) //1.1d60
+			if(l<0x02000006) //2.0a6
 			{
 				((pVersionCheckDataPtr)sidrIN->messageData)->version = pVersionShadowIRCTooOld;
 				displayOldVersionMsg();
@@ -2321,10 +1878,7 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 				setupMessages(sidrIN->yourInfo->captureMessages);
 				SetIdleThreshold(kIdleNormal);
 				
-				gSortForwardIcon = (CIconHandle)Get1IndResource('cicn', 500);
-				gSortReverseIcon = (CIconHandle)Get1IndResource('cicn', 501);
 				dInWindowRight = mainPrefs->userlistInWindowRight;
-				dScrollbarLeft = mainPrefs->userlistScrollbarLeft;
 				prefsPanel = PMLAdd("\pUserlist");
 
 				globalUserlist= !mainPrefs->userlistInWindow;
@@ -2362,10 +1916,6 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			PWClosed();
 			break;
 
-		case pUIWindowMoveMessage:
-			ULMoveWindow((pUIWindowMoveDataPtr)sidrIN->messageData);
-			break;
-		
 		case pUIWindowCloseMessage:
 			ULCloseWindow((pUIWindowCloseDataPtr)sidrIN->messageData);
 			break;
@@ -2374,14 +1924,6 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			ULWindowMenuSelect((pServiceWindowMenuPtr)sidrIN->messageData);
 			break;
 		
-		case pUIInGrowMessage:
-			ULGrowWindow((pUIInGrowDataPtr)sidrIN->messageData);
-			break;
-		
-		case pUIUpdateMessage:
-			ULUpdateWin((pUIUpdateDataPtr)sidrIN->messageData);
-			break;
-			
 		case pUIMouseUpDownMessage:
 			ULMouse((pUIMouseUpDownDataPtr)sidrIN->messageData);
 			break;
@@ -2471,11 +2013,11 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			break;
 		
 		case pCMPopupsMessage:
-			ULContextualMenu((pCMPopupsDataPtr)sidrIN->messageData);
+			//ULContextualMenu((pCMPopupsDataPtr)sidrIN->messageData);
 			break;
 		
 		case pCMPopupsReturnMessage:
-			ULContextualMenuProcess((pCMPopupsReturnDataPtr)sidrIN->messageData);
+			//ULContextualMenuProcess((pCMPopupsReturnDataPtr)sidrIN->messageData);
 			break;
 	}
 }
