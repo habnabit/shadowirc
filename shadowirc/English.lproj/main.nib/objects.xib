@@ -295,6 +295,7 @@
               </object>
               <object class="IBCarbonMenuItem" id="311">
                 <string name="title">Other…</string>
+                <ostype name="command">FTSZ</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="312">
                 <boolean name="separator">TRUE</boolean>

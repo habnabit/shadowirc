@@ -31,6 +31,7 @@ enum menuCommands
 extern MenuHandle gAppleMenu, gEditMenu, gFileMenu, gShortcutsMenu, gWindowMenu, gHelpMenu;
 
 void DoFind(char again);
+void DoFontSizeWindow(void);
 
 void HitAppleURLMenu(short item);
 void HitSelectConnectionMenu(short item);

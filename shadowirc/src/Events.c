@@ -467,6 +467,11 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 			HitCommandsMenu(hiCommand.menu.menuItemIndex);
 			return noErr;
 		
+		//Font Menu
+		case 'FTSZ':
+			DoFontSizeWindow();
+			return noErr;
+		
 		//Window Menu
 		case 'CONS':
 			ToggleConsoleWindow();

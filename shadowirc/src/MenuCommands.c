@@ -45,7 +45,6 @@
 
 MenuHandle gAppleMenu, gFileMenu, gEditMenu, gShortcutsMenu, gWindowMenu;
 static MenuHandle gFontsMenu;
-static short gFontSizeOtherItem;
 
 static void DoFind2(MWPtr mw);
 
@@ -517,11 +516,11 @@ int HitWindowSelectWindowMenu(const short item)
 	return 1;
 }
 
-static pascal void HitFontsMenu(short item)
+void DoFontSizeWindow(void)
 {
 	Str255 s;
-	short i;
 	long l;
+	short i;
 	DialogPtr d;
 	char b;
 	MWPtr mw = GetActiveMW();
@@ -530,59 +529,65 @@ static pascal void HitFontsMenu(short item)
 	if(!mw)
 		return;
 	
-	if(item == gFontSizeOtherItem)
-	{
-		s[0] = 0;
-		EnterModalDialog();
-		d = GetNewDialog(141, 0, (WindowPtr)-1);
+	s[0] = 0;
+	EnterModalDialog();
+	d = GetNewDialog(141, 0, (WindowPtr)-1);
+	
+	SetText(d, 4,"\p");
+	SetupModalDialog(d, 1, 2);
+	b = 0;
+	do {
+		ModalDialog(StdDlgFilter, &i);
 		
-		SetText(d, 4,"\p");
-		SetupModalDialog(d, 1, 2);
-		b = 0;
-		do {
-			ModalDialog(StdDlgFilter, &i);
-			
-			switch(i)
-			{
-				case 1:
-					GetText(d, 4, s);
-					
-				case 2:
-					b = i;
-					break;
-			}
-		} while(!b);
-		
-		DisposeDialog(d);
-		FinishModalDialog();
-		
-		if(s[0])
+		switch(i)
 		{
-			StringToNum(s, &l);
-			if(l >= 4 && l < 32767)
-			{
-				MWSetFontSize(mw, -1, l);
-				WEActivate(mw->we);
-			}
+			case 1:
+				GetText(d, 4, s);
+				
+			case 2:
+				b = i;
+				break;
 		}
+	} while(!b);
+	
+	DisposeDialog(d);
+	FinishModalDialog();
+	
+	if(s[0])
+	{
+		StringToNum(s, &l);
+		if(l >= 4 && l < 32767)
+		{
+			MWSetFontSize(mw, -1, l);
+			WEActivate(mw->we);
+		}
+	}
+}
+
+static pascal void HitFontsMenu(short item)
+{
+	Str255 s;
+	long l;
+	MWPtr mw = GetActiveMW();
+	
+	//We don't do anything if there's no active mw
+	if(!mw)
+		return;
+	
+	GetMenuItemText(gFontsMenu, item, s);
+	if(item>fontsBegin)
+	{
+		FMFontFamily fontFamily = FMGetFontFamilyFromName(s);
+		
+		MWSetFontSize(mw, fontFamily, -1);
 	}
 	else
 	{
-		GetMenuItemText(gFontsMenu, item, s);
-		if(item>fontsBegin)
-		{
-			FMFontFamily fontFamily = FMGetFontFamilyFromName(s);
-			
-			MWSetFontSize(mw, fontFamily, -1);
-		}
-		else
-		{
-			StringToNum(s, &l);
-			MWSetFontSize(mw, -1, l);
-		}
-		
-		WEActivate(mw->we);
+		StringToNum(s, &l);
+		MWSetFontSize(mw, -1, l);
 	}
+	
+	WEActivate(mw->we);
 }
 
 void HitSelectConnectionMenu(short item)
@@ -760,7 +765,6 @@ void FontsMenuInit(void)
 		MenuHandle mh = GetMenuHandle(fontsMenu);
 		gFontsMenu = mh;
 		fontsBegin=CountMenuItems(mh);
-		gFontSizeOtherItem = fontsBegin - 1;
 		CreateStandardFontMenu(mh, fontsBegin, 0, kNilOptions, 0);
 	}
 }
