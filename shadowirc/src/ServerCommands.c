@@ -321,12 +321,13 @@ static pascal void nJoin(linkPtr link, LongString *ls, StringPtr from, StringPtr
 			LSAppend2(*ls, ' b');
 			SendCommand(link, ls); //banlist
 			
+/*--causes problems on some servers. Disable for now.
 			if(LinkCanMode(link, 'e', false))
 			{
 				ls->data[ls->len] = 'e'; //change 'b' to 'e'
 				SendCommand(link, ls); //Get exception list
 			}
-
+*/
 			DrawMWinStatus(dd);
 		}
 		ChannelListAdd(link, p.channel->chName);
