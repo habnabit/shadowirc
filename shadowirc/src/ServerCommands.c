@@ -790,7 +790,7 @@ pascal void doMODE(linkPtr link, ConstStringPtr channel, StringPtr modeChange, C
 {
 	int x, y;
 	short len;
-	char up;
+	char up = 0;
 	channelPtr ch;
 	pServerMODEData pUL;
 	char sendUL;
