@@ -233,17 +233,9 @@ pascal void HitEditMenu(short item)
 		DialogPtr d = GetDialogFromWindow(w);
 		
 		if(item == 3)
-		{
 			DialogCut(d);
-			ClearCurrentScrap();
-			TEToScrap();
-		}
 		else if(item == 4)
-		{
 			DialogCopy(d);
-			ClearCurrentScrap();
-			TEToScrap();
-		}
 		else if(item==5)
 			DialogPaste(d);
 		else if(item==6) //clear
@@ -315,20 +307,12 @@ pascal void HitEditMenu(short item)
 				else if(mwFront && MWActive->winType==textWin)
 					WECut(we);
 				else if(otherFront)
-				{
 					TECut(te);
-					ClearCurrentScrap();
-					TEToScrap();
-				}
 				break;
 			
 			case 4: //copy
 				if(otherFront)
-				{
 					TECopy(te);
-					ClearCurrentScrap();
-					TEToScrap();
-				}
 				else
 					WECopy(we);
 				break;

@@ -57,7 +57,6 @@ pascal void EnterModalDialog(void)
 {
 	WindowPtr fnf;
 	
-	TEFromScrap();
 	if(!inBackground)
 	{
 		fnf=ActiveNonFloatingWindow();
@@ -91,9 +90,6 @@ pascal void ExitModalDialog(void)
 		WResume();
 		inBackground=false;
 	}
-	
-	ClearCurrentScrap();
-	TEToScrap();
 }
 
 pascal void WSelect(WindowPtr w)

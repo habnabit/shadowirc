@@ -741,7 +741,6 @@ static OSStatus DoResumeEvent(EventHandlerCallRef handlerCallRef, EventRef event
 	pContextSwitchDataRec p;
 	
 	inBackground=0;
-	TEFromScrap();
 	InitCursor();
 	
 	if(!noFloatingInput)
