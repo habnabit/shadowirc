@@ -5,7 +5,7 @@
 			Landon Fuller <landonf@fullers.org>
 			Chris Campbell <chris_campbell@mac.com>
 			Sean McGovern <smcgovern@users.sourceforge.net>
-	Copyright (C) 2003 Landon Fuller, Chris Campbell, John Bafford, Sean McGovern
+	Copyright (C) 2002-3 Landon Fuller, Chris Campbell, John Bafford, Sean McGovern
 	http://www.shadowirc.com
 
 	This program is free software; you can redistribute it and/or
@@ -118,7 +118,7 @@ typedef struct DNRRecord {
     pthread_t thread;
     pthread_mutex_t lock;
     Str255 name;
-    struct in_addr ip;
+    struct addrinfo *addr_list;
 } DNRRecord, *DNRRecordPtr;
 
 typedef long connectionIndex;
@@ -819,16 +819,20 @@ static void DestroyConnection(connectionIndex *cp)
 static pthread_mutex_t dnslock = PTHREAD_MUTEX_INITIALIZER;
 static void FindAddressDNR(DNRRecordPtr drp)
 {
-        struct hostent *hp;
-        char *str;
-
-        str = safe_malloc(drp->name[0] + 1);
-        CopyPascalStringToC(drp->name, str);
-        pthread_mutex_lock(&dnslock);
+	struct addrinfo hints;
+	int error;
+	char *str;
+	
+	str = safe_malloc(drp->name[0] + 1);
+	CopyPascalStringToC(drp->name, str);
+	pthread_mutex_lock(&dnslock);
 	pthread_cleanup_push((void *) pthread_mutex_unlock, (void *) &dnslock);
-        hp = gethostbyname(str);
-        free(str);
+	
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_INET;	// limit to IPv4 until remainder of changes are checked in
 	pthread_mutex_lock(&drp->lock);
+	error = getaddrinfo(str, NULL, &hints, &drp->addr_list); // where will we free the list?
+	free(str);
 	/*
 	 * If we have been asked to cancel, we should do it before
 	 * we attempt to play with possibly deallocated data structures.
@@ -837,20 +841,18 @@ static void FindAddressDNR(DNRRecordPtr drp)
 	 * and a cancel will not be sent until we release the lock.
 	 */
 	pthread_testcancel();
-
-        if(hp == NULL)
-        {
-            drp->ioResult = -1;
-        } else {
-            drp->ioResult = noErr;
-            bcopy(hp->h_addr_list[0], &drp->ip.s_addr, sizeof(drp->ip.s_addr));
-            CopyCStringToPascal(hp->h_name, drp->name);
-        }
+	
+	if(error)
+	{
+		drp->ioResult = -1;
+	} else {
+		drp->ioResult = noErr;
+	}
 	pthread_mutex_unlock(&drp->lock);
-        /*
-         * pop pthread_mutex_unlock off the cleanup stack and execute it
-         * this unlocks our lock mutex lock
-         */
+	/*
+	 * pop pthread_mutex_unlock off the cleanup stack and execute it
+	 * this unlocks our lock mutex lock
+	 */
 	pthread_cleanup_pop(1);
 }
 
@@ -1004,9 +1006,11 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 			pthread_mutex_lock(&c->dnrrp->lock);
 			if(c->dnrrp->ioResult == noErr)
 			{
+				struct sockaddr_in *sin;
 				cer->event = C_Found;
 				cer->value = (long)NewString(c->dnrrp->name);
-				cer->addr = c->dnrrp->ip;
+				sin = (struct sockaddr_in *)c->dnrrp->addr_list[0].ai_addr;
+				memcpy(&cer->addr, &sin->sin_addr, sizeof(cer->addr));
 			} else if(c->dnrrp->ioResult != inProgress) {
 				/*
 				 * If dnrrp->ioResult is != inProgress and we hold the mutex,
@@ -1040,7 +1044,10 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 			if(cer->event != C_NoEvent)
 			{
 				if(c->dnrrp->ioResult != inProgress)
+				{
+					freeaddrinfo(c->dnrrp->addr_list);
 					DisposePtr((Ptr)c->dnrrp);
+				}
 				c->dnrrp = 0;
 				DestroyConnection(&rcp);
 			}
