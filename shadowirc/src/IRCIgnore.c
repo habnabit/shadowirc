@@ -88,10 +88,9 @@ pascal char IsIgnoredNickUser(ConstStr255Param nick, ConstStr255Param user)
 {
 	Str255 s;
 	
-	pstrcpy(user, &s[nick[0]+1]);
 	pstrcpy(nick, s);
-	s[s[0]+1] = '!';
-	s[0]+=user[0]+1;
+	SAppend1(s, '!');
+	pstrcat(s, user, s);
 	
 	return IsIgnored(s);
 }
@@ -175,16 +174,10 @@ pascal void DoIgnore(LongString  *in)
 				pdelete(str, 1, 1);
 
 			if(!pos('@', str)) //tack on a !*@*
-			{
-				*(long*)&str[str[0]+1]='!*@*';
-				str[0]+=4;
-			}
+				pstrcat(str, "\p!*@*", str);
 			else if(!pos('!', str)) //no 
-			{
-				pstrcpy(str, &str[2]);
-				*(short*)&str[1]='*!';
-				str[0]+=2;
-			}
+				pstrcat("\p*!", str, str);
+
 			if(remove)
 				deleteIgnores(str);
 			else

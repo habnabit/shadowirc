@@ -2,7 +2,7 @@
 	ShadowIRC - A Mac OS IRC Client
 	Copyright (C) 1996-2000 John Bafford
 	dshadow@shadowirc.com
-	http://www.shadowirc.com
+	http://www.shadowirc.comes
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -170,24 +170,7 @@ pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nic
 
 pascal void SMPrefix(LongString *ls, short where)
 {
-	Str255 s;
-	char i;
-	prefsPtr mp = mainPrefs;
-	
-	*(short*)s=0x0208;
-	if(mp->serverMessagePrefix[0]>252)
-		i=252;
-	else
-		i=mp->serverMessagePrefix[0];
-	BlockMoveData(mp->serverMessagePrefix, &s[2], i+1);
-	s[0]+=i;
-	s[2]=sicServer;
-	LSConcatStrAndLS(s, ls, ls);
-
-	if(where == dsConsole)
-		LineMsg(ls);
-	else if(where == dsFrontWin)
-		Message(ls);
+	SMPrefixColor(ls, where, sicServer);
 }
 
 pascal char SMLink(linkPtr link, LongString *ls)
@@ -196,14 +179,12 @@ pascal char SMLink(linkPtr link, LongString *ls)
 	
 	if(link && link != CurrentTarget.link)
 	{
+		pstrcpy("\p[", s);
 		if(link->CurrentServer[0])
-			pstrcpy(link->CurrentServer, &s[1]);
+			pstrcat(s, link->CurrentServer, s);
 		else
-			pstrcpy(link->linkPrefs->linkName, &s[1]);
-		s[0]=s[1]+3;
-		s[1]='[';
-		*(short*)&s[s[0]-1] = '] ';
-		LSConcatStrAndLS(s, ls, ls);
+			pstrcat(s, link->linkPrefs->linkName, s);
+		LSConcatStrAndStrAndLS(s, "\p] ", ls, ls);
 		return 1;
 	}
 	else
@@ -222,18 +203,11 @@ pascal char SMPrefixLink(linkPtr link, LongString *ls, short where)
 pascal void SMPrefixColor(LongString *ls, short where, short color)
 {
 	Str255 s;
-	char i;
-	prefsPtr mp = mainPrefs;
 	
 	*(short*)s=0x0208; //len 2 + 2
-	if(mp->serverMessagePrefix[0]>252)
-		i=252;
-	else
-		i=mp->serverMessagePrefix[0];
-	BlockMoveData(mp->serverMessagePrefix, &s[2], i+1);
-	s[0]+=i;
 	s[2]=color;
-	LSConcatStrAndLS(s, ls, ls);
+	
+	LSConcatStrAndStrAndLS(s, mainPrefs->serverMessagePrefix, ls, ls);
 
 	if(where == dsConsole)
 		LineMsg(ls);
@@ -253,19 +227,13 @@ pascal char SMPrefixLinkColor(linkPtr link, LongString *ls, short where, short c
 pascal void SMPrefixIrcleColor(LongString *ls, short where, short color)
 {
 	Str255 s;
-	char i;
 	short cm;
 	prefsPtr mp=mainPrefs;
 	
 	*(short*)s=0x0203; //len 2 + 2
-	if(mp->serverMessagePrefix[0]>252)
-		i=252;
-	else
-		i=mp->serverMessagePrefix[0];
-	BlockMoveData(mp->serverMessagePrefix, &s[2], i+1);
-	s[0]+=i;
 	s[2]=color;
-	LSConcatStrAndLS(s, ls, ls);
+	
+	LSConcatStrAndStrAndLS(s, mp->serverMessagePrefix, ls, ls);
 	cm=mp->colorMethod;
 	mp->colorMethod=cmIrcle;
 
@@ -289,21 +257,14 @@ pascal char SMPrefixLinkIrcleColor(linkPtr link, LongString *ls, short where, sh
 pascal void SMPrefixRGBColor(LongString *ls, short where, const RGBColor *rgb)
 {
 	Str255 s;
-	char i;
-	prefsPtr mp = mainPrefs;
 	
 	*(short*)s=0x0508; //len 2 + 6
 	s[2] = sicCustomColor;
 	s[3] = *(char*)&rgb->red;
 	s[4] = *(char*)&rgb->green;
 	s[5] = *(char*)&rgb->blue;
-	if(mp->serverMessagePrefix[0]>248)
-		i=252;
-	else
-		i=mp->serverMessagePrefix[0];
-	BlockMoveData(mp->serverMessagePrefix, &s[6], i+1);
-	s[0]+=i;
-	LSConcatStrAndLS(s, ls, ls);
+	
+	LSConcatStrAndStrAndLS(s, mainPrefs->serverMessagePrefix, ls, ls);
 
 	if(where == dsConsole)
 		LineMsg(ls);

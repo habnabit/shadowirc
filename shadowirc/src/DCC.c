@@ -2232,6 +2232,7 @@ pascal void hostToIPStr(long l, Str255 s)
 {
 	int i1, i2, i3, i4;
 	charsLong c;
+	Str255 s2;
 	
 	c.l = l;
 	i1= c.chars[0];
@@ -2240,18 +2241,18 @@ pascal void hostToIPStr(long l, Str255 s)
 	i4= c.chars[3];
 
 	NumToString(i1,s);
-	i1=s[0]+1;
-	NumToString(i2,&s[i1]);
-	i2=i1+s[i1]+1;
-	NumToString(i3,&s[i2]);
-	i3=i2+s[i2]+1;
-	NumToString(i4,&s[i3]);
-	//i4=i3+s[i3]+1;
+	SAppend1(s, '.');
 	
-	s[0]+=3+s[i1]+s[i2]+s[i3];
-	s[i1]='.';
-	s[i2]='.';
-	s[i3]='.';
+	NumToString(i2, s2);
+	pstrcat(s, s2, s);
+	SAppend1(s, '.');
+	
+	NumToString(i3, s2);
+	pstrcat(s, s2, s);
+	SAppend1(s, '.');
+	
+	NumToString(i4, s2);
+	pstrcat(s, s2, s);
 }
 
 pascal ConstStringPtr dccTypToStr(short d)

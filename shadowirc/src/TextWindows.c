@@ -94,8 +94,7 @@ static pascal MWPtr TWCreate(ConstStr255Param name)
 
 pascal MWPtr NewTextWin(void)
 {
-	Str255 s;
-	int i;
+	Str255 s, sn;
 	MWPtr mw;
 	MWPtr x;
 	
@@ -110,19 +109,17 @@ pascal MWPtr NewTextWin(void)
 	if(!mw)
 		untitledNum = -1;
 	
+	pstrcpy("\puntitled", s);
+	
 	if(++untitledNum)
 	{
-		NumToString(untitledNum, &s[9]);
-		i=s[9];
+		SAppend1(s, ' ');
+		
+		NumToString(untitledNum, sn);
+		pstrcat(s, sn, s);
 	}
 	else
-	{
 		untitledNum = 1;
-		i=-1;
-	}
-	
-	pstrcpy("\puntitled ", s);
-	s[0]+=i;
 	
 	mw= TWCreate(s);
 	if(mw)

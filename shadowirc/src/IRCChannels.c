@@ -716,7 +716,7 @@ static void DrawChannelModes(mwWidgetPtr o, char winActive)
 		MoveTo(p.h+1, p.v+1);
 		
 		TextSize(10);
-		rgb.red=rgb.green=rgb.blue=-1;
+		rgb = white;
 		if(!ch->hasOps || !winActive)
 			LightenColor(&rgb);
 		RGBForeColor(&rgb);
@@ -729,9 +729,9 @@ static void DrawChannelModes(mwWidgetPtr o, char winActive)
 			{
 				clr = modeflags[x];
 				if(clr) //mode up, 50% grey bg
-					rgb.red=rgb.green=rgb.blue= 32766; //50%
+					rgb = HalfGrey;
 				else
-					rgb.red=rgb.green=rgb.blue=-1;
+					rgb = white;
 					
 				if(!ch->hasOps || !winActive)
 					LightenColor(&rgb);
@@ -1550,25 +1550,22 @@ pascal void ShowHelp(short helpID)
 			ht = p.text;
 			hs = p.style;
 			
-			pstrcpy((**hmiList).list[helpID].name, &title[6]);
+			pstrcpy((**hmiList).list[helpID].name, title);
 		}
 		else //my text
 		{
 			ht=GetResource('TEXT', 127 + helpID);
 			hs=GetResource('styl', 127 + helpID);
 			
-			GetIntString(&title[6], spHelp, helpID);
+			GetIntString(title, spHelp, helpID);
 		}
 		if(ht && hs)
 		{
-			int x = title[6];
-			pstrcpy("\pHelp: ", title);
-			title[0] += x;
+			pstrcat("\pHelp: ", title, title);
 			SetWTitle(hel->w, title);
 			
 			WEDeactivate(hel->we);
 			WESetSelection(0, 0x7FFFFFFF, hel->we);
-			WEDelete(hel->we);
 			HLock(ht);
 			HLock(hs);
 			WEInsert(*ht, GetHandleSize(ht), (StScrpHandle)hs, 0, hel->we);

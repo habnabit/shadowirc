@@ -569,16 +569,13 @@ inline void IWInternalDraw(iwWidgetPtr o)
 			{
 				int x;
 				
-				*(short*)&s[1] = ' [';
-				s[0] = 2;
+				pstrcpy("\p [", s);
 				if(inputLine.statuslineFlags & kUmodeFlagsPlus)
 					SAppend1(s, '+');
 				
 				for(x=1;x<=link->yourUmodes[0];x++)
 					if(link->yourUmodes[x])
-					{
 						SAppend1(s, link->yourUmodes[x]);
-					}
 				
 				if(s[0]>2)
 				{

@@ -272,7 +272,7 @@ pascal void ListDrawUser(ULI ul, int num, short po)
 		s[0] = s[1] +1;
 		s[1] = '(';
 		TruncString(ul->nickListWidth - kLeftOffset - 17, s, truncEnd);
-		s[++s[0]] = ')';
+		SAppend1(s, ')');
 	}
 	else
 	{

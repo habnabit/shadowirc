@@ -255,10 +255,8 @@ static pascal void SetButtonTitle(Handle b, Str255 name, const Rect *r)
 	wid= (r->right - r->left) - (StringWidth("\pSelect \"\" "));
 	res=TruncString(wid, name, smTruncMiddle);
 	pstrcpy("\pSelect \"", s);
-	pstrcpy(name, &s[8]);
-	s[0]+=s[8]+1;
-	s[8]='"';
-	s[s[0]]='"';
+	pstrcat(s, name, s);
+	SAppend1(s, '"');
 	SetControlTitle((ControlHandle)b, s);
 	ValidRect(r);
 }
@@ -342,10 +340,7 @@ pascal char DoGetDirectory(StandardFileReply *out)
 	CustomGetFile(fileFilter, numTypes, types,out, rGetDirectoryDLOG, p, dialogHook, 0, 0, 0, (Ptr)out);
 	pstrcpy(out->sfFile.name, name);
 	if(gDirSelectionFlag && out->sfIsVolume)
-	{
-		name[0]++;
-		name[name[0]]=':';
-	}
+		SAppend1(name, ':');
 	
 	if(gDirSelectionFlag && out->sfIsVolume)
 		pstrcpy(name, out->sfFile.name);

@@ -904,10 +904,9 @@ inline pascal void nInvite(linkPtr link, LongString *ls, StringPtr from, StringP
 	LongString tls;
 	Str255 s;
 	
-	pstrcpy(fromuser, &s[from[0]+1]);
 	pstrcpy(from, s);
-	s[0]+=fromuser[0] + 1;
-	s[from[0]+1]='!';
+	SAppend1(s, '!');
+	pstrcat(s, fromuser, s);
 	
 	p.ignored = IsIgnored(s);
 	p.link=link;

@@ -548,7 +548,7 @@ pascal void LSConcatStrAndLS(ConstStr255Param s, const LongString *ls, LongStrin
 		i=ls->len;
 	
 	BlockMoveData(&ls->data[1], &out->data[x+1], i);	// Move the longstring down FIRST, THEN move the string in.
-	BlockMoveData(&s[1], &out->data[1], x);					// This way, we can allow out = ls.
+	BlockMoveData(s, out->data, x+1);					// This way, we can allow out = ls.
 	out->len=i+x;
 }
 
@@ -557,8 +557,22 @@ pascal void LSConcatStrAndStr(ConstStr255Param s1, ConstStr255Param s2, LongStri
 	short x=s1[0], y=s2[0];
 	
 	out->len=x+y;
-	BlockMoveData(&s1[1], &out->data[1], x);
-	BlockMoveData(&s2[1], &out->data[x+1], y);
+	BlockMoveData(s2, &out->data[x], y+1);
+	BlockMoveData(s1, out->data, x+1);
+}
+
+pascal void LSConcatStrAndStrAndLS(ConstStr255Param s1, ConstStr255Param s2, const LongString *ls, LongString *out)
+{
+	short x=s1[0], y=s2[0];
+	int i = maxLSlen - (x + y);
+	
+	if(i > ls->len)
+		i = ls->len;
+	BlockMoveData(ls->data, &out->data[x+y], i+1);
+	out->len = x + y + i;
+
+	BlockMoveData(s2, &out->data[x], y+1);
+	BlockMoveData(s1, out->data, x+1);
 }
 
 pascal void LSConcatLSAndLS(const LongString *ls, const LongString *ls2, LongString *out)
@@ -712,7 +726,7 @@ pascal void LSConcatStrAndLSAndStr(ConstStr255Param s1, const LongString *ls, Co
 		n=ls->len;
 	
 	BlockMoveData(&ls->data[1], &out->data[i+1], n);
-	BlockMoveData(&s1[1], &out->data[1], i);
+	BlockMoveData(s1, out->data, i+1);
 	out->len=i+n;
 	
 	i=maxLSlen-out->len;
@@ -727,7 +741,7 @@ pascal void LSConcatStrAndStrAndStr(ConstStr255Param s1, ConstStr255Param s2, Co
 {
 	long x=s1[0], y=s2[0], z=s3[0], a=x+y, i=maxLSlen-a;
 
-	BlockMoveData(&s1[1], &out->data[1], x);
+	BlockMoveData(s1, out->data, x+1);
 	BlockMoveData(&s2[1], &out->data[x+1], y);
 	
 	i=maxLSlen-a;
@@ -741,7 +755,7 @@ pascal void LSStrCat4(LongString *out, ConstStr255Param s1, ConstStr255Param s2,
 {
 	long x=s1[0], y=s2[0], a=x+y, i;
 
-	BlockMoveData(&s1[1], &out->data[1], x);
+	BlockMoveData(s1, out->data, x+1);
 	BlockMoveData(&s2[1], &out->data[x+1], y);
 	
 	x = s3[0];

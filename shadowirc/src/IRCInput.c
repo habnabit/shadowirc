@@ -710,18 +710,16 @@ pascal void processSOCKS(CEPtr c, connectionPtr conn)
 			}
 			else
 			{
-				ConstStringPtr sp;
+				ConstStringPtr sp = GetIntStringPtr(spSOCKS, 10);
 				
 				if(mainPrefs->firewallType == fwSOCKS5)
 				{
-					sp = GetIntStringPtr(spSOCKS, 10);
 					if(send[1]>8)
 						send[1] = 9;
 					GetIntString(send, spSOCKS, send[1]);
 				}
 				else// if(mainPrefs->firewallType == fwSOCKS4A || mainPrefs->firewallType == fwSOCKS4)
 				{
-					sp = GetIntStringPtr(spSOCKS, 10);
 					if(send[1] > 93 || send[1] < 90)
 						send[1] = 9;
 					else
