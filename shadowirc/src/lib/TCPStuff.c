@@ -514,9 +514,7 @@ static size_t TCPCharsAvailable(int sockfd)
 /*
  * sockaddr_union
  * utilized by getsockname below in:
- * TCPLocalPort
  * TCPLocalIP
- * TCPRemoteIP
  */
 
 typedef union {
@@ -531,13 +529,24 @@ typedef union {
  */
 int TCPLocalPort(int sockfd)
 {
-    sockaddr_union sau;
+    struct sockaddr_storage sas;
     int len;
     
-    len = sizeof(sockaddr_union);
-    if(getsockname(sockfd, (SA *) &sau.sa, &len) < 0)
+    len = sizeof(sas);
+    if(getsockname(sockfd, (SA *) &sas, &len) < 0)
         return (-1);
-    return (ntohs(sau.sin.sin_port));
+    
+    switch(sas.ss_family)
+    {
+	    case AF_INET6:
+		    return (ntohs(((struct sockaddr_in6 *)&sas)->sin6_port));
+		    break;
+	    case AF_INET:
+		    return (ntohs(((struct sockaddr_in *)&sas)->sin_port));
+		    break;
+	    default:
+		    return (-1);
+    }
 }
 
 
