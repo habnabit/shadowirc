@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -339,17 +339,32 @@ pascal void LSCopyString(const LongString *ls, short firstpos, short len, String
 
 pascal short LSPosCustom(ConstStr255Param s, const LongString *ls, short start)
 {
-	int i=s[0], max=ls->len-i+1;
+	int i = s[0], max = ls->len - i + 1;
 	int x, x2, x3;
 	const unsigned char* lsd = ls->data;
 	char b;
+	int step, stop;
 	
-	for(x=start;x<=max;x++)
+	if(start >= 0)
+	{
+		step = 1;
+		stop = max + 1;
+	}
+	else
+	{
+		step = -1;
+		start = ls->len + start + 1;
+		if(start > max)
+			start = max;
+		stop = 1;
+	}
+	
+	for(x = start; x != stop; x+= step)
 	{
 		b = 1;
 		
-		for(x2=1, x3 = x; b && (x2<=i);x2++, x3++)
-			b=(s[x2]==lsd[x3]);
+		for(x2=1, x3 = x; b && (x2 <= i); x2++, x3++)
+			b = (s[x2] == lsd[x3]);
 		
 		if(b)
 			return x;
@@ -359,37 +374,37 @@ pascal short LSPosCustom(ConstStr255Param s, const LongString *ls, short start)
 
 pascal short LSPos(ConstStr255Param s, const LongString *ls)
 {
-	int i=s[0], max=ls->len-i+1;
-	int x, x2, x3;
-	const unsigned char* lsd = ls->data;
-	char b;
-	
-	for(x=1;x<=max;x++)
-	{
-		b = 1;
-		
-		for(x2=1, x3 = x; b && (x2<=i);x2++, x3++)
-			b=(s[x2]==lsd[x3]);
-		
-		if(b)
-			return x;
-	}
-	return 0;
+	return LSPosCustom(s, ls, 1);
 }
 
 pascal short LSPosCaseCustom(ConstStr255Param s, const LongString *ls, short start)
 {
-	int i=s[0], max=ls->len-i+1;
+	int i = s[0], max = ls->len - i + 1;
 	int x, x2, x3;
 	const unsigned char* lsd = ls->data;
 	char b;
+	int step, stop;
 	
-	for(x=start;x<=max;x++)
+	if(start >= 0)
+	{
+		step = 1;
+		stop = max + 1;
+	}
+	else
+	{
+		step = -1;
+		start = ls->len + start + 1;
+		if(start > max)
+			start = max;
+		stop = 1;
+	}
+	
+	for(x = start; x != stop; x+= step)
 	{
 		b = 1;
 		
-		for(x2=1, x3 = x; b && (x2<=i);x2++, x3++)
-			b=(inupc(s[x2])==inupc(lsd[x3]));
+		for(x2=1, x3 = x; b && (x2 <= i); x2++, x3++)
+			b = (inupc(s[x2]) == inupc(lsd[x3]));
 		
 		if(b)
 			return x;
@@ -399,22 +414,7 @@ pascal short LSPosCaseCustom(ConstStr255Param s, const LongString *ls, short sta
 
 pascal short LSPosCase(ConstStr255Param s, const LongString *ls)
 {
-	int i=s[0], max=ls->len-i+1;
-	int x, x2, x3;
-	const unsigned char* lsd = ls->data;
-	char b;
-	
-	for(x=1;x<=max;x++)
-	{
-		b = 1;
-		
-		for(x2=1, x3 = x; b && (x2<=i);x2++, x3++)
-			b=(inupc(s[x2])==inupc(lsd[x3]));
-		
-		if(b)
-			return x;
-	}
-	return 0;
+	return LSPosCaseCustom(s, ls, 1);
 }
 
 pascal void LSNextArgIRC(LongString *ls, StringPtr arg)
