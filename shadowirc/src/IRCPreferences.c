@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -17,12 +17,6 @@
 	You should have received a copy of the GNU General Public License
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
-
-/*	ChangeLog
-		2000-11-10 JB	Added enum PrefsWindowID
-		2000-11-09 JB	Fixed one prefs crash
-		2000-10-16	JB	Various code cleanup.
 */
 
 #include <Carbon/Carbon.h>

@@ -24,8 +24,6 @@
 
 extern char inBackground;
 
-WindowActivateProcPtr ActivateWindowProcPtr;
-
 Rect *WGetBBox(WindowPtr w, Rect *rr)
 {
     RgnHandle r = NewRgn();
@@ -41,50 +39,6 @@ pascal char WIsFloater(WindowPtr w)
 	
 	GetWindowClass(w, &wclass);
 	return wclass == kFloatingWindowClass;
-}
-
-//Not called if has 8.6
-static pascal void WDeactivate(WindowPtr w)
-{
-	if(IsWindowHilited(w))
-	{
-		HiliteWindow(w, 0);
-		ActivateWindowProcPtr(w, 0);
-	}
-}
-
-pascal void EnterModalDialog(void)
-{
-	WindowPtr fnf;
-	
-	if(!inBackground)
-	{
-		fnf=ActiveNonFloatingWindow();
-		
-		if(fnf && IsWindowHilited(fnf))
-			WDeactivate(fnf);
-		
-		HideFloatingWindows();
-	}
-}
-
-pascal void ExitModalDialog(void)
-{
-	if(!inBackground)
-	{
-		WindowPtr fnf;
-		
-		fnf = ActiveNonFloatingWindow();
-
-		//Directly do WActivate stuff since window is going to hilite itself...		
-		if(fnf)
-		{
-			HiliteWindow(fnf, 1);
-			ActivateWindowProcPtr(fnf, 1);
-		}
-		
-		ShowFloatingWindows();
-	}
 }
 
 pascal void WSelect(WindowPtr w)

@@ -30,9 +30,6 @@
 
 #define USE_SHADOWIRC_ASSEMBLY 0
 
-/* CPC - Not defined
-static pascal void FlashDialogItem(DialogPtr theDialog, short item);
-*/
 static char matchFrom(ConstStr255Param s, ConstStr255Param mask, int i,  int j);
 
 
@@ -705,39 +702,17 @@ pascal void NavDialogFilter(const long callBackSelector, NavCBRecPtr cbp, void* 
 	}
 }
 
-/*
-static pascal void FlashDialogItem(DialogPtr theDialog, short item)
-{
-	ControlHandle	control;
-	unsigned long		ticks;
-	OSErr			err;
-	
-	err = GetDialogItemAsControl( theDialog, item, &control );
-	
-	if(!err)
-	{
-		if(GetControlHilite(control) == 255) //disabled, so do nothing.
-			return;
-		HiliteControl(control, 1);
-		Delay(8, &ticks);
-		HiliteControl(control, 0);
-	}
-}
-*/
-
 pascal void SetupModalDialog(DialogPtr d, short ok, short cancel)
 {
 	SetDialogDefaultItem(d, ok);
 	SetDialogCancelItem(d, cancel);
 	SetDialogTracksCursor(d, true);
-	EnterModalDialog();
 	if(!IsWindowVisible(GetDialogWindow(d)))
 		ShowWindow(GetDialogWindow(d));
 }
 
 pascal void FinishModalDialog(void)
 {
-	ExitModalDialog();
 	SetThemeCursor(kThemeArrowCursor);
 }
 

@@ -1084,7 +1084,6 @@ void ApplInit(void)
 
 	FlushEvents(everyEvent, 0);
 	
-	ActivateWindowProcPtr=&WindowActivate;
 	scb=NewSndCallBackUPP(AsyncSoundCallback);
 	
 	InitTimers();

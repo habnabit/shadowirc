@@ -24,17 +24,11 @@
 
 #include <Carbon/Carbon.h>
 
-typedef pascal void (*WindowActivateProcPtr)(WindowPtr window, char activate);
-extern WindowActivateProcPtr ActivateWindowProcPtr;
-
 #define IsDialog(w) (GetWindowKind(w) == dialogKind)
 
 Rect *WGetBBox(WindowPtr w, Rect *r);
 pascal char WIsFloater(WindowPtr w);
 pascal void WSelect(WindowPtr w);
-pascal void EnterModalDialog(void);
-pascal void ExitModalDialog(void);
-
 
 pascal WindowPtr WCreate(const Rect *boundsRect, ConstStr255Param title, short theProc, char goAwayFlag, long refCon, char isFloater);
 
