@@ -53,8 +53,6 @@ static char MouseInWindow(ULI ul);
 
 static void ULDragTrack(pUIDragTrackData *p);
 static void ULDragReceive(pUIDragReceiveData *p);
-INLINE void ULPaneDragTrack(pMWPaneDragTrackData *p);
-INLINE void ULPaneDragReceive(pMWPaneDragReceiveData *p);
 
 //static void ULContextualMenu(pCMPopupsData *p);
 //static void ULContextualMenuProcess(pCMPopupsReturnData *p);
@@ -112,7 +110,6 @@ static void ULSetWindowProperty(ULI ul)
 	SetWindowProperty(ul->uwin, kUserlistSignature, kUserlistWindow, sizeof(ul), &ul);
 }
 
-/*
 static ULI ULGetWindowProperty(WindowPtr w)
 {
 	ULI ul;
@@ -122,7 +119,6 @@ static ULI ULGetWindowProperty(WindowPtr w)
 	
 	return ul;
 }
-*/		
 
 INLINE ULI ULIFromMW(MWPtr mw)
 {
@@ -613,33 +609,6 @@ static void ULDragReceive(pUIDragReceiveData *p)
 */
 }
 
-INLINE void ULPaneDragTrack(pMWPaneDragTrackData *p)
-{
-/*
-	pUIDragTrackData p2;
-	
-	p2.window = p->pane->mw->w;
-	p2.drag = p->drag;
-	p2.message = p->message;
-	
-	ULDragTrack(&p2);
-*/
-}
-
-INLINE void ULPaneDragReceive(pMWPaneDragReceiveData *p)
-{
-/*
-	pUIDragReceiveData p2;
-	
-	p2.window = p->pane->mw->w;
-	p2.drag = p->drag;
-	
-	ULDragReceive(&p2);
-	
-	p->received = (p2.returnVal == 0);
-*/
-}
-
 #pragma mark -
 
 
@@ -971,6 +940,85 @@ void DBCustomDrawItem(ControlRef browser, DataBrowserItemID item, DataBrowserPro
 	}
 }
 
+static Boolean DBAddDragItem(ControlRef browser, DragReference theDrag, DataBrowserItemID item, ItemReference *itemRef)
+{
+	UserListPtr u = (UserListPtr)item;
+	
+	if(u)
+	{
+		DragAddPtr(theDrag, (ItemReference)NULL, kUserFlavor, u, flavorSenderOnly);
+		return true;
+	}
+	
+	return false;
+}
+
+static void DBPostProcessDrag(ControlRef browser, DragReference theDrag, OSStatus trackDragResult)
+{
+}
+
+static Boolean DBAcceptDrag(ControlRef browser, DragReference theDrag, DataBrowserItemID item)
+{
+	if(item && DragIsTypeAvail(theDrag, flavorTypeHFS))
+		return true;
+	
+	return false;
+}
+
+static Boolean DBReceiveDrag(ControlRef browser, DragReference theDrag, DataBrowserItemID item)
+{
+	UserListPtr u = (UserListPtr)item;
+	ULI ul = ULGetWindowProperty(GetControlOwner(browser));
+	
+	if(u && DragIsTypeAvail(theDrag, flavorTypeHFS))
+	{
+		HFSFlavor *hf;
+		FSSpec f;
+		Str255 s;
+		unsigned short items, i;
+		ItemReference item;
+		FlavorFlags flags;
+		long siz;
+		linkPtr l;
+		
+		pstrcpy(u->nick, s);
+	
+		CountDragItems(theDrag, &items);
+		for(i=1;i<=items;i++)
+		{
+			GetDragItemReferenceNumber(theDrag, i, &item);
+			
+			if(!GetFlavorFlags(theDrag, item, flavorTypeHFS, &flags))
+			{
+				GetFlavorDataSize(theDrag, item, flavorTypeHFS, &siz);
+				hf = (HFSFlavor*)NewPtr(siz);
+				GetFlavorData(theDrag, item, flavorTypeHFS, hf, &siz, 0);
+				
+				f = hf->fileSpec;
+				if(ul->mw && ul->mw->link)
+					l = ul->mw->link;
+				else
+					l = sidr->CurrentTarget->link;
+				DoDCCSendFile(l, s, &f, true, false);
+	
+				DisposePtr((Ptr)hf);
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+static DataBrowserDragFlags DBCAcceptDrag(ControlRef browser, DataBrowserItemID itemID, DataBrowserPropertyID property, const Rect *theRect, DragReference theDrag)
+{
+	return DBAcceptDrag(browser, theDrag, itemID);
+}
+
+static Boolean DBCReceiveDrag(ControlRef browser, DataBrowserItemID itemID, DataBrowserPropertyID property, DataBrowserDragFlags dragFlags, DragReference theDrag)
+{
+	return DBReceiveDrag(browser, theDrag, itemID);
+}
+
 static ULI ULINew(WindowPtr w, long type)
 {
 	ULI ul = (ULI)NewPtrClear(sizeof(UserListInstance));
@@ -1053,8 +1101,14 @@ static ULI ULINew(WindowPtr w, long type)
 		static DataBrowserItemDataUPP dbIDUPP = NULL;
 		static DataBrowserItemCompareUPP dbICUPP = NULL;
 		static DataBrowserItemNotificationUPP dbINUPP = NULL;
+		static DataBrowserAddDragItemUPP addDragItemCallback = NULL;
+		static DataBrowserAcceptDragUPP dbADUPP = NULL;
+		static DataBrowserReceiveDragUPP dbRDUPP = NULL;
+		static DataBrowserPostProcessDragUPP postProcessDragCallback = NULL;
 		DataBrowserCustomCallbacks dccb;
 		static DataBrowserDrawItemUPP dbCDIUPP = NULL;
+		static DataBrowserItemAcceptDragUPP acceptDragCallback = NULL;
+		static DataBrowserItemReceiveDragUPP receiveDragCallback = NULL;
 		static ControlFontStyleRec controlFontStyleStruc;
 		
 		controlFontStyleStruc.flags = kControlUseSizeMask | kControlUseFaceMask;
@@ -1106,6 +1160,22 @@ static ULI ULINew(WindowPtr w, long type)
 			dbINUPP = NewDataBrowserItemNotificationUPP(DBItemNotify);
 		dcb.u.v1.itemNotificationCallback = dbINUPP;
 		
+		if(!addDragItemCallback)
+			addDragItemCallback = NewDataBrowserAddDragItemUPP(DBAddDragItem);
+		dcb.u.v1.addDragItemCallback = addDragItemCallback;
+
+		if(!dbADUPP)
+			dbADUPP = NewDataBrowserAcceptDragUPP(DBAcceptDrag);
+		dcb.u.v1.acceptDragCallback = dbADUPP;
+		
+		if(!dbRDUPP)
+			dbRDUPP = NewDataBrowserReceiveDragUPP(DBReceiveDrag);
+		dcb.u.v1.receiveDragCallback = dbRDUPP;
+		
+		if(!postProcessDragCallback)
+			postProcessDragCallback = NewDataBrowserPostProcessDragUPP(DBPostProcessDrag);
+		dcb.u.v1.postProcessDragCallback = postProcessDragCallback;
+
 		SetDataBrowserCallbacks(ul->browser, &dcb);
 		SetDataBrowserHasScrollBars(ul->browser, false, true);
 		SetDataBrowserTableViewNamedColumnWidth(ul->browser, 'name', ul->nickListWidth);
@@ -1122,7 +1192,18 @@ static ULI ULINew(WindowPtr w, long type)
 		if(!dbCDIUPP)
 			dbCDIUPP = NewDataBrowserDrawItemUPP(DBCustomDrawItem);
 		dccb.u.v1.drawItemCallback = dbCDIUPP;
+		
+		if(!acceptDragCallback)
+			acceptDragCallback = NewDataBrowserItemAcceptDragUPP(DBCAcceptDrag);
+		dccb.u.v1.acceptDragCallback = acceptDragCallback;
+		
+		if(!receiveDragCallback)
+			receiveDragCallback = NewDataBrowserItemReceiveDragUPP(DBCReceiveDrag);
+		dccb.u.v1.receiveDragCallback = receiveDragCallback;
+	
 		SetDataBrowserCustomCallbacks(ul->browser, &dccb);
+		
+		SetAutomaticControlDragTrackingEnabledForWindow(ul->uwin, type == ulGlobal);
 	}
 	
 	GetPort(&gp);
@@ -1872,14 +1953,6 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 		 case pMWPaneDestroyMessage:
 		 	SULPaneDestroy((pMWPaneDestroyDataPtr)sidrIN->messageData);
 		 	break;
-		
-		case pMWPaneDragTrackMessage:
-			ULPaneDragTrack((pMWPaneDragTrackDataPtr)sidrIN->messageData);
-			break;
-			
-		case pMWPaneDragReceiveMessage:
-			ULPaneDragReceive((pMWPaneDragReceiveDataPtr)sidrIN->messageData);
-			break;
 		
 		case pCMPopupsMessage:
 			//ULContextualMenu((pCMPopupsDataPtr)sidrIN->messageData);
