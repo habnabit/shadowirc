@@ -831,7 +831,7 @@ pascal Handle MyTEStyleToExtended(StScrpHandle styles, char del)
 		
 		p = *h;
 		
-		if(p->scrpNStyles > 32767)
+		if(numStyles > 32767)
 			p->scrpNStyles = 32767;
 		else
 			p->scrpNStyles = numStyles;
