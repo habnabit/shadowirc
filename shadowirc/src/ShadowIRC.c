@@ -33,8 +33,8 @@
 
 int main(void);
 
-pascal void ToolboxInit(void);
-pascal void ApplicationInit(void);
+void ToolboxInit(void);
+void ApplicationInit(void);
 
 static pascal void RunStartupConnections(void)
 {

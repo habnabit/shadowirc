@@ -31,8 +31,8 @@ pascal long ShadowIRCVersion2(StringPtr v, StringPtr date);
 pascal long ShadowIRCVersion(StringPtr str){if(str)pstrcpy(CL_VERSION, str);return SIVersion;}
 pascal long ShadowIRCVersion2(StringPtr v, StringPtr date){if(v) pstrcpy(CL_VERSION,v); if(date) pstrcpy(cdt,date);return SIVersion;}
 
-pascal void setVers(void);
-pascal void setVers(void)
+void setVers(void);
+void setVers(void)
 {
 	//compile date & time
 	CopyCStringToPascal(__DATE__  " " __TIME__, cdt);

@@ -1012,7 +1012,7 @@ static void InitLocalEventHandlers()
 	MyIAEH(kEventClassApplication, kEventAppDeactivated, DoSuspendEvent);
 }
 
-pascal void ApplInit(void)
+void ApplInit(void)
 {
 	mouseRgn=NewRgn();
 	SetRectRgn(mouseRgn, -32767, -32767, 32766, 32766);

@@ -54,11 +54,11 @@
 inline void AppleMenuURLInit(void);
 inline void CheckPreferences(void);
 void ToolboxInit(void);
-pascal void ApplicationInit(void);
+void ApplicationInit(void);
 inline void SetupUPPs(void);
 
-pascal void ApplInit();
-pascal void setVers(void);
+void ApplInit();
+void setVers(void);
 
 STRnPtr spFiles, spCM, spError, spInfo, spDCC, spHelp, spTopic, spAppleURL, spServices, spSOCKS, spServer, spFile, spWhois;
 
@@ -73,8 +73,7 @@ inline void CheckPreferences(void)
 	}
 }
 
-static pascal void AboutDlgVersion(DialogPtr d, short i);
-static pascal void AboutDlgVersion(DialogPtr d, short i)
+static void AboutDlgVersion(DialogPtr d, short i)
 {
 	Str255 s;
 	Rect r;
@@ -106,7 +105,7 @@ inline void SetupUPPs(void)
 
 #define GetStrN(sr) *(STRnHand)Get1Resource('STR#', sr)
 
-pascal void ApplicationInit(void)
+void ApplicationInit(void)
 {
     WindowRef splashWindow = NULL;
 	LongString ls;
