@@ -987,7 +987,7 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
                                                 } else {
                                                     c->status = CS_Closing;
                                                     cer->event = C_Closed;
-                                                    CloseTCPConnection(&rcp);
+                                                    CloseTCPConnection(rcp);
                                                 }
                                         }
 					break;
