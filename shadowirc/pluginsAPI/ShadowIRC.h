@@ -443,10 +443,7 @@ enum connectStage {
 	csSOCKSSendingAuthRequest,	//Attempting authentication with SOCKS server
 	csSOCKSSendingRequest,			//Sending connection request to SOCKS server
 
-	csLookingUp2,						//Secondary IP lookup (for SOCKS4)
-
 	csFailedToLookup = -1,			//IP lookup failed
-	csConnectFailed = -2,			//connect failed
 	csFailedToConnect = -3,		//connect failed
 	csSOCKSAuthFailed = -4,		//SOCKS authentication failed
 	csSOCKSConnectFailed = -5	//SOCKS connection failed
@@ -465,19 +462,16 @@ struct Connection {
 	const connectionPtr next;			//Pointer to next connection
 	const long socket;						//The connection number
 	const short connType;				//Type of connection
-	const short reserved;
+	unsigned short port;				//The port we're connecting on
+	
 	const dccPtr dcc;						//Ptr to DCC information, if this is a DCC, else nil.
 	void* refCon;							//Reference constant.
 	const linkPtr link;						//The link for this connection, or nil.
 	
-	unsigned long ip;						//The IP
+	struct in_addr ip, localip;
 	Str255 name;							//name of connection
-	unsigned short port;					//The port we're connecting to
-	short connectStage;					//stage in connect (for IRC connections)
 	long lastData;							//The time the last data came in.
 
-	char outgoing;							//True if outgoing, false if not.
-	char tryingToConnect;				//True if we're in the process of connecting
 	char textOrBinary;					//True if text, false if not. Determines how it's processed on input and output.
 	char lineTerm;							//See enum lineTermList. Valid only for ConnPutLS().
 };
@@ -498,11 +492,8 @@ enum connectionStatus {
 	C_NoEvent,					// No network event.
 	C_Found,						// Name -> IP search successful
 	C_SearchFailed,			// Name -> IP search failed
-	C_NameFound,				// IP -> Name search successful
-	C_NameSearchFailed,	// IP -> Name search failed
 	C_Established,				// Connection established.
 	C_FailedToOpen,			// 
-	C_Closing,					// Closing connection.
 	C_Closed,						// Connection closed.
 	C_CharsAvailable			// Data is available.
 };
@@ -552,6 +543,7 @@ struct Link {
 	linkPtr next, prev;					//Next/previous link.
 
 	short outstandingUSERHOST;		//The number of outstanding USERHOST queries
+	short connectStage;
 };
 
 
@@ -583,7 +575,8 @@ typedef struct UserListRec {	//A linked list of users.
 															//Invalid if zero, although not necessarally valid if non-zero, either.
 	char userlistIsSelected;					//Set by the userlist service. True if the user is selected, false if not. DON'T CHANGE THIS unless you're the userlist service.
 	char isHalfOp;									//True is the user is a half-op. (mode +h on TS4 servers)
-	short pad;											//Padding to even data struct
+	char isIgnored;
+	char pad;											//Padding to even data struct
 	long facesServiceRefCon;					//RefCon for faces service **ONLY**. If you're not a faces service, DON'T EVER touch this.
 } UserListRec, *UserListPtr;
 
@@ -677,8 +670,7 @@ enum iwOverrideErrors {
 };
 
 enum iwShadowIRCWidgets {
-	iwStatusLine = 'stat',
-	iwMemory = 'memd'
+	iwStatusLine = 'stat'
 };
 
 typedef struct iwWidgetRec iwWidgetRec, *iwWidgetPtr;
@@ -2567,21 +2559,6 @@ Rect WGetBBox(WindowPtr w);
 /*	Gets the bounding rectangle for a valid window, including titlebar
 		Input:	w - window
 		Output:	return value: Rect of window
-		Note:	Not a real function. It's #define'd at the bottom of this file.
-*/
-
-char WIsVisible(WindowPtr w);
-/*	Determines if a window is visible or not.
-		Input:	w - window
-		Output:	return value: true if window is visible, false if not.
-		Note:	Not a real function. It's #define'd at the bottom of this file.
-*/
-
-char WIsActive(WindowPtr w);
-/*	Determines if a window is active (selected).
-		Input:	w - window
-		Output:	return value: true if active, false if not
-		Note:	Not a real function. It's #define'd at the bottom of this file.
 */
 
 pascal char StandardDialogFilter(DialogPtr d, EventRecord *e, short *item);
@@ -4004,9 +3981,5 @@ pascal char DirectorySelectButton(FSSpec *fss);
 pascal long _UndocumentedAPI(long, long);
 /*	This function is undocumented, and should never be called.
 */
-
-#define WGetBBox(w, r) (GetPortBounds(GetWindowPort(w), r))
-#define WIsVisible(w) (IsWindowVisible(w))
-#define WIsActive(w) (IsWindowHilited(w))
 
 #endif
