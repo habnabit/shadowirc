@@ -1,0 +1,403 @@
+ShadowIRC Version History
+© 1996-2000 John Bafford
+All Rights Reserved
+
+Changes to the ShadowIRC Plugins SDK are listed in the Version History file in the SDK package.
+
+Changes in 1.1b2 - August 2000
+Bug Fixes:
+¥ Connection Actions prefs pane now changes when you select different connections.
+¥ Worked around a compiler bug causing crashes drawing icon-based widgets in message windows.
+¥ Fixed a bug when selecting the default file name for saving window text to a file. The generated name was being replaced accidentally by the window name, which could contain colons.
+¥ Fixed displaying the topic length/maximum length in the topic window. (Hash table wasn't searching correctly.)
+¥ /broadcast and /bract show using the correct color.
+
+Miscelaneous:
+¥ Recompiled using Universal Interfaces 3.3.2.
+
+
+Change in 1.1b1r1 - August 4, 2000, 1 AM
+¥ Fixed crash displaying the icons in the message windows. (Thanks, nthd!)
+
+Changes in 1.1b1 - August 3, 2000
+¥ Released as open source under the GNU General Public License.
+
+New Features:
+¥ Added option for inputlines in message windows.
+¥ Added an option to not open query windows for incoming or outgoing messages when auto-query is turned on.
+¥ Added connection name to channel and query window titles.
+¥ Reorganized the preferences.
+¥ Plugins are slightly faster now; moreso on PPC.
+¥ ShadowIRC attempts to use a server's stated feature list as approprate.
+¥ Added 'Search Backwards' option in Find window.
+¥ /q == /query
+¥ /query nickname message opens a query and sends a message.
+¥ When receiving a dcc chat request when you have one for the same user attempting to connect, one is canceled so you don't get DCC collision errors.
+¥ Many behind-the-scenes additions and changes for plugins.
+¥ Userlist now processes $selectednick (nickname), $selecteduserhost (username@host) in shortcuts.
+¥ Better AppleScript support for plugins.
+¥ Holding down the command key temporarially disables cursor focusing if you have cursor focusing enabled.
+¥ Three ctrl-C's in a row in mIRC color mode use the default color.
+¥ ShadowIRC's preferences file and plugins preferences are now stored in the "ShadowIRC Ä" in the Preferences folder. You will need to copy your plugins' preferences from the Plugins folder to if you wish to save them.
+¥ Highlight plugin.
+
+Bug Fixes:
+¥ Fixed the parse errors.
+¥ Fixed a bug in the TCP/IP code.
+¥ Fixed several potential crashes.
+¥ Scroll bars behave better. Inactive windows properly display disabled scrollbars now.
+¥ Cleaned up prefs window and related resources.
+¥ Fixed several problems with DCC file receive. Automatically receiving files that already exist should work correctly now.
+¥ Nicknames containing ^0, ^1, etc should no longer cause problems with message displays.
+¥ Fixed several potential crashes handling commands.
+¥ Fixed incorrect display of nick when dragging and dropping text to a window belonging to a different connection.
+¥ Replaced the three checkboxes for what to do at quit with three radio buttons.
+¥ Moved the prefs to the Edit menu.
+¥ Fixed a problem where colorized topics would fail to restore the foreground color correctly, so other message window widgets (like the numusers plugin) would draw in the wrong color.
+¥ "Fixed" the message window list. Faster and uses less memory.
+¥ The channel topic at the bottom of channel windows now respects the "Disable Color" and "Disable Styles" settings in the Preferences.
+¥ Fixed a crash after closing message windows when the active window became a plugin window.
+¥ If you resize your screen to make it larger after you open ShadowIRC, you should be able to move windows outside of the bounds of the original screen now.
+¥ Server list has a white background now, instead of grey.
+¥ Dragging a file onto the userlist to DCC to someone will send to the correct connection for that user, rather than the connection of the front window.
+¥ Fixed a potential crash when opening a new connection when (very) low on memory.
+
+Miscelaneous:
+¥ Userlist and Popups plugins updated.
+¥ Serverlist plugin integrated into ShadowIRC.
+¥ Better support for Carbon and Mac OS X.
+¥ Requires the Appearance Manager. Takes better advantage of Appearance Manager services.
+¥ Recompiled with CodeWarrior Pro 5.3
+
+Known Issues:
+¥ The preferences panel may display garbage when opening it. If it does, hit the cancel button and reopen the window.
+
+
+Changes in 1.0.3 - August 7, 1999
+(These changes are bug fixes and improvments that were originally in ShadowIRC 1.1.)
+New Features:
+¥ Better contextual menu support for plugins.
+
+Bug Fixes:
+¥ Fixed a few memory leaks, including one when doing a reverse DNS lookup.
+¥ Receiving a private action (rather than a channel action) with auto-query turned on wouldn't open a query window.
+¥ Contextual menus now work when control-clicking on a window's title bar.
+¥ Fixed a crash clicking on the menubar if the Fonts menu was disabled.
+¥ Having query windows open for two people with the same nick on two different servers could incorrectly change the current target if one of them changed their nick.
+¥ Selecting even numbered servers from the popup menu in the console works correctly.
+¥ Extra separator in Window menu between channels and queries/DCC windows removed when not necessary. 
+¥ Control-N to clear color styles works now.
+¥ Kick message is now used when you /kick someone with no reason.
+¥ Message windows created by plugins now appear in the Window menu.
+¥ Some bug fixes in the window managment library when there isn't a floating window visible.
+¥ Menubar always gets restored now after closing modal dialogs.
+¥ Windows can't open on top of dialogs now.
+¥ Fixed dragging a windowshaded window.
+
+Miscelaneous:
+¥ Minor speed enhancments in various plces.
+¥ Turned on inlining for 68k code for better performance. Tweaked some frequently used functions for better performance on both 68k and PPC.
+¥ Removed the accidental export of 100+ non-API functions in ShadowIRC PPC.
+¥ Recompiled with CodeWarrior Pro 5
+
+
+Changes in 1.0.2 - March 17, 1999
+¥ Added support for DCC receive through SOCKS firewalls.
+¥ Added support for SOCKS4 and SOCKS4A servers.
+¥ Windows menu no longer has a ten channel limit.
+¥ Windows remember their positions after a cascade or tile.
+¥ Fixed a problem with reconnecting if a reconnection delay had been set.
+¥ Fixed a problem pasting text into dialogs.
+¥ Help window shows up entirely on screen when console isn't visible.
+¥ Minor bug fixes.
+¥ Internal changes necessary for new features in v1.1.
+¥ Userlist window reverts to default position if it gets positioned offscreen.
+¥ Rewrote several often-used functions in PowerPC assembly for speed.
+¥ Other internal changes for speed.
+¥ Increased maximum size of scrollback in message windows to 30k.
+¥ Fixed a bug which would prevent the text editor from saving files.
+¥ Recompiled with CodeWarrior Pro 4.1.
+
+Changes in 1.0.1 - December 12, 1998
+¥ Better file handling in some places.
+¥ Better support for multiple instances of ShadowIRC using the same plugins.
+¥ Fixed plugins-related crash in the preferences window.
+¥ Added window proxies for text windows (Mac OS 8.5).
+¥ Text editor is slightly better behaved when it can't open a large file.
+¥ Fixed a bug in /ignore.
+¥ Console menu item in Window menu checks and unchecks properly.
+¥ Leading spaces before commands in the connect script are removed before processing.
+¥ Fixed a bug reading in extremely long (511 or 512 characters) lines of text from IRC servers.
+¥ Fixed some bugs in the userlist. Improved the appearance of the divider.
+¥ Userlist menu item is properly checked or disabled now.
+
+Changes in 1.0 - November 30, 1998
+New Features:
+¥ Added registration code.
+¥ SOCKS 5 Firewall support.
+¥ Option for faster DCC send.
+¥ DCC send now allows selectable packet sizes; the default is 4k, and valid packet sizes range from 0.5k to 16k, although the maximum limit is purely arbitrary and could be raised higher. Note that you probabally don't want to set the packet size above 4k unless you are on a fast connection.
+¥ DCC sends also have other enhancments, particuarally with (very) fast connections and with clients with small receive buffers.
+¥ DCC gets should also be faster (depending on connection speed), and will always pull all availble data as quickly as possible.
+¥ DCC supports MacBinary III. File creation and modification dates are also properly set now.
+¥ "Reverse" DCC sends, which allow files to be sent from inside a firewall in many cases.
+¥ mIRC color processing is complete: ShadowIRC can draw the background color when one is given.
+¥ mIRC-like popups support: control-click on a one-word selection or option-click. They can be configured from the Popups.conf file in the plugins Preferences folder. (Popups plugin must be installed; it's in the Plugins folder in the distribution.)
+¥ A serverlist. (ServerList plugin must be installed; it's in the Plugins folder in the distribution.)
+¥ A userlist. (Userlist plugin must be installed; it's in the Plugins folder in the distribution.)
+¥ Appearance Manager aware: message window and inputline status areas draw using Appearance theme colors. Scroll bars use proportional thumbs under Mac OS 8.5. (Scroll bars still use SmartScroll for proportional thumbs under earlier versions of Mac OS.) 30th shortcut is disabled properly under Mac OS 8.5. ShadowIRC attempts to draw windows to look like the Apple Platinum theme when Appearance is not available. 
+¥ Slightly sped up loading plugins.
+¥ Sped up processing of many server commands.
+¥ Reduces memory requirments while processing server commands.
+¥ Sped up opening new channel windows.
+¥ Slightly sped up 68k plugins.
+¥ Added options for default signoff and kick messages, and ctcp finger and userinfo responses. '$version' in the signoff message is expanded into the version of ShadowIRC you are using.
+¥ '$selecteduser' in shortcuts is replaced with the first selected user if the userlist is installed.
+¥ If Show MOTD option is turned on, the MOTD recieved during connection is displayed in the console.
+¥ Query windows now track nick changes.
+¥ Actions work in DCC chats.
+¥ Sped up connecting to IRC servers. Also removed a one second delay between establishing a connection and registering with the server.
+¥ Sped up style processing in message windows.
+¥ Attached a connections list to the connection/server name in the inputline.
+¥ Home and End keys now scroll to the top/bottom of the current message window.
+¥ Cmd-up and cmd-down work function as page up/page down.  Cmd-opt-up and cmd-opt-down function as home/end
+¥ Ctrl-up and ctrl-down scroll the text of the current message window up/down by one line.
+¥ Using Cmd-` to activate the console window will now hide it if it is the frontmost window.
+¥ Tab key doesn't delete inputline text when it cycles through nicks: if /msg nickname is at the begining of the inputline, ShadowIRC replaces the nickname with the next person in the /msg nicknames buffer; otherwise, it inserts /msg nickname at the begining of the message.
+¥ Text windows now have live scrolling.
+¥ Contextual menu support in message windows has been enhanced. Menus don't show choices that don't apply to the current selection (or lack of one).
+¥ ShadowIRC now has Drag and Drop support:
+	* Text can be dropped on any channel window or the inputline. Text can also be dropped on the desktop.
+	* Dragging a nickname from one channel window to another invites them.
+	* Text can be dropped on the topic bar in channel windows to set topics.
+	* Files can be droped on query and DCC chat windows to initiate a dcc send.
+¥ ShadowIRC is now Appearance Manager savvy.
+¥ By popular request, ctrl-d and ctrl-u clears inputline text.
+¥ Lowered low-memory cleanup from 40k to 30k free.
+¥ Added a simple text editor.
+¥ Cmd-period will stop pastes (and text drops).
+¥ You can disable displaying join, part, quit, or mode change messages.
+¥ Plugins can mix color styles, save/reset text styles, and specify arbitrary colors (i.e. colors not in a color set) in displayed text.
+¥ Added a new color for notify messages so they stand out more.
+¥ Added a new color for timestamps.
+¥ Control-clicking on a deactivated window will now properly activate it before displaying the contextual menu.
+¥ Shift-tab cycles through the /msg nicknames list backwards.
+¥ Further enhanced the usefulness of the commands menu: when applicable, text in the inputline is appeneded to a command.
+¥ /c command will now also take a server name, port, password. (i.e. /c 1 irc.amug.org)
+¥ /bye [<signoff reason>] - Disconnects from all servers and quits.
+¥ /say <text> - Sends the text to the current window. (So you can type text that begins with the command character.)
+¥ /exceptions [<mask>] - Lists the exceptions on the channel, optionally matching against the mask.
+¥ Added ctcps to console prefs option.
+¥ Support for EfNet TS4.
+¥ Color settings can be imported and exported.
+¥ Rewrote the low-level DNS lookup code. Startup and DNS lookups should be marginally faster now.
+¥ Did some optimizations on the TCP/IP code.
+¥ Added option to resend away messages on reconnect.
+¥ Added undo support for text windows and the inputline.
+
+Bug Fixes:
+¥ Cmd-clicking on URLs now works correctly if the url helper is already open.
+¥ Fixed problem where a /msg, /notice, etc which began with a : would have the : stripped. (You can /msg :) now.)
+¥ Fixed a bug in /dcc where additional parameters typed after the nickname would cause the dcc not to work. 
+¥ Fixed a bug involving getting userhosts for connections other than the first one.
+¥ No-such-user messages from userhost lookups are no longer displayed.
+¥ Inverse text is displayed in inverse now.
+¥ /ISON works again
+¥ Fixed preferences window crashes.
+¥ Text windows now scroll when you drag-select in the window.
+¥ Fixed a bug in Find, where it wouldn't find a one character long string.
+¥ Fixed the annoying scrolling problem where if there weren't a whole number of lines being displayed in a window and you scrolled away from the bottom, you couldn't scroll all the way back to the bottom until more text was added to the window. 
+¥ DCC send and get can now send/recieve multiple files from the same user, however you may need to have auto-dcc get turned on at present to simultaneously recieve multiple files from the same person.
+¥ CTCPs are no longer valid if the ctcp character is not the first character in the message received.
+¥ Topic window allows you to set the topic on a -t channel regardless of whether or not you're an op.
+¥ Getting kicked from a +k channel will attempt to rejoin with the most recently used key.
+¥ Fixed return key in prefs/shortcuts/etc dialog boxes.
+¥ The cursor is restored to normal after opening a contextual menu without the contextual menu manager installed.
+¥ Topics with ctrl-n (clear styles) now draw correctly in the topic bar.
+¥ Sounds plugin will play private /msg sounds when it's the first plugin loaded now.
+¥ A few minor bug fixes for stuff that could only cause problems for plugins that use some commands.
+¥ Fixed a bug relating to plugin preference panels.
+¥ Default height for the inputline is now the minimum height it can be set.
+¥ Fixed a bug which caused (parts of) some inputline displays to not display the first time ShadowIRC was opened unless the window was moved and/or resized from the default position/size.
+¥ Fixed a possible freeze/crash when parsing large numbers of beeps for message windows.
+¥ You can no longer set a connection name to an empty string.
+¥ Clicking in a window title bar now immediately activates it like it should.
+¥ Grow box behaves a bit better than it did before when Appearance wasn't installed.
+¥ Correctly reports ops if you join a new channel on some non-standard servers. (TalkCity, for example.)
+¥ Fixed plugin-related bugs with DNS lookups.
+¥ Using the tab key to select a nick to send a /msg to now properly remembers the correct connection to send it through.
+¥ Fixed a problem with drawing the border of the message window status area in the channel text.
+¥ Now ignore "empty" CTCP requests. Previously, they would cause garbage to display and would generate messy ctcp replies.
+¥ Now does signon script when connecting to servers that don't have a MOTD.
+¥ Your nickname is now indented when text indenting is on.
+¥ Identd should be a little more compatible now, since the connection isn't closed until the server closes it first, or after a timeout period.
+¥ Invites from ignored people no longer display.
+¥ Notices now display userhost information when the toggle for displaying them with /msgs is turned on.
+¥ Fixed a potential crash whenever a ban was removed from the internal bans list.
+¥ Removed delay when disconnecting from servers.
+¥ Correctly send the quit command in all cases when disconnecting.
+¥ Fixed problem with displaying improperly terminated CTCP requests.
+¥ Fixed potential crash when receiving messages in the background.
+¥ Now properly sends the PASS authentication command to the server.
+¥ Fixed a bug when deleting connections that prevented the last connection in the list from being deleted.
+¥ Fixed bugs closing files that could result in the finder reporting that "the server that contains it has been disconnected." This could also cause another application to quit when ShadowIRC is quit.
+¥ When a dcc is received while ShadowIRC is in the background, no longer bring up a standard file dialog (and crash). Instead, inform the user with the notification manager.
+¥ Fixed several bugs that limited what plugins could do with windows (plugin windows can have reference constants now) and message windows (plugins can now put controls in message windows, and have them track clicks properly). Also fixed some bugs dealing with continually resizing panes in message windows.
+¥ Added several other items to the API to extend what plugins can do.
+¥ Reduced the default size of message windows so they fit on 9" screens.
+¥ Fixed some bugs in the handling of items in the windows menu.
+¥ Actions can now be longer than 255 characters.
+¥ Fixed formatting problem with actions.
+¥ Fixed several other miscelaneous bugs.
+¥ Fixed bug in DCC send that was causing finished dcc sends to close too quickly.
+¥ Fixed bug in DCC that caused files to not be closed properly after a send or get.
+¥ Changing the font size in message windows no longer resets the font back to Geneva.
+¥ Pressing (option-)up-arrow to go to the previous text in the inputline no longer puts garbage in the inputline.
+¥ Tile and cascade work a bit better now. Tile sizes and positions windows approprately for Appearance themes.
+¥ Fixed a bug in the floating windows library that would cause new windows to always be placed behind all others when ShadowIRC was in the background.
+
+Miscelaneous:
+¥ ShadowIRC has been recompiled with CodeWarrior Pro 4.
+¥ The Command Reference file is no longer included because it is in the help menu.
+¥ A few other minor additions to the plugins SDK.
+¥ ShadowIRC uses Navigation Services, when present.
+¥ "Settings" files from ShadowIRC 0.6.2 and earlier are no longer checked. If you have not yet upgraded to ShadowIRC 0.6.3 or later, you will need to move it to the preferences folder in the System Folder and rename it "ShadowIRC Preferences".
+¥ The mailcheck plugin has been updated.
+¥ Plugins from ShadowIRC 0.7.0 do not work; they must be updated to work with ShadowIRC 1.0.
+
+
+Changes in 0.7.0 - April 29, 1998
+¥ DCC Send works. Fixed bugs in DCC Get. Added MacBinary DCC send.
+¥ Added progress indicator for file transfers to /dcc.
+¥ Plugins can now create items in the inputline and in message window status areas. Plugins can also create panels in message windows to provide displays or controls.
+¥ Darkened inputline and message window status areas. Mode switches look "3D" now.
+¥ Added topic window. (Click on topic area in channel windows.)
+¥ Fixed /dns nickname
+¥ Now uses offscreen graphics to update message window and inputline status areas to reduce flicker.
+¥ If windows or the inputline appear offscreen when they're created, they're moved to "default" positions onscreen.
+¥ Fixed problems that could result in crashes and garbage in the inputline status area if the last window was closed.
+¥ Added options to limit the number of retries and delay between retries on server connection retries.
+¥ Fixed a problem where case-insensitive string compares would not correctly compare a lower-case 'z' to a capital 'z'.
+¥ ShadowIRC continues to process data even when a dialog is open.
+¥ Resaved the splash screen in a format that loads quicker. (Doesn't require QuickTime to display anymore, and it's smaller, too.)
+¥ You can select Ircle or mIRC color processing on a window-by-window basis now.
+¥ Cascading windows menu item.
+¥ Dialogs are Appearance Manager aware.
+¥ Added widget to message window status lines that displays the window's contextual menu.
+¥ $il tag (inputline text) can be used more than once per shortcut.
+¥ $<- tag, when paired with a $-> tag, sets a selection in the inputline. (Eg; "/kick $channel $->$nick$<-") Selected text in the inputline will replace anything between these two tags.
+¥ $lastjoiner expands to the last person that joined the current channel.
+¥ Fixed a minor bug where ShadowIRC could think you have ops on entering a channel when you didn't. This happened if someone who's nick that started with your nick was opped.
+¥ Moved help window to help menu. Added command reference.
+¥ Lots of bug fixes relating to plugins and preferences panels.
+¥ Worked around problems with attempting to open/close the same file more than once.
+¥ When running low on memory, ShadowIRC now deletes text in message windows before it brings up a low-memory alert. The alert is still displayed if ShadowIRC can't keep more than 40k of memory free.
+¥ Fixed problem where userhosts would not be pulled from the server all the time for multiple connections.
+¥ Select All now selects inputline text if you have typed something since clicking on a window.
+¥ Oper kill no longer quits ShadowIRC.
+¥ Other minor bug fixes and trivial feature additions.
+¥ Some code optimization.
+¥ Extensive enhancments to the plugins API.
+
+Changes in 0.6.4 - March 15, 1998
+¥ If the current target is a DCC chat window and the connection is closed, properly update the inputline and current target variable. Previously, attempting to type into the window again without selecting another window first could cause a crash.
+¥ If the position of a new message window ShadowIRC opens would appear partially offscreen, ShadowIRC repositions the window so it's entirely onscreen.
+¥ Fixed several bugs relating to plugins doing DNS lookups and preferences windows panels.
+¥ Support for modeless channels (+channelname) in ircu 2.10.02.
+¥ ShadowIRC now support sending part commends directly. (/part channelname part reason here)
+
+Changes in 0.6.3 - March 6, 1998
+¥ Fixed a bug calling plugins for CTCP messages. (Wasn't setting the current connection.)
+¥ Fixed a bug in displaying /whois idle times.
+¥ Will now properly handle DCC chats from different connections with the same target nickname.
+¥ ShadowIRC now saves its settings file as "ShadowIRC Preferences" in the Preferences folder.
+¥ Added at least eight numeric commands for SuperChat.
+¥ /ignore can take a list of comma separated ignore maks now.
+¥ Added /notify list. /notify nickname adds someone to the notify list for the current connection, /notify -nickname removes them. /notify also takes a comma or space-delimited list of nicknames.
+¥ Help window now always opens with a white background.
+¥ Fixed a bug that could potentially cause crashes at startup and put garbage into the status line.
+¥ Added two more Dalnet numeric replies.
+¥ Preferences window remembers the active pane when you close and reopen it.
+¥ Added Disconnect DCC Connection option for DCC chat windows. (Closes the DCC connection without closing the window.)
+¥ More bug fixes dealing with situations where a plugin does something that causes a plugin to be called.
+¥ Fixed a cosmetic bug where message windows opened while ShadowIRC was in the background would have their scroll bars active.
+
+Changes in 0.6.2 - February 16, 1998
+¥ Fixed a bug that could cause crashes when opening the preferences window.
+¥ Actions work in query windows now.
+¥ A /who or /whois without an argument when the current target is a query or DCC window does a /who on that person.
+¥ /whois now displays idle time in hours, minutes, and seconds, rather than just seconds.
+¥ Plugins can now communicate with each other.
+
+Changes in 0.6.1 - February 14, 1998
+¥ Multiple connections are enabled.
+¥ Logging prefs window displays the path to the logs directory now.
+¥ ShadowIRC puts log files in a folder inside the logs folder with the name of the connection; this way, if you're on the same channel on two different networks, log files won't interfere with each other. If the folders are deleted, ShadowIRC will re-create them. If you use the logging feature, it is not reccommended you give the same name to more than one connection.
+¥ Added /c and /d = open/close a connection
+¥ Fixed (I hope) a problem where ShadowIRC could get confused by messages from the server that were fragmented.
+¥ Displays IP lookup messages in console when connecting.
+¥ /umode = /mode YourNickname
+¥ Sending a /msg to more than one person at a time (/msg nick1,nick2,etc.) no longer automatically opens a /query window if that option is enabled. You can still open a /query window for outgoing message to multiple nicks with /query nick,nick2,nick3, though.
+¥ Added connect/disconnect to server item in channel window contextual menus.
+¥ Added connect/disconnect submenus in console window contextual menu.
+¥ Added connect/disconnect submenus in file menu.
+¥ The mIRC color set now more accurately represents the actual colors mIRC uses.
+¥ WASTE text engine updated to version 1.3.
+¥ Changed the way the current resource file is reset to ShadowIRC's resource fork when loading plugins. This should be more reliable and faster.
+¥ The low memory checker should function better now. You will get an error the first time it detects you have less than 40k free, and ShadowIRC will "gracefully" terminate if you have less than 15k free.
+¥ Fixed a problem that could cause crashes when opening a DCC chat window.
+¥ Fixed MacBinary DCC file get. DCC send still does NOT work.
+¥ Processes color and styles in the topic line. Color is only processed if you're using the Ircle color set. mIRC color support in the topic line will be added later.
+¥ Moved a bunch of strings from the code to STR# resources.
+¥ Various other bug fixes and minor tweaks.
+
+Changes in 0.6.0 - January 13, 1998 (not officially released)
+¥ Multiple connection support is mostly completed; just a few small things to iron out first.
+¥ A ton of minor bug fixes and tweaks for multiple connection support.
+¥ No more ten channel limit (although anything past the first ten doesn't show up in the windows menu yet.)
+¥ /signoff no longer attemps to reconnect if you have that option enabled.
+¥ After joining a channel, update its status line. (In case the window was for an inactive channel, etc.)
+¥ Fixed a problem with cursor focusing where if the "don't select window" option was enabled, moving the mouse over the console window could cause the inputline to flicker.
+¥ Option to prevent new windows from being activated if there was text in the inputline (so a /query window automatically opening wouldn't accidentally take text meant for a channel, for example).
+¥ Fixed a problem where when rejoining channels during a reconnection, the target as show in the inputline and the active window might not match.
+¥ Added numeric 512 (no such gline, undernet)
+¥ ShadowIRC was accidentally using the notice color instead of the server message color for most server messages. (Since they're the same color by default, this probabally wasn't visible.)
+¥ Channel CTCPs now identify as such.
+¥ If the "show user@host with incoming messages" option is turned on, this applies to CTCPs as well.
+¥ Added server password setting for thos situations where one is necessary. (You can usually leave this blank.)
+¥ 30 shortcuts are now available.
+¥ The Mercutio MDEF is used for the Shortcuts menu.
+¥ NOTE: The prefs file format has changed. You will need to throw out your old settings file.
+¥ NOTE: ALL plugins will need to be updated to work with this version. Plugins from older versions of ShadowIRC will not load and an error message will be displayed.
+
+Changes in 0.5.5 - January 8, 1998
+¥ Option to not load the fonts menu. (This can speed up launch on machines with large numbers of fonts.)
+¥ Fixed a bug that could cause ShadowIRC to freeze when in Ircle color mode and a line of text to be displayed ended with a ctrl-c.
+¥ Fixed a bug where rejoining a channel that had bans in it after being kicked or reconnecting to the server could crash ShadowIRC or leave the banslist corrupted.
+¥ Fixed a bug that could cause problems when plugins created new message windows.
+¥ Fixed a bug that could cause plugins to lose messages. (Most obvious would be that some plugins aren't inited at startup.)
+¥ Fixed a bug with text input into message windows owned by plugins.
+¥ Options to automatically log query windows and DCC chat.
+¥ Got rid of that annoying '* :' in /whois and /whowas replies.
+¥ Increased the time between userhost lookups when joining channels to help reduce user-not-found errors due to connection lag.
+¥ Processes numeric 275 (/stats d on Undernet)
+¥ When using the "Copy and paste to Inputline" contextual menu item, now deselect the selection before pasting.
+¥ Fixed a bug in /query where it wouldn't display the right error message when you /query'd an invalid nickname.
+¥ Plugins can now get mode changes.
+¥ Fixed a bug with pasting multiple lines of text into ShadowIRC.
+¥ When displaying user@hosts with private messages, display as "nick[user@host]" rather than "nick!user@host"
+¥ Now includes the Infinity WDEF for compatibility with pre-7.5 systems.
+¥ Includes sound support for plugins.
+¥ IrcII text display option.
+¥ Fixed a bug involving windows that had "special" characters (like ^, for example) not closing properly because they weren't inserted into the windows menu properly.
+¥ Updated a bunch of code in preparation for multiple connections. The new code is also more efficient.
+
+Changes in older versions of ShadowIRC can be found on the version history web page: <http://www.shadowirc.com/history.phtml>.
+
+ShadowIRC 0.5.4r1 - December 31, 1997
+ShadowIRC 0.5.4 - December 29, 1997
+ShadowIRC 0.5.3 - December 22, 1997
+ShadowIRC 0.5.2r1 - December 14, 1997 (5:30 PM EST)
+ShadowIRC 0.5.2 - December 14, 1997 (4:30 PM EST)
+ShadowIRC 0.5.1 - December 6, 1997
+ShadowIRC 0.5 - November 30, 1997
