@@ -180,7 +180,7 @@
 // use translucent dragging for text
 
 #ifndef WASTE_TRANSLUCENT_DRAGS
-#define WASTE_TRANSLUCENT_DRAGS			0
+#define WASTE_TRANSLUCENT_DRAGS			1
 #endif
 
 // macros for debugging
