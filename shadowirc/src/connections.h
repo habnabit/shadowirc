@@ -77,11 +77,11 @@ enum lineTermList {
 
 #ifndef _TCP
 typedef pascal void (*ConnInputFuncPtr)(void*, connectionPtr conn);
-typedef pascal void (*DCCInputFuncPtr)(connectionPtr conn, void*);
 #else
 typedef pascal void (*ConnInputFuncPtr)(CEPtr, connectionPtr conn);
-typedef pascal void (*DCCInputFuncPtr)(connectionPtr conn, TCPConnectionPtr);
 #endif
+
+typedef pascal void (*DCCInputFuncPtr)(connectionPtr conn);
 
 struct Connection {
 	CONST connectionPtr next;
@@ -115,16 +115,13 @@ struct Connection {
 	DCCInputFuncPtr DCCInputFunc; //Should be CONST...
 	struct plugsRec* pluginRef;
 	
+	unsigned long closeTime;
+	unsigned long ip2;
+	
 	Str63 socksName;
 	short socksPort;
 	CONST short socksType;
 	char socksMethodVersion, socksMethod;
-	
-	short unused;
-	
-	unsigned long closeTime;
-	
-	unsigned long ip2;
 };
 
 enum maxLinks {
