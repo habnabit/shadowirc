@@ -359,11 +359,7 @@ pascal OSErr _WEMakeDragImage ( GWorldPtr * imageGWorld, RgnHandle * imageRgn, W
 	}
 
 	//	get bounding rectangle of image region
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 	GetRegionBounds( *imageRgn, & localBounds );
-#else
-	localBounds = ( ** imageRgn ) -> rgnBBox ;
-#endif
 
 	//	translate to global coordinates
 	globalBounds = localBounds ;
@@ -420,14 +416,11 @@ pascal OSErr _WEMakeDragImage ( GWorldPtr * imageGWorld, RgnHandle * imageRgn, W
 	if ( pixels != nil )
 	{
 		//	convert the image itself to global coordinates
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 		Rect	imageRgnBBox;
 		
 		GetRegionBounds( * imageRgn, & imageRgnBBox );
 		offset = topLeft ( imageRgnBBox );
-#else
-		offset = topLeft ( ( ** imageRgn ) -> rgnBBox ) ;
-#endif
+		
 		OffsetRect ( & ( * pixels ) -> bounds, offset . h, offset . v ) ;
 	}
 
@@ -467,16 +460,7 @@ pascal OSErr _WEDrag ( Point mouseLoc, EventModifiers modifiers, float clickTime
 	SetPort ( pWE -> port ) ;
 
 	// turn the cursor into an arrow
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
-	{
-	static Cursor arrow;
-
-	GetQDGlobalsArrow ( &arrow );
-	SetCursor ( &arrow ) ;
-	}
-#else
-	SetCursor ( & qd . arrow ) ;
-#endif
+	SetThemeCursor(kThemeArrowCursor);
 
 	// fabricate an EventRecord for TrackDrag
 	event . what = mouseDown ;
@@ -586,11 +570,7 @@ pascal OSErr _WEDrag ( Point mouseLoc, EventModifiers modifiers, float clickTime
 #endif
 
 	//	set the bounds of the drag
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 	GetRegionBounds( dragRgn, &dragBounds );
-#else
-	dragBounds = ( * dragRgn ) -> rgnBBox ;
-#endif
 	if ( ( err = SetDragItemBounds ( drag, ( ItemReference ) hWE, & dragBounds ) ) != noErr )
 	{
 		goto cleanup ;
@@ -1374,15 +1354,10 @@ pascal Boolean WEDraggedToTrash(DragReference drag)
 	}
 
 	// lock the data handle of the coerced descriptor
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 	if (AEGetDescData(&coercedDropLocation, &pSpec, sizeof(pSpec)))
 	{
 		goto cleanup;
 	}
-#else
-	HLock(coercedDropLocation.dataHandle);
-	pSpec = *(FSSpecHandle)coercedDropLocation.dataHandle;
-#endif
 
 	// determine the directory ID of the drop location (assuming it's a folder!)
 	BLOCK_CLR(pb);

@@ -527,31 +527,14 @@ pascal OSErr WENew(const LongRect *destRect, const LongRect *viewRect, UInt32 fe
 	// determine whether the Drag Manager is available
 	if ((Gestalt(gestaltDragMgrAttr, &response) == noErr) && BTST(response, gestaltDragMgrPresent))
 	{
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #if TARGET_RT_MAC_CFM
 		if ((UInt32) NewDrag != kUnresolvedCFragSymbolAddress)
-  #endif
-#else
-  #if GENERATINGCFM
-		if ((UInt32) NewDrag != kUnresolvedCFragSymbolAddress)
-  #endif
-#endif
 			BSET(pWE->flags, weFHasDragManager);
 
 #if WASTE_TRANSLUCENT_DRAGS
 		// determine whether translucent drags are available
 		if (BTST(response, 3))
 		{
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #if TARGET_RT_MAC_CFM
 			if ((UInt32) SetDragImage != kUnresolvedCFragSymbolAddress)
-  #endif
-#else
-  #if GENERATINGCFM
-			if ((UInt32) SetDragImage != kUnresolvedCFragSymbolAddress)
-  #endif
-#endif
-
 				BSET(pWE->flags, weFHasTranslucentDrags);
 		}
 #endif	// WASTE_TRANSLUCENT_DRAGS
@@ -575,24 +558,6 @@ pascal OSErr WENew(const LongRect *destRect, const LongRect *viewRect, UInt32 fe
 		if (GetScriptManagerVariable(smDoubleByte) != 0)
 		{
 			// wrap the macros instead of duplicating the body of the conditionals
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #if TARGET_CPU_68K
-  			if (1)
-  #else
-  			if (0)
-  #endif
-#else
-#if GENERATING68K
-  			if (1)
-  #else
-  			if (0)
-  #endif
-#endif
- 			{
-			BSET(pWE->flags, weFDoubleByte);	// the WorldScript Power Adapter breaks this :-(
-			}
-			else
-			{
 			ScriptCode script;
 			for ( script = smRoman; script <= smKlingon; script++ )
 			{
@@ -602,7 +567,6 @@ pascal OSErr WENew(const LongRect *destRect, const LongRect *viewRect, UInt32 fe
 					BSET(pWE->flags, weFDoubleByte);
 					break;
 				}
-			}
 			}
 		}
 
@@ -646,15 +610,9 @@ pascal OSErr WENew(const LongRect *destRect, const LongRect *viewRect, UInt32 fe
 
 	// copy text attributes from the active graphics port
 	BLOCK_CLR(attributes);
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 	attributes.runStyle.tsFont = GetPortTextFont(pWE->port);
 	attributes.runStyle.tsSize = GetPortTextSize(pWE->port);
 	attributes.runStyle.tsFace = GetPortTextFace(pWE->port);
-#else
-	attributes.runStyle.tsFont = pWE->port->txFont;
-	attributes.runStyle.tsSize = pWE->port->txSize;
-	attributes.runStyle.tsFace = pWE->port->txFace;
-#endif
 	if (BTST(pWE->flags, weFHasColorQD))
 	{
 		GetForeColor(&attributes.runStyle.tsColor);

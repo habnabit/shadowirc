@@ -1863,14 +1863,7 @@ pascal Boolean WEAdjustCursor(Point mouseLoc, RgnHandle mouseRgn, WEHandle hWE)
 		// set the cursor
 		if (cursorID == 0)
 		{
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
-			static Cursor arrow;
-
-			GetQDGlobalsArrow(&arrow);
-			SetCursor(&arrow) ;
-#else
-			SetCursor(&qd.arrow);
-#endif
+			SetThemeCursor(kThemeArrowCursor);
 		}
 		else
 		{
@@ -2023,11 +2016,7 @@ pascal void WEUpdate(RgnHandle updateRgn, WEHandle hWE)
 	if (!EmptyRgn(auxRgn))
 	{
 		// calculate the rectangle to update
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 		GetRegionBounds(auxRgn, &r);
-#else
-		r = (*auxRgn)->rgnBBox;
-#endif
 		WERectToLongRect(&r, &updateRect);
 
 		// find out which lines need to be redrawn and draw them
@@ -2181,11 +2170,7 @@ pascal void WEScroll(SInt32 hOffset, SInt32 vOffset, WEHandle hWE)
 	SetPort(pWE->port);
 
 	// get view rect in short coordinates
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 	GetRegionBounds(pWE->viewRgn, &viewRect);
-#else
-	viewRect = (*pWE->viewRgn)->rgnBBox;
-#endif
 
 	// hide the caret if it's showing
 	if (BTST(pWE->flags, weFCaretVisible))

@@ -434,22 +434,13 @@ pascal void _WEDrawTSMHilite(Rect *segmentRect, UInt8 tsFlags)
 	RGBColor background, foreground, saveForeground;
 	Boolean isColorPort;
 	Boolean usingTrueGray;
-
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 	Pattern	pattern;
 
 	isColorPort = IsPortColor(GetQDGlobalsThePort());
-#else
-	isColorPort = (((CGrafPtr) qd.thePort)->portVersion < 0);
-#endif
 	usingTrueGray = false;
 
 	// by default, the pen pattern is solid
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 	PenPat(GetQDGlobalsBlack(&pattern));
-#else
-	PenPat(&qd.black);
-#endif
 
 	// if we're drawing in color, set the foreground color
 	if (isColorPort)
@@ -479,11 +470,7 @@ pascal void _WEDrawTSMHilite(Rect *segmentRect, UInt8 tsFlags)
 	{
 		if (!usingTrueGray)
 		{
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 			PenPat(GetQDGlobalsGray(&pattern));
-#else
-			PenPat(&qd.gray);
-#endif
 		}
 	}
 	// use a 2-pixel tall underline if text is "selected", else use a 1-pixel tall underline
@@ -533,11 +520,7 @@ static Boolean SLDraw
 
 		// calculate the visible portion of this rectangle
 		// we do this by intersecting the line rectangle with the view rectangle
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 		GetRegionBounds(pWE->viewRgn, &cd->drawRect);
-#else
-		cd->drawRect = (*pWE->viewRgn)->rgnBBox;
-#endif
 		SectRect(&cd->lineRect, &cd->drawRect, &cd->drawRect);
 
 		if (cd->usingOffscreen)
@@ -711,14 +694,9 @@ static Boolean SLDraw
 			}
 
 			// copy the offscreen image of the [visible portion of the] line to the screen
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
 			CopyBits(GetPortBitMapForCopyBits(pWE->offscreenPort), 
 					 GetPortBitMapForCopyBits(cd->screenPort),
 					 &cd->drawRect, &cd->drawRect, srcCopy, nil);
-#else
-			CopyBits(&pWE->offscreenPort->portBits, &cd->screenPort->portBits,
-					 &cd->drawRect, &cd->drawRect, srcCopy, nil);
-#endif
 
 			// restore the original background color in the onscreen port
 			if (cd->usingColor)
@@ -858,17 +836,11 @@ pascal void _WESaveQDEnvironment(GrafPtr port, Boolean saveColor, QDEnvironment 
 	SetPort(port);
 	GetPenState(&environment->envPen);
 	PenNormal();
-#if defined(TARGET_API_MAC_CARBON) && TARGET_API_MAC_CARBON
+	
 	environment->envStyle.tsFont = GetPortTextFont(port);
 	environment->envStyle.tsFace = GetPortTextFace(port);
 	environment->envStyle.tsSize = GetPortTextSize(port);
 	environment->envMode = GetPortTextMode(port);
-#else
-	environment->envStyle.tsFont = port->txFont;
-	environment->envStyle.tsFace = port->txFace;
-	environment->envStyle.tsSize = port->txSize;
-	environment->envMode = port->txMode;
-#endif
 	environment->envStyle.tsFlags = saveColor;		// remember if color was saved
 	if (saveColor)
 	{
