@@ -1861,8 +1861,8 @@ static pascal void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255P
 		inet_ntoa_str(x->ip, c);
 		NumToString(x->port, st);
 		LSConcatStrAndStrAndStr(c, "\p:", st, &ls);
-		LSMakeStr(ls);
-		LSParamString(&ls, GetIntStringPtr(spDCC, sDCCRequest), dccTypeStr, fr, des, ls.data);
+		LSCopyString(&ls, 1, ls.len, c);
+		LSParamString(&ls, GetIntStringPtr(spDCC, sDCCRequest), dccTypeStr, fr, des, c);
 	}
 
 	SMPrefixLinkColor(link, &ls, dsFrontWin, sicCTCP);
