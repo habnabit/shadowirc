@@ -24,7 +24,6 @@
 #include <Carbon/Carbon.h>
 
 #include "MacBinary.h"
-#include "MyMemory.h"
 #include "CalcCRC.h"
 
 #include "utils.h"

@@ -21,7 +21,6 @@
 
 #include <Carbon/Carbon.h>
 
-#include "MyMemory.h"
 #include "StringList.h"
 #include "IRCGlobals.h"
 #include "filesMan.h"
@@ -173,7 +172,7 @@ pascal OSErr FindAppSpec(FSSpec *appSpec)
 	ProcessSerialNumber thisProcess = {0, kCurrentProcess};
 	ProcessInfoRec processInfo;
 	
-	MZero(&processInfo, sizeof(ProcessInfoRec));
+	bzero(&processInfo, sizeof(ProcessInfoRec));
 	
 	processInfo.processInfoLength = sizeof(ProcessInfoRec);
 	processInfo.processName = NULL;
