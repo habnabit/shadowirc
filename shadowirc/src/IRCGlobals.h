@@ -259,7 +259,6 @@ extern short fontsBegin;
 extern const unsigned char CL_VERSION[];
 extern Str63 cdt, shadowIRCDefaultSignoff;
 extern char debugOn;
-extern char QuitRequest;
 extern unsigned long idleTime;
 extern char anyAway;
 extern char inBackground;

@@ -285,9 +285,7 @@ CantInstallDialogHandler:
 	
 	QuitApplicationEventLoop();
 	
-	QuitRequest = 1;
-	
-	return QuitRequest;
+	return 1;
 }
 
 #pragma mark -

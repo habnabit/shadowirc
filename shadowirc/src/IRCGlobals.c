@@ -25,7 +25,6 @@ Str63 cdt;
 Str63 shadowIRCDefaultSignoff;
 char inBackground=0;
 char anyAway;
-char QuitRequest=0;
 char debugOn;
 
 unsigned long launchTime;
