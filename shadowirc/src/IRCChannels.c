@@ -1591,9 +1591,7 @@ MWPtr ChJoin(channelPtr ch)
 
 void DoJoinSelWin(MWPtr w)
 {
-	if(MWActive && MWActive->protect)
-		ShowWindow(w->w);
-	else if(mainPrefs->dontActivateNewWindowsIfInputlineText)
+	if(mainPrefs->dontActivateNewWindowsIfInputlineText)
 	{
 		LongString ls;
 
