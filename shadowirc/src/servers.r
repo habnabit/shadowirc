@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2001 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -77,6 +77,8 @@ resource 'NTWK' (128, "Network List")
 		'shad', 0, "ShadowNet",
 		'wolf', 0, "WolfNet",
 		'xwor', 0, "XWorld",
+		'opnn', 0, "Open Projects Network",
+		'qdek', 0, "QDeckers",
 		'ееее', 0, "Miscelaneous"
 	};
 };
@@ -85,35 +87,27 @@ resource 'SRVR' (128, "Undernet")
 {
 	'unet',
 	{
-		6667, 0, 0, "Ann-Arbor.mi.us.undernet.org",
-		6667, 0, 0, "Arlington.va.us.undernet.org",
-		6667, 0, 0, "Atlanta.ga.us.undernet.org",
-		6667, 0, 0, "Baltimore.md.us.undernet.org",
-		6667, 0, 0, "BayCity.mi.us.undernet.org",
-		6667, 0, 0, "Chicago.il.us.undernet.org",
-		6667, 0, 0, "Dallas.tx.us.undernet.org",
-		6667, 0, 0, "LasVegas.nv.us.undernet.org",
-		6667, 0, 0, "Los-angeles.ca.us.undernet.org",
-		6667, 0, 0, "McLean.va.us.undernet.org",
-		6667, 0, 0, "NewBrunswick.nj.us.undernet.org",
-		6667, 0, 0, "NewYork.ny.us.undernet.org",
-		6667, 0, 0, "RockHill.sc.us.undernet.org",
-		6667, 0, 0, "SaltLake.ut.us.undernet.org",
-		6667, 0, 0, "SanDiego.ca.us.undernet.org",
-		6667, 0, 0, "StLouis.mo.us.undernet.org",
-		6667, 0, 0, "Washington-1.dc.us.undernet.org",
-		6667, 0, 0, "Washington.dc.us.undernet.org",
-		6667, 0, 0, "Montreal.qu.ca.undernet.org",
-		6667, 0, 0, "Toronto.on.ca.undernet.org",
-		6667, 0, 0, "Vancouver.bc.ca.undernet.org",
-		6667, 0, 0, "Antwerpen.be.eu.undernet.org",
-		6667, 0, 0, "Auckland.nz.undernet.org",
-		6667, 0, 0, "Caen.fr.eu.undernet.org",
-		6667, 0, 0, "Goettingen.de.eu.undernet.org",
-		6667, 0, 0, "Graz.at.eu.undernet.org",
-		6667, 0, 0, "London.uk.eu.undernet.org",
-		6667, 0, 0, "Oslo1.no.eu.undernet.org",
-		6667, 0, 0, "Regensburg.de.eu.undernet.org"
+		6667, 0, 0, "arlington.va.us.undernet.org",
+		6667, 0, 0, "austin.tx.us.undernet.org",
+		6667, 0, 0, "mclean.va.us.undernet.org",
+		6667, 0, 0, "washington.dc.us.undernet.org",
+		
+		6667, 0, 0, "montreal.qu.ca.undernet.org",
+		6667, 0, 0, "toronto.on.ca.undernet.org",
+
+		6667, 0, 0, "amsterdam.nl.eu.undernet.org",
+		6667, 0, 0, "brussels.be.eu.undernet.org",
+		6667, 0, 0, "caen.fr.eu.undernet.org",
+		6667, 0, 0, "diemen.nl.eu.undernet.org",
+		6667, 0, 0, "flanders.be.eu.undernet.org",
+		6667, 0, 0, "geneva.ch.eu.undernet.org",
+		6667, 0, 0, "graz.at.eu.undernet.org",
+		6667, 0, 0, "graz2.at.eu.undernet.org",
+		6667, 0, 0, "haarlem.nl.eu.undernet.org",
+		6667, 0, 0, "london.uk.eu.undernet.org",
+		6667, 0, 0, "oslo.no.eu.undernet.org",
+		6667, 0, 0, "paris.fr.eu.undernet.org",
+		6667, 0, 0, "stockholm.se.eu.undernet.org"
 	};
 };
 
@@ -592,6 +586,24 @@ resource 'SRVR' (151, "DarkTree.Net")
 		6667, 0, 0, "Mastermind.AR.Darktree.Net",
 		6667, 0, 0, "Cumulus.CO.DarkTree.Net",
 		6667, 0, 0, "IronSide.CO.DarkTree.Net",
+	};
+};
+
+resource 'SRVR' (152, "Open Projects Network")
+{
+	'opnn',
+	{
+		6667, 0, 0, "irc.openprojects.net"
+	};
+};
+
+
+resource 'SRVR' (153, "QDeckers")
+{
+	'qdek',
+	{
+		6667, 0, 0, "irc.qdeckers.com",
+		6667, 0, 0, "irc.shadowhawk.ro"
 	};
 };
 
