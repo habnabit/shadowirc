@@ -25,5 +25,5 @@
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
 
-CVSROOT $CVSROOT/CVSROOT/syncmail %{sVv} cvslog@shadowirc.com
-DEFAULT $CVSROOT/CVSROOT/syncmail %{sVv} shadowirc-commits@lists.sourceforge.net
+CVSROOT $CVSROOT/CVSROOT/syncmail -u %{sVv} cvslog@shadowirc.com
+DEFAULT $CVSROOT/CVSROOT/syncmail -u %{sVv} shadowirc-commits@lists.sourceforge.net
