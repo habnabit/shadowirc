@@ -3,5 +3,7 @@
 "LogFolderName" = "Logs";
 
 "NoLogFolder" = "The currently specified log folder is invalid. Please choose another in the preferences dialog.";
+"NoDCCFolder" = "The currently specified DCC folder is invalid. Please choose another in the preferences dialog.";
 
 "DirSelMessage" = "Please choose a folder.";
+
