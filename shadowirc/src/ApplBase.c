@@ -61,7 +61,6 @@ static pascal void WindowActivate(WindowPtr window, char activate);
 static pascal void floatingWindowClick(EventRecord *e);
 static pascal void inZoomInOutHandler(const EventRecord *e, short part);
 static pascal void inDragHandler(EventRecord *e);
-inline void inProxyHandler(EventRecord *e);
 static pascal void inContentHandler(EventRecord *e);
 inline void inGoAwayHandler(const EventRecord *e);
 static pascal void inGrowHandler(const EventRecord *e);
@@ -765,14 +764,6 @@ static pascal void inDragHandler(EventRecord *e)
 	}
 }
 
-inline void inProxyHandler(EventRecord *e)
-{
-	if(IsWindowPathSelectClick((WindowPtr)e->message, e))
-		WindowPathSelect((WindowPtr)e->message, 0, 0);
-	else
-		TrackWindowProxyDrag((WindowPtr)e->message, e->where);
-}
-
 inline void inGoAwayHandler(const EventRecord *e)
 {
 	MWPtr p;
@@ -969,10 +960,6 @@ static pascal void doMouseDown(EventRecord *e)
 					case inZoomIn:
 					case inZoomOut:
 						inZoomInOutHandler(e, i);
-						break;
-
-					case inProxyIcon:
-						inProxyHandler(e);
 						break;
 				}
 			}
