@@ -112,6 +112,8 @@ void ApplicationInit(void)
 {
 	WindowRef splashWindow = NULL;
 	LongString ls;
+	ControlRef theControl;
+	ControlButtonContentInfo content;
 	
 	spFiles = GetStrN(srFiles);
 	spCM=GetStrN(srCM);
@@ -143,19 +145,28 @@ void ApplicationInit(void)
 			CFBundleRef appBundle;
 			CFStringRef text;
 			ControlID versionInfoID = { kApplicationSignature, kSIRCVersionInfoID };
-			ControlRef versionControl;
 			ControlFontStyleRec controlStyle;
+			Rect boundsRect;
 			
 			DisposeNibReference(mainNibRef);
 			
 			appBundle = CFBundleGetMainBundle();
 			text = (CFStringRef) CFBundleGetValueForInfoDictionaryKey(appBundle, CFSTR("CFBundleGetInfoString"));
-			GetControlByID(splashWindow, &versionInfoID, &versionControl);
-			SetControlData(versionControl, kControlLabelPart, kControlStaticTextCFStringTag, sizeof(CFStringRef), &text);
+			GetControlByID(splashWindow, &versionInfoID, &theControl);
+			SetControlData(theControl, kControlLabelPart, kControlStaticTextCFStringTag, sizeof(CFStringRef), &text);
 			controlStyle.flags = kControlUseJustMask | kControlUseSizeMask;
 			controlStyle.just = teCenter;
 			controlStyle.size = 12;
-			SetControlFontStyle(versionControl, &controlStyle);
+			SetControlFontStyle(theControl, &controlStyle);
+			
+			content.contentType = kControlContentPictHandle;
+			content.u.picture = LoadAppLogoFromResources();
+			
+			SetPortWindowPort(splashWindow);
+			
+			SetRect(&boundsRect, 0, 0, 360, 144);
+			CreatePictureControl(splashWindow, &boundsRect, &content, TRUE, &theControl);
+			
  			ShowWindow(splashWindow);
 			SelectWindow(splashWindow);
 		}
@@ -191,7 +202,15 @@ void ApplicationInit(void)
 	AppleHelpInit();
 	
 	if(splashWindow)
+	{
+		if(content.u.picture)
+			DisposeHandle((Handle)content.u.picture);
+		
+		if(theControl)
+			DisposeControl(theControl);
+		
 		DisposeWindow(splashWindow);
+	}
 }
 
 static void Gestalts(void)

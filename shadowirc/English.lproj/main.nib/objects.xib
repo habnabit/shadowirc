@@ -4,7 +4,7 @@
   <object name="rootObject" class="NSCustomObject" id="1">
     <string name="customClass">NSApplication</string>
   </object>
-  <array count="97" name="allObjects">
+  <array count="95" name="allObjects">
     <object class="IBCarbonWindow" id="181">
       <string name="windowRect">83 108 187 502 </string>
       <string name="title">Save Preferences</string>
@@ -37,7 +37,6 @@
         </array>
       </object>
       <int name="carbonWindowClass">1</int>
-      <int name="themeBrush">0</int>
       <int name="windowPosition">7</int>
     </object>
     <reference idRef="182"/>
@@ -320,7 +319,6 @@
               <object class="IBCarbonMenuItem" id="343">
                 <boolean name="dynamic">TRUE</boolean>
                 <string name="title">Minimize Window</string>
-                <string name="keyEquivalent">m</string>
                 <ostype name="command">mini</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="349">
@@ -542,16 +540,9 @@
         <int name="menuID">264</int>
       </object>
     </object>
-    <object class="IBCarbonPicture" id="359">
-      <string name="bounds">0 0 144 360 </string>
-      <ostype name="controlSignature">SIRC</ostype>
-      <int name="controlID">4</int>
-      <int name="contentResID">128</int>
-    </object>
     <object class="IBCarbonRootControl" id="360">
       <string name="bounds">0 0 188 360 </string>
-      <array count="2" name="subviews">
-        <reference idRef="359"/>
+      <array count="1" name="subviews">
         <object class="IBCarbonStaticText" id="361">
           <string name="bounds">152 20 168 340 </string>
           <ostype name="controlSignature">SIRC</ostype>
@@ -561,7 +552,7 @@
     </object>
     <reference idRef="361"/>
     <object class="IBCarbonWindow" id="362">
-      <string name="windowRect">243 250 431 610 </string>
+      <string name="windowRect">427 385 615 745 </string>
       <string name="title">Splash Screen</string>
       <reference name="rootControl" idRef="360"/>
       <boolean name="hasCloseBox">FALSE</boolean>
@@ -572,12 +563,6 @@
       <int name="carbonWindowClass">3</int>
       <int name="themeBrush">1</int>
       <int name="windowPosition">7</int>
-    </object>
-    <object class="IBCarbonPicture" id="363">
-      <string name="bounds">0 0 144 360 </string>
-      <ostype name="controlSignature">SIRC</ostype>
-      <int name="controlID">131</int>
-      <int name="contentResID">128</int>
     </object>
     <object class="IBCarbonStaticText" id="364">
       <string name="bounds">152 20 184 340 </string>
@@ -594,8 +579,7 @@
       <string name="title">About ShadowIRC</string>
       <object name="rootControl" class="IBCarbonRootControl" id="367">
         <string name="bounds">0 0 268 360 </string>
-        <array count="4" name="subviews">
-          <reference idRef="363"/>
+        <array count="3" name="subviews">
           <reference idRef="365"/>
           <object class="IBCarbonButton" id="368">
             <string name="bounds">228 145 248 215 </string>
@@ -620,7 +604,7 @@
     <reference idRef="367"/>
     <reference idRef="368"/>
   </array>
-  <array count="97" name="allParents">
+  <array count="95" name="allParents">
     <reference idRef="1"/>
     <reference idRef="181"/>
     <reference idRef="182"/>
@@ -708,11 +692,9 @@
     <reference idRef="342"/>
     <reference idRef="342"/>
     <reference idRef="203"/>
-    <reference idRef="360"/>
     <reference idRef="362"/>
     <reference idRef="360"/>
     <reference idRef="1"/>
-    <reference idRef="367"/>
     <reference idRef="367"/>
     <reference idRef="367"/>
     <reference idRef="1"/>
@@ -731,5 +713,5 @@
     <string>Splash</string>
     <reference idRef="362"/>
   </dictionary>
-  <unsigned_int name="nextObjectID">369</unsigned_int>
+  <unsigned_int name="nextObjectID">372</unsigned_int>
 </object>

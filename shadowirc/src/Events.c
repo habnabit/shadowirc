@@ -200,6 +200,8 @@ static void DoAbout(void)
 		ControlID versionInfoID = { kApplicationSignature, kSIRCVersionInfoID };
 		ControlRef theControl = NULL;
 		ControlFontStyleRec controlStyle;
+		ControlButtonContentInfo content;
+		Rect boundsRect;
 		
 		DisposeNibReference(mainNibRef);
 		
@@ -218,6 +220,14 @@ static void DoAbout(void)
 		SetControlData(theControl, kControlLabelPart, kControlStaticTextCFStringTag, sizeof(CFStringRef), &text);
 		controlStyle.size = 12;
 		SetControlFontStyle(theControl, &controlStyle);
+
+		content.contentType = kControlContentPictHandle;
+		content.u.picture = LoadAppLogoFromResources();
+		
+		SetPortWindowPort(aboutWindow);
+		
+		SetRect(&boundsRect, 0, 0, 360, 144);
+		CreatePictureControl(aboutWindow, &boundsRect, &content, TRUE, &theControl);
 		
 		status = InstallWindowEventHandler(aboutWindow, awUPP, 1, &awSpec,(void *)aboutWindow, NULL);
 		
@@ -225,6 +235,10 @@ static void DoAbout(void)
 		SelectWindow(aboutWindow);
 		
 		status = RunAppModalLoopForWindow(aboutWindow);
+		
+		DisposeHandle((Handle)content.u.picture);
+		if(theControl)
+			DisposeControl(theControl);
 	}
  }
  

@@ -71,6 +71,9 @@ pascal void writeMainPrefs(void);
 pascal void writeAllFiles(void);
 pascal char readMainPrefs(void); //Return true if the prefs were just created
 
+OSStatus GetFSRefForResourcesFolder(FSRef *ref);
+PicHandle LoadAppLogoFromResources(void);
+
 pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileName, long type, long creator, long navFlags, FSSpec *f, char allowReplace);
 
 #ifdef __NAVIGATION__

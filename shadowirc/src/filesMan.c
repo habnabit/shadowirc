@@ -275,6 +275,93 @@ pascal char DirectorySelectButton(FSSpec *fss)
 
 #pragma mark -
 
+OSStatus GetFSRefForResourcesFolder(FSRef *ref)
+{
+	OSStatus err = noErr;
+	CFBundleRef bundle;
+	CFURLRef resourcesURL;
+	FSRef resourcesRef;
+	
+	bundle = CFBundleGetMainBundle();
+	resourcesURL = CFBundleCopyResourcesDirectoryURL(bundle);
+	
+	if(resourcesURL != NULL)
+	{
+		if(CFURLGetFSRef(resourcesURL, &resourcesRef))
+			BlockMoveData(&resourcesRef, ref, sizeof(FSRef));
+		else
+		{
+			ref = NULL;
+			err = paramErr;
+		}
+	}
+	else
+	{
+		ref = NULL;
+		err = paramErr;
+	}
+	
+	return err;
+}
+
+PicHandle LoadAppLogoFromResources(void)
+{
+	OSStatus err = noErr;
+	FSRef resourcesRef;
+	PicHandle picture = NULL;
+	
+	err = GetFSRefForResourcesFolder(&resourcesRef);
+	
+	if(err == noErr)
+	{
+		CFStringRef fileName = CFSTR("ShadowIRCSplash.pict");
+		FSRef pictureRef;
+		UniChar *nameBuffer = NULL;
+		UniCharCount sourceLength;
+		
+		sourceLength = (UniCharCount) CFStringGetLength(fileName);
+		
+		nameBuffer = (UniChar *)NewPtr(sourceLength * sizeof(UniChar));
+		if(nameBuffer == NULL)
+			return NULL;
+		
+		CFStringGetCharacters(fileName, CFRangeMake(0, sourceLength), &nameBuffer[0]);
+		
+		if((err = FSMakeFSRefUnicode(&resourcesRef, sourceLength, nameBuffer, kTextEncodingUnicodeDefault, &pictureRef)) == noErr)
+		{
+			HFSUniStr255 forkName;
+			SInt16 forkRefNum = 0;
+			
+			err = FSGetDataForkName(&forkName);
+			
+			err = FSOpenFork(&pictureRef, forkName.length, forkName.unicode, fsRdPerm, &forkRefNum);
+			if(err == noErr)
+			{
+				SInt64 forkSize, pictLength;
+				
+				FSGetForkSize(forkRefNum, &forkSize);
+				
+				pictLength = forkSize - 512;
+				picture = (PicHandle)NewHandle(pictLength);
+				if(picture != NULL)
+				{
+					HLock((Handle)picture);
+					
+					err = FSReadFork(forkRefNum, fsFromStart, 512, pictLength, *picture, NULL);
+					
+					HUnlock((Handle)picture);
+				}
+				
+				FSCloseFork(forkRefNum);
+			}
+		}
+		
+		DisposePtr((Ptr)nameBuffer);
+	}
+	
+	return picture;
+}
+
 pascal char MyStandardPutFile(ConstStr255Param message, ConstStr255Param fileName, long type, long creator, long navFlags, FSSpec *f, char allowReplace)
 {
 	char ret = kNoErr;
