@@ -338,7 +338,7 @@ pascal char IsLinkValid(linkPtr link)
 
 
 
-pascal char ConnStartNetworking()
+char ConnStartNetworking(void)
 {
 	static char inited = 0;
 	
@@ -428,7 +428,7 @@ static void ConnFinishStaleConnections(void)
 	}
 }
 
-pascal void ConnStopNetworking()
+void ConnStopNetworking(void)
 {
 	ConnFinishStaleConnections();
 	FinishEverything();

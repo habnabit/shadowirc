@@ -307,7 +307,7 @@ CantInstallDialogHandler:
 
 #pragma mark -
 
-char ToggleConsoleWindow()
+char ToggleConsoleWindow(void)
 {
 		if(ActiveNonFloatingWindow() == consoleWin->w && IsWindowVisible(consoleWin->w))
 		{

@@ -702,7 +702,7 @@ static OSErr PreDrag(DragReference drag, WEReference we)
 	return err;
 }
 
-void InitDrag()
+void InitDrag(void)
 {
 	sPreTrackerUPP = NewWEPreTrackDragProc(PreDrag);
 }

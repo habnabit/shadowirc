@@ -50,4 +50,4 @@ void AppleMenuURLInit(void);
 void ConnectionMenuInit(void);
 void ConnectionMenuHilites(void);
 
-char ToggleConsoleWindow();
+char ToggleConsoleWindow(void);

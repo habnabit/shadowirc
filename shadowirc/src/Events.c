@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 2003 John Bafford, Chris Campbell
+	Copyright (C) 2002-2003 John Bafford, Chris Campbell
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -859,7 +859,7 @@ static OSStatus DoCommandEvent(EventHandlerCallRef nextHandler, EventRef theEven
 	return myErr;
 }
 
-void InitEventHandlers()
+void InitEventHandlers(void)
 {
 	const EventTypeSpec commandType = {kEventClassCommand, kEventProcessCommand};
 	

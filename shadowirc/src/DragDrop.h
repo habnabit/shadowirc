@@ -34,6 +34,6 @@ extern WEPreTrackDragUPP sPreTrackerUPP;
 #endif
 
 void MWInitDrag(MWPtr mw);
-void InitDrag();
+void InitDrag(void);
 
 #endif
