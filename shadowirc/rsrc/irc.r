@@ -1875,17 +1875,6 @@ data 'DLOG' (130, "Err") {
 	$"0000 0082 00"                                       /* ...‚. */
 };
 
-resource 'DLOG' (132, "Quit/Save Prefs") {
-	{73, 90, 161, 410},
-	dBoxProc,
-	visible,
-	noGoAway,
-	0x0,
-	132,
-	"Quit",
-	alertPositionMainScreen
-};
-
 resource 'DLOG' (141, "Font Size") {
 	{180, 266, 267, 456},
 	movableDBoxProc,
