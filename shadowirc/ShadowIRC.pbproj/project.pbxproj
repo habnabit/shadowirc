@@ -24,7 +24,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F552BFBA0211030901A80061,
-				F552BFBB0211030901A80061,
 				F552BFBC0211030901A80061,
 				F552BFBD0211030901A80061,
 				F552BFBE0211030901A80061,
@@ -206,7 +205,6 @@
 				F59209380317839001A80166,
 				F5059DA802A5C0C70132A983,
 				F552BF300211030901A80061,
-				F552BF440211030901A80061,
 				F552BF480211030901A80061,
 				F552BF490211030901A80061,
 				F552BF4F0211030901A80061,
@@ -1069,12 +1067,6 @@
 			path = src/plugins.h;
 			refType = 2;
 		};
-		F552BF440211030901A80061 = {
-			isa = PBXFileReference;
-			name = resources.r;
-			path = src/resources.r;
-			refType = 4;
-		};
 		F552BF450211030901A80061 = {
 			isa = PBXFileReference;
 			name = ServerCommands.c;
@@ -1647,12 +1639,6 @@
 		};
 		F552BFBA0211030901A80061 = {
 			fileRef = F552BF300211030901A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F552BFBB0211030901A80061 = {
-			fileRef = F552BF440211030901A80061;
 			isa = PBXBuildFile;
 			settings = {
 			};

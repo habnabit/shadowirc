@@ -1,5 +1,29 @@
 #include <Carbon/Carbon.r>
 
+resource 'open' (300, purgeable)
+{
+	'SIRC',
+	{
+		'TEXT'
+	}
+};
+
+resource 'open' (301, purgeable)
+{
+	'SIRC',
+	{
+		'COLR'
+	}
+};
+
+resource 'scsz' (0)
+{
+	launchToGetTerminology,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	
+	0, 0, 0, 0, 0, 0
+};
+
 resource 'ALRT' (130) {
 	{54, 40, 156, 431},
 	130,
