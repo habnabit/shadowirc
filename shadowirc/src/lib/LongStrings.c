@@ -209,15 +209,13 @@ asm pascal char LSCmp(register const LongString *ls1, register const LongString 
 }
 #endif
 
-/*
-inline char inupc(char c);
-inline char inupc(char c)
+static inline char inupc(char c);
+static inline char inupc(char c)
 {
 	if((c>='a') && (c<='z'))
 		c-=32;
 	return c;
 }
-*/
 
 #if !USE_SHADOWIRC_ASSEMBLY
 pascal char LSCaseCmp(const LongString *ls1, const LongString *ls2)
