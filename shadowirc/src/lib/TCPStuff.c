@@ -137,7 +137,6 @@ typedef struct tcpConnectionRecord {
     DNRRecordPtr dnrrp;
     long timeout;
     short status;
-    char pad;
     char closedone;
 } tcpConnectionRecord;
 
@@ -153,8 +152,6 @@ static void FindAddressDNR(DNRRecordPtr);
 
 TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short remoteport);
 TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog);
-
-tcpConnectionRecord *GetConnection(long cp);
 
 int GetConnectionSocket(long cp);
 
@@ -586,18 +583,6 @@ static char ValidConnection(connectionIndex *cp)
 	
 	return false;
     return 0;
-}
-
-/*
- * GetConnection
- * XXX: Not used anywhere. Delete it after verifying its uselessness
- */
-tcpConnectionRecord *GetConnection(long cp)
-{
-   if (ValidConnection(&cp))
-      return &connections[cp-1];
-   else
-      return 0;
 }
 
 /*
