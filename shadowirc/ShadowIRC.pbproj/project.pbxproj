@@ -42,7 +42,6 @@
 				F552BFBE0211030901A80061,
 				F552BFBF0211030901A80061,
 				F54C279E02152A0001A80061,
-				F54C27A002152A1B01A80061,
 			);
 			isa = PBXRezBuildPhase;
 			name = "ResourceManager Resources";
@@ -247,7 +246,6 @@
 				F552BF580211030901A80061,
 				0867D6AAFE840B52C02AAC07,
 				F54C279D02152A0001A80061,
-				F54C279F02152A1B01A80061,
 				F573F87E021878C501A80061,
 			);
 			isa = PBXGroup;
@@ -660,17 +658,6 @@
 		};
 		F54C279E02152A0001A80061 = {
 			fileRef = F54C279D02152A0001A80061;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-		F54C279F02152A1B01A80061 = {
-			isa = PBXFileReference;
-			path = carb.r;
-			refType = 4;
-		};
-		F54C27A002152A1B01A80061 = {
-			fileRef = F54C279F02152A1B01A80061;
 			isa = PBXBuildFile;
 			settings = {
 			};
