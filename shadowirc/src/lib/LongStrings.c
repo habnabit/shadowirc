@@ -303,20 +303,20 @@ pascal void LSDelete(LongString *ls, short firstpos, short lastpos)
 
 pascal void LSCopy(const LongString *ls, short firstpos, short len, LongString *out)
 {
-	int i;
-	
-	if(firstpos>0)
+	if(firstpos > ls->len)
+		out->len = 0;
+	else if(firstpos > 0)
 	{
-		if(len>(ls->len - firstpos+1))
-			i=(ls->len-firstpos+1);
-		else
-			i=len;
+		short maxLen = ls->len - firstpos + 1;
 		
-		BlockMoveData(&ls->data[firstpos], &out->data[1], i);
-		out->len=i;
+		if(len > maxLen)
+			len = maxLen;
+		
+		BlockMoveData(&ls->data[firstpos], &out->data[1], len);
+		out->len = len;
 	}
 	else
-		if(out!=ls)
+		if(out != ls)
 			LSDupe(ls, out);
 }
 
