@@ -1,0 +1,71 @@
+/*
+	ShadowIRC - A Mac OS IRC Client
+	Copyright (C) 1996-2000 John Bafford
+	dshadow@shadowirc.com
+	http://www.shadowirc.com
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/
+
+#ifndef _Floaters_
+#define _Floaters_
+
+#ifndef __MACWINDOWS__
+#include <MacWindows.h>
+#endif
+
+typedef pascal void (*WindowActivateProcPtr)(WindowPtr window, char activate);
+extern WindowActivateProcPtr ActivateWindowProcPtr;
+
+#define IsVisible(w) IsWindowVisible(w)
+#define IsActive(w) IsWindowHilited(w)
+#define IsDialog(w) (GetWindowKind(w) == dialogKind)
+
+#if TARGET_CARBON
+inline Rect WGetBBox(WindowPtr w)
+{
+	RgnHandle r = NewRgn();
+	Rect rr;
+	GetWindowRegion(w, kWindowContentRgn, r);
+	GetRegionBounds(r, &rr);
+	DisposeRgn(r);
+	return rr;
+}
+#else
+#define WGetBBox(w) ((**(((WindowPeek)w)->contRgn)).rgnBBox)
+#endif
+
+#pragma lib_export on
+#pragma export on
+pascal WindowPtr FrontNonFloater(void);
+pascal char WIsFloater(WindowPtr w);
+pascal void WMoveToFront(WindowPtr w);
+pascal void WSelect(WindowPtr w);
+pascal void WDrag(WindowPtr w, Point startPoint, const Rect *boundsRect);
+pascal void WShow(WindowPtr w);
+pascal void WHide(WindowPtr w);
+pascal void WMove(WindowPtr w, short h, short v, char front);
+pascal void EnterModalDialog(void);
+pascal void ExitModalDialog(void);
+#pragma export off
+#pragma lib_export off
+
+
+#pragma internal on
+pascal void WSuspend(void);
+pascal void WResume(void);
+pascal WindowPtr WCreate(const Rect *boundsRect, ConstStr255Param title, short theProc, char goAwayFlag, long refCon, char isFloater);
+#pragma internal reset
+#endif

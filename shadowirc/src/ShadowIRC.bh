@@ -1,0 +1,87 @@
+#
+#ShadowIRC - A Mac OS IRC Client
+#Copyright (C) 1996-2000 John Bafford
+#dshadow@shadowirc.com
+#http://www.shadowirc.com
+#
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
+#
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+
+# 1 - enabled
+# 2 - disabled
+# 3 - checked
+# 4 - marked
+
+STR# 26742 Balloon Help Strings
+
+### MENUS
+
+MENU 256 Apple
+1.1 Displays a dialog with the current version of ShadowIRC and your registration info.
+END-MENU
+
+MENU 257 File
+0.1 File MenuÂÂUse this menu to connct to the server, close windows, edit and save the prefs, or quit.
+2.1 Creates a new text window with ShadowIRC's built-in text editor. 
+3.1 Opens a file with ShadowIRC's built-in text editor.
+4.1 Closes the front window.
+4.2 Closes the front window. Disabled because there is no window to close.
+
+9.1 Signs off from any IRC servers (if connected) and quits ShadowIRC.
+END-MENU
+
+MENU 258 Edit
+0.1 Edit MenuÂÂUse this menu to work with text.
+1.2 Undo. Disabled because this program doesn't support Undo.
+3.1 Deletes selected text and places it on the clipboard.
+4.1 Copies selected text and places it on the clipboard.
+5.1 Pastes text in clipboard at the insertion point.
+6.1 Deletes selected text.
+7.1 Selects all text in the active window.
+
+9.1 Searches for text in the current window.
+10.1 Searches for the next occurance of the text you previously searched for.
+
+12.1 Opens the preferences window.
+END-MENU
+
+MENU 260 Windows
+0.1 Windows MenuÂÂUse this menu to open or select windows.
+1.1 Opens the Console.
+END-MENU
+
+MENU 261 Shortcuts
+0.1 Shortcuts MenuÂÂUse this menu to edit or activate shortcuts.
+1.1 Allows you to edit your shortcuts.
+END-MENU
+
+MENU 262 Commands
+0.1 Commands MenuÂÂContains shortcuts for frequently used IRC commands.
+END-MENU
+
+MENU 263 Fonts
+0.1 Fonts MenuÂÂAllows you to change the font the current window is displaying text in.
+END-MENU
+
+
+### DIALOGS
+DIALOG 10003 Topic
+1.1 Closes this window and sets the topic.
+1.2 Closes this window and sets the topic. Disabled because you can not set the topic.
+2.1 Closes this window without setting the topic.
+END-DIALOG
+
+END
+STR# 26742 Balloon Help Strings

@@ -1,0 +1,72 @@
+/*
+	ShadowIRC - A Mac OS IRC Client
+	Copyright (C) 1996-2000 John Bafford
+	dshadow@shadowirc.com
+	http://www.shadowirc.com
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+*/
+
+#ifndef _IRCAux
+#define _IRCAux
+
+enum nickFormats
+{
+	//Source. One must be selected, or normal is assumed.
+	kNickNormal = (1 << 0),
+	kNickNotice = (1 << 1),
+	kNickPrivmsg = (1 << 2),
+	kNickOther = (1 << 3),
+	
+	//Display modifications
+	kNickAction = (1 << 4),
+	kNickSend = (1 << 5)
+};
+
+#pragma lib_export on
+#pragma export on
+pascal void MakeChannel(StringPtr s);
+pascal void NextArg(StringPtr from, StringPtr arg);
+
+#ifdef _connections
+pascal void putServer(linkPtr link, LongString *ls);
+pascal char OpenConnection(linkPtr link);
+
+
+pascal void ConnPut(connectionPtr *conn, const void* p, long len);
+pascal void ConnPutText(connectionPtr *conn, void* p, long len);
+pascal void ConnPutLS(connectionPtr *conn, LongString *ls);
+#endif
+#pragma export off
+#pragma lib_export off
+
+#pragma internal on
+pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nickC, int type);
+pascal void FormatMessage(ConstStr255Param nick, const LongString *text, ConstStringPtr nickC, ConstStringPtr textC, int type, LongString *out);
+
+
+pascal void ConnectionMenuSetup(void);
+pascal void ConnectionMenuHilites(void);
+
+#ifdef _connections
+pascal void StatusMsg(linkPtr link, short n);
+pascal char ValidPrefs(linkPtr link);
+pascal void ServerOK(short status, linkPtr link);
+pascal void connection2(connectionPtr conn);
+pascal char connection3(linkPtr link, char reg);
+#endif
+#pragma internal reset
+
+#endif
