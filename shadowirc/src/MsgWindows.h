@@ -74,7 +74,6 @@ enum mwTypes {
 	chanWin,
 	queryWin,
 	pluginWin,
-	helpWin,
 	dccWin
 };
 
@@ -169,7 +168,7 @@ struct MessageWindow {
 	
 	char inactive;
 	CONST unsigned char channelWindowNumber;
-	CONST char protect;
+	CONST char protect; //this is not set to true by default anywhere. It might be removable.
 	unsigned char drawingStatus;
 };
 

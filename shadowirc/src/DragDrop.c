@@ -362,7 +362,7 @@ static pascal OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessa
 					}
 				}
 				else
-					if(mw->winType != conWin && mw->winType != helpWin)
+					if(mw->winType != conWin)
 						ret = WETrackDrag(message, drag, mw->we);
 				break;
 			
@@ -484,7 +484,7 @@ static pascal OSErr MWTextPaneReceiveDrag(MWPtr mw, DragReference drag)
 		}
 	}
 	
-	if(mw->winType != conWin && mw->winType != helpWin)
+	if(mw->winType != conWin)
 	{
 		Point mouse;
 		mwPanePtr tp;

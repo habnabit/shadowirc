@@ -301,7 +301,6 @@ static pascal void CMMWMake(cmmwData *d)
 	Str255 s;
 	int x;
 	MenuHandle m;
-	char cmWindowIsHelp = mw->winType == helpWin;
 	
 	m = d->m = NewMenu(200, "\p");
 	WEGetSelection(&d->s0, &d->s1, mw->we);
@@ -337,28 +336,25 @@ static pascal void CMMWMake(cmmwData *d)
 		CMILAdd(d, "\p-", mcNull, 0);
 		CMILAdd(d, GetIntStringPtr(spCM, sCopyAll), mcCopy, 0);
 
-		if(!cmWindowIsHelp)
-		{
-			CMILAdd(d, GetIntStringPtr(spCM, sClearAll), mcClear, 0);
-			
-			CMILAdd(d, "\p-", mcNull, 0);
-			
-			CMILAdd(d, GetIntStringPtr(spCM, sColorStyle), mcNull, 0);
-			item = (**d->items).numItems;
-			SetItemCmd(m, item, hMenuCmd);
-			SetItemMark(m, item, 203);
+		CMILAdd(d, GetIntStringPtr(spCM, sClearAll), mcClear, 0);
+		
+		CMILAdd(d, "\p-", mcNull, 0);
+		
+		CMILAdd(d, GetIntStringPtr(spCM, sColorStyle), mcNull, 0);
+		item = (**d->items).numItems;
+		SetItemCmd(m, item, hMenuCmd);
+		SetItemMark(m, item, 203);
 
-			d->colorMenu = GetMenu(203);
-			
-			InsertMenuItem(d->colorMenu, GetIntStringPtr(spCM, sNone), 0);
-			InsertMenuItem(d->colorMenu, "\p-", 1);
-			InsertMenu(d->colorMenu, -1);
-			if(mw->colorMethod == cmNone)
-				x = 1;
-			else
-				x = mw->colorMethod +2;
-			CheckMenuItem(d->colorMenu, x, true);
-		}
+		d->colorMenu = GetMenu(203);
+		
+		InsertMenuItem(d->colorMenu, GetIntStringPtr(spCM, sNone), 0);
+		InsertMenuItem(d->colorMenu, "\p-", 1);
+		InsertMenu(d->colorMenu, -1);
+		if(mw->colorMethod == cmNone)
+			x = 1;
+		else
+			x = mw->colorMethod +2;
+		CheckMenuItem(d->colorMenu, x, true);
 	}
 	else //selection
 	{
@@ -367,12 +363,12 @@ static pascal void CMMWMake(cmmwData *d)
 			CMILAdd(d, GetIntStringPtr(spCM, sCopySelection), mcCopy, 0);
 			CMILAdd(d, GetIntStringPtr(spCM, sCopyToInputline), mcCopyIL, 0);
 
-			if(!cmWindowIsHelp && !d->oneWord)
+			if(!d->oneWord)
 				CMILAdd(d, GetIntStringPtr(spCM, sClearSelection), mcClear, 0);
 		}
 	}
 
-	if(!cmWindowIsHelp && d->pane->creator == kApplicationSignature)
+	if(d->pane->creator == kApplicationSignature)
 	{
 		ConstStringPtr s;
 		

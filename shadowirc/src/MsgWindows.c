@@ -215,9 +215,6 @@ pascal ConstStringPtr MWGetName(MWPtr mw, Str255 s)
 		else if(mw->winType == pluginWin)
 		{
 		}
-		else if(mw->winType == helpWin)
-		{
-		}
 	}
 	
 	if(s)
@@ -859,49 +856,6 @@ pascal void MWNewPosition(Rect *windowSize)
 	*windowSize=cornerstone;
 }
 
-static pascal void MWTallPosition(Rect *r);
-static pascal void MWTallPosition(Rect *r)
-{
-	short windowTopHeight;
-	short windowLeftWid;
-	BitMap screenBits;
-	WindowPtr wp = consoleWin->w;
-
-	if(!IsWindowVisible(wp))
-		wp = ActiveNonFloatingWindow();
-	
-	if(wp)
-	{
-		RgnHandle cr, sr;
-		Rect crr, srr;
-		
-		cr = NewRgn();
-		sr = NewRgn();
-		
-		GetWindowRegion(wp, kWindowContentRgn, cr);
-		GetWindowRegion(wp, kWindowStructureRgn, sr);
-		GetRegionBounds(cr, &crr);
-		GetRegionBounds(sr, &srr);
-		
-		windowTopHeight = crr.top - srr.top;
-		windowLeftWid = crr.left - srr.left;
-		
-		DisposeRgn(cr);
-		DisposeRgn(sr);
-	}
-	else
-	{
-		windowTopHeight = 21;
-		windowLeftWid = 5;
-	}
-
-	r->left = windowLeftWid + 1;
-	r->top = windowTopHeight + GetMBarHeight() + 1;
-	r->right = 500;
-	GetQDGlobalsScreenBits(&screenBits);
-	r->bottom = screenBits.bounds.bottom - 50;
-}
-
 #define STY_0 (sizeof(myScrpSTElement)+2)
 #define STY_1 sizeof(myScrpSTElement)
 
@@ -950,10 +904,6 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 		else
 			MWNewPosition(&windowSize);
 	}
-	else if(winType == helpWin)
-	{
-		MWTallPosition(&windowSize);
-	}
 	else // not a channel/console win
 	{
 		MWNewPosition(&windowSize);
@@ -989,7 +939,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 		h->paneList = 0;
 		h->refCon = 0;
 		h->colorMethod = mainPrefs->colorMethod;
-		h->protect = (winType == helpWin);
+		h->protect = false;
 		h->vscr = 0;
 		h->we = 0;
 		h->drawingStatus = 0;
