@@ -87,6 +87,16 @@ inline void n433nickInUse(linkPtr link, LongString *rest);
 		SAFELIST - does /list in chunks
 */
 
+static HTPtr DefaultServerOptions(void)
+{
+	HTPtr so = HTCreate(DEFAULT_HASHSIZE);
+	
+	HTAdd(so, "\pCHANTYPES", "\p#&", htTypeString);
+	HTAdd(so, "\pPREFIX", "\p(ov)@+", htTypeString);
+	
+	return so;
+}
+
 static void n005ServerFeatures(linkPtr link, LongString *ls)
 {
 	Str255 feature, value;
@@ -437,7 +447,7 @@ pascal char NumericComm(short comm, StringPtr from, ConstStringPtr target, LongS
 			//Clear and create a new hashtable.
 			if(link->serverOptions)
 				HTDestroy(link->serverOptions);
-			link->serverOptions = HTCreate(DEFAULT_HASHSIZE);
+			link->serverOptions = DefaultServerOptions();
 			
 			runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &pCWSC);
 			UpdateStatusLine();
