@@ -21,7 +21,7 @@
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-	Note: This code based on Peter N. Lewis's MacTCP source code.
+	Note: This code was originally based on Peter N. Lewis's MacTCP source code.
 */
 
 #pragma mark -
@@ -36,6 +36,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -85,8 +86,6 @@ typedef struct TCPConnection {
 	char closedone;
 	char inBuf[INCOMINGBUFSIZE];
 } TCPConnection;
-
-OSErr TCPReceiveUpTo(connectionPtr conn, char term, long timeout, Ptr readPtr, long readSize, long *readPos, char *gotterm);
 
 #pragma mark -
 #pragma mark ¥¥¥ÊTCPConnections
@@ -410,12 +409,11 @@ OSErr TCPSendChars(int sockfd, const void* d, size_t len)
 
 static size_t TCPCharsAvailable(int sockfd)
 {
-        char inBuf[INCOMINGBUFSIZE];
-        int nbytes;
-        nbytes = recv(sockfd, inBuf, INCOMINGBUFSIZE, MSG_PEEK);
-        if(nbytes == -1)
-            return (0);
-        return(nbytes);
+	int nbytes = 0;
+	ioctl(sockfd, FIONREAD, &nbytes);
+	if(nbytes == -1)
+		return (0);
+	return(nbytes);
 }
 
 /*
