@@ -463,7 +463,7 @@ static OSStatus MWDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef th
 	
 	if(wheelAxis == kEventMouseWheelAxisY)
 	{
-		MWScroll(mw, 4 * mw->scrpHeight * wheelDelta);
+		MWScroll(mw, -4 * mw->scrpHeight * wheelDelta);
 		myErr = noErr;
 	}
 	
