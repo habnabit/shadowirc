@@ -57,10 +57,10 @@ typedef struct connectionEventRecord {
         /*
          * XXX landonf: The "const" long "value" is used to pass back a pointer
          * to a pascal string (hostname). It also was used to pass back the IP address.
-	 * addr will hold the IP address instead
+	 * sas will hold the IP address instead
          */
 	CONST long value;
-	struct in_addr addr;
+	struct sockaddr_storage *sas;
 } connectionEventRecord, *CEPtr;
 
 #undef CONST

@@ -1568,7 +1568,7 @@ typedef struct pHelpMenuData {
 */
 typedef struct pDNSLookupData {
 	long refCon;				//The number you passed to DNSLookup()
-	long ip;						//The IP searched/found as four 8-bit values
+	struct sockaddr_storage *sas;		//The Internet address
 	StringPtr search;		//What you searched for
 	StringPtr reply;		//The results of the search. Length of 0 if search not successful.
 	char nameToIP;			//True if this was a name to IP search, false if an IP to name search

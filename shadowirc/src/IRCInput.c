@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -928,10 +928,10 @@ void processPlugin(CEPtr c, connectionPtr conn)
 
 void dnsEvent(CEPtr c, connectionPtr conn)
 {
-	Str255 s2;
 	LongString ls;
-	struct in_addr ip;
-	Str255 name;
+	struct sockaddr_storage sas;
+	Str255 s2, name;
+	char hbuf[NI_MAXHOST];
 	pDNSLookupData p;
 	DNSLookupDataPtr dldp;
 	
@@ -939,7 +939,7 @@ void dnsEvent(CEPtr c, connectionPtr conn)
 	{
 		case C_Found:
 			p.successful=1;
-			memcpy(&ip, &c->addr, sizeof(ip));
+			memcpy(&sas, c->sas, sizeof(struct sockaddr_storage));
 			pstrcpy(*(StringHandle)(c->value), name);
 			DisposeHandle((Handle)c->value);
 			*(long*)&c->value = 0; //const-cast
@@ -952,15 +952,16 @@ void dnsEvent(CEPtr c, connectionPtr conn)
 	if(conn->pluginRef) // then it's a plugin //conn->refCon && (dldp->magic!='SIRC')) //saving data
 	{
 		p.refCon=(long)conn->refCon;
-		memcpy(&p.ip, &ip, sizeof(p.ip));
+		p.sas = safe_malloc(sizeof(struct sockaddr_storage));
+		memcpy(p.sas, &sas, sizeof(struct sockaddr_storage));
 		p.nameToIP=c->event<3;
 		p.search=conn->name;
 		if(p.successful)
 		{
 			if(p.nameToIP)
 			{
-				inet_ntoa_str(ip, s2);
-				p.reply=s2;
+				getnameinfo((struct sockaddr *)&sas, sas.ss_len, hbuf, sizeof(hbuf), NULL, 0, NI_NUMERICHOST);
+				CopyCStringToPascal(hbuf, p.reply);
 			}
 			else
 				p.reply=name;
@@ -972,6 +973,8 @@ void dnsEvent(CEPtr c, connectionPtr conn)
 		}
 		if(conn->pluginRef)
 			runIndPlugin(conn->pluginRef, pDNSLookupMessage, &p);
+			
+		free(p.sas);
 	}
 	else
 	{
@@ -988,8 +991,10 @@ void dnsEvent(CEPtr c, connectionPtr conn)
 		{
 			if(conn->connType==connDNSIP)
 			{
-				inet_ntoa_str(ip, s2);
-				LSConcatLSAndStr(&ls,s2,&ls);
+				char pstr[NI_MAXHOST];
+				getnameinfo((struct sockaddr *)&sas, sas.ss_len, hbuf, sizeof(hbuf), NULL, 0, NI_NUMERICHOST);
+				CopyCStringToPascal(hbuf, pstr);
+				LSConcatLSAndStr(&ls,pstr,&ls);
 			}
 			else
 				LSConcatLSAndStr(&ls,name,&ls);

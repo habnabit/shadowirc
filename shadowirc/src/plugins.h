@@ -875,7 +875,7 @@ typedef struct pHelpMenuData {
 */
 typedef struct pDNSLookupData {
 	long refCon;					//The number you passed to DNSLookup()
-	struct in_addr ip;
+	struct sockaddr_storage *sas;
 	StringPtr search;
 	StringPtr reply;
 	char nameToIP;

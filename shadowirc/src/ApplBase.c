@@ -51,6 +51,7 @@
 #include "InetConfig.h"
 #include "MenuCommands.h"
 #include "Events.h"
+#include "utils.h"
 #include "ApplBase.h"
 
 static void doTCPEvent(CEPtr message);
@@ -439,12 +440,16 @@ static void NetworkProcess(EventLoopTimerRef timer, void* data)
 	connectionEventRecord connEvt;
 	int x = -8;
 	
+	connEvt.sas = safe_malloc(sizeof(struct sockaddr_storage));
+	
 	while(GetConnectionEvent(&connEvt))
 	{
 		doTCPEvent(&connEvt);
 		if(!++x)
 			break;
 	}
+	
+	free(connEvt.sas);
 }
 
 static void InitTimers()
@@ -603,7 +608,7 @@ static void doTCPEvent(CEPtr c)
 	switch(c->event)
 	{
 		case C_Found:
-			memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
+			memcpy(&conn->ip, &((struct sockaddr_in *)c->sas)->sin_addr, sizeof(conn->ip));
 			DisplayLookupResult(conn);
                         /*
                          * The socket connect() can fail, even when non-blocking
@@ -616,7 +621,7 @@ static void doTCPEvent(CEPtr c)
 			break;
 		
 		case C_Established:
-			memcpy(&conn->ip, &c->addr, sizeof(conn->ip));
+			memcpy(&conn->ip, &((struct sockaddr_in *)c->sas)->sin_addr, sizeof(conn->ip));
 			break;
 	}
 	

@@ -867,7 +867,7 @@ static void FindAddressDNR(DNRRecordPtr drp)
 
 /*
  * FindAddress
- * Externally visable DNS function
+ * Externally visible DNS function
  * Starts FindAddressDNR as a thread
  */
 OSErr FindAddress(connectionIndex *cp, ConstStr255Param hostname)
@@ -1015,11 +1015,9 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 			pthread_mutex_lock(&c->dnrrp->lock);
 			if(c->dnrrp->ioResult == noErr)
 			{
-				struct sockaddr_in *sin;
 				cer->event = C_Found;
 				cer->value = (long)NewString(c->dnrrp->name);
-				sin = (struct sockaddr_in *)c->dnrrp->addr_list[0].ai_addr;
-				memcpy(&cer->addr, &sin->sin_addr, sizeof(cer->addr));
+				memcpy(cer->sas, c->dnrrp->addr_list[0].ai_addr, sizeof(struct sockaddr_storage));
 			} else if(c->dnrrp->ioResult != inProgress) {
 				/*
 				 * If dnrrp->ioResult is != inProgress and we hold the mutex,
@@ -1091,7 +1089,7 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
                                          * socket
                                          */
                                         if(FD_ISSET(c->sockfd, rset) || FD_ISSET(c->sockfd, wset)) {
-                                                struct sockaddr_in clientaddr;
+                                                struct sockaddr_storage clientaddr;
                                                 int len, newfd;
 
                                                 len = sizeof(clientaddr);
