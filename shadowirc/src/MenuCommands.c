@@ -471,19 +471,10 @@ static pascal void HitFontsMenu(short item)
 		{
 			if(MWActive)
 			{
-/*
-				OSStatus status;
-				FMFontFamily fontFamily;
-				FMFontStyle style;
-
-				status = GetFontFamilyFromMenuSelection(gFontsMenu, item, &fontFamily, &style);
-				if(!status)
-*/				
-				GetFNum(s, &i);
-				{
-					MWSetFontSize(MWActive, i, -1);
-					WEActivate(MWActive->we);
-				}
+				FMFontFamily fontFamily = FMGetFontFamilyFromName(s);
+				
+				MWSetFontSize(MWActive, fontFamily, -1);
+				WEActivate(MWActive->we);
 			}
 		}
 		else
