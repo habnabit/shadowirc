@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x02000004
+#define _ShadowIRC_API_Version_ 0x02000005
 
 #include <Carbon/Carbon.h>
 
@@ -594,7 +594,7 @@ struct Channel {
 	Str255 chName;					//The name of the channel.
 	Str255 topic;						//The topic.
 	char modes[8];						//Mode flags. True if on, false if not.
-	short limit;							//If +l, the limit.
+	long limit;							//If +l, the limit.
 	Str255 key;							//If +k, the key.
 	const bansP bans;					//Pointer to first ban, or nil if no bans.
 	const UserListPtr userlist;	//Pointer to first entry in this channel's userlist.

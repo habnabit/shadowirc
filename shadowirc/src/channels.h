@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -70,7 +70,7 @@ typedef struct Channel {
 	CONST Str255 chName;
 	Str255 topic;
 	char modes[8];
-	short limit;
+	long limit;
 	Str255 key;
 	CONST bansP bans;
 	CONST UserListPtr userlist;
