@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -28,8 +28,7 @@
 
 #define SetRGBColor(color, r, g, b) ((color).red = r, (color).green = g, (color).blue = b)
 
-extern pascal char inupc(char c);
-extern void DebugLS(char *str);
+extern char inupc(char c);
 
 #define LineMsg(ls) MWMessage(consoleWin, ls)
 
