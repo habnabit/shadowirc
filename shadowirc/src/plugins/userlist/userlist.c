@@ -1,6 +1,6 @@
 /*
 	ShadowIRC Userlist
-	Copyright (C) 1997-2003 John Bafford
+	Copyright (C) 1997-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -1806,7 +1806,7 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			shadowircColors = sidrIN->shadowircColors;
 			
 			l=((pVersionCheckDataPtr)sidrIN->messageData)->version;
-			if(l<0x02000008) //2.0a8
+			if(l<0x0200000B) //2.0a11
 			{
 				((pVersionCheckDataPtr)sidrIN->messageData)->version = pVersionShadowIRCTooOld;
 				displayOldVersionMsg();

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -301,7 +301,6 @@ static void nJoin(linkPtr link, LongString *ls, StringPtr from, StringPtr fromus
 	LSMakeStr(*ls);
 	
 	p.link=link;
-	p.channelName=chName;
 	p.username=from;
 	p.userhost=fromuser;
 	p.dontDisplay = !mainPrefs->displayJoin;
@@ -331,6 +330,15 @@ static void nJoin(linkPtr link, LongString *ls, StringPtr from, StringPtr fromus
 	}
 	else
 		p.channel=ChFind(chName, link);
+	
+	if(!p.channel) //it's _possible_ for the channel to not exist. e.g. muh messes up.
+	{
+		LongString tls;
+		
+		LSStrCat4(&tls, "\pJOIN for unknown channel ", chName, "\p by ", from);
+		LineMsg(&tls);
+		return;
+	}
 	
 	p.userPtr=ULAddUser(p.channel, from, fromuser);
 	runPlugins(pServerJOINMessage, &p);
@@ -373,7 +381,6 @@ static void nPart(linkPtr link, LongString *target, StringPtr from, StringPtr fr
 	p.link=link;
 	p.username=from;
 	p.userhost=fromuser;
-	p.channelName=channel;
 	p.partReason=target;
 	p.userPtr=ULFindUserName(p.channel, from);
 	p.dontDisplay = !mainPrefs->displayPart;

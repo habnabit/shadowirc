@@ -1,5 +1,5 @@
 /*	ShadowIRC Plugins Header File
-		Version 2.0a10-preliminary
+		Version 2.0a11-preliminary
 		© John Bafford 1997-2004. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x0200000A
+#define _ShadowIRC_API_Version_ 0x0200000B
 
 #include <Carbon/Carbon.h>
 #include <netinet/in.h>
@@ -1052,7 +1052,6 @@ typedef struct pNumericCommandDataRec {
 */
 typedef struct pServerJOINDataRec {
 	linkPtr link;							//The link
-	StringPtr channelName;			//The name of the channel that was joined or parted.
 	StringPtr username;				//The name of the user.
 	StringPtr userhost;				//The user@host of the user.
 	const UserListPtr userPtr;	//The UserListPtr of this user.
@@ -1066,7 +1065,6 @@ typedef struct pServerJOINDataRec {
 */
 typedef struct pServerPARTDataRec {
 	linkPtr link;					//The link
-	StringPtr channelName;			//The name of the channel that was joined or parted.
 	StringPtr username;				//The name of the user.
 	StringPtr userhost;				//The user@host of the user.
 	const UserListPtr userPtr;	//The UserListPtr of this user.
