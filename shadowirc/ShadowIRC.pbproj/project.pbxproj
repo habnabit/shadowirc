@@ -66,6 +66,27 @@
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
 		};
+		14B760000688B95F0069164D = {
+			fileEncoding = 4;
+			isa = PBXFileReference;
+			lastKnownFileType = sourcecode.c.h;
+			name = ShadowIRC_Prefix.pch;
+			path = src/ShadowIRC_Prefix.pch;
+			refType = 2;
+			sourceTree = SOURCE_ROOT;
+		};
+		14B760010688B95F0069164D = {
+			fileRef = 14B760000688B95F0069164D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		14B760990688BB3E0069164D = {
+			fileRef = 14B760000688B95F0069164D;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		14EEACA8044D95C800A80001 = {
 			children = (
 				14EEACA9044D95C800A80001,
@@ -338,6 +359,8 @@
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = src/ShadowIRC_Prefix.pch;
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				HEADER_SEARCH_PATHS = "src src/lib src/waste/public-inc src/waste/private-inc";
 				INFOPLIST_FILE = "Info-ShadowIRC.plist";
@@ -381,6 +404,7 @@
 		F4BBC26F056EE75900BD6D17 = {
 			buildActionMask = 2147483647;
 			files = (
+				14B760990688BB3E0069164D,
 				F4BBC270056EE75900BD6D17,
 				F4BBC271056EE75900BD6D17,
 				F4BBC272056EE75900BD6D17,
@@ -770,6 +794,7 @@
 				F4BBC2AE056EE75900BD6D17,
 				F4BBC2AF056EE75900BD6D17,
 				F424EAA805A5345400B68878,
+				14B760010688B95F0069164D,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1604,6 +1629,7 @@
 		};
 		F510A8AB021CB6B10132A983 = {
 			children = (
+				14B760000688B95F0069164D,
 				F552BEF70211030901A80061,
 				F552BEF90211030901A80061,
 				F552BEFB0211030901A80061,
