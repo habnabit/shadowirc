@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -33,8 +33,6 @@
 static pascal void FlashDialogItem(DialogPtr theDialog, short item);
 */
 static char matchFrom(ConstStr255Param s, ConstStr255Param mask, int i,  int j);
-static pascal void DisableMenus(short except);
-static pascal void EnableMenus(void);
 
 
 pascal void SecsToHMS(long l, LongString *ls)
@@ -749,42 +747,6 @@ static pascal void FlashDialogItem(DialogPtr theDialog, short item)
 }
 */
 
-typedef struct MBAR {
-	short num;
-	short id[1];
-} MBAR, *MBARPtr, **MBARHand;
-	
-static pascal void DisableMenus(short except)
-{
-	short rf = CurResFile();
-	MBARHand m;
-	int x;
-	
-	UseResFile(gApplResFork);
-	m = (MBARHand)Get1Resource('MBAR', 256);
-	for(x=0;x<(**m).num;x++)
-		if((**m).id[x] != except)
-			DisableMenuItem(GetMenuHandle((**m).id[x]), 0);
-
-	DrawMenuBar();
-	UseResFile(rf);
-}
-
-static pascal void EnableMenus(void)
-{
-	short rf = CurResFile();
-	MBARHand m;
-	int x;
-	
-	UseResFile(gApplResFork);
-	m = (MBARHand)Get1Resource('MBAR', 256);
-	for(x=0;x<(**m).num;x++)
-		EnableMenuItem(GetMenuHandle((**m).id[x]), 0);
-
-	DrawMenuBar();
-	UseResFile(rf);
-}
-
 pascal void SetupModalDialog(DialogPtr d, short ok, short cancel)
 {
 	SetDialogDefaultItem(d, ok);
@@ -793,14 +755,12 @@ pascal void SetupModalDialog(DialogPtr d, short ok, short cancel)
 	EnterModalDialog();
 	if(!IsVisible(GetDialogWindow(d)))
 		ShowWindow(GetDialogWindow(d));
-	DisableMenus(EditMenu);
 }
 
 pascal void FinishModalDialog(void)
 {
 	ExitModalDialog();
 	SetThemeCursor(kThemeArrowCursor);
-	EnableMenus();
 }
 
 pascal unsigned char StandardDialogFilter(DialogPtr d, EventRecord *e, short *item)
