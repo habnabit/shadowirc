@@ -66,37 +66,6 @@
 //052
 //053
 //054
-//080
-//081
-//082
-//083
-//084
-		0867D6AAFE840B52C02AAC07 = {
-			children = (
-				0867D6ABFE840B52C02AAC07,
-			);
-			isa = PBXVariantGroup;
-			name = InfoPlist.strings;
-			refType = 4;
-		};
-		0867D6ABFE840B52C02AAC07 = {
-			fileEncoding = 10;
-			isa = PBXFileReference;
-			name = English;
-			path = English.lproj/InfoPlist.strings;
-			refType = 4;
-		};
-		0867D6ACFE840B52C02AAC07 = {
-			fileRef = 0867D6AAFE840B52C02AAC07;
-			isa = PBXBuildFile;
-			settings = {
-			};
-		};
-//080
-//081
-//082
-//083
-//084
 //190
 //191
 //192
@@ -217,7 +186,6 @@
 				F5059DA302A5C0930132A983,
 				F5D4BE900323C8880132A983,
 				F5BA629F030FFFCA0132A983,
-				0867D6AAFE840B52C02AAC07,
 				F5059D9402A3470A0132A983,
 				F5F61A2F02A02E380132A988,
 				F5BA63C70315E9C70132A983,
@@ -391,7 +359,6 @@
 		20286C36FDCF999611CA2CEA = {
 			buildActionMask = 2147483647;
 			files = (
-				0867D6ACFE840B52C02AAC07,
 				F5F61A3102A02E390132A988,
 				F5059D9602A3470A0132A983,
 				F5059DAA02A5C0C70132A983,
