@@ -70,6 +70,4 @@ void main(void)
 	DrawMenuBar();
 	
 	ApplRun();
-	
-	ApplExit();
 }

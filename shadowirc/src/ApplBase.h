@@ -38,7 +38,6 @@ extern long sScrollStep;
 
 pascal void ApplRun(void);
 pascal void ApplInit(void);
-pascal void ApplExit(void);
 pascal char doQuit(LongString *reason);
 
 pascal void doUpdateEvent(EventRecord *e);

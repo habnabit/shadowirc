@@ -79,6 +79,7 @@ static pascal void doTCPEvent(CEPtr message);
 static pascal void ApplEvents(EventRecord *e);
 static pascal char doDialogEvent(EventRecord *e);
 static pascal void FinishStaleConnections(void);
+static pascal void ApplExit(void);
 
 WindowPtr ContextWindow = 0;
 
@@ -1357,6 +1358,8 @@ pascal void ApplRun(void)
 		}
 		ApplEvents(&e);
 	}
+	
+	ApplExit();
 }
 
 static pascal long GrowZoneProc(long needed)
@@ -1486,7 +1489,7 @@ static pascal void FinishStaleConnections(void)
 	}
 }
 
-pascal void ApplExit(void)
+static pascal void ApplExit(void)
 {
 	runAllPlugins(pQuitMessage, 0);
 	
