@@ -41,6 +41,7 @@
 #include "MenuCommands.h"
 #include "IRCCFPrefs.h"
 #include "StringKeys.h"
+#include "inputLine.h"
 
 enum PrefsWindowID {
 	kwPrefConn = 1001,
@@ -1551,8 +1552,11 @@ pascal void OpenPreferencesWindow(short panelID)
 		if(!xmw->protect)
 		{
 			SetWindowContentColor(xmw->w, &shadowircColors[sicWindowBG]);
-			if(xmw->il)
-				WESetStyle(weDoColor, &ts, xmw->il);
+			if(xmw->inputData)
+			{
+				WEReference il = ILGetWEFromMW(xmw);
+				WESetStyle(weDoColor, &ts, il);
+			}
 		}
 	
 	pd.canceled = cancelPrefs;

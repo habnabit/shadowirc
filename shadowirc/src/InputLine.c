@@ -46,6 +46,13 @@
 #include "CMenus.h"
 #include "IRCInput.h"
 
+struct inputAreaData {
+	WEReference il;
+
+	CharsHandle hist;
+	short hpos;
+};
+
 inputLineRec inputLine;
 
 char noFloatingInput = 0;
@@ -53,9 +60,6 @@ char noFloatingInput = 0;
 inline void IWInternalDraw(iwWidgetPtr o);
 
 static char _ILInsertLine(WEReference il, LongString *ls, char select);
-static long _ILGetHpos(MWPtr mw);
-static CharsHandle _ILGetHist(MWPtr mw);
-static void _ILSetHpos(MWPtr mw, long hp);
 
 pascal void IWRecalculateRects(void)
 {
@@ -230,7 +234,7 @@ static void IWGrow(WindowRef window, Rect r)
 	if(noFloatingInput)
 		return;
 	
-	il = ILGetWE();
+	il = inputLine.inputData->il;
 	
 	WGetBBox(window, &r);
 	
@@ -258,16 +262,6 @@ static void IWGrow(WindowRef window, Rect r)
 	IWRecalculateRects();
 }
 
-pascal char ILWEIsInput(WEReference we)
-{
-	long s = 0;
-	
-	if(!WEGetUserInfo(kInputField, &s, we) && s == kInputField)
-		return true;
-	else
-		return false;
-}
-
 #pragma mark -
 
 static void IWClick(WindowRef ilWindow, EventRef event)
@@ -286,7 +280,7 @@ static void IWClick(WindowRef ilWindow, EventRef event)
 	
 	GlobalToLocal(&where);
 	if(where.v > inputLine.statusLineHeight)
-		WEClick(where, modifiers, time, ILGetWE());
+		WEClick(where, modifiers, time, inputLine.inputData->il);
 	else
 		StatusLineClick(where, modifiers);
 	
@@ -313,13 +307,13 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 				//For now, we do nothing as it is consistent with what we used to do. This will need to be fixed, however...
 				case kEventWindowActivated:
 				case kEventWindowShown:
-					WEActivate(inputLine._il);
+					WEActivate(inputLine.inputData->il);
 					result = noErr;
 					break;
 					
 				case kEventWindowDeactivated:
 				case kEventWindowHidden:
-					WEDeactivate(inputLine._il);
+					WEDeactivate(inputLine.inputData->il);
 					result = noErr;
 					break;
 				
@@ -328,7 +322,7 @@ static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, 
 					Rect tempRect;
 					
 					EraseRect(GetWindowPortBounds(ilWindow, &tempRect));
-					WEUpdate(0, ILGetWE());
+					WEUpdate(0, inputLine.inputData->il);
 					UpdateStatusLine();
 					result = noErr;
 					break;
@@ -404,7 +398,7 @@ static OSErr IWDragTrackingHandler(DragTrackingMessage message, WindowPtr window
 	OSErr ret = dragNotAcceptedErr;
 	
 	if(!inputLocked)
-		ret = WETrackDrag(message, drag, ILGetWE());
+		ret = WETrackDrag(message, drag, inputLine.inputData->il);
 	
 	return ret;
 }
@@ -416,12 +410,32 @@ static OSErr IWDragReceiveHandler(WindowPtr window, void* refCon, DragReference 
 	
 	if(!inputLocked)
 	{
-			err= WEReceiveDrag(drag, ILGetWE());
+			err= WEReceiveDrag(drag, inputLine.inputData->il);
 			if(!err)
 				processPaste(CurrentTarget.mw, true);
 	}
 	
 	return err;
+}
+
+inputAreaDataPtr IADNew(WEReference il)
+{
+	inputAreaDataPtr iad = malloc(sizeof(inputAreaData));
+	
+	iad->il = il;
+	iad->hist = (CharsHandle)NewHandle(1);
+	(*iad->hist)[0] = 0;
+	iad->hpos = 0;
+	
+	return iad;
+}
+
+void IADDispose(inputAreaDataPtr iad)
+{
+	WEDispose(iad->il);
+	DisposeHandle(iad->hist);
+	
+	free(iad);
 }
 
 void OpenInputLine()
@@ -453,16 +467,14 @@ void OpenInputLine()
 		static EventHandlerUPP ilUPP = NULL;
 		static DragTrackingHandlerUPP iwTrackingHandlerUPP = nil;
 		static DragReceiveHandlerUPP iwReceiveHandlerUPP = nil;
+		WEReference twe;
 
 		if(mainPrefs->nonGlobalInput)
 		{
 			noFloatingInput = 1;
 			return;
 		}
-			
-		inputLine._hist=(CharsHandle)NewHandle(1);
-		(*inputLine._hist)[0]=0;
-
+		
 		s = GetIntStringPtr(spInfo, sInputline);
 		// add Live Resize and attach the Standard Handler [smcgovern]
 		inputLine.w= WCreate(&mainPrefs->inputLoc, s, kWindowResizableAttribute | kWindowLiveResizeAttribute | kWindowStandardHandlerAttribute, 0, true);
@@ -538,12 +550,14 @@ void OpenInputLine()
 			
 			// switched off DrawOffscreen, as Aqua does that anyways
 			// (prevent triple-buffering) [smcgovern]
-			WENew(&dr, &dr, weDoUndo | weDoAutoScroll | weDoMonoStyled | weDoDragAndDrop | weDoAutoBlink, &inputLine._il);
-			WESetInfo(weRefCon, &inputLine.w, inputLine._il);
-			WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, inputLine._il);
-			WESetUserInfo(kInputField, kInputField, inputLine._il);
+			WENew(&dr, &dr, weDoUndo | weDoAutoScroll | weDoMonoStyled | weDoDragAndDrop | weDoAutoBlink, &twe);
+			WESetInfo(weRefCon, &inputLine.w, twe);
+			WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, twe);
+			WESetUserInfo(kInputField, kInputField, twe);
 			
-			WEActivate(inputLine._il);
+			inputLine.inputData = IADNew(twe);
+			
+			WEActivate(twe);
 			SetPort(p0);
 			WSelect(inputLine.w);
 			
@@ -782,7 +796,8 @@ inline void IWInternalDraw(iwWidgetPtr o)
 pascal void ILAddHistory(MWPtr mw, LongString *line)
 {
 	int i;
-	CharsHandle hist = _ILGetHist(mw);
+	inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
+	CharsHandle hist = iad->hist;
 	
 	if(GetHandleSize((Handle)hist)>MAXHIST)
 	{
@@ -798,17 +813,18 @@ pascal void ILAddHistory(MWPtr mw, LongString *line)
 	{
 		line->data[i]=0;
 		PtrAndHand(&line->data[1], (Handle)hist, i);
-		_ILSetHpos(mw, GetHandleSize((Handle)hist)-1);
+		iad->hpos = GetHandleSize((Handle)hist)-1;
 	}
 }
 
-static void RecallLine(WEReference il, CharsHandle hist, int p)
+static void RecallLine(inputAreaDataPtr iad, int p)
 {
+	CharsHandle hist = iad->hist;
 	int i;
 	LongString ls;
 		
 	//On 68k ShadowIRC, the il is getting trashed here.
-	ILSetHpos(p);
+	iad->hpos = p;
 	i=0;
 	do
 	{
@@ -817,51 +833,49 @@ static void RecallLine(WEReference il, CharsHandle hist, int p)
 		ls.data[i]=(*hist)[p];
 	} while(ls.data[i]);
 	
-	ls.len=i-1;
-	ILSetText(il, &ls);
+	ls.len = i - 1;
+	IADSetText(iad, &ls);
 }
 
-pascal void RecallLineUp(void)
+void RecallLineUp(inputAreaDataPtr iad)
 {
 	int i;
-	WEReference il = ILGetWE();
 
-	if(il)
+	if(iad)
 	{
-		CharsHandle hist = ILGetHist();
+		CharsHandle hist = iad->hist;
 		
-		i = ILGetHpos();
-		if(i>0)
+		i = iad->hpos;
+		if(i > 0)
 		{
 			while((*hist)[--i])
 				;
-			RecallLine(il, hist, i);
+			RecallLine(iad, i);
 		}
 	}
 }
 
-pascal void RecallLineDown(void)
+void RecallLineDown(inputAreaDataPtr iad)
 {
 	int i;
-	WEReference il = ILGetWE();
 
-	if(il)
+	if(iad)
 	{
-		CharsHandle hist = ILGetHist();
+		CharsHandle hist = iad->hist;
 		long z = GetHandleSize((Handle)hist);
 		
-		i=ILGetHpos();
+		i = iad->hpos;
 		if(i<z-1)
 		{
 			while((*hist)[++i])
 				;
 			
 			if(i<z-1)
-				RecallLine(il, hist, i);
+				RecallLine(iad, i);
 			else
 			{
 				int ls = 0;
-				ILSetText(il, (LongString*)&ls);
+				IADSetText(iad, (LongString*)&ls);
 			}
 		}
 	}
@@ -869,168 +883,45 @@ pascal void RecallLineDown(void)
 
 #pragma mark -
 
+inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw)
+{
+	if(!noFloatingInput)
+		return inputLine.inputData;
+	else if(mw)
+		return mw->inputData;
+	else //no mw specified; try the current window and see if that works
+	{
+		mw = MWFromWindow(ActiveNonFloatingWindow());
+		if(mw)
+			return mw->inputData;
+		else
+			return 0;
+	}
+}
+
+WEReference IADGetWE(inputAreaDataPtr iad)
+{
+	if(iad)
+		return iad->il;
+	else
+		return 0;
+}
+
 WEReference ILGetWEFromMW(MWPtr mw)
 {
-	if(!noFloatingInput)
-		return inputLine._il;
-	else
-	{
-		if(mw)
-			return mw->il;
-		else
-			return 0;
-	}
-}
-
-WEReference ILGetWE(void)
-{
-	if(!noFloatingInput)
-		return inputLine._il;
-	else
-	{
-		MWPtr mw = MWFromWindow(ActiveNonFloatingWindow());
-		if(mw)
-			return mw->il;
-		else
-			return 0;
-	}
-}
-
-static CharsHandle _ILGetHist(MWPtr mw)
-{
-	if(!noFloatingInput)
-		return inputLine._hist;
-	else
-	{
-		if(mw)
-			return mw->hist;
-		else
-			return 0;
-	}
-}
-
-pascal CharsHandle ILGetHist(void)
-{
-	return _ILGetHist(MWFromWindow(ActiveNonFloatingWindow()));
-}
-
-static void _ILSetHpos(MWPtr mw, long hp)
-{
-	if(!noFloatingInput)
-		inputLine._hpos = hp;
-	else
-	{
-		if(mw)
-			mw->hpos = hp;
-	}
-}
-
-pascal void ILSetHpos(long hp)
-{
-	MWPtr mw = MWFromWindow(ActiveNonFloatingWindow()); //fix a crash in 68k - compiler bug
-	_ILSetHpos(mw, hp);
-}
-
-static long _ILGetHpos(MWPtr mw)
-{
-	if(!noFloatingInput)
-		return inputLine._hpos;
-	else
-	{
-		if(mw)
-			return mw->hpos;
-		else
-			return 0;
-	}
-}
-
-pascal long ILGetHpos(void)
-{
-	return _ILGetHpos(MWFromWindow(ActiveNonFloatingWindow()));
-}
-
-void ILSetCursorSelection(WEReference il, long start, long finish)
-{
-	WESetSelection(start, finish, il);
-}
-
-pascal void SetInputLineCursorSelection(long start, long finish)
-{
-	ILSetCursorSelection(ILGetWE(), start, finish);
-}
-
-void ILGetCursorSelection(WEReference il, long *start, long *finish)
-{
-	WEGetSelection(start, finish, il);
-}
-
-pascal void GetInputLineCursorSelection(long *start, long *finish)
-{
-	ILGetCursorSelection(ILGetWE(), start, finish);
-}
-
-char ILSetText(WEReference il, LongString *ls)
-{
-	if(il)
-	{
-		WEDeactivate(il);
-		WESetSelection(0,0x7FFFFFFF, il);
-		WEDelete(il);
-		_ILInsertLine(il, ls,false);
-		WESetSelection(0x7FFFFFFF,0x7FFFFFFF,il);
-		WESelView(il);
-		WEActivate(il);
-		return true;
-	}
-	else
-		return false;
-}
-
-pascal char ILSetTextFromMW(MWPtr mw, LongString *ls)
-{
-	if(mw && mw->il)
-		return ILSetText(mw->il, ls);
-	else
-		return ILSetText(ILGetWE(), ls);
-}
-
-pascal void SetInputLine(LongString *ls)
-{
-	ILSetText(ILGetWE(), ls);
-}
-
-char ILGetText(WEReference il, LongString *ls)
-{
-	long i;
+	inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
 	
-	if(il)
-	{
-		i=WEGetTextLength(il);
-		if(i>500)
-			i=500;
-		
-		BlockMoveData(*WEGetText(il), &ls->data[1], i);
-		ls->len=i;
-		return true;
-	}
-	else
-	{
-		ls->len = 0;
-		return false;
-	}
+	return IADGetWE(iad);
 }
 
-char ILGetTextFromMW(MWPtr mw, LongString *ls)
+void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish)
 {
-	if(mw && mw->il)
-		return ILGetText(mw->il, ls);
-	else
-		return ILGetText(ILGetWE(), ls);
+	WESetSelection(start, finish, iad->il);
 }
 
-pascal void GetInputLine(LongString *line)
+void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish)
 {
-	ILGetText(ILGetWE(), line);
+	WEGetSelection(start, finish, iad->il);
 }
 
 static char _ILInsertLine(WEReference il, LongString *ls, char select)
@@ -1057,12 +948,44 @@ static char _ILInsertLine(WEReference il, LongString *ls, char select)
 		return false;
 }
 
-pascal char ILInsertLine(MWPtr mw, LongString *ls, char select)
+char IADSetText(inputAreaDataPtr iad, LongString *ls)
 {
-	if(mw && mw->il)
-		return _ILInsertLine(mw->il, ls, select);
+	if(iad)
+	{
+		WEReference il = iad->il;
+		
+		WEDeactivate(il);
+		WESetSelection(0,0x7FFFFFFF, il);
+		WEDelete(il);
+		_ILInsertLine(il, ls,false);
+		WESetSelection(0x7FFFFFFF,0x7FFFFFFF,il);
+		WESelView(il);
+		WEActivate(il);
+		return true;
+	}
 	else
-		return _ILInsertLine(ILGetWE(), ls, select);
+		return false;
+}
+
+char IADGetText(inputAreaDataPtr iad, LongString *ls)
+{
+	long i;
+	
+	if(iad)
+	{
+		i=WEGetTextLength(iad->il);
+		if(i>500)
+			i=500;
+		
+		BlockMoveData(*WEGetText(iad->il), &ls->data[1], i);
+		ls->len=i;
+		return true;
+	}
+	else
+	{
+		ls->len = 0;
+		return false;
+	}
 }
 
 #pragma mark -
@@ -1073,8 +996,8 @@ pascal void IWLock()
 	{
 		long l = 0;
 		inputLine.lock = 1;
-		SetInputLine((LongString*)&l);
-		WEFeatureFlag(weFReadOnly, weBitSet, ILGetWE());
+		IADSetText(inputLine.inputData, (LongString*)&l);
+		WEFeatureFlag(weFReadOnly, weBitSet, inputLine.inputData->il);
 		UpdateStatusLine();
 	}
 }
@@ -1098,7 +1021,7 @@ pascal void IWUnlock()
 		EraseRect(&r);
 		inputLine.lock = 0;
 		SetPort(p0);
-		WEFeatureFlag(weFReadOnly, weBitClear, ILGetWE());
+		WEFeatureFlag(weFReadOnly, weBitClear, inputLine.inputData->il);
 	}
 }
 
@@ -1207,7 +1130,7 @@ static void IWStatusLineWidgetClick(iwWidgetPtr o, Point where, short modifiers)
 			if(i==ni)
 			{
 				LSStrLS("\p/nick ", &ls);
-				SetInputLine(&ls);
+				IADSetText(inputLine.inputData, &ls);
 			}
 			else if(i==ni-1)
 			{

@@ -50,8 +50,8 @@ char inputLocked = 0;
 static char MWNavKey(MWPtr mw, UInt32 modifiers, char c);
 
 static char MaximizeNick(Str255 nick, simpleListPtr sl);
-static void HandleNickComplete(WEReference il);
-static void HandleMsgBufferShortcut(UInt32 modifiers);
+static void HandleNickComplete(inputAreaDataPtr iad);
+static void HandleMsgBufferShortcut(inputAreaDataPtr iad, UInt32 modifiers);
 
 pascal void ServerCommands(LongString *ls, linkPtr link);
 inline void pluginMWGotText(LongString *ls, MWPtr win);
@@ -126,7 +126,8 @@ pascal void processPaste(MWPtr mw, char dragAndDrop)
 	long lastCR;
 	Ptr p;
 	char cp;
-	WEReference il = ILGetWEFromMW(mw);
+	inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
+	WEReference il = IADGetWE(iad);
 	
 	WEDeactivate(il);
 	l=WEGetTextLength(il);
@@ -153,7 +154,7 @@ pascal void processPaste(MWPtr mw, char dragAndDrop)
 		if(cp)
 		{
 			l = 0;
-			ILSetTextFromMW(mw, (LongString*)&l);
+			IADSetText(iad, (LongString*)&l);
 		}
 		//Else do nothing. It's compeltely processed unless it's not a complete line.
 	}
@@ -227,10 +228,11 @@ pascal void GetLine(char action, MWPtr mw)
 {
 	LongString line;
 	short s;
+	inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
 	
-	ILGetTextFromMW(mw, &line);
-	s=0;
-	ILSetTextFromMW(mw, (LongString*)&s);
+	IADGetText(iad, &line);
+	s = 0;
+	IADSetText(iad, (LongString*)&s);
 	ProcessLine(&line, true, action, mw);
 }
 
@@ -406,7 +408,7 @@ static char MaximizeNick(Str255 nick, simpleListPtr sl)
 	return ret;
 }
 
-static void HandleNickComplete(WEReference il)
+static void HandleNickComplete(inputAreaDataPtr iad)
 {
 	if(!CurrentTarget.inactive && CurrentTarget.type == targChannel)
 	{
@@ -414,11 +416,13 @@ static void HandleNickComplete(WEReference il)
 		long cStart, cEnd;
 		long wStart, wEnd;
 		long sel;
+		WEReference il;
 		
-		ILGetText(il, &ls);
-		ILGetCursorSelection(il, &cStart, &cEnd);
+		IADGetText(iad, &ls);
+		IADGetCursorSelection(iad, &cStart, &cEnd);
 		
 		//Get the word that the cursor is currently in...
+		il = IADGetWE(iad);
 		WEFindWord(cStart, kTrailingEdge, &wStart, &wEnd, il);
 		
 		if(wStart != wEnd)
@@ -468,8 +472,8 @@ static void HandleNickComplete(WEReference il)
 				LSDelete(&ls, wStart, wStart + sel);
 				LSInsertStr(nick, wStart - 1, &ls);
 				
-				ILSetText(il, &ls);
-				ILSetCursorSelection(il, wStart + nick[0], wStart + nick[0]);
+				IADSetText(iad, &ls);
+				IADSetCursorSelection(iad, wStart + nick[0], wStart + nick[0]);
 				
 				if(sl->eltCount > 1)
 				{
@@ -488,7 +492,7 @@ static void HandleNickComplete(WEReference il)
 	}
 }
 
-static void HandleMsgBufferShortcut(UInt32 modifiers)
+static void HandleMsgBufferShortcut(inputAreaDataPtr iad, UInt32 modifiers)
 {
 	LongString ls, ls2;
 	long p1, p2;
@@ -524,7 +528,7 @@ static void HandleMsgBufferShortcut(UInt32 modifiers)
 		s[0]=0;
 	
 	LSConcatStrAndStr("\p/msg ", s, &ls);
-	GetInputLine(&ls2);
+	IADGetText(iad, &ls2);
 	if(ls2.len > 4 && *(long*)&ls2.data[1] == '/msg' && ls2.data[5]==' ') //replace
 	{
 		LSNextArg(&ls2, 0);
@@ -542,8 +546,8 @@ static void HandleMsgBufferShortcut(UInt32 modifiers)
 	if(++p1>--p2)
 		p1--;
 	
-	SetInputLineCursorSelection(p1, p2);
-	SetInputLine(&ls);
+	IADSetCursorSelection(iad, p1, p2);
+	IADSetText(iad, &ls);
 }
 
 void Key(EventRef event, char dontRepeat)
@@ -551,10 +555,11 @@ void Key(EventRef event, char dontRepeat)
 	char c;
 	LongString ls;
 	pKeyDownDataRec p;
-	WEReference il;
 	MWPtr mw;
 	char dontProcess;
 	UInt32 modifiers;
+	inputAreaDataPtr iad;
+	WEReference il;
 	
 	GetEventParameter(event, kEventParamKeyModifiers, typeUInt32, NULL, sizeof(UInt32), NULL, &modifiers);
 	GetEventParameter(event, kEventParamKeyMacCharCodes, typeChar, NULL, sizeof(char), NULL, &c);
@@ -570,15 +575,18 @@ void Key(EventRef event, char dontRepeat)
 	p.event = event;
 	runPlugins(pKeyDownMessage, &p);
 	
-	il = ILGetWE();
-	if(!il)
+	if(!c)
 		return;
 	
-	if(!c)
+	iad = ILGetInputDataFromMW(mw);
+	
+	if(!iad)
 		return;
 	
 	if((mw && MWNavKey(mw, modifiers, c)) || dontProcess)
 		return;
+	
+	il = IADGetWE(iad);
 	
 	iwFront = true;
 	lastKey=now;
@@ -595,9 +603,9 @@ void Key(EventRef event, char dontRepeat)
 		
 		case 9: //tab
 			if(modifiers & optionKey)
-				HandleMsgBufferShortcut(modifiers);
+				HandleMsgBufferShortcut(iad, modifiers);
 			else
-				HandleNickComplete(il);
+				HandleNickComplete(iad);
 			break;
 		
 		case 27: //esc
@@ -605,8 +613,8 @@ void Key(EventRef event, char dontRepeat)
 			{
 		case 21: //0x15 = ctrl-u
 		case 4: //ctrl-d
-				ls.len=0;
-				SetInputLine(&ls);
+				ls.len = 0;
+				IADSetText(iad, &ls);
 			}
 			break;
 		
@@ -616,14 +624,14 @@ void Key(EventRef event, char dontRepeat)
 		
 		case 30:
 			if(!mainPrefs->optionToMoveInputLine || (modifiers & optionKey)==optionKey)
-				RecallLineUp();
+				RecallLineUp(iad);
 			else
 				WEKey(c, modifiers, il);
 			break;
 		
 		case 31:
 			if(!mainPrefs->optionToMoveInputLine || (modifiers & optionKey)==optionKey)
-				RecallLineDown();
+				RecallLineDown(iad);
 			else
 				WEKey(c, modifiers, il);
 			break;

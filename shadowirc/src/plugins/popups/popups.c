@@ -1,6 +1,6 @@
 /*
 	Popups - ShadowIRC plugin for context-based menus in Message Windows
-	Copyright (C) 1998-2000 John Bafford
+	Copyright (C) 1998-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -446,6 +446,7 @@ void DoCommand(pCMPopupsReturnDataPtr d, menuPtr x)
 	LongString ls;
 	channelPtr ch;
 	UserListPtr u;
+	inputAreaDataPtr iad = ILGetInputDataFromMW(0);
 
 	pstrcpy(x->command, s);
 	
@@ -507,7 +508,7 @@ void DoCommand(pCMPopupsReturnDataPtr d, menuPtr x)
 				} while(p>=0);
 				
 				//$il
-				GetInputLine(&temp);
+				IADGetText(iad, &temp);
 				do
 				{
 					p = Munger(h, 0, "$il", 3, &temp.data[1], temp.len);

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -91,55 +91,52 @@ enum statuslineFlags {
 	kBoldedPopups = 1 << 2
 };
 
+typedef struct inputAreaData inputAreaData, *inputAreaDataPtr;
+
 typedef struct inputLineRec {
 	CONST WindowPtr w;
-	CONST CharsHandle _hist;
+	CONST inputAreaDataPtr inputData;
 	CONST FontInfo fi;
 	CONST short fontnum, fontsize;
 	
 	CONST iwWidgetPtr objectList;
 	CONST iwWidgetPtr status;
 
-#ifndef _WASTE_
-	CONST Ptr _il;
-#else
-	CONST WEReference _il;
-#endif
-
 	CONST short statusLinePos, statusLineHeight;
-	short _hpos;
 	
 	char statuslineFlags;
 	CONST char lock;
 } inputLineRec, *inputLinePtr;
 
 extern inputLineRec inputLine;
+extern char noFloatingInput;
+
+#undef CONST
+
 
 #ifdef _MsgWindows_
 pascal void ILAddHistory(MWPtr mw, LongString *line);
+
+inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw);
 #endif
 
 void OpenInputLine(void);
 void StatusLineClick(Point where, short modifiers);
 
-#ifdef _WASTE_
-pascal char ILWEIsInput(WEReference we);
-WEReference ILGetWE(void);
+void IADDispose(inputAreaDataPtr iad);
 
-void ILSetCursorSelection(WEReference il, long start, long finish);
-void ILGetCursorSelection(WEReference il, long *start, long *finish);
+char IADGetText(inputAreaDataPtr iad, LongString *ls);
+char IADSetText(inputAreaDataPtr iad, LongString *ls);
 
-char ILGetText(WEReference il, LongString *ls);
-char ILSetText(WEReference il, LongString *ls);
-#endif
+void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish);
+void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish);
+
+void RecallLineUp(inputAreaDataPtr iad);
+void RecallLineDown(inputAreaDataPtr iad);
+
 
 pascal void IWLock();
 pascal void IWUnlock();
-
-pascal void SetInputLineCursorSelection(long start, long finish);
-pascal void GetInputLineCursorSelection(long *start, long *finish);
-pascal void SetInputLine(LongString *ls);
-pascal void GetInputLine(LongString *line);
 
 pascal iwWidgetPtr IWNewWidget(long type, short align, short width);
 pascal void IWRecalculateRects(void);
@@ -150,27 +147,10 @@ pascal short IWOverride(long type, iwWidgetPtr *object);
 
 #ifdef _MsgWindows_
 #ifdef _WASTE_
-char ILSetTextFromMW(MWPtr mw, LongString *ls);
-char ILGetTextFromMW(MWPtr mw, LongString *ls);
-#endif
-#endif
-
-#undef CONST
-
-pascal void RecallLineUp(void);
-pascal void RecallLineDown(void);
-
-#ifdef _MsgWindows_
-#ifdef _WASTE_
+inputAreaDataPtr IADNew(WEReference il);
 WEReference ILGetWEFromMW(MWPtr mw);
+WEReference IADGetWE(inputAreaDataPtr iad);
 #endif
-pascal char ILInsertLine(MWPtr mw, LongString *ls, char select);
 #endif
-
-pascal CharsHandle ILGetHist(void);
-pascal void ILSetHpos(long hp);
-pascal long ILGetHpos(void);
-
-extern char noFloatingInput;
 
 #endif

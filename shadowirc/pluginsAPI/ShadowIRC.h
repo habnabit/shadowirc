@@ -676,20 +676,23 @@ enum statuslineFlags {
 	kBoldedPopups = 1 << 2			//Bold the nick/channel/server name
 };
 
+/*
+	inputAreaData: A private structure used to maintain portions of the inputline data
+*/
+typedef struct inputAreaData inputAreaData, *inputAreaDataPtr;
+
 typedef struct inputLineRec {
 	const WindowPtr window;				//The inputwindow. If nil, it means there's no global floating inputline.
-	const CharsHandle history;			//The text buffer
+	const inputAreaDataPtr inputData; //Input data
 	const FontInfo fi;							//The status line font.
 	const short fontnum;						//The status line font number
 	const short fontsize;						//The status line font size
 	
 	const iwWidgetPtr widgetList;		//Status line widget list
 	const Ptr reserved2;
-	const Ptr inputline;						//The WEReference for the inputline text field.
 
 	const short statusLinePos;
 	const short statusLineHeight;		//The height of the status line
-	const short hpos;							//The position in the inputline history
 	
 	char statuslineFlags;						//umodeFlags
 } inputLineRec, *inputLinePtr;
@@ -2241,19 +2244,6 @@ pascal short IWOverride(long type, iwWidgetPtr *widget);
 					return value: error condition. See enum iwOverrideErrors
 */
 
-char ILGetTextFromMW(MWPtr mw, LongString *ls);
-/*	Gets the inputline of a given window.
-		Input:	mw - The message window to get the input from, or nil for the frontmost input.
-		Output:	ls - The text of the inputfield.
-					return value: true if an input field was found, false if not.
-*/
-
-char ILSetTextFromMW(MWPtr mw, LongString *ls);
-/*	Sets the inputline of a given window.
-		Input:	mw - The message window to set the input for, or nil for the frontmost input.
-		Output:	ls - The text to set the inputfield to.
-					return value: true if an input field was found, false if not.
-*/
 
 /*	Depreciated Functions:
 		These function still work now, however their use is depreciated since ShadowIRC now has the ability
@@ -2266,30 +2256,40 @@ pascal void UpdateStatusLine(void);
 		Output:	none
 */
 
-pascal void SetInputLineCursorSelection(long start, long finish);
+inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw);
+/*
+	Gets the inputAreaDataPtr for the current message window (or the global inputline).
+	Input:	mw - The MWPtr of the window to get the input reference from. NULL for the front window.
+	Output: return value: the IAD of the specified window, or NULL if none found.
+*/
+
+char IADGetText(inputAreaDataPtr iad, LongString *ls);
+/*	Gets the inputline text from a given IAD reference.
+		Input:	iad - The IAD to get the input from
+		Output:	ls - The text of the inputfield.
+					return value: true if an input field was found, false if not.
+*/
+
+char IADSetText(inputAreaDataPtr iad, LongString *ls);
+/*	Sets the inputline of a given IAD reference.
+		Input:	iad - The IAD to get to set the input for
+		Output:	ls - The text to set the inputfield to.
+					return value: true if an input field was found, false if not.
+*/
+
+void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish);
 /*	Sets the position of the selection on the input line.
-		Input:	start - The start of the selection.
+		Input:	iad - The IAD reference of the input field
+					start - The start of the selection.
 					finish - The end of the selection. If start == finish, insertion point is placed at start.
 		Output:	none
 */
 
-pascal void GetInputLineCursorSelection(long *start, long *finish);
+void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish);
 /*	Gets the selection in the inputline.
-		Input:	none
+		Input:	iad - The IAD reference of the input field
 		Output:	start - The start of the selection.
 					finish - The end of the selection.
-*/
-
-pascal void GetInputLine(LongString *line);
-/*	Gets the text in the input line.
-		Input:	none
-		Output:	line - LongString containing the text of the input line.
-*/
-
-pascal void SetInputLine(LongString *ls);
-/*	Sets the text in the input line.
-		Input:	ls - LongString for inputline.
-		Output:	none
 */
 
 

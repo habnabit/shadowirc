@@ -573,7 +573,7 @@ static OSStatus DoResumeEvent(EventHandlerCallRef handlerCallRef, EventRef event
 	InitCursor();
 	
 	if(!noFloatingInput)
-		WEActivate(ILGetWE());
+		WEActivate(ILGetWEFromMW(0));
 	
 	NotifyRemove(); //Clear notification manager requests.
 
@@ -590,7 +590,7 @@ static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef even
 	inBackground=1;
 	
 	if(!noFloatingInput)
-		WEDeactivate(ILGetWE());
+		WEDeactivate(ILGetWEFromMW(0));
 	
 	p.inBackground=inBackground;
 	runPlugins(pContextSwitchMessage, &p);

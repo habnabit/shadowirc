@@ -332,6 +332,7 @@ static OSErr MWWidgetTrackDrag(MWPtr mw,  Point mouse, short state, DragReferenc
 static OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage message, DragReference drag)
 {
 	OSErr ret;
+	WEReference il;
 	
 	if(o)
 	{
@@ -364,7 +365,8 @@ static OSErr MWTrackDragPane2(mwPanePtr o, Point mouse, DragTrackingMessage mess
 				break;
 			
 			case mwInputPane:
-				ret = WETrackDrag(message, drag, mw->il);
+				il = ILGetWEFromMW(mw);
+				ret = WETrackDrag(message, drag, il);
 				break;
 
 			default:

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -36,6 +36,7 @@
 #include "AppearanceHelp.h"
 #include "inline.h"
 #include "TextManip.h"
+#include "InputLine.h"
 
 static void MWDestroyWidget2(mwWidgetPtr w);
 inline mwPanePtr MWInsertPaneAfter(MWPtr mw, short align);
@@ -47,6 +48,7 @@ static void UpdateInputRegion(mwPanePtr w)
 {
 	MWPtr mw = w->mw;
 	LongRect lr;
+	WEReference il = IADGetWE(mw->inputData);
 	
 	EraseRect(&w->drawArea);
 	
@@ -55,18 +57,17 @@ static void UpdateInputRegion(mwPanePtr w)
 	lr.bottom = w->drawArea.bottom - 6;
 	lr.right = w->drawArea.right-6;
 	
-	WESetDestRect(&lr, mw->il);
-	WESetViewRect(&lr, mw->il);
+	WESetDestRect(&lr, il);
+	WESetViewRect(&lr, il);
 	
-	WECalText(mw->il);
-	WESelView(mw->il);
-	WEUpdate(0, mw->il);
+	WECalText(il);
+	WESelView(il);
+	WEUpdate(0, il);
 }
 
 static void MWInputPaneClick(mwPanePtr o, Point where, float time, UInt32 modifiers)
 {
 	extern char iwFront;
-	
 	MWPtr mw = o->mw;
 	
 	iwFront = true;
@@ -105,7 +106,9 @@ static void MWInputPaneClick(mwPanePtr o, Point where, float time, UInt32 modifi
 	}
 	else if(where.v >= o->drawArea.top + 8) //field
 	{
-		WEClick(where, modifiers, time, mw->il);
+		WEReference il = IADGetWE(mw->inputData);
+				
+		WEClick(where, modifiers, time, il);
 	}
 }
 
@@ -116,6 +119,7 @@ static void DrawInputPane(mwPanePtr o)
 	char ia;
 	RGBColor oldFront, oldBack;
 	RgnHandle rgn1, rgn2;
+	WEReference il = IADGetWE(mw->inputData);
 	
 	r = o->drawArea;
 	r.bottom = r.top + 5;
@@ -158,13 +162,13 @@ static void DrawInputPane(mwPanePtr o)
 	
 	if(ia)
 	{
-		WEActivate(mw->il);
-		WEUpdate(0, mw->il);
+		WEActivate(il);
+		WEUpdate(0, il);
 	}
 	else
 	{
-		WEUpdate(0, mw->il);
-		WEDeactivate(mw->il);
+		WEUpdate(0, il);
+		WEDeactivate(il);
 	}
 	RGBBackColor(&oldBack);
 }
@@ -215,10 +219,8 @@ pascal void MWDestroyAllPanes(MWPtr mw)
 			}
 			else if(o->type == mwInputPane)
 			{
-				if(mw->hist)
-					DisposeHandle(mw->hist);
-				if(mw->il)
-					WEDispose(mw->il);
+				IADDispose(mw->inputData);
+				mw->inputData = 0;
 			}
 		}
 		else
@@ -266,10 +268,12 @@ pascal void MWPaneActivate(MWPtr mw, char activate)
 				DrawMWinStatus(mw);
 			else if(o->type == mwInputPane)
 			{
+				WEReference il = IADGetWE(mw->inputData);
+				
 				if(activate)
-					WEActivate(mw->il);
+					WEActivate(il);
 				else
-					WEDeactivate(mw->il);
+					WEDeactivate(il);
 				DrawInputPane(o);
 			}
 		}

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -364,7 +364,7 @@ pascal void HitEditMenu(short item)
 
 	we=0;
 	if(iwFront)
-		we=ILGetWE();
+		we = ILGetWEFromMW(0);
 	else if(mwFront)
 		we=activeMW->we;
 	else if(otherFront) //this was a dangerous assumption.
@@ -380,13 +380,13 @@ pascal void HitEditMenu(short item)
 				if(we)
 				{
 					if(!noFloatingInput)
-						WEUndo(ILGetWE());
+						WEUndo(ILGetWEFromMW(0));
 				}
 				break;
 				
 			case 3: //cut
 				if(iwFront)
-					WECut(ILGetWE());
+					WECut(ILGetWEFromMW(0));
 				break;
 			
 			case 4: //copy
@@ -396,7 +396,7 @@ pascal void HitEditMenu(short item)
 			case 5: //paste
 				if(mwFront || iwFront)
 				{
-					WEReference il = ILGetWE();
+					WEReference il = ILGetWEFromMW(0);
 					
 					if(il)
 					{

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -347,6 +347,8 @@ pascal void ProcessShortcutText(LongString *ls, short *cursorPos, short *endPos)
 		lh=NewHandle(ls->len);
 		if(lh)
 		{
+			inputAreaDataPtr iad = ILGetInputDataFromMW(0);
+			
 			BlockMoveData(&ls->data[1], *lh, ls->len);
 			
 			if(CurrentTarget.bad)
@@ -384,7 +386,7 @@ pascal void ProcessShortcutText(LongString *ls, short *cursorPos, short *endPos)
 			
 			PluginShortcutText(lh);
 			
-			GetInputLine(&ilt);
+			IADGetText(iad, &ilt);
 			RepeatMunger(lh, 0, "$il", 3, &ilt.data[1], ilt.len);
 			
 			if(cursorPos)
@@ -413,7 +415,8 @@ static void ParseShortcutText(ConstStr255Param s)
 	short cp, ep;
 	Handle h;
 	long l1,l2;
-	WEReference il = ILGetWE();
+	inputAreaDataPtr iad = ILGetInputDataFromMW(0);
+	WEReference il = IADGetWE(iad);
 	
 	if(!il)
 		return;
@@ -444,7 +447,7 @@ static void ParseShortcutText(ConstStr255Param s)
 			LSStrLS(s3, &ls);
 			pdelete(s2, 1, p+1);
 			ProcessShortcutText(&ls, &cp, &ep);
-			SetInputLine(&ls);
+			IADSetText(iad, &ls);
 			GetLine(false, CurrentTarget.mw);
 		}
 		else
@@ -460,28 +463,28 @@ static void ParseShortcutText(ConstStr255Param s)
 				{
 					h=NewHandle(l2-l1);
 					WECopyRange(l1, l2, h, 0, 0, il);
-					SetInputLine(&ls);
+					IADSetText(iad, &ls);
 					if(ep<0)
 						ep=cp;
-					SetInputLineCursorSelection(cp,ep);
+					IADSetCursorSelection(iad, cp, ep);
 					if(l2-l1!=0)
 					{
 						HLock(h);
 						WEInsert(*h, l2-l1, 0, 0, il);
-						SetInputLineCursorSelection(cp, (l2-l1)+cp);
+						IADSetCursorSelection(iad, cp, (l2-l1)+cp);
 					}
 					DisposeHandle(h);
 				}
 				else
 				{
-					SetInputLine(&ls);
+					IADSetText(iad, &ls);
 					if(ep<cp)
 						ep=cp;
-					SetInputLineCursorSelection(cp,ep);
+					IADSetCursorSelection(iad, cp,ep);
 				}
 			}
 			else
-				SetInputLine(&ls);
+				IADSetText(iad, &ls);
 			s2[0]=0;
 		}
 	}while(s2[0]);

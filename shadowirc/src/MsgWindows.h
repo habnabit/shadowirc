@@ -126,7 +126,7 @@ struct MessageWindow {
 	const short unused;
 	CONST short winType;			//The type of window. (What to do if a user tries to close it.)
 	CONST ControlHandle vscr;	//The vertical scroll bar.
-
+	
 #ifndef _WASTE_
 	CONST Ptr we;
 #else
@@ -158,13 +158,7 @@ struct MessageWindow {
 
 	CONST mwPanePtr textPane, widgetsPane;
 
-	CONST CharsHandle hist;
-#ifndef _WASTE_
-	CONST Ptr il;
-#else
-	CONST WEReference il;
-#endif
-	short hpos;
+	struct inputAreaData *inputData;
 	
 	char inactive;
 	CONST unsigned char channelWindowNumber;

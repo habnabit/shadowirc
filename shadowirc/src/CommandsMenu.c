@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -22,9 +22,9 @@
 #include "LongStrings.h"
 #include "IRCGlobals.h"
 
-#include "InputLine.h"
 #include "connections.h"
 #include "MsgWindows.h"
+#include "InputLine.h"
 #include "channels.h"
 #include "IRCChannels.h"
 #include "utils.h"
@@ -39,8 +39,9 @@ void HitCommandsMenu(short item)
 	short len;
 	Str255 s2;
 	short modifiers = 0;
+	inputAreaDataPtr iad = ILGetInputDataFromMW(0);
 	
-	GetInputLine(&il);
+	IADGetText(iad, &il);
 	len = il.len;
 	
 	if(!CurrentTarget.bad && CurrentTarget.chan)
@@ -95,16 +96,16 @@ void HitCommandsMenu(short item)
 				
 				SAppend1(s2, ' ');
 				LSConcatStrAndStrAndStr("\p/invite ", s2, targ, &ls);
-				SetInputLine(&ls);
-				SetInputLineCursorSelection(8, 8+s2[0]);
+				IADSetText(iad, &ls);
+				IADSetCursorSelection(iad, 8, 8+s2[0]);
 			}
 			else
 			{
 				LSConcatStrAndStr("\p/invite  ", targ, &ls);
 				s2[0] = 1;
 			}
-			SetInputLine(&ls);
-			SetInputLineCursorSelection(8,8+s2[0]-1);
+			IADSetText(iad, &ls);
+			IADSetCursorSelection(iad, 8,8+s2[0]-1);
 			ls.len=0;
 			break;
 		
@@ -154,7 +155,7 @@ void HitCommandsMenu(short item)
 		else if(tack == 2)
 			LSConcatLSAndLS(&ls, &il, &ls);
 	
-		SetInputLine(&ls);
+		IADSetText(iad, &ls);
 	}
 }
 

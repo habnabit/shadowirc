@@ -722,7 +722,8 @@ static char CMIW(Point where)
 	short outMenuID;
 	unsigned short outMenuItem;
 	long outUserSelectionType;
-	WEReference il = ILGetWE();
+	inputAreaDataPtr iad = ILGetInputDataFromMW(0);
+	WEReference il = IADGetWE(iad);
 	
 	CMCreate(&d);
 	d.type = cmInputline;
@@ -735,7 +736,7 @@ static char CMIW(Point where)
 	{
 		LongString ls;
 		
-		GetInputLine(&ls);
+		IADGetText(iad, &ls);
 		if(ls.len)
 		{
 			CMILAdd(&d, GetIntStringPtr(spCM, sCutAll), mcILCut, 0);

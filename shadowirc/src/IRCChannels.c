@@ -1635,37 +1635,37 @@ void ChannelMsg(linkPtr link, ConstStr255Param ch, const LongString *msg)
 
 MWPtr ChJoin(channelPtr ch)
 {
-	MWPtr w;
+	MWPtr mw;
 	long i;
 	LongString ls;
 	linkPtr link=ch->link;
 	mwWidgetPtr o;
 	char createdNewWindow = 0;
 	
-	w=ch->window;
+	mw = ch->window;
 	
-	if(!w)
-		w = MWFindChannel(ch);
+	if(!mw)
+		mw = MWFindChannel(ch);
 	
-	if(!w)
+	if(!mw)
 	{
-		i=linkWinNull(link);
+		i = linkWinNull(link);
 		
 		LSConcatStrAndStrAndStr(ch->chName, "\p: ", link->linkPrefs->linkName, &ls);
 		LSMakeStr(ls);
-		w=MWNew(ls.data, chanWin, link, i);
-		if(w)
+		mw = MWNew(ls.data, chanWin, link, i);
+		if(mw)
 		{
-			wmAdd(w);
-			ch->window=w;
-			MWSetChannel(w, ch);
+			wmAdd(mw);
+			ch->window = mw;
+			MWSetChannel(mw, ch);
 
-			linkWinAdd(w, i);
+			linkWinAdd(mw, i);
 
 			createdNewWindow = true;
 
 			if(mainPrefs->autoLogging)
-				MWStartLogging(w);
+				MWStartLogging(mw);
 		}
 	}
 	else
@@ -1673,57 +1673,48 @@ MWPtr ChJoin(channelPtr ch)
 		LSConcatStrAndStrAndStr(ch->chName, "\p: ", link->linkPrefs->linkName, &ls);
 		LSMakeStr(ls);
 		
-		wmChange(w, ls.data);
-		MWSetChannel(w, ch);
-		ch->window=w;
-		w->inactive=0;
+		wmChange(mw, ls.data);
+		MWSetChannel(mw, ch);
+		ch->window = mw;
+		mw->inactive = 0;
 		
 		//Only need to fix the target if the window already exited.
-		if(CurrentTarget.bad && ActiveNonFloatingWindow() == w->w)
+		if(CurrentTarget.bad && ActiveNonFloatingWindow() == mw->w)
 		{
-			SetTarget(w, &CurrentTarget);
+			SetTarget(mw, &CurrentTarget);
 			UpdateStatusLine();
 		}
 	}
 
 	if(ch->chName[1]!= '+' && !mainPrefs->noModesWidget) //don't add modes widget if modeless channel
 	{
-		o = MWNewWidget(w, mwModesWidget, mwAlignLeft, mwModesWidgetWidth);
+		o = MWNewWidget(mw, mwModesWidget, mwAlignLeft, mwModesWidgetWidth);
 		if(o)
 			o->data = (long)NewPtrClear(sizeof(mwModesWidgetData));
 	}
 
 	if(createdNewWindow)
-	{
-		if(mainPrefs->dontActivateNewWindowsIfInputlineText)
-		{
-			GetInputLine(&ls);
-			if(!ls.len)
-				WSelect(w->w);
-			else
-				ShowWindow(w->w);
-		}
-		else
-			WSelect(w->w);
-	}
+		DoJoinSelWin(mw);
 	
-	return w;
+	return mw;
 }
 
-void DoJoinSelWin(MWPtr w)
+void DoJoinSelWin(MWPtr mw)
 {
 	if(mainPrefs->dontActivateNewWindowsIfInputlineText)
 	{
 		LongString ls;
+		inputAreaDataPtr iad = ILGetInputDataFromMW(mw);
+		
+		IADGetText(iad, &ls);
 
-		GetInputLine(&ls);
 		if(!ls.len)
-			WSelect(w->w);
+			WSelect(mw->w);
 		else
-			ShowWindow(w->w);
+			ShowWindow(mw->w);
 	}
 	else
-		WSelect(w->w);
+		WSelect(mw->w);
 }
 
 MWPtr DoJoinQuery(ConstStr255Param q, linkPtr link)

@@ -46,6 +46,7 @@
 #include "MoreFilesX.h"
 #include "IRCCFPrefs.h"
 #include "StringKeys.h"
+#include "InputLine.h"
 
 #define kLogFolderNameKey CFSTR("LogFolderName")
 
@@ -1100,27 +1101,23 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 				{
 					LongRect dr;
 					TextStyle ts;
-
+					WEReference il;
+					
 					MWNewPane(h, mwInputPane, mwPaneBottom, 32, -1);
-					h->hist=(CharsHandle)NewHandle(1);
-					(*h->hist)[0]=0;
-					h->hpos = 0;
-
+					
 					dr.left= dr.top = dr.right = dr.bottom = 0;
 					
-					WENew(&dr, &dr, weDoUndo | weDoAutoScroll | weDoMonoStyled | weDoDragAndDrop | weDoAutoBlink, &h->il);
-					WESetInfo(weRefCon, &h, h->il);
-					WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, h->il);
-					WESetUserInfo(kInputField, kInputField, h->il);
+					WENew(&dr, &dr, weDoUndo | weDoAutoScroll | weDoMonoStyled | weDoDragAndDrop | weDoAutoBlink, &il);
+					WESetInfo(weRefCon, &h, il);
+					WESetInfo(wePreTrackDragHook, &sPreTrackerUPP, il);
+					WESetUserInfo(kInputField, kInputField, il);
 					ts.tsColor = shadowircColors[sicStandard];
-					WESetStyle(weDoColor, &ts, h->il);
+					WESetStyle(weDoColor, &ts, il);
+					
+					h->inputData = IADNew(il);
 				}
 				else
-				{
-					h->hist = 0;
-					h->il = 0;
-					h->hpos = 0;
-				}
+					h->inputData = 0;
 
 			MWPaneRecalculate(h);
 			MWRecalculateRects(h);
