@@ -1329,6 +1329,7 @@ pascal void DCCConnOpened(connectionPtr *cn)
 
 static void DCCGetLineChat(connectionPtr conn, CEPtr c)
 {
+	#pragma unused(c)
 	int i;
 	long nn;
 	LongString ls;

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -60,6 +60,7 @@ static void DoModesWidget(mwWidgetPtr o, Point p);
 static void StandardIconWidget(mwWidgetPtr o, CIconHandle icon[]);
 static OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData);
 static void TopicWindowSet(WindowRef dlgWindow, channelPtr ch);
+static void ChCloseTopicWindow(channelPtr ch);
 
 target CurrentTarget = {0, 0, 0, 0, 1, 0, 0};
 
@@ -362,7 +363,7 @@ static void DeleteTopicWindowInfo(WindowPtr parent, WindowPtr sheet)
 	DisposePtr((void*)twi);
 }
 
-void ChCloseTopicWindow(channelPtr ch)
+static void ChCloseTopicWindow(channelPtr ch)
 {
 	WindowPtr parent = ch->window->w;
 	WindowPtr sheet;
@@ -650,6 +651,7 @@ typedef struct mkData {
 
 static OSStatus ModeLEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
+	#pragma unused(myHandler)
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
 	WindowRef aboutWindow;
@@ -699,6 +701,7 @@ static OSStatus ModeLEventHandler(EventHandlerCallRef myHandler, EventRef event,
 
 static OSStatus ModeKEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
+	#pragma unused(myHandler)
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
 	WindowRef aboutWindow;

@@ -5,7 +5,7 @@
 			Landon Fuller <landonf@fullers.org>
 			Chris Campbell <chris_campbell@mac.com>
 			Sean McGovern <smcgovern@users.sourceforge.net>
-	Copyright (C) 2002-3 Landon Fuller, Chris Campbell, John Bafford, Sean McGovern
+	Copyright (C) 2002-2003 Landon Fuller, Chris Campbell, John Bafford, Sean McGovern
 	http://www.shadowirc.com
 
 	This program is free software; you can redistribute it and/or
@@ -152,6 +152,9 @@ TCPStateType doTCPActiveOpen(int *sockfd, struct sockaddr *remotehost, u_short r
 TCPStateType doTCPListenOpen(int af, int *sockfd, u_short localport, int backlog);
 
 int GetConnectionSocket(long cp);
+
+static ssize_t read_fd(int fd, void *ptr, size_t nbytes, int *recvfd);
+static int ident_bind(void);
 
 #pragma mark -
 
@@ -345,7 +348,8 @@ static int nblk_accept(int sockfd, struct sockaddr *addr, int *addrlen)
         return retval;
 }
 
-ssize_t read_fd(int fd, void *ptr, size_t nbytes, int *recvfd) {
+static ssize_t read_fd(int fd, void *ptr, size_t nbytes, int *recvfd)
+{
 	struct msghdr msg;
 	struct iovec iov[1];
 	ssize_t n;
@@ -383,7 +387,8 @@ ssize_t read_fd(int fd, void *ptr, size_t nbytes, int *recvfd) {
 	return (n);
 }
 
-int ident_bind(void) {
+static int ident_bind(void)
+{
 	int fd = -1, sockfd[2], status;
 	char c, path[MAXPATHLEN];
         CFBundleRef bundle;

@@ -1950,15 +1950,18 @@ pascal void WEIdle(UInt32 *maxSleep, WEHandle hWE)
 }
 
 //Auto-blink timer by jbafford [JKB]
+static void _WEAutoBlinkTimer(EventLoopTimerRef timer, void* data);
+static void _WEStartAutoBlink(WEHandle hWE);
 
 static void _WEAutoBlinkTimer(EventLoopTimerRef timer, void* data)
 {
+	#pragma unused(timer)
 	WEHandle hWE = (WEHandle)data;
 	
 	WEIdle(0, hWE);
 }
 
-void _WEStartAutoBlink(WEHandle hWE)
+static void _WEStartAutoBlink(WEHandle hWE)
 {
 	static EventLoopTimerUPP abUPP = NULL;
 	float ticks;

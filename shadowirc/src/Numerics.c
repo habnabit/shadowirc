@@ -36,6 +36,8 @@
 #include "IRCNotify.h"
 #include "TextManip.h"
 
+static void UpdateUserInfo(linkPtr link, ConstStr63Param nick, ConstStr255Param userhost, char isOper, char isAway);
+
 pascal void doMODE(linkPtr link, ConstStringPtr channel, StringPtr modeChange, ConstStringPtr setBy, LongString *tls);
 
 static void AttemptNickRegainNickChange(linkPtr link, ConstStringPtr cantUse)
@@ -151,7 +153,7 @@ static void n005ServerFeatures(linkPtr link, LongString *ls)
 	}
 }
 
-void UpdateUserInfo(linkPtr link, ConstStr63Param nick, ConstStr255Param userhost, char isOper, char isAway)
+static void UpdateUserInfo(linkPtr link, ConstStr63Param nick, ConstStr255Param userhost, char isOper, char isAway)
 {
 	UserListPtr ul;
 	channelPtr ch;

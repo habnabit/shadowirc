@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -57,6 +57,7 @@ enum serviceStrings {
 };
 
 inline void callIndPlugin(plugsPtr ref, void* msgD, short msg);
+inline void callIndPluginRF(plugsPtr ref, void* msgD, short msg);
 inline void initSIDR(void);
 static void AddService(FourCharCode serviceType, plugsPtr ref);
 static void InitPlugins(void);
