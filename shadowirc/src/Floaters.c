@@ -22,8 +22,6 @@
 #include "Floaters.h"
 #include "IRCGlobals.h"
 
-extern char inBackground;
-
 Rect *WGetBBox(WindowPtr w, Rect *rr)
 {
     RgnHandle r = NewRgn();
