@@ -126,7 +126,6 @@ pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nic
 				LSConcatLSAndStrAndStr(ls, "\p             ", nick, ls);
 			else
 				LSConcatLSAndStrAndStr(ls, "\p * ", nick, ls);
-			LSAppend1(*ls, ' ');
 		}
 		else if(type & kNickPrivmsg)
 		{
@@ -134,7 +133,7 @@ pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nic
 			LSConcatLSAndStr(ls, nickC, ls);
 			LSAppend1(*ls, '*');
 			LSConcatLSAndStr(ls, nick, ls);
-			LSAppend2(*ls, '* ');
+			LSAppend1(*ls, '*');
 		}
 		else if(type & kNickOther)
 		{
@@ -142,7 +141,7 @@ pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nic
 			LSConcatLSAndStr(ls, nickC, ls);
 			LSAppend1(*ls, '(');
 			LSConcatLSAndStr(ls, nick, ls);
-			LSAppend2(*ls, ') ');
+			LSAppend1(*ls, ')');
 		}
 		else if(mainPrefs->ircIIDisplay)
 		{
@@ -150,14 +149,15 @@ pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nic
 			LSConcatLSAndStr(ls, nickC, ls);
 			LSAppend1(*ls, '<');
 			LSConcatLSAndStr(ls, nick, ls);
-			LSAppend2(*ls, '> ');
+			LSAppend1(*ls, '>');
 		}
 		else
 		{
 			extraSpace = 0;
 			LSConcatLSAndStr(ls, nick, ls);
-			LSAppend2(*ls, ': ');
+			LSAppend1(*ls, ':');
 		}
+		LSAppend1(*ls, ' ');
 		
 		if(mainPrefs->textIndenting && extraSpace != -1)
 		{
@@ -172,7 +172,8 @@ pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nic
 			LSConcatLSAndStrAndStr(ls, "\p> -", nick, ls);
 		else
 			LSConcatLSAndStrAndStr(ls, "\p-", nick, ls);
-		LSAppend2(*ls, '- ');
+		LSAppend1(*ls, '-');
+		LSAppend1(*ls, ' ');
 	}
 }
 
