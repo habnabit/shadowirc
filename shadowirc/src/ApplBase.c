@@ -398,13 +398,8 @@ pascal char doQuit(LongString *reason)
 			save = 1;
 		else
 		{
-			int sel = 0;
-
 			save = 0;
 			if(mainPrefs->quitAction == qaConfirm)
-				sel = 1;
-
-			if(sel)
 			{
 				DialogPtr d=GetNewDialog(131, 0, (WindowPtr)-1);
 				SetupModalDialog(d, 1, 5);
@@ -529,8 +524,8 @@ static pascal char CheckMem(void)
 	{
 		LSStrLS("\pQUIT :Ran out of memory", &ls);
 		linkfor(link, firstLink)
-			if(link->serverStatus==S_CONN)
-				SendCommand(link, &ls);
+			SendCommand(link, &ls);
+			
 		Delay(90, (unsigned long*)&i);
 		
 		SysBeep(0);

@@ -125,6 +125,7 @@ pascal void ServerOK(short status, linkPtr link)
 			n=6;
 			break;
 		case C_Closed:
+		case -23008: //connection dodesn't exist
 			a=S_OFFLINE;
 			n=S_OFFLINE;
 			break;
@@ -139,10 +140,10 @@ pascal void ServerOK(short status, linkPtr link)
 			a = S_CONN;
 			break;
 		default:
-			a=link->serverStatus;
 			NumToString(status, s);
 			LSStrCat4(&ls, "\pserverok:unknown status: ", s, "\p: ", link->linkPrefs->linkName);
 			LineMsg(&ls);
+			return;
 	}
 	
 	link->serverStatus=a;
@@ -170,11 +171,7 @@ pascal void ConnPut(connectionPtr *cn, const void* p, long len)
 	conn->dataOut += len;
 	status = ConnSend(conn, p, len, false);
 	if(conn->connType==connIRC)
-	{
 		ServerOK(status, conn->link);
-		if(status == -23008)
-			deleteConnection(cn);
-	}
 	else if(conn->connType==connPLUGIN)
 	{
 		pConnectionData p;
@@ -282,9 +279,9 @@ pascal char connection3(linkPtr link, char reg)
 {
 	pServiceCWLinkStateChangeData p;
 	
+	p.link = link;
 	if(link->conn->ip!=-1)
 	{
-		p.link = link;
 		link->serverStatus=S_CONN;
 		p.connectStage = link->conn->connectStage=csConnected;
 		runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
@@ -343,6 +340,7 @@ pascal void connection2(connectionPtr conn)
 		SMPrefix(&ls, dsConsole);
 		if(conn->socksType == connIRC)
 		{
+			p.link = link;
 			link->serverStatus=S_OPENING;
 			UpdateStatusLine();
 		}
@@ -354,7 +352,6 @@ pascal void connection2(connectionPtr conn)
 			conn->connectStage=csOpeningConnection;
 			if(conn->socksType == connIRC)
 			{
-				p.link = link;
 				p.connectStage = conn->connectStage;
 				runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
 			}
@@ -364,7 +361,6 @@ pascal void connection2(connectionPtr conn)
 			conn->connectStage = csFailedToConnect;
 			if(conn->socksType == connIRC)
 			{
-				p.link = link;
 				p.connectStage = conn->connectStage;
 				runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
 				ServerOK(C_FailedToOpen, link);
@@ -444,6 +440,8 @@ pascal void startConnection(linkPtr link)
 		search = link->conn->socksName;
 	else
 		search = link->conn->name;
+	
+	p.link = link;
 	if(!FindAddress(&link->conn->private_socket, search))
 	{
 		if(mainPrefs->firewallType == fwSOCKS4)
@@ -451,7 +449,6 @@ pascal void startConnection(linkPtr link)
 		else
 			link->conn->connectStage=csLookingUp;
 
-		p.link = link;
 		p.connectStage = link->conn->connectStage;
 		runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
 		LSParamString(&ls, GetIntStringPtr(spInfo, sLookingUpIP), search, 0, 0, 0);
@@ -459,7 +456,6 @@ pascal void startConnection(linkPtr link)
 	}
 	else
 	{
-		p.link = link;
 		p.connectStage = link->conn->connectStage = csFailedToLookup;
 		runIndService(connectionWindowServiceClass, pServiceCWLinkStateChange, &p);
 		ServerOK(C_SearchFailed, link);
@@ -472,7 +468,6 @@ pascal char OpenConnection(linkPtr link)
 	{
 		startConnection(link);
 		ConnectionMenuHilites();
-		UpdateStatusLine();
 		return 1;
 	}
 	return 0;

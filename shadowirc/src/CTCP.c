@@ -117,15 +117,12 @@ pascal void SendCTCPReply(linkPtr link, ConstStr255Param fr, ConstStr255Param co
 	
 	if(!mainPrefs->disableCTCP)
 	{
-		if(link->serverStatus==S_CONN)
-		{
-			quote(st);
-			LSStrCat4(&ls, "\pNOTICE ", fr, "\p :\1", co);
-			LSAppend1(ls, ' ');
-			LSConcatLSAndLS(&ls, st, &ls);
-			LSAppend1(ls, 1);
-			SendCommand(link, &ls);
-		}
+		quote(st);
+		LSStrCat4(&ls, "\pNOTICE ", fr, "\p :\1", co);
+		LSAppend1(ls, ' ');
+		LSConcatLSAndLS(&ls, st, &ls);
+		LSAppend1(ls, 1);
+		SendCommand(link, &ls);
 	}
 }
 
