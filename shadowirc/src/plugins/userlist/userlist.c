@@ -2417,9 +2417,3 @@ pascal void main(ShadowIRCDataRecord* sidrIN)
 	ExitCodeResource();
 	#endif
 }
-
-/*
-MacTek: http://cctr.umkc.edu/user/cgladish/faq/gspot2-faq.html
-http://www.ozemail.com.au/~jdukes/docs/gspot.html
-http://www.jmk.su.se/jmk/stud/magen/g-guntin/g-punkt.html
-*/
