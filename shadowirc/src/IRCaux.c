@@ -268,14 +268,12 @@ void DisplayLookupResult(connectionPtr conn)
 //connect to the server, and then open the identd connection
 pascal void connection2(connectionPtr conn)
 {
-	linkPtr link = conn->link;
-
 	if(ConnNewActive(conn)) //this makes the connection to the (socks) server
 	{
 		if(conn->socksType == connIRC)
 		{
 			CreateIdentdConn(conn);
-			LinkSetStage(link, csOpeningConnection);
+			LinkSetStage(conn->link, csOpeningConnection);
 			link->serverStatus=S_OPENING;
 			UpdateStatusLine();
 		}
@@ -284,8 +282,8 @@ pascal void connection2(connectionPtr conn)
 	{
 		if(conn->socksType == connIRC)
 		{
-			LinkSetStage(link, csFailedToConnect);
-			ServerOK(C_FailedToOpen, link);
+			LinkSetStage(conn->link, csFailedToConnect);
+			ServerOK(C_FailedToOpen, conn->link);
 		}
 	}
 }
