@@ -2263,18 +2263,17 @@ inputAreaDataPtr ILGetInputDataFromMW(MWPtr mw);
 	Output: return value: the IAD of the specified window, or NULL if none found.
 */
 
-char IADGetText(inputAreaDataPtr iad, LongString *ls);
+long IADGetText(inputAreaDataPtr iad, LongString *ls);
 /*	Gets the inputline text from a given IAD reference.
 		Input:	iad - The IAD to get the input from
-		Output:	ls - The text of the inputfield.
-					return value: true if an input field was found, false if not.
+		Output:	ls - The text of the inputfield. (If NULL, then no text is retrieved.)
+					return value: length of text in the input field
 */
 
-char IADSetText(inputAreaDataPtr iad, LongString *ls);
+void IADSetText(inputAreaDataPtr iad, LongString *ls);
 /*	Sets the inputline of a given IAD reference.
 		Input:	iad - The IAD to get to set the input for
 		Output:	ls - The text to set the inputfield to.
-					return value: true if an input field was found, false if not.
 */
 
 void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish);
