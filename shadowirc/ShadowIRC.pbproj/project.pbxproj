@@ -244,6 +244,7 @@
 				0867D6AAFE840B52C02AAC07,
 				F54C279D02152A0001A80061,
 				F573F87E021878C501A80061,
+				F5F61A2F02A02E380132A988,
 			);
 			isa = PBXGroup;
 			name = Resources;
@@ -420,6 +421,7 @@
 				0867D6ACFE840B52C02AAC07,
 				F573F87F021878C601A80061,
 				F526526D0227D84B0132A983,
+				F5F61A3102A02E390132A988,
 			);
 			isa = PBXResourcesBuildPhase;
 		};
@@ -2178,6 +2180,27 @@
 		};
 		F5DB41530213AAFB01A80061 = {
 			fileRef = F5DB41430213AAFA01A80061;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		F5F61A2F02A02E380132A988 = {
+			children = (
+				F5F61A3002A02E380132A988,
+			);
+			isa = PBXVariantGroup;
+			name = channel.nib;
+			path = "";
+			refType = 4;
+		};
+		F5F61A3002A02E380132A988 = {
+			isa = PBXFileReference;
+			name = English;
+			path = English.lproj/channel.nib;
+			refType = 4;
+		};
+		F5F61A3102A02E390132A988 = {
+			fileRef = F5F61A2F02A02E380132A988;
 			isa = PBXBuildFile;
 			settings = {
 			};
