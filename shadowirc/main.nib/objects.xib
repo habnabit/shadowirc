@@ -141,9 +141,14 @@
               </object>
               <object class="IBCarbonMenuItem" id="231">
                 <string name="title">New Text Window</string>
+                <string name="keyEquivalent">n</string>
+                <int name="keyEquivalentModifier">1572864</int>
+                <ostype name="command">NTWN</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="232">
                 <string name="title">Open Text File…</string>
+                <string name="keyEquivalent">o</string>
+                <ostype name="command">open</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="220">
                 <string name="title">Close Window</string>
@@ -186,10 +191,12 @@
               <object class="IBCarbonMenuItem" id="237">
                 <string name="title">Find</string>
                 <string name="keyEquivalent">f</string>
+                <ostype name="command">FIND</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="238">
                 <string name="title">Find Again</string>
                 <string name="keyEquivalent">g</string>
+                <ostype name="command">FAGN</ostype>
               </object>
             </array>
           </object>
@@ -493,20 +500,25 @@
               <object class="IBCarbonMenuItem" id="348">
                 <string name="title">Console</string>
                 <string name="keyEquivalent">`</string>
+                <ostype name="command">CONS</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="344">
                 <string name="title">Previous Window</string>
                 <string name="keyEquivalent">[</string>
+                <ostype name="command">PWIN</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="345">
                 <string name="title">Next Window</string>
                 <string name="keyEquivalent">]</string>
+                <ostype name="command">NWIN</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="346">
                 <string name="title">Cascade</string>
+                <ostype name="command">WCAS</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="347">
                 <string name="title">Tile</string>
+                <ostype name="command">WTIL</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="355">
                 <boolean name="separator">TRUE</boolean>

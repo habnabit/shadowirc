@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -54,16 +54,8 @@ UserItemUPP AboutDlgVersionFilter;
 static pascal void DoFind2(void);
 static pascal void DoFind(char again);
 
-static pascal void cascade2(WindowPtr w);
-static pascal void DoCascadeWindows(void);
-static pascal void DoTileWindows(void);
-static pascal void DoCycleCommand(char next);
-
-static pascal void DoAbout(void);
 static pascal void HitFontsMenu(short item);
 static pascal void MenuAppleURL(short item);
-static pascal void HitFileMenu(int item);
-static pascal void CloseFrontWindow(void);
 
 void FontsMenuInit(void);
 
@@ -207,69 +199,6 @@ static pascal void DoFind(char again)
 
 #pragma mark -
 
-
-static pascal void CloseFrontWindow(void)
-{
-	WindowClose(FrontNonFloater());
-}
-
-#pragma mark -
-
-static pascal void DoCycleCommand(char next)
-{
-	MWPtr activeW, mw;
-	
-	if(!FrontNonFloater()) //do nothing if no front window.
-		return;
-	
-	activeW=MWActive;
-	if(!activeW) //no active mw. find one
-	{
-		return;
-	}
-	
-	if(next)
-	{
-		if(!activeW->prev)
-			mw=consoleWin;
-		else
-			mw=activeW->prev;
-		
-		//window to activate is in mw, and w is correct
-		while(!IsVisible(mw->w))
-		{
-			mw=mw->prev;
-			
-			if(mw==activeW)
-				break;
-			else if(!mw)
-				mw=consoleWin;
-		}
-		MWActive=mw;
-		WSelect(mw->w);
-	}
-	else //exact same as above, except prev instead of next
-	{
-		if(!activeW->next)
-			mw = mwl;
-		else
-			mw=activeW->next;
-		
-		//window to activate is in mw, and w is correct
-		while(!IsVisible(mw->w))
-		{
-			mw=mw->next;
-			
-			if(mw==activeW)
-				break;
-			else if(!mw)
-				mw = mwl;
-		}
-		MWActive=mw;
-		WSelect(mw->w);
-	}
-}
-
 pascal void WindowClose(WindowPtr wp)
 {
 	long i;
@@ -287,179 +216,7 @@ pascal void WindowClose(WindowPtr wp)
 	}
 }
 
-static pascal void cascade2(WindowPtr w)
-{
-	WindowPtr w2;
-	MWPtr mw;
-	Rect r;
-	
-	w2=GetNextWindow(w);
-	if(w2)
-		cascade2(w2);
-	
-	mw=MWFromWindow(w);
-	if(mw)
-	{
-		MWNewPosition(&r);
-		MWSetDimen(mw, r.left, r.top, r.right-r.left, r.bottom-r.top);
-		UpdateWindowPosition(mw->w);
-		MWNewPosition(&r); //twice to give some more space
-	}
-}
-
-static pascal void DoCascadeWindows(void)
-{
-	WindowPtr w;
-	
-	SetRect(&cornerstone, 5, GetMBarHeight() + 16, 425, 340);
-	w=FrontNonFloater();
-	
-	if(w)
-		cascade2(w);
-}
-
-static pascal void DoTileWindows(void)
-{
-	WindowPtr w = FrontNonFloater();
-	WindowPtr w2=w;
-	int cnt = 0;
-	int height;
-	short windowTopHeight, windowBotHeight;
-	short windowLeftWid, windowRightWid;
-	
-	if(w)
-	{
-		RgnHandle cr, sr;
-		Rect crr, srr;
-		
-		cr = NewRgn();
-		sr = NewRgn();
-			
-		GetWindowRegion(w, kWindowContentRgn, cr);
-		GetWindowRegion(w, kWindowStructureRgn, sr);
-		GetRegionBounds(cr, &crr);
-		GetRegionBounds(sr, &srr);
-
-		windowTopHeight = crr.top - srr.top;
-		windowBotHeight = srr.bottom - crr.bottom;
-
-		windowLeftWid = crr.left - srr.left;
-		windowRightWid = srr.right - crr.right;
-
-		DisposeRgn(cr);
-		DisposeRgn(sr);
-	}
-	
-	while(w)
-	{
-		if(IsVisible(w) && MWFromWindow(w))
-			cnt++;
-		
-		w = GetNextWindow(w);
-	}
-	
-	if(cnt>0)
-	{
-		short totHeight;
-		Rect r;
-		short mbarHeight = GetMBarHeight();
-		BitMap screenBits;
-		Rect sb;
-		
-		GetQDGlobalsScreenBits(&screenBits);
-		sb = screenBits.bounds;
-
-		SetRect(&sb, -sb.left, -sb.top + mbarHeight + windowTopHeight, sb.right - sb.left, sb.bottom - sb.top - 35);
-		totHeight = sb.bottom - sb.top;
-		height = (totHeight / cnt) - windowTopHeight - windowBotHeight;
-		
-		r.left = windowLeftWid;
-		r.right = sb.right - windowRightWid;
-		r.top = sb.top;
-		r.bottom = r.top + height;
-		
-		w = w2;
-		while(w)
-		{
-			if(IsVisible(w))
-			{
-				MWPtr mw = MWFromWindow(w);
-				if(mw)
-				{
-					MWSetDimen(mw, r.left, r.top, r.right-r.left, r.bottom-r.top);
-					UpdateWindowPosition(mw->w);
-					r.top+=height + windowTopHeight + windowBotHeight;
-					r.bottom+=height + windowTopHeight + windowBotHeight;
-				}
-			}
-			
-			w = GetNextWindow(w);
-		}
-	}
-}
-
-
 #pragma mark -
-
-static pascal void DoAbout(void)
-{
-	DialogPtr d;
-	short i;
-	Rect itemRect;
-	Handle itemHandle;
-	short itemType;
-	
-	d = GetNewDialog(128, 0, (WindowPtr)-1);
-	SetDialogDefaultItem(d, 1);
-	SetDlogFont(d);
-	EnterModalDialog();
-	ShowWindow(GetDialogWindow(d));
-
-	GetDialogItem(d, 3, &itemType, &itemHandle, &itemRect);
-	SetDialogItem(d, 3, itemType, (Handle)AboutDlgVersionFilter, &itemRect);
-	GetDialogItem(d, 4, &itemType, &itemHandle, &itemRect);
-	SetDialogItem(d, 4, itemType, (Handle)AboutDlgVersionFilter, &itemRect);
-	GetDialogItem(d, 5, &itemType, &itemHandle, &itemRect);
-	SetDialogItem(d, 5, itemType, (Handle)AboutDlgVersionFilter, &itemRect);
-
-	do {
-		ModalDialog(StdDlgFilter, &i);
-	} while(!i);
-
-	DisposeDialog(d);
-	ExitModalDialog();
-}
-
-#pragma mark -
-
-static pascal void HitFileMenu(int item)
-{
-	switch(item)
-	{
-		case 2:
-			NewTextWin();
-			break;
-		
-		case 3:
-			TWSelect();
-			break;
-			
-		case 4:
-			CloseFrontWindow();
-			break;
-		
-		case 6:
-			if(MWActive && MWActive->winType == textWin)
-				TWSave(MWActive, false);
-			else
-				writeAllFiles();
-			break;
-
-		case 9:
-			doQuit(0);
-			break;
-	}
-}
 
 pascal void HitEditMenu(short item)
 {
@@ -468,12 +225,6 @@ pascal void HitEditMenu(short item)
 	WEReference we;
 	long s0, s1;
 	WindowPtr w = FrontNonFloater();
-	
-	if(item == 12)
-	{
-		OpenPreferencesWindow(-1);
-		return;
-	}
 	
 	if(w && IsDialog(w))
 	{
@@ -635,56 +386,31 @@ pascal void HitEditMenu(short item)
 
 pascal void HitWindowMenu(const short item)
 {
-	if(item == wConsoleItem)
+	//check for service items
+	if(wMenuServices && item <= wLastServiceItem)
 	{
-		if(FrontNonFloater() == consoleWin->w && IsVisible(consoleWin->w))
+		pServiceWindowMenuData dp;
+		
+		wMSDataPtr service = &(**wMenuServices).service[item - wFirstServiceItem];
+		dp.key = service->key;
+		dp.menuItem = item;
+		runIndPlugin(service->pluginRef, pServiceWindowMenu, &dp);
+	}
+	else
+	{
+		if(item<windowsStart2)
 		{
-			WHide(consoleWin->w);
-			mainPrefs->consoleOpen=0;
+			//NOW Menus menu selection workaround
+			//What should this be normally?
+			if(item-windowsStart <= wmItems.channelsLength)
+				WSelect((**wmItems.channels).mw[item-windowsStart-1]->w);
 		}
 		else
 		{
-			 if(!IsVisible(consoleWin->w)) //not front and visible
-			 	WShow(consoleWin->w);
-			WSelect(consoleWin->w);
-			mainPrefs->consoleOpen=1;
+			if(item-windowsStart2 <= wmItems.restLength)
+				WSelect((**wmItems.rest).mw[item-windowsStart2-1]->w);
 		}
-	}
-	else //check for service items
-	{
-		if(wMenuServices && item <= wLastServiceItem)
-		{
-			pServiceWindowMenuData dp;
-			
-			wMSDataPtr service = &(**wMenuServices).service[item - wFirstServiceItem];
-			dp.key = service->key;
-			dp.menuItem = item;
-			runIndPlugin(service->pluginRef, pServiceWindowMenu, &dp);
-		}
-		else if(item == wNextWindowItem)
-			DoCycleCommand(true);
-		else if(item == wPrevWindowItem)
-			DoCycleCommand(false);
-		else if(item == wCascadeItem)
-			DoCascadeWindows();
-		else if(item == wTileItem)
-			DoTileWindows();
-		else
-		{
-			if(item<windowsStart2)
-			{
-				//NOW Menus menu selection workaround
-				//What should this be normally?
-				if(item-windowsStart <= wmItems.channelsLength)
-					WSelect((**wmItems.channels).mw[item-windowsStart-1]->w);
-			}
-			else
-			{
-				if(item-windowsStart2 <= wmItems.restLength)
-					WSelect((**wmItems.rest).mw[item-windowsStart2-1]->w);
-			}
-		}	
-	}
+	}	
 }
 
 static pascal void HitFontsMenu(short item)
@@ -832,14 +558,6 @@ pascal void DoMenuEvent(long menuitem, const EventRecord *e)
 	{
 		switch(menuNum)
 		{
-			case appleMenu:
-				if(itemNum==1)
-					DoAbout();
-				break;
-			
-			case FileMenu:
-				HitFileMenu(itemNum);
-				break;
 			case EditMenu:
 				HitEditMenu(itemNum);
 				break;
