@@ -142,7 +142,7 @@ short unused5;
 	char dontActivateNewWindowsIfInputlineText;
 	char quitAction;
 	char dccWindowAutoOpen;
-char unused4;
+	char dccUsePortRange;
 	char disableCTCP;						//Prevent responses to CTCP commands
 	char noCTCPUnknownErrMsg;	//Stops the sending of CTCP ERRMSGs on unknown CTCP commands
 	char disableCTCPMessages;		//Stop the display of CTCP messages.
@@ -154,7 +154,8 @@ char unused4;
 	char autoLogDCCChat;					//If true, automatically logs dcc chats
 	char autoQueryOpen;
 	char nonGlobalInput;
-char unused[68];
+	short dccPortRangeLow, dccPortRangeHigh;
+char unused[64];
 	Str255 shortcuts[30];				//The shortcuts
 char unused2[70];
 	char autoDCCGet;

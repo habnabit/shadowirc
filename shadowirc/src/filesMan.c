@@ -402,7 +402,7 @@ enum PrefsData {
 	kShadowIRC11PreferencesVersion = 3,
 	kShadowIRC12PreferencesVersion = 3,
 	PreferencesVersion = kShadowIRC11PreferencesVersion,
-	PrefsUpdateLevel = 4,
+	PrefsUpdateLevel = 5,
 	SizeOfPrefsDataArea = sizeof(prefsRec) + (numSIColors * sizeof(RGBColor)) + (sizeof(linkPrefsRec)*maxLinks),
 	SizeOfPrefs = sizeof(prefsStruct) + SizeOfPrefsDataArea
 };
@@ -574,7 +574,6 @@ static pascal void ReadInPrefs(void)
 				
 				mainPrefs->userlistInWindowRight = 1;
 				mainPrefs->nonGlobalInput = 0;
-				mainPrefs->unused4 = 0;
 				
 				for(x=0;x<17;x++)
 					p.padding[x] = 0;
@@ -587,6 +586,11 @@ static pascal void ReadInPrefs(void)
 					lpp->unusedX = 0;
 					lpp->regainNick = 0;
 				}
+				
+			case 4:
+				mainPrefs->dccUsePortRange = 0;
+				mainPrefs->dccPortRangeLow = 2048;
+				mainPrefs->dccPortRangeHigh = 4096;
 				
 				p.prefsUpdate = PrefsUpdateLevel;
 		}
@@ -673,7 +677,7 @@ mp->unused5 = 0;
 	mp->dontActivateNewWindowsIfInputlineText=0;
 	mp->quitAction = qaAutoSave;
 	mp->dccWindowAutoOpen = 0;
-mp->unused4=0;
+	mp->dccUsePortRange = 0;
 
 	mp->disableCTCP=0;
 	mp->noCTCPUnknownErrMsg=1;
@@ -687,7 +691,10 @@ mp->unused4=0;
 	mp->autoQueryOpen = 0;
 	mp->nonGlobalInput = 0;
 	
-	for(x=0;x<68;x++)
+	mp->dccPortRangeLow = 2048;
+	mp->dccPortRangeHigh = 4096;
+	
+	for(x=0;x<64;x++)
 		mp->unused[x] = 0;
 
 	for(x=0;x<30;x++)
