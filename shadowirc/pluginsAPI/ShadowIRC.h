@@ -1,5 +1,5 @@
 /*	ShadowIRC Plugins Header File
-		Version 1.1
+		Version 1.2d1
 		й John Bafford 1997-2001. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x01010080
+#define _ShadowIRC_API_Version_ 0x01020001
 
 #pragma mark еее ShadowIRC Message Definitions
 /*	------------------------------------------------------------------------------------------
@@ -994,12 +994,12 @@ typedef struct ShadowIRCDataRecord {
 	const char *const inBackground;			//True if ShadowIRC is in the background, false if it's in the foreground.
 	const long *const lastInput;					//The time the user last hit return in the inputline. (GetDateTime())
 	const long *const lastKeyTime;				//The time the user last input any text to the inputline. (GetDateTime())
-	const char canAE;									//True if AppleEvents are available, false if not.
+const char reserved3;
 	const char hasCM;									//True if System-Wide Contextual Menu support exists. (OS 8 and later)
-	const char has75;									//True if the user has MacOS 7.5 or later.
+const char reserved;	
 	const char hasWM11;							//True if Window Manager 1.1 present
 	const char hasDrag;								//True if the Drag Manager is pesent.
-	const char hasAppearance;					//True if the Appearance Manager is present.
+const char reserved2;
 	const char hasNavServices;					//True if Navigation Services are present and enabled.
 	const char hasAppearance11;				//True if Appearance 1.1 is present.
 	
@@ -1012,11 +1012,6 @@ typedef struct ShadowIRCDataRecord {
 	
 	const Ptr internetConfig;						//The Internet Config component. Nil if IC is not installed. Typecast to internetConfigurationComponent.
 	const WindowPtr* const ContextWindow;	//The WindowPtr for the last activated/clicked window.
-	
-	#if !__POWERPC__
-	const long unused[94];							//free space, so sidr can expand without breaking 68k plugs
-	const ProcPtr procs[1];						//List of (Universal)ProcPtrs for 68k plugins. NEVER touch this.
-	#endif
 } ShadowIRCDataRecord;
 
 
@@ -1898,7 +1893,6 @@ enum pnwFlags {
 		Unless otherwise specified, all character pointers are pointers to 255-character Pascal strings.
 		------------------------------------------------------------------------------------------
 */
-#if __POWERPC__
 
 #pragma mark е LongStrings
 /*	------------------------------------------------------------------------------------------
@@ -2091,8 +2085,6 @@ pascal OSErr LSParamLS(LongString *ls, ConstStr255Param r0, ConstStr255Param r1,
 /*	Same as LSParmString(), except ls is the input and output string.
 */
 
-#endif
-
 #define LSAppend1(ls,ch){(ls).len++;(ls).data[(ls).len]=ch;}
 #define LSAppend2(ls,sh){(ls).len+=2;*(short*)&(ls).data[(ls).len-1]=sh;}
 #define LSAppend3(ls,lo){(ls).len+=3;*(long*)&(ls).data[(ls).len-2]=lo;}
@@ -2120,7 +2112,6 @@ pascal OSErr LSParamLS(LongString *ls, ConstStr255Param r0, ConstStr255Param r1,
 		
 		------------------------------------------------------------------------------------------
 */
-#if __POWERPC__
 
 pascal char NewService(FourCharCode serviceType);
 /*	Sets up your plugin as a particular service. Only one plugin can register for any one service.
@@ -4229,10 +4220,6 @@ pascal void GetQD(QDGlobals* *qdg);
 pascal long _UndocumentedAPI(long, long);
 /*	This function is undocumented, and should never be called.
 */
-
-#else
-#include "ShadowIRC68k.h"
-#endif
 
 #define WGetBBox(w) ((**(((WindowPeek)w)->contRgn)).rgnBBox)
 #define WIsVisible(w) ((((WindowPeek)w)->visible))
