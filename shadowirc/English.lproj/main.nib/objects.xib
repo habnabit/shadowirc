@@ -54,7 +54,7 @@
       <ostype name="command">copy</ostype>
     </object>
     <object class="IBCarbonMenuItem" id="193">
-      <string name="title">Clear</string>
+      <string name="title">Delete</string>
       <ostype name="command">clea</ostype>
     </object>
     <object class="IBCarbonMenuItem" id="196">
@@ -702,5 +702,5 @@
     <string>Splash</string>
     <reference idRef="362"/>
   </dictionary>
-  <unsigned_int name="nextObjectID">372</unsigned_int>
+  <unsigned_int name="nextObjectID">374</unsigned_int>
 </object>
