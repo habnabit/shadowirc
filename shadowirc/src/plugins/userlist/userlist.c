@@ -530,54 +530,46 @@ INLINE void ULInContentHit(ULI ul, const EventRecord *e)
 
 #pragma mark -
 
+static void ULScroll(ULI ul, long delta)
+{
+	ControlHandle bar = ul->bar;
+	long value = GetControl32BitValue(bar);
+	long max = GetControl32BitMaximum(bar);
+	
+	if(((value<max) && (delta>0)) || ((value>0) && (delta<0)))
+	{
+		SetControl32BitValue(bar, value+delta);
+		ListDraw(ul);
+	}
+}
+
 static ULI gULILiveScrollbar;
 
 static void ULScrollbarActionProc(ControlHandle bar, short part)
 {
-	short val;
+	long scrollStep = 0;
 	
 	switch(part)
 	{
 		case kControlUpButtonPart:
-			val = GetControlValue(bar);
-			if(val > 0)
-			{
-				SetControlValue(bar, val-1);
-				ListDraw(gULILiveScrollbar);
-			}
+			scrollStep = -1;
 			break;
 			
 		case kControlDownButtonPart:
-			val = GetControlValue(bar);
-			if(val < GetControlMaximum(bar))
-			{
-				SetControlValue(bar, val+1);
-				ListDraw(gULILiveScrollbar);
-			}
+			scrollStep = 1;
 			break;
 
 		case kControlPageUpPart:
-			val = GetControlValue(bar);
-			if(val > 0)
-			{
-				val -= gULILiveScrollbar->visLines;
-				if(val < 0)
-					val = 0;
-				SetControlValue(bar, val);
-				ListDraw(gULILiveScrollbar);
-			}
+			scrollStep = -gULILiveScrollbar->visLines;
 			break;
 		
 		case kControlPageDownPart:
-			val = GetControlValue(bar);
-			if(val < GetControlMaximum(bar))
-			{
-				val += gULILiveScrollbar->visLines;
-				SetControlValue(bar, val);
-				ListDraw(gULILiveScrollbar);
-			}
+			scrollStep = gULILiveScrollbar->visLines;
 			break;
 	}
+	
+	if(scrollStep)
+		ULScroll(gULILiveScrollbar, scrollStep);
 }
 
 static void ULScrollbarLive(ULI ul, const EventRecord *e)
@@ -595,8 +587,8 @@ static void ULScrollbarLive(ULI ul, const EventRecord *e)
 	
 	range = constraint.limitRect.bottom - constraint.limitRect.top;
 	
-	initial=old=cur=GetControlValue(ul->bar);
-	max=GetControlMaximum(ul->bar);
+	initial=old=cur=GetControl32BitValue(ul->bar);
+	max=GetControl32BitMaximum(ul->bar);
 	
 	GetMouse(&mouse);
 	do
@@ -614,7 +606,7 @@ static void ULScrollbarLive(ULI ul, const EventRecord *e)
 		
 		if(cur != old)
 		{
-			SetControlValue(ul->bar, cur);
+			SetControl32BitValue(ul->bar, cur);
 			ListDraw(ul);
 			old=cur;
 		}
@@ -1263,6 +1255,53 @@ static void ULIDestroy(ULI ul)
 	}
 }
 
+static OSStatus ULDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
+{
+	OSStatus myErr = eventNotHandledErr;
+	Point mouseLoc;
+	EventMouseWheelAxis wheelAxis;
+	long wheelDelta;
+	ULI ul = userData;
+	
+	GetEventParameter(theEvent, kEventParamMouseLocation, typeQDPoint, NULL, sizeof(mouseLoc), NULL, &mouseLoc);
+	GetEventParameter(theEvent, kEventParamMouseWheelAxis, typeMouseWheelAxis, NULL, sizeof(wheelAxis), NULL, &wheelAxis);
+	GetEventParameter(theEvent, kEventParamMouseWheelDelta, typeLongInteger, NULL, sizeof(wheelDelta), NULL, &wheelDelta);
+	
+	if(wheelAxis == kEventMouseWheelAxisY)
+	{
+		// Scroll the vertical scroll bar
+		int maxValue = GetControl32BitMaximum(ul->bar);
+		int numLines;
+		float lineValue;
+		long adjustedDelta;
+		
+		if(ul->users)
+			numLines = (**ul->users).num;
+		else
+			numLines = 0;
+		
+		lineValue = (float)maxValue/(float)numLines;
+		adjustedDelta = (((float)lineValue * (float)wheelDelta) + ((wheelDelta < 0)?(-0.5):(0.5)));
+		
+		ULScroll(ul, -adjustedDelta);
+		
+		myErr = noErr;
+	}
+	
+	return myErr;
+}
+
+static void ULInstallWindowHandlers(ULI ul)
+{
+	static EventHandlerUPP mouseWheelHandler = NULL;
+	const EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
+	
+	if(!mouseWheelHandler)
+		mouseWheelHandler = NewEventHandlerUPP(ULDoMouseWheelEvent);
+	
+	InstallWindowEventHandler(ul->uwin, mouseWheelHandler, 1, &wheelType, ul, NULL);
+}
+
 static ULI ULINew(WindowPtr w, long type)
 {
 	ULI ul = (ULI)NewPtrClear(sizeof(UserListInstance));
@@ -1294,7 +1333,9 @@ static ULI ULINew(WindowPtr w, long type)
 		
 		ul->uwin = pluginNewWindow(&mainPrefs->userListRect, "\pUserlist", -1, pnwHasCloseBox | pnwHasGrowBox | pnwFloaterWindow | pnwFIsFloater);
 		ULSetWindowProperty(ul);
-
+		
+		ULInstallWindowHandlers(ul);
+		
 		ul->uwinSize.right = mainPrefs->userListRect.right - mainPrefs->userListRect.left;
 		ul->uwinSize.bottom =  mainPrefs->userListRect.bottom - mainPrefs->userListRect.top;
 
