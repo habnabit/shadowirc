@@ -345,6 +345,25 @@ static pascal char MWNavKey(EventModifiers modifiers, long message)
 	return proc;
 }
 
+static void BackwordDel(WEReference we)
+{
+	long selStart, selEnd;
+	long wordStart, wordEnd;
+	
+	//Delete the active selection.
+	WEGetSelection(&selStart, &selEnd, we);
+	if(selStart != selEnd)
+		WEDelete(we);
+	
+	//Then, delete from the selection to the begining of the current word.
+	//We call WEFindWord() twice so we can account for the whitespace at the beginning of the word.
+	WEFindWord(selStart, kTrailingEdge, &wordStart, &wordEnd, we);
+	WEFindWord(wordStart,kTrailingEdge, &wordStart, &wordEnd, we);
+	
+	WESetSelection(wordStart, selStart, we);
+	WEDelete(we);
+}
+
 pascal void Key(EventRecord *e, char dontProcess)
 {
 	char c;
@@ -461,6 +480,10 @@ pascal void Key(EventRecord *e, char dontProcess)
 				ls.len=0;
 				SetInputLine(&ls);
 			}
+			break;
+		
+		case 23: //ctrl-w
+			BackwordDel(il);
 			break;
 		
 		case 30:
