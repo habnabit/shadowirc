@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -671,15 +671,15 @@ pascal void finishConnect(linkPtr link)
 	if(CurrentTarget.bad)
 		SetTarget(consoleWin, &CurrentTarget);
 	
-	*(short*)st=0x0120; //string of space
+	pstrcpy("\p +", st); //space+; can stack modechanges without multiple plusses
 	if(lp->modeI)
-		SAppend2(st, '+i');
+		SAppend1(st, 'i');
 	if(lp->modeW)
-		SAppend2(st, '+w');
+		SAppend1(st, 'w');
 	if(lp->modeS)
-		SAppend2(st, '+s');
+		SAppend1(st, 's');
 
-	if(st[0]>1)
+	if(st[0]>2)
 	{
 		LSConcatStrAndStrAndStr("\pMODE ", link->CurrentNick, st, &ls);
 		SendCommand(link, &ls);

@@ -663,7 +663,8 @@ _Skip:
 		case 555: //server option for this command not supported (TalkCity)
 			LSNextArgIRC(rest, s1);
 			LSStrLS(s1, &ls);
-			LSAppend2(ls, ': ');
+			LSAppend1(ls, ':');
+			LSAppend1(ls, ' ');
 			LSConcatLSAndLS(&ls, rest, &ls);
 			SMPrefixLink(link, &ls, dsFrontWin);
 			break;
@@ -927,13 +928,11 @@ _Skip:
 			LSNextArg(rest, s1); //server
 			LSNextArg(rest, s2); //unix time
 			LSNextArgIRC(rest, 0); //??
+			LSMakeStr(*rest);
+			
 			//rest is long date
-			LSConcatStrAndStr("\pTime for ", s1, &ls);
-			LSAppend2(ls, ': ');
-			LSConcatLSAndLS(&ls, rest, &ls);
-			LSAppend2(ls, ' (');
-			LSConcatLSAndStr(&ls, s2, &ls);
-			LSAppend1(ls, ')');
+			//Time for ^0: ^1 (^2)
+			LSParamString(&ls, GetIntStringPtr(spInfo, sServerTime), s1, rest->data, s2, 0);
 			SMPrefixLink(link, &ls, dsFrontWin);
 			break;
 		

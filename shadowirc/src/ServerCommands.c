@@ -432,10 +432,10 @@ static pascal void nQuit(linkPtr link, LongString *ls, StringPtr from, StringPtr
 	p.dontSound = false;
 	runPlugins(pServerQUITMessage, &p);
 	
-	LSConcatStrAndStr(from, "\p has signed off (", ls);
-	LSAppend2(*ls, 0x08FA); //save text style
+	LSParamString(ls, GetIntStringPtr(spServer, sUserHasSignedOff), from, 0, 0, 0);
+	LSConcatLSAndStr(ls, "\p (\x08\xFA", ls); //open paren and save color style
 	LSConcatLSAndLS(ls, &signoffMessage, ls);
-	LSAppend3(*ls, 0x08FB2900); //restore style+ )
+	LSConcatLSAndStr(ls, "\p\x08\xFB)", ls); //restore color style and close paren
 	SMPrefix(ls, dsNowhere);
 	
 	if(!p.dontSound)
@@ -1072,8 +1072,7 @@ static pascal void nWallops(linkPtr link, LongString *ls, StringPtr from, String
 	
 	if(!p.ignore)
 	{
-		LSConcatStrAndStr("\pWALLOPS !", from, ls);
-		LSAppend2(*ls, '! ');
+		LSConcatStrAndStrAndStr("\pWALLOPS !", from, "\p! ", ls);
 		LSConcatLSAndLS(ls, &tls, ls);
 		SMPrefixLink(link, ls, (mainPrefs->wallopsToConsole?dsConsole:dsFrontWin));
 		SoundService(sndWallops, 0);

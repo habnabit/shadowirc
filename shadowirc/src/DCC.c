@@ -220,12 +220,11 @@ pascal void DCCGetStatus(dccPtr d, dccStatus *status)
 			}
 			if(dd->getmax >0)
 			{
-				LSAppend2(ls2, ', ');
 				if(d->dccType == dccGET)
 					NumToString(((float)dd->gotten / (float)dd->getmax) * 100L, ss);
 				else
 					NumToString(((float)((dccSENDDataPtr)dd)->acked / (float)dd->getmax) *100L, ss);
-				LSConcatLSAndStr(&ls2, ss, &ls2);
+				LSConcatLSAndStrAndStr(&ls2,"\p, ", ss, &ls2);
 				LSAppend1(ls2, '%');
 			}
 
@@ -238,7 +237,8 @@ pascal void DCCGetStatus(dccPtr d, dccStatus *status)
 			if(time < 1)
 				time = 1;
 			NumToString(ack / time, ss);
-			LSAppend2(ls2, ', ');
+			LSAppend1(ls2, ',');
+			LSAppend1(ls2, ' ');
 			LSConcatLSAndStrAndStr(&ls2, ss, "\p bytes/sec", &ls2);
 			LSAppend1(ls2, ')');
 

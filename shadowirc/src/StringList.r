@@ -99,7 +99,8 @@ resource 'STR#' (253, "Server Messages", locked, preload)
 		"Received channel CTCP \"^0\" for ^2 from ^1",
 		"Received CTCP \"^0\" from ^1",
 		"CPING time for ^0: ^1^2 seconds",
-		"CTCP ^0 reply from ^1: ^2"
+		"CTCP ^0 reply from ^1: ^2",
+		"^0 has signed off"
 	};
 };
 
@@ -228,7 +229,8 @@ resource 'STR#' (257, "Informative Strings", locked, preload)
 		"^0 is now known as ^1",
 		"You have been rejected by ^0: ",
 		"^0 was kicked off ^1 by ^2",
-		"Length: ^0; Maximum Length: ^1"
+		"Length: ^0; Maximum Length: ^1",
+		"Time for ^0: ^1 (^2)"
 	};
 };
 

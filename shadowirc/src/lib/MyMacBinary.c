@@ -54,7 +54,7 @@ pascal short ValidateMBHeader(MBIIHeaderPtr header, char handle2plus)
 			CalcMBCRC(&ocrc, ((MBpacket)header)[i]);
 		if(ocrc == header->crc)
 		{
-			if(header->version == 1 && start.ftype == macbin_folder_ftype && (start.fcreator == macbin_folder_creator_start) || start.fcreator == macbin_folder_creator_end)
+			if(header->version == 1 && start.ftype == macbin_folder_ftype && ((start.fcreator == macbin_folder_creator_start) || start.fcreator == macbin_folder_creator_end))
 			{
 				if(start.fcreator == macbin_folder_creator_start)
 					typ = PT_StartBlock;

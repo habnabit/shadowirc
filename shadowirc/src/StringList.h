@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2001 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -147,7 +147,8 @@ enum InfoStrings {
 	sIsNowKnownAs,
 	sRejected,
 	sKickedOffBy,
-	sTopicLength
+	sTopicLength,
+	sServerTime
 };
 
 enum topicStrings {
@@ -178,7 +179,8 @@ enum serverStrings {
 	sReceivedChannelCTCP,
 	sReceivedCTCP,
 	sCPINGTime,
-	sCTCPReply
+	sCTCPReply,
+	sUserHasSignedOff
 };
 
 enum fileStrings {
