@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 34;
+	objectVersion = 38;
 	objects = {
 		0249A665FF388DC511CA2CEA = {
 			isa = PBXApplicationReference;
@@ -43,7 +43,6 @@
 				F54C279E02152A0001A80061,
 			);
 			isa = PBXRezBuildPhase;
-			name = "ResourceManager Resources";
 		};
 //040
 //041
@@ -414,7 +413,6 @@
 				F510A8B9021CBC000132A983,
 			);
 			isa = PBXHeadersBuildPhase;
-			name = Headers;
 		};
 		20286C36FDCF999611CA2CEA = {
 			buildActionMask = 2147483647;
@@ -424,7 +422,6 @@
 				F526526D0227D84B0132A983,
 			);
 			isa = PBXResourcesBuildPhase;
-			name = "Bundle Resources";
 		};
 		20286C38FDCF999611CA2CEA = {
 			buildActionMask = 2147483647;
@@ -495,7 +492,6 @@
 				F552BFB70211030901A80061,
 			);
 			isa = PBXSourcesBuildPhase;
-			name = Sources;
 		};
 		20286C3BFDCF999611CA2CEA = {
 			buildActionMask = 2147483647;
@@ -504,7 +500,6 @@
 				0249A66AFF388E3911CA2CEA,
 			);
 			isa = PBXFrameworksBuildPhase;
-			name = "Frameworks & Libraries";
 		};
 		20286C3CFDCF999611CA2CEA = {
 			fileRef = 20286C33FDCF999611CA2CEA;
