@@ -111,6 +111,9 @@ static void DoFind2(MWPtr mw)
 	long s0, s1;
 	long found;
 	
+	if(!mw)
+		mw = GetActiveMW();
+	
 	if(find.searchFor[0] && mw)
 	{
 		t=WEGetText(mw->we);
@@ -140,13 +143,13 @@ static void DoFind2(MWPtr mw)
 	}
 }
 
-void DoFind(MWPtr mw, char again)
+void DoFind(char again)
 {
 	DialogPtr d;
 	short i;
 	
 	if(again && find.searchFor[0])
-		DoFind2(mw);
+		DoFind2(0);
 	else //throw a dialog
 	{
 		d=GetNewDialog(135, 0, (WindowPtr)-1);
@@ -174,7 +177,7 @@ void DoFind(MWPtr mw, char again)
 		FinishModalDialog();
 		
 		if(i==1)
-			DoFind2(mw);
+			DoFind2(0);
 	}
 }
 

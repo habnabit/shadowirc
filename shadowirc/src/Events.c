@@ -91,11 +91,11 @@ static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef the
 	switch(hiCommand.commandID)
 	{
 		case 'FIND':
-			DoFind(mw, false);
+			DoFind(false);
 			return noErr;
 
 		case 'FAGN':
-			DoFind(mw, true);
+			DoFind(true);
 			return noErr;
 	}
 	

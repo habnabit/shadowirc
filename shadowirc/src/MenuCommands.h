@@ -30,7 +30,7 @@ enum menuCommands
 
 extern MenuHandle gAppleMenu, gEditMenu, gFileMenu, gShortcutsMenu, gWindowMenu, gHelpMenu;
 
-void DoFind(MWPtr mw, char again);
+void DoFind(char again);
 
 void HitAppleURLMenu(short item);
 void HitSelectConnectionMenu(short item);
