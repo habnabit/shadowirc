@@ -808,7 +808,13 @@ pascal void MenuInit(void)
 
 	if(hasAquaMenuMgr)
 	{
+		MenuRef menu;
+		MenuItemIndex index;
+		
 		// Enable the Application menu Preferences... item
 		EnableMenuCommand(NULL, kHICommandPreferences);
+
+		GetIndMenuItemWithCommandID(NULL, kHICommandPreferences, 1, &menu, &index);
+		SetMenuItemCommandKey(menu, index, false, '=');
 	}
 }
