@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2004 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -121,18 +121,19 @@ pascal void killISONs(linkPtr link)
 
 pascal void deleteNotify(linkPtr link, ConstStr255Param nick)
 {
-	notifyPtr n=findNotify(link, nick);
+	notifyPtr n = findNotify(link, nick);
 	notifyPtr n2;
 	char l;
 	
-	if(n->ISON)
+	if(n && n->ISON)
 	{
-		n2=n;
-		l=n2->nick[0];
-		n2->nick[0]=0;
-		n=findNotify(link, nick);
-		n2->nick[0]=l;
+		n2 = n;
+		l = n2->nick[0];
+		n2->nick[0] = 0;
+		n = findNotify(link, nick);
+		n2->nick[0] = l;
 	}
+	
 	trashNotify(link, n);
 }
 
