@@ -339,7 +339,7 @@
               </object>
               <object class="IBCarbonMenuItem" id="348">
                 <string name="title">Console</string>
-                <string name="keyEquivalent">`</string>
+                <string name="keyEquivalent">&apos;</string>
                 <ostype name="command">CONS</ostype>
               </object>
               <object class="IBCarbonMenuItem" id="344">
