@@ -158,7 +158,7 @@ static void DoCycleCommand(char next)
 			mw=activeW->prev;
 		
 		//window to activate is in mw, and w is correct
-		while(!IsVisible(mw->w))
+		while(!IsWindowVisible(mw->w))
 		{
 			mw=mw->prev;
 			
@@ -178,7 +178,7 @@ static void DoCycleCommand(char next)
 			mw=activeW->next;
 		
 		//window to activate is in mw, and w is correct
-		while(!IsVisible(mw->w))
+		while(!IsWindowVisible(mw->w))
 		{
 			mw=mw->next;
 			
@@ -257,7 +257,7 @@ static void DoTileWindows(void)
 	
 	while(w)
 	{
-		if(IsVisible(w) && MWFromWindow(w))
+		if(IsWindowVisible(w) && MWFromWindow(w))
 			cnt++;
 		
 		w = GetNextWindow(w);
@@ -286,7 +286,7 @@ static void DoTileWindows(void)
 		w = w2;
 		while(w)
 		{
-			if(IsVisible(w))
+			if(IsWindowVisible(w))
 			{
 				MWPtr mw = MWFromWindow(w);
 				if(mw)

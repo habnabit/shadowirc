@@ -775,7 +775,7 @@ static pascal void MWTallPosition(Rect *r)
 	BitMap screenBits;
 	WindowPtr wp = consoleWin->w;
 
-	if(!IsVisible(wp))
+	if(!IsWindowVisible(wp))
 		wp = FrontNonFloater();
 	
 	if(wp)

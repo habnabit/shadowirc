@@ -116,7 +116,7 @@ pascal char CMClick(WindowPtr w, const EventRecord *e)
 	
 	if(stdCM || optCM)
 	{
-		if(!WIsFloater(w) && !IsActive(w))
+		if(!WIsFloater(w) && !IsWindowHilited(w))
 			WSelect(w);
 		
 		return DetermineCM(w, e->where, optCM);

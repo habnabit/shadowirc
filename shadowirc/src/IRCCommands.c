@@ -909,7 +909,7 @@ static pascal void TranslateCommand(linkPtr link, LongString *s)
 				WESetSelection(0,0x7FFFFFFF, mw->we);
 				WEDelete(mw->we);
 				SetControlMaximum(mw->vscr, 0);
-				if(IsActive(mw->w))
+				if(IsWindowHilited(mw->w))
 					WEActivate(mw->we);
 			}
 			s->len=0;

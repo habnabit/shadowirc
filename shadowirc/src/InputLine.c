@@ -924,7 +924,7 @@ pascal void UpdateStatusLine(void)
 	if(noFloatingInput)
 		return;
 	
-	if(!IsVisible(inputLine.w))
+	if(!IsWindowVisible(inputLine.w))
 		return;
 	
 	if(++reentrant > 1)

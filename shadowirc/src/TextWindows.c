@@ -50,7 +50,7 @@ typedef struct textWinData {
 pascal void TWStatusClick(mwWidgetPtr o, Point p)
 {
 	#pragma unused(p)
-	TWStatus(o, IsActive(o->mw->w));
+	TWStatus(o, IsWindowHilited(o->mw->w));
 }
 
 pascal void TWStatus(mwWidgetPtr o, char winActive)

@@ -187,14 +187,14 @@ static pascal void DoFind(char again)
 
 char ToggleConsoleWindow()
 {
-		if(FrontNonFloater() == consoleWin->w && IsVisible(consoleWin->w))
+		if(FrontNonFloater() == consoleWin->w && IsWindowVisible(consoleWin->w))
 		{
 			WHide(consoleWin->w);
 			return mainPrefs->consoleOpen = 0;
 		}
 		else
 		{
-			if(!IsVisible(consoleWin->w)) //not front and visible
+			if(!IsWindowVisible(consoleWin->w)) //not front and visible
 				WShow(consoleWin->w);
 			WSelect(consoleWin->w);
 			return mainPrefs->consoleOpen = 1;
@@ -630,7 +630,7 @@ pascal void MenuBarClick(const EventRecord *e)
 	}
 	
 	//Update window menu
-	if((w = FrontNonFloater())!=0 && (w=GetNextWindow(w))!=0 && IsVisible(w))
+	if((w = FrontNonFloater())!=0 && (w=GetNextWindow(w))!=0 && IsWindowVisible(w))
 	{
 		EnableMenuCommand(gWindowMenu, kCommandPrevWin);
 		EnableMenuCommand(gWindowMenu, kCommandNextWin);
@@ -640,7 +640,7 @@ pascal void MenuBarClick(const EventRecord *e)
 		DisableMenuCommand(gWindowMenu, kCommandPrevWin);
 		DisableMenuCommand(gWindowMenu, kCommandNextWin);
 	}
-	CheckMenuItem(gWindowMenu, wConsoleItem, IsVisible(consoleWin->w));
+	CheckMenuItem(gWindowMenu, wConsoleItem, IsWindowVisible(consoleWin->w));
 	DoMenuEvent(MenuSelect(e->where), e);
 }
 

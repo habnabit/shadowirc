@@ -632,7 +632,7 @@ static pascal void StandardIconWidget(mwWidgetPtr o, CIconHandle icon[])
 		r.bottom = o->drawArea.bottom - 1;
 		r.right = o->drawArea.right - 1;
 		
-		if(IsActive(o->mw->w))
+		if(IsWindowHilited(o->mw->w))
 			PlotCIcon(&r, icon[0]);
 		else
 			PlotCIcon(&r, icon[1]);
@@ -1171,7 +1171,7 @@ pascal void DrawMWinStatus(MWPtr mw)
 	char b;
 	int themeTextColor;
 	
-	if(!mw || !mw->w || !IsVisible(mw->w))
+	if(!mw || !mw->w || !IsWindowVisible(mw->w))
 		return;
 	
 	if(++mw->drawingStatus > 1)
@@ -1179,7 +1179,7 @@ pascal void DrawMWinStatus(MWPtr mw)
 	
 	GetPort(&gp);
 	SetPortWindowPort(mw->w);
-	winActive = IsActive(mw->w);
+	winActive = IsWindowHilited(mw->w);
 
 	p = mw->widgetsPane;
 restart:

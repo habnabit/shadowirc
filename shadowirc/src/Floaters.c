@@ -59,7 +59,7 @@ pascal void WMoveToFront(WindowPtr w)
 //Not called if has 8.6
 static pascal void WDeactivate(WindowPtr w)
 {
-	if(IsActive(w))
+	if(IsWindowHilited(w))
 	{
 		HiliteWindow(w, 0);
 		ActivateWindowProcPtr(w, 0);
@@ -75,7 +75,7 @@ pascal void EnterModalDialog(void)
 	{
 		fnf=FrontNonFloater();
 		
-		if(fnf && IsActive(fnf))
+		if(fnf && IsWindowHilited(fnf))
 			WDeactivate(fnf);
 		
 		HideAllFloaters();

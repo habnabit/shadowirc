@@ -119,7 +119,7 @@ static pascal void DrawInputPane(mwPanePtr o)
 	
 	r = o->drawArea;
 	r.bottom = r.top + 5;
-	ia = IsActive(mw->w);
+	ia = IsWindowHilited(mw->w);
 
 	if(ia)
 		DrawBorder(&r, kThemeStateActive, true);
@@ -366,7 +366,7 @@ pascal void MWPaneUpdate(MWPtr mw)
 				r.bottom = o->drawArea.bottom+1;
 				
 				GetForeColor(&rgb);
-				if(IsActive(mw->w))
+				if(IsWindowHilited(mw->w))
 					RGBForeColor(&black);
 				else
 					RGBForeColor(&VDkGrey);

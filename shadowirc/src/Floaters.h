@@ -27,8 +27,6 @@
 typedef pascal void (*WindowActivateProcPtr)(WindowPtr window, char activate);
 extern WindowActivateProcPtr ActivateWindowProcPtr;
 
-#define IsVisible(w) IsWindowVisible(w)
-#define IsActive(w) IsWindowHilited(w)
 #define IsDialog(w) (GetWindowKind(w) == dialogKind)
 
 Rect *WGetBBox(WindowPtr w, Rect *r);

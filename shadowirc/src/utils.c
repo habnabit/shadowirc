@@ -753,7 +753,7 @@ pascal void SetupModalDialog(DialogPtr d, short ok, short cancel)
 	SetDialogCancelItem(d, cancel);
 	SetDialogTracksCursor(d, true);
 	EnterModalDialog();
-	if(!IsVisible(GetDialogWindow(d)))
+	if(!IsWindowVisible(GetDialogWindow(d)))
 		ShowWindow(GetDialogWindow(d));
 }
 
