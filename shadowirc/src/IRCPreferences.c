@@ -531,41 +531,6 @@ static pascal void SetPreferencesWindow(short windowNum, short connListNum)
 				setButtonEnable(PrefsDlg, 5, lp->useConnectMacro);
 				setButtonEnable(PrefsDlg, 6, lp->useConnectMacro);
 				SetText(PrefsDlg, 5,  lp->connectMacro);
-				
-/*
-				//Clear the list...
-			{
-				ListHandle lh;
-				Cell c;
-				ThemeDrawingState ts;
-				Str255 st;
-				
-				GetThemeDrawingState(&ts);
-				NormalizeDrawingState();
-				
-				lh= GetAppearanceListBoxHandle(PrefsDlg, 9);
-				
-				if((**lh).dataBounds.bottom > 0)
-					LDelRow((**lh).dataBounds.bottom, 0, lh);
-				
-				(**lh).selFlags = lOnlyOne + lNoNilHilite;
-				
-				LAddRow(connPrefsRowNum+1, 0, lh);
-				
-				c.h = c.v = 0;
-				for(x=0; x< connPrefsRowNum; x++)
-				{
-					NumToString(x, st);
-					LSetCell(&st[1], st[0], c, lh);
-					c.v++;
-				}
-
-				c.v = 0;
-				LSetSelect(true, c, lh);
-				LSetDrawingMode(true, lh);
-				SetThemeDrawingState(ts);
-			}
-*/
 				break;
 			
 			case kwPrefMessages:
