@@ -147,7 +147,6 @@ enum messagesList
 	pMWWindowMoveMessage			=52,		//User moved one of your message windows.
 	pUIMWGotTextMessage				=54,		//User typed text to one of your plugin's message windows
 	pUIActivateMessage					=55,		//A window has become active or deactive.
-	pUIMouseUpDownMessage			=56,		//A user clicked in your window somewhere.
 	pUIMWInfoRefresh						=252,	//ShadowIRC is refreshing your Message Window's status bar. Tell it what you want it to do.
 
 //Drag and Drop
@@ -861,14 +860,6 @@ typedef struct pUIActivateData {
 	WindowPtr window;	//The window being activated or deactivated
 	char activate;			//True if being activated, false if being deactivated.
 } pUIActivateData, *pUIActivateDataPtr;
-
-/*	pUIMouseUpDownData
-*/
-typedef struct pUIMouseUpDownData {
-	WindowPtr window;	//The window that was clicked on, or nil if a mouseUp event.
-	EventRecord *e;		//The full event record
-	char down;				//True if the mouse was pressed, false if it was released.
-} pUIMouseUpDownData, *pUIMouseUpDownDataPtr;
 
 #ifdef _MsgWindows_
 

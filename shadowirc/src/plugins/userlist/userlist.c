@@ -46,7 +46,6 @@ const RGBColor MDkGrey = {cMDkGrey, cMDkGrey, cMDkGrey};
 
 INLINE ULI ULIFromMW(MWPtr mw);
 static ULI ULIFromChannel(channelPtr ch);
-static ULI ULIFromWindow(WindowPtr w);
 
 INLINE void ULGotNamesList(pServiceULNamesEndData *p);
 INLINE void ULSActivateWin(pServiceActivateWinData *p);
@@ -67,7 +66,6 @@ INLINE void DestroyGlobalUserlistWindow(void);
 static void ULCloseWindow(ULI ul);
 INLINE void ULWindowMenuSelect(pServiceWindowMenuData *p);
 static void ULResizeWin(ULI ul, short height, short wid);
-INLINE void ULMouse(pUIMouseUpDownData *p);
 
 INLINE void ULNewMessageWindow(pMWNewData *p);
 static void SULPaneUpdate(pMWPaneUpdateData *p);
@@ -148,26 +146,6 @@ static ULI ULIFromChannel(channelPtr ch)
 		else	
 			return ULIFromMW(ch->window);
 	}
-}
-
-static ULI ULIFromWindow(WindowPtr w)
-{
-	ULI ul = ULGetWindowProperty(w);
-	MWPtr mw;
-	
-	if(ul)
-	{
-		if(ul->ulType == ulWindowRefCon) //global userlist
-			return ul;
-		else //not global list
-		{
-			mw = MWFromWindow(w);
-			if(mw && mw->winType == chanWin)
-				return ULIFromMW(mw);
-		}
-	}
-	
-	return 0;
 }
 
 #pragma mark -
@@ -1497,36 +1475,6 @@ static void ULResizeWin(ULI ul, short height, short wid)
 	}
 }
 
-INLINE void ULMouse(pUIMouseUpDownData *p)
-{
-	ULI ul;
-	GrafPtr gp;
-	ControlHandle c;
-	short pa;
-	
-	if(p->down)
-	{
- 		ul = ULIFromWindow(p->window);
- 		if(ul)
-		{
-			//This is an inContent mouse press, so deal accordingly...
-			
-			GetPort(&gp);
-			SetPortWindowPort(ul->uwin);
-			
-			GlobalToLocal(&p->e->where);
-			pa = FindControl(p->e->where, ul->uwin, &c);
-			
-			if(c == ul->browser) //it's our scrollbar
-			{
-				//hit the databrowser
-			}
-			
-			SetPort(gp);
-		}
-	}
-}
-
 INLINE void CreateGlobalUserlistWindow(void)
 {
 	if(!gUserlist)
@@ -1757,10 +1705,6 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 
 		case pServiceWindowMenu:
 			ULWindowMenuSelect((pServiceWindowMenuPtr)sidrIN->messageData);
-			break;
-		
-		case pUIMouseUpDownMessage:
-			ULMouse((pUIMouseUpDownDataPtr)sidrIN->messageData);
 			break;
 		
 		case pServiceULNamesEnd:

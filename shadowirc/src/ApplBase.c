@@ -64,7 +64,6 @@ static pascal void inDragHandler(EventRecord *e);
 static pascal void inContentHandler(EventRecord *e);
 inline void inGoAwayHandler(const EventRecord *e);
 static pascal void inGrowHandler(const EventRecord *e);
-static pascal void doMouseUp(EventRecord *e);
 static pascal void doMouseDown(EventRecord *e);
 static void doTCPEvent(CEPtr message);
 static pascal void ApplEvents(EventRecord *e);
@@ -73,8 +72,6 @@ static pascal void ApplExit(void);
 static pascal void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand *infoRecord);
 
 static RgnHandle mouseRgn;
-
-static plugsPtr mouseDownPluginRef=0;
 
 typedef struct aspData {
 	long refcon;
@@ -412,18 +409,7 @@ static pascal void floatingWindowClick(EventRecord *e) //this also takes care of
 		{
 			pd=(pluginDlgInfoPtr)GetWRefCon(wp);
 			if(pd && (pd->magic==PLUGIN_MAGIC))
-			{
-				mouseDownPluginRef = pd->pluginRef;
-				if(i==inContent)
-				{
-					pUIMouseUpDownData pdd;
-					pdd.window=wp;
-					pdd.e = e;
-					pdd.down=true;
-					runIndPlugin(pd->pluginRef, pUIMouseUpDownMessage, &pdd);
-				}
 				return;
-			}
 		}
 		else
 		{ //it's not a floater I know of.
@@ -667,7 +653,6 @@ static pascal void inGrowHandler(const EventRecord *e)
 static pascal void inContentHandler(EventRecord *e)
 {
 	MWPtr mw;
-	pUIMouseUpDownData pdd;
 	GrafPtr gp;
 	WindowPtr w;
 	
@@ -678,18 +663,6 @@ static pascal void inContentHandler(EventRecord *e)
 	mw = MWFromWindow(w);
 	if(mw)
 		MWHitContent(mw, e);
-	else
-	{
-		pluginDlgInfoPtr pd = (pluginDlgInfoPtr)GetWRefCon(w);
-		if(pd && (pd->magic==PLUGIN_MAGIC))
-		{
-			pdd.window = w;
-			pdd.e = e;
-			pdd.down=true;
-			mouseDownPluginRef=pd->pluginRef;
-			runIndPlugin(pd->pluginRef, pUIMouseUpDownMessage, &pdd);
-		}
-	}
 
 	SetPort(gp);
 }
@@ -792,20 +765,6 @@ pascal void doUpdateEvent(EventRecord *e)
 		DrawControls(mw->w);
 		MWPaneUpdate(mw);
 		EndUpdate(mw->w);
-	}
-}
-
-static pascal void doMouseUp(EventRecord *e)
-{
-	pUIMouseUpDownData pdd;
-	
-	if(mouseDownPluginRef)
-	{
-		pdd.window=0;
-		pdd.e = e;
-		pdd.down=false;
-		runIndPlugin(mouseDownPluginRef, pUIMouseUpDownMessage, &pdd);
-		mouseDownPluginRef = 0;
 	}
 }
 
@@ -935,10 +894,6 @@ static pascal void ApplEvents(EventRecord *e)
 			
 		case mouseDown:
 			doMouseDown(e);
-			break;
-		
-		case mouseUp:
-			doMouseUp(e);
 			break;
 	}
 }
