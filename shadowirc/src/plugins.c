@@ -46,6 +46,7 @@
 #include "DragDrop.h"
 #include "MenuCommands.h"
 #include "ApplBase.h"
+#include "Inline.h"
 
 wMenuServicesHand wMenuServices = 0;
 
@@ -65,11 +66,6 @@ static void InitPlugins(void);
 pascal long _UndocumentedAPI(long type, long data);
 
 static plugsPtr IPCFind(FourCharCode IPCType, long *version, long *data);
-
-//For Inlined crap
-#define linkfor(list, init) for((list) = (init); (list); (list)=(list)->next)
-pascal void pstrcpy(ConstStr255Param f, ConstStr255Param dest);
-pascal void LineMsg(const LongString *ls);
 
 pascal long ShadowIRCVersion(StringPtr);
 
