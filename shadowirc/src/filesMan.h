@@ -93,7 +93,6 @@ pascal void FileAdd(short fref, char res);
 pascal OSErr FileClose(short fref);
 OSStatus FileCloseFork(short fref);
 pascal short CreateUniqueFile(FSSpec *file, OSType creator, OSType type);
-pascal char ValidFSSpec(const FSSpec *f);
 pascal OSErr FindAppSpec(FSSpec *appSpec);
 
 pascal void OpenPrefs(void);

@@ -209,12 +209,6 @@ pascal OSErr FindAppSpec(FSSpec *appSpec)
 	return GetProcessInformation(&thisProcess, &processInfo);
 }
 
-pascal char ValidFSSpec(const FSSpec *f)
-{
-	FSSpec f2;
-	return !FSMakeFSSpec(f->vRefNum, f->parID, f->name, &f2);
-}
-
 pascal short CreateUniqueFile(FSSpec *file, OSType creator, OSType type)
 {
 	OSErr err;
