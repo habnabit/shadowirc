@@ -493,64 +493,91 @@ static void TopicWindowSet(WindowRef dlgWindow, channelPtr ch)
 	
 	SetWindowCancelButton(dlgWindow, topicCancelControl);
 	SetWindowDefaultButton(dlgWindow, topicCancelControl);
+	SetKeyboardFocus(dlgWindow, topicTextControl, kControlFocusNextPart);
 }
 
 static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
 	WindowRef sheet = NULL;
-	ControlRef control = NULL, topicTextControl = NULL, topicOKControl = NULL;
 	ControlID topicTextControlID = { kApplicationSignature, kSIRCTopicTextControlID };
 	ControlID topicOKControlID = { kApplicationSignature, kSIRCTopicOKControlID };
-	CFStringRef theString;
-	Str255 s1;
-	LongString ls;	/* BLECH! */
+	ControlRef topicTextControl = NULL, topicOKControl = NULL;
 	channelPtr ch;
-	UInt32 cmd;
+	UInt32 eventClass, eventKind;
 	TopicWindowInfoPtr twi;
 	
-	GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &control);
-	GetControlCommandID(control, &cmd);
-
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
+	
 	sheet =(WindowRef)userData;
 	
 	twi = GetTopicWindowInfo(sheet);
 	ch = twi->ch;
 
-	switch(cmd)
+	GetControlByID(sheet, &topicTextControlID, &topicTextControl);
+	GetControlByID(sheet, &topicOKControlID, &topicOKControl);
+	
+	switch(eventClass)
 	{
-		case kHICommandTopicText:		// find out if there's a way to see if text has been typed or not
-			if(twi->hadOps)
+		case kEventClassControl:
+		{
+			ControlRef theControl = NULL;
+			CFStringRef theString;
+			Str255 s1;
+			LongString ls;	/* BLECH! */
+			UInt32 cmd;
+
+			GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &theControl);
+			GetControlCommandID(theControl, &cmd);
+			
+			switch(cmd)
 			{
-				GetControlByID(sheet, &topicOKControlID, &topicOKControl);
-				SetWindowDefaultButton(sheet, topicOKControl);
+				case kHICommandOK:
+					GetControlData(topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
+					CFStringGetPascalString(theString, s1, sizeof(Str255), CFStringGetSystemEncoding());
+					if(s1[0])
+					{
+						LSStrCat4(&ls,"\pTOPIC ", ch->chName, "\p :", s1);
+						SendCommand(ch->link, &ls);
+					}
+		
+				case kHICommandCancel:
+					ChCloseTopicWindow(ch);
+					result = noErr;
+					break;
 			}
 			break;
+		}
 		
-		case kHICommandOK:
-			GetControlByID(sheet, &topicTextControlID, &topicTextControl);
-			GetControlData(topicTextControl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theString, NULL);
-			CFStringGetPascalString(theString, s1, sizeof(Str255), CFStringGetSystemEncoding());
-			if(s1[0])
+		case kEventClassTextInput:
+			switch(eventKind)
 			{
-				LSStrCat4(&ls,"\pTOPIC ", ch->chName, "\p :", s1);
-				SendCommand(ch->link, &ls);
+				case kEventTextInputUnicodeForKeyEvent:
+				// TODO: how do I check to see if the focus is *definitely* on the edit text control?
+				result = CallNextEventHandler(myHandler, event);
+				if((result == noErr) && twi->hadOps)
+				{
+					SetWindowDefaultButton(sheet, topicOKControl);
+					result = noErr;
+				}
+				break;
 			}
-
-		case kHICommandCancel:
-			ChCloseTopicWindow(ch);
 			break;
 	}
 	
 	return result;
 }
-
+ 
 void ChTopicWindow(channelPtr ch)
 {
 	IBNibRef mainNibRef;
 	WindowRef channelTopicSheet = NULL;
 	static EventHandlerUPP ctUPP = NULL;
-	const EventTypeSpec ctSpec = { kEventClassControl, kEventControlHit };
+	const EventTypeSpec ctSpec[] = {
+		{ kEventClassTextInput, kEventTextInputUnicodeForKeyEvent },
+		{ kEventClassControl, kEventControlHit }
+	};
 	OSStatus status;
 	WindowPtr parent;
 	
@@ -565,7 +592,7 @@ void ChTopicWindow(channelPtr ch)
 
 	DisposeNibReference(mainNibRef);
 
-	status = InstallWindowEventHandler(channelTopicSheet, ctUPP, 1, &ctSpec,(void *)channelTopicSheet, NULL);
+	status = InstallWindowEventHandler(channelTopicSheet, ctUPP, (sizeof(ctSpec)/sizeof(ctSpec[0])), ctSpec,(void *)channelTopicSheet, NULL);
 	require_noerr(status, CantInstallDialogHandler);
 	
 	parent = ch->window->w;
