@@ -50,6 +50,7 @@
 #include "IRCPreferences.h"
 #include "MenuCommands.h"
 #include "IRCChannels.h"
+#include "MoreFilesX.h"
 #include "plugins.h"
 
 
@@ -74,7 +75,7 @@ inline void CheckPreferences(void)
 {
 	LongString ls;
 	
-	if(!ValidFSSpec(&logFolderFSp) && mainPrefs->autoLogging)
+	if(!FSRefValid(&logFolderRef) && mainPrefs->autoLogging)
 	{
 		LSGetIntString(&ls, spError, sLogsFolderInvalid); //logs folder invalid
 		SMPrefix(&ls, dsConsole);

@@ -36,7 +36,8 @@ short fontsBegin;
 prefsPtr mainPrefs;
 linkPrefsRec *linkPrefsArray;
 RGBColor *shadowircColors;
-FSSpec logFolderFSp, dccFolderFSp;
+FSSpec dccFolderFSp;
+FSRef logFolderRef;
 
 short gApplResFork;
 

@@ -1139,7 +1139,7 @@ pascal char readMainPrefs(void)
 	
 	err = SetupLogFolder(&localRef);
 	if(err == noErr)
-		err = FSGetCatalogInfo(&localRef, kFSCatInfoNone, NULL, NULL, &logFolderFSp, NULL);
+		BlockMoveData(&localRef, &logFolderRef, sizeof(FSRef));
 	else if(err == paramErr)
 	{
 		FolderErrorToConsole(kNoLogFolderKey);

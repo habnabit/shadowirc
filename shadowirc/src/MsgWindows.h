@@ -234,7 +234,7 @@ pascal void InitMsgWindows(void);
 pascal void MWUnquote(MWPtr mw);
 pascal void MWQuote(MWPtr mw);
 
-OSErr MWLogToFSp(MWPtr mw, const FSSpec *fs, long s0, long s1);
+OSStatus MWLogToFSRef(MWPtr mw, const FSRef *ref, long s0, long s1);
 OSStatus SetupLogFolder(FSRef *ref);
 void MWLogToFile(MWPtr mw, long s0, long s1);
 void MWStopLogging(MWPtr mw);

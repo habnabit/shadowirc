@@ -124,6 +124,9 @@ static void ScrollBarChanged(WEReference we, long val);
 
 pascal OSErr FSpGetDirectoryID(FSSpec*, long*, char*); //for MWStartLogging
 
+static pascal void SelectLogFileNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD);
+static OSStatus SelectLogFile(MWPtr mw, const CFStringRef fileName, long s0, long s1);
+
 /*
 	This function returns the frontmost message window.
 */
@@ -389,63 +392,163 @@ static void TextScrolled(WEReference we)
 
 #pragma mark -
 
-OSErr MWLogToFSp(MWPtr mw, const FSSpec *fs, long s0, long s1)
+OSStatus MWLogToFSRef(MWPtr mw, const FSRef *ref, long s0, long s1)
 {
-	short err;
+	OSStatus err = noErr;
+	HFSUniStr255 forkName;
 	short refNum;
 	Handle text;
 	long textlen;
 	
-	err=FSpCreate(fs, 'ttxt', 'TEXT', 0);
-	if(!err)
+	err = FSGetDataForkName(&forkName);
+	if((err = FSOpenFork(ref, forkName.length, forkName.unicode, fsRdWrPerm, &refNum)) == noErr)
 	{
-		err=FSpOpenDF(fs, fsRdWrPerm, &refNum);
-		if(!err)
+		text= WEGetText(mw->we);
+		textlen=WEGetTextLength(mw->we);
+
+		if(s0==s1)
 		{
-			text= WEGetText(mw->we);
-			textlen=WEGetTextLength(mw->we);
-
-			if(s0==s1)
-			{
-				s0=0;
-				s1=textlen;
-			}
-
-			textlen=s1-s0;
-			SetEOF(refNum, textlen);
-			SetFPos(refNum, fsFromStart, 0);
-			FSWrite(refNum, &textlen, &((*text)[s0]));
-			FSClose(refNum);
+			s0=0;
+			s1=textlen;
 		}
+
+		textlen=s1-s0;
+
+		FSSetForkSize(refNum, fsFromStart, textlen);
+		FSSetForkPosition(refNum, fsFromStart, 0);
+		FSWriteFork(refNum, fsAtMark, 0, textlen, &((*text)[s0]), NULL);
+		FSCloseFork(refNum);
 	}
 
 	return err;
 }
 
+typedef struct SelectLogFileRec {
+	MWPtr mw;
+	long s0;
+	long s1;
+} SelectLogFileRec, *SelectLogFileRecPtr;
+
+static pascal void SelectLogFileNavHook(NavEventCallbackMessage callBackSelector, NavCBRecPtr callBackParms, NavCallBackUserData callBackUD)
+{
+        OSStatus err = noErr;
+	
+	switch (callBackSelector)
+	{
+		case kNavCBUserAction:
+		{
+			NavReplyRecord reply;
+			NavUserAction userAction = 0;
+                        FSRef parentRef;
+			
+			if((err = NavDialogGetReply(callBackParms->context, &reply)) == noErr)
+ 			{
+			    userAction = NavDialogGetUserAction(callBackParms->context);
+			    switch(userAction)
+			    {
+				    case kNavUserActionSaveAs:
+					    err = UnpackFSRefFromNavReply(&reply, &parentRef);
+					    
+					    if(err == noErr)
+					    {
+						    SelectLogFileRecPtr selRec = (SelectLogFileRecPtr)callBackUD;
+						    FSRef ref;
+						    
+						    if((err = CreateFileRef(reply.saveFileName, &parentRef, (OSType)0, (OSType)'TEXT', reply.replacing, &ref)) == noErr)
+							    MWLogToFSRef(selRec->mw, &ref, selRec->s0, selRec->s1);
+					    }
+					    break;
+			    }
+			    err = NavDisposeReply(&reply);
+ 			}
+			break;
+		}
+		case kNavCBTerminate:	
+			NavDialogDispose(callBackParms->context);
+			break;
+        }
+}
+
+static OSStatus SelectLogFile(MWPtr mw, const CFStringRef fileName, long s0, long s1)
+{
+	OSStatus err = noErr;
+	NavDialogRef theDialog;
+	NavDialogCreationOptions dialogOptions;
+	NavEventUPP eventUPP = NULL;
+	SelectLogFileRecPtr selRec = NULL; 
+	
+	err = NavGetDefaultDialogCreationOptions(&dialogOptions);
+	dialogOptions.modality = kWindowModalityAppModal;
+	dialogOptions.preferenceKey = kNavPutFile;
+	
+	dialogOptions.clientName = (CFStringRef) CFBundleGetValueForInfoDictionaryKey(CFBundleGetMainBundle(), CFSTR("CFBundleName"));
+	
+	dialogOptions.saveFileName = CFStringCreateCopy(NULL, fileName);
+	
+	eventUPP = NewNavEventUPP(SelectLogFileNavHook);
+	if(eventUPP == NULL)
+		return paramErr;
+	
+	selRec = (SelectLogFileRecPtr)NewPtr(sizeof(SelectLogFileRec));
+	if(selRec != NULL)
+	{
+		selRec->mw = mw;
+		selRec->s0 = s0;
+		selRec->s1 = s1;
+	}
+	
+	if((err = NavCreatePutFileDialog(&dialogOptions, (OSType)'TEXT', (OSType)0, eventUPP, selRec, &theDialog)) == noErr)
+	{
+		if(theDialog != NULL)
+		{
+			if((err = NavDialogRun(theDialog)) != noErr)
+			{
+				// something went wrong, deallocate stuff and return the error
+				if(dialogOptions.saveFileName)
+					CFRelease(dialogOptions.saveFileName);
+				if(selRec)
+					DisposePtr((Ptr)selRec);
+				NavDialogDispose(theDialog);
+				DisposeNavEventUPP(eventUPP);
+				return err;
+			}
+ 		}
+ 	}
+	
+	if(dialogOptions.saveFileName)
+		CFRelease(dialogOptions.saveFileName);
+	if(selRec)
+		DisposePtr((Ptr)selRec);
+	DisposeNavEventUPP(eventUPP);
+	
+ 	return err;
+}
+
 void MWLogToFile(MWPtr mw, long s0, long s1)
 {
-	Str255 s;
-	Str255 s2;
+	OSStatus err = noErr;
+	CFStringRef dateString;
+	Str255 date, tmpDate;
 	int k;
 	LongString ls;
-	FSSpec f;
-	
-	DateString(now, shortDate, s2, 0);
-	k=s2[0]+1;
-	TimeString(now, false, &s2[k], 0);
-	s2[0]+=s2[k]+1;
-	s2[k]=' ';
+
+	GetDateTime(&now);
+	DateString(now, shortDate, tmpDate, 0);
+	k=tmpDate[0]+1;
+	TimeString(now, false, &tmpDate[k], 0);
+	tmpDate[0]+=tmpDate[k]+1;
+	tmpDate[k]=' ';
 
 	GetWTitle(mw->w, ls.data);
 	ls.len = ls.data[0];
 	k = pos(':', ls.data);
 	if(k)
-		LSCopyString(&ls, 1, k-1, s);
+		LSCopyString(&ls, 1, k-1, date);
 	else
-		pstrcpy(ls.data, s);
+		pstrcpy(ls.data, date);
 	
-	SAppend1(s, ' ');
-	LSConcatStrAndStr(s,s2, &ls);
+	SAppend1(date, ' ');
+	LSConcatStrAndStr(date, tmpDate, &ls);
 	
 	for(k=1;k<ls.len;k++)
 		if(ls.data[k]==':')
@@ -454,8 +557,11 @@ void MWLogToFile(MWPtr mw, long s0, long s1)
 			k--;
 		}
 	
-	if(MyStandardPutFile(0, s, 'TEXT', 'SIRC', kNDefault, &f, true) <= 0)
-		MWLogToFSp(mw, &f, s0, s1);
+	dateString = CFStringCreateWithPascalString(NULL, date, CFStringGetSystemEncoding());
+	err = SelectLogFile(mw, dateString, s0, s1);
+	
+	if(dateString)
+		CFRelease(dateString);
 }
 
 OSStatus SetupLogFolder(FSRef *ref)
@@ -504,6 +610,7 @@ void MWStopLogging(MWPtr mw)
 		Str255 s1, s2, s;
 		LongString ls;
 		
+		GetDateTime(&now);
 		DateString(now, longDate, s1, 0);
 		SAppend1(s1, ' ');
 		TimeString(now, true, s2, 0);
@@ -517,105 +624,132 @@ void MWStopLogging(MWPtr mw)
 		SMPrefix(&ls, dsNowhere);
 		MWMessage(mw, &ls);
 
-		FileClose(mw->logRefNum);
+		FileCloseFork(mw->logRefNum);
 		mw->logRefNum=0;
 	}
 }
 
 void MWStartLogging(MWPtr mw)
 {
+	OSStatus err = noErr;
+	FSRef linkRef, ref;
+	FSCatalogInfo catalogInfo;
+	HFSUniStr255 forkName;
+	CFStringRef string;
 	LongString ls;
-	FSSpec f;
-	
-	Str255 s, s1, s2;
-	char exists;
-	long dirID;
-	CInfoPBRec pb;
 	linkPtr link;
-	OSErr err;
-	short p;
+	UniChar *nameBuf = NULL;
+	UniCharCount nameBufLen = 0;
+	SInt16 position = 0;
+	
+	catalogInfo.textEncodingHint = kTextEncodingUnicodeDefault;
 	
 	if(!mw->logRefNum) //if we're already logging, then don't do anything.
 	{
-		f=logFolderFSp;
-		link = mw->link;
-		
-		if(link)
+		if(FSRefValid(&logFolderRef))
 		{
-			pstrcpy(link->linkPrefs->linkName, f.name);
-
-			if(!ValidFSSpec(&f)) //need to make dir
+			FSCatalogInfo catalogInfo;
+			
+			linkRef = logFolderRef;
+			link = mw->link;
+			
+			if(link)
 			{
-				if(FSpDirCreate(&f, 0, &dirID)) //couldn't create
-				{
+				string = CFStringCreateWithPascalString(NULL, link->linkPrefs->linkName, CFStringGetSystemEncoding());
+			
+				err = UseDirFSRef(&logFolderRef, string, TRUE, &linkRef);
+				if(err != noErr)
+ 				{
+					// FAILED, display error in console and return
 					LSGetIntString(&ls, spError, sCantMakeLogFolderThisConn);
 					MWMessage(mw, &ls);
+					CFRelease(string);
 					return;
 				}
-				else
+				
+				err = FSGetCatalogInfo(&linkRef, kFSCatInfoNodeFlags, &catalogInfo, NULL, NULL, NULL);
+				if(err == noErr)
 				{
-					f.parID = dirID;
-					f.name[0]=0;
+					Boolean isDirectory;
+					
+					isDirectory = ((catalogInfo.nodeFlags & kFSNodeIsDirectoryMask) != 0);
+					if(!isDirectory)
+					{
+						// FAILED, display error in console and return
+						LSGetIntString(&ls, spError, sLogFolderThisConnIsFile);
+						MWMessage(mw, &ls);
+						CFRelease(string);
+						return;
+					}
 				}
+				
+				CFRelease(string);
+			}
+			
+			GetWTitle(mw->w, ls.data);
+			if(ls.data[0] == '(')
+			{
+				ls.data[0]--;
+				pdelete(ls.data, 1, 1);
+			}
+			ls.len = ls.data[0];
+			if((position = pos(':', ls.data)) != 0)
+				LSDelete(&ls, position, ls.len);
+			
+			string = LSCreateCFString(&ls);
+			
+			if(string)
+			{
+				nameBufLen = (UniCharCount) CFStringGetLength(string);
+				nameBuf = (UniChar *)NewPtr(nameBufLen * sizeof(UniChar));
+				
+				if(nameBuf)
+					CFStringGetCharacters(string, CFRangeMake(0, nameBufLen), &nameBuf[0]);
+				
+				err = FSMakeFSRefUnicode(&linkRef, nameBufLen, nameBuf, kTextEncodingUnicodeDefault, &ref);
+				if(err == fnfErr)
+				{
+					err = CreateFileRef(string, &linkRef, (OSType)0, (OSType)'TEXT', FALSE, &ref);
+					
+					if(err != noErr)
+						return;
+				}
+				
+				if(nameBuf)
+					DisposePtr((Ptr)nameBuf);
+			}
+			
+			//open the file and make a note in the log that it was opened
+			//MWMessage() makes sure it is appended to the *end* of the file
+			err = FSGetDataForkName(&forkName);
+			if((err = FSOpenFork(&ref, forkName.length, forkName.unicode, fsRdWrPerm, &mw->logRefNum)) == noErr)
+			{
+				Str255 date, time, filename;
+				
+				CFStringGetPascalString(string, filename, sizeof(Str255), CFStringGetSystemEncoding());
+				
+				FileAdd(mw->logRefNum, false);
+				GetDateTime(&now);
+				DateString(now, longDate, date, NULL);
+				SAppend1(date, ' ');
+				TimeString(now, TRUE, time, NULL);
+				LSParamString(&ls, GetIntStringPtr(spInfo, sOpeningLogFile), filename, date, time, 0);
+				SMPrefix(&ls, dsNowhere);
+				MWMessage(mw, &ls);
 			}
 			else
-			{
-				FSpGetDirectoryID(&f, &f.parID, &exists);
-				if(!exists)
-				{
-					LSGetIntString(&ls, spError, sLogFolderThisConnIsFile);
-					MWMessage(mw, &ls);
-					return;
-				}
-			}
+				mw->logRefNum = 0;
 		}
-		
-		pb.dirInfo.ioCompletion=0;
-		pb.dirInfo.ioNamePtr=f.name;
-		pb.dirInfo.ioVRefNum=f.vRefNum;
-		pb.hFileInfo.ioDirID=f.parID;
-		pb.dirInfo.ioFDirIndex=0;
-		PBGetCatInfoSync(&pb);
-		
-		f.parID = pb.hFileInfo.ioDirID;
-		
-		GetWTitle(mw->w, ls.data);
-		if(ls.data[0] == '(')
+		else	// log folder is invalid
 		{
-			ls.data[0]--;
-			pdelete(ls.data, 1, 1);
+			Str255 pstring;
+			
+			string = CFCopyLocalizedString(kNoLogFolderKey, NULL);
+			CFStringGetPascalString(string, pstring, sizeof(Str255), CFStringGetSystemEncoding());
+			CFRelease(string);
+			LSStrLS(pstring, &ls);
+			LineMsg(&ls);
 		}
-		ls.len = ls.data[0];
-		p = pos(':', ls.data);
-		if(p)
-			LSCopyString(&ls, 1, p-1, s);
-		else
-			pstrcpy(ls.data, s);
-
-		exists = FSMakeFSSpec(f.vRefNum, f.parID, s, &f) == 0;
-		if(!exists) //then we have to create the file
-		{
-			err=FSpCreate(&f, 'ttxt', 'TEXT', 0);
-			if(err)
-			{
-				//display error
-				return;
-			}
-		}
-		
-		//open the file and set te position to the end and make a note in the log that it was opened
-		if(!FSpOpenDF(&f, fsRdWrPerm, &mw->logRefNum))
-		{
-			FileAdd(mw->logRefNum, false);
-			DateString(now, longDate, s1, 0);
-			SAppend1(s1, ' ');
-			TimeString(now, true, s2, 0);
-			LSParamString(&ls, GetIntStringPtr(spInfo, sOpeningLogFile), s, s1, s2, 0);
-			SMPrefix(&ls, dsNowhere);
-			MWMessage(mw, &ls);
-		}
-		else
-			mw->logRefNum = 0;
 	}
 }
 
@@ -1159,7 +1293,8 @@ static void DoAddRGBColorHunk(myStScrpHandle sty, int i, int *nsty, const RGBCol
 pascal void MWMessage(MWPtr win, const LongString *msg)
 {
 	long s0, s1, d1;
-	long len, nl;
+	long len;
+	SInt64 nl;
 	int i,ii;
 	WEReference we;
 	LongString ls;
@@ -1547,10 +1682,10 @@ pascal void MWMessage(MWPtr win, const LongString *msg)
 		if(win->logRefNum && !dontLog)
 		{
 			len = ls.len + !noCR;
-			GetEOF(win->logRefNum, &nl);
-			SetEOF(win->logRefNum, nl + len);
-			SetFPos(win->logRefNum, fsFromStart, nl);
-			FSWrite(win->logRefNum, &len, &ls.data[noCR]);
+			FSGetForkSize(win->logRefNum, &nl);
+			FSSetForkSize(win->logRefNum, fsFromStart, nl + len);
+			FSSetForkPosition(win->logRefNum, fsFromStart, nl);
+			FSWriteFork(win->logRefNum, fsAtMark, 0, len, &ls.data[noCR], NULL);
 		}
 	}
 }

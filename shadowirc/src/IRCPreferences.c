@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -70,7 +70,7 @@ static void SetColorsPanel(void);
 static void ExportColors(void);
 static void ImportColors(void);
 
-static void DoDirSel(FSSpec *fss, short item);
+static OSStatus DoDirSelRef(FSRef *ref, short item);
 pascal unsigned char PrefsDialogFilter(DialogPtr d, EventRecord *e, short *item);
 static void RedrawPreferencesWindow(DialogPtr d);
 
@@ -477,8 +477,8 @@ static void SetPreferencesWindow(short windowNum, short connListNum)
 	prefsPtr mp = mainPrefs;
 	MenuHandle mh;
 	linkPrefsPtr lp;
-	StringHandle sth;
 	PreferencesMenuItemPtr pp= &(**pmlList).list[windowNum];
+	CFURLRef folderURL;
 	
 	if(pp->pluginRef)
 	{
@@ -584,6 +584,9 @@ static void SetPreferencesWindow(short windowNum, short connListNum)
 				break;
 			
 			case kwPrefDCC:
+			{
+				FSRef localRef;
+				
 				setCheckBox(PrefsDlg, 4, mp->autoAcceptDCCChat);
 				setCheckBox(PrefsDlg, 5, mp->autoAcceptDCCChatWhenNotAway);
 				setCheckBox(PrefsDlg, 6, mp->enableDCC);
@@ -592,15 +595,27 @@ static void SetPreferencesWindow(short windowNum, short connListNum)
 				setCheckBox(PrefsDlg, 12, mp->FastDCCSends);
 				setCheckBox(PrefsDlg, 14, mp->dccReverseSends);
 				setButtonEnable(PrefsDlg, 5, mp->autoAcceptDCCChat);
-				x=255;
-				FSpGetFullPath(&dccFolderFSp, &x, (char ***)&sth);
-				if(sth)
+				
+				if((FSpMakeFSRef(&dccFolderFSp, &localRef)) == noErr)
 				{
-					BlockMoveData(*sth, &s[1], x);
-					DisposeHandle((Handle)sth);
+					folderURL = CFURLCreateFromFSRef(NULL, &localRef);
+					if(folderURL)
+					{
+						CFStringRef folderString;
+						
+						folderString = CFURLCopyFileSystemPath(folderURL, kCFURLPOSIXPathStyle);
+						if(folderString)
+						{
+							Str255 folderPstring;
+							
+							CFStringGetPascalString(folderString, folderPstring, sizeof(Str255), CFStringGetSystemEncoding());
+							SetText(PrefsDlg, 9, folderPstring);
+							CFRelease(folderString);
+						}
+						CFRelease(folderURL);
+					}
 				}
-				s[0]=x;
-				SetText(PrefsDlg, 9, s);
+				
 				SetControlValue(GetControlHandle(PrefsDlg, 13), dccsiztomenu());
 				
 				if(!ExistsService(dccWindowServiceType))
@@ -608,6 +623,7 @@ static void SetPreferencesWindow(short windowNum, short connListNum)
 				
 				setCheckBox(PrefsDlg, 15, mp->dccWindowAutoOpen);
 				break;
+			}
 			
 			case kwPrefWindows:
 				setCheckBox(PrefsDlg, 4,  mp->autoQuery);
@@ -647,15 +663,23 @@ static void SetPreferencesWindow(short windowNum, short connListNum)
 				setCheckBox(PrefsDlg, 4,  mp->autoLogging);
 				setCheckBox(PrefsDlg, 8,  mp->autoLogQueries);
 				setCheckBox(PrefsDlg, 9,  mp->autoLogDCCChat);
-				x=255;
-				FSpGetFullPath(&logFolderFSp, &x, (char ***)&sth);
-				if(sth)
+				
+				folderURL = CFURLCreateFromFSRef(NULL, &logFolderRef);
+				if(folderURL)
 				{
-					BlockMoveData(*sth, &s[1], x);
-					DisposeHandle((Handle)sth);
+					CFStringRef folderString;
+					
+					folderString = CFURLCopyFileSystemPath(folderURL, kCFURLPOSIXPathStyle);
+					if(folderString)
+					{
+						Str255 folderPstring;
+						
+						CFStringGetPascalString(folderString, folderPstring, sizeof(Str255), CFStringGetSystemEncoding());
+						SetText(PrefsDlg, 7, folderPstring);
+						CFRelease(folderString);
+					}
+					CFRelease(folderURL);
 				}
-				s[0]=x;
-				SetText(PrefsDlg, 7, s);
 				break;
 			
 			case kwPrefFirewall:
@@ -906,28 +930,38 @@ static char GetPreferencesWindow(short windowNum, StringPtr errorString, short c
 	return 1;
 }
 
-static void DoDirSel(FSSpec *fss, short item)
+static OSStatus DoDirSelRef(FSRef *ref, short item)
 {
-	short len;
-	Str255 st;
-	StringHandle sth;
-	OSErr err;
+	OSStatus err = noErr;
+	CFURLRef folderURL;
 	
-	DirectorySelectButton(fss);
-	len = 255;
-	err = FSpGetFullPath(fss, &len, (char ***)&sth);
-	if(len)
+	err = DirectorySelectButtonRef(ref);
+	if(err != noErr)
+		return err;		// BAIL OUT: nothing makes sense from here.
+	
+	folderURL = CFURLCreateFromFSRef(NULL, ref);
+	if(folderURL)
 	{
-		BlockMoveData(*sth, &st[1], len);
-		DisposeHandle((Handle)sth);
-		st[0]=len;
-		SetText(PrefsDlg, item, st);
+		CFStringRef folderString;
+		
+		folderString = CFURLCopyFileSystemPath(folderURL, kCFURLPOSIXPathStyle);
+		if(folderString)
+		{
+			Str255 folderPstring;
+			
+			CFStringGetPascalString(folderString, folderPstring, sizeof(Str255), CFStringGetSystemEncoding());
+			SetText(PrefsDlg, item, folderPstring);
+			CFRelease(folderString);
+		}
+		CFRelease(folderURL);
 	}
 	else
 		SetText(PrefsDlg, item, "\p");
 	
 	setButtonEnable(PrefsDlg, 1, true);
 	setButtonEnable(PrefsDlg, 2, pc.ok);
+	
+	return err;
 }
 
 static EventRecord prefsWindowEventRecord;
@@ -1102,8 +1136,16 @@ static void HitPreferencesWindow(short windowNum, short item)
 						break;
 					
 					case 8:
-						DoDirSel(&dccFolderFSp, 9);
+					{
+						FSRef localRef;
+						
+						if((FSpMakeFSRef(&dccFolderFSp, &localRef)) == noErr)
+						{
+							if((DoDirSelRef(&localRef, 9)) == noErr)
+								FSGetCatalogInfo(&localRef, kFSCatInfoNone, NULL, NULL, &dccFolderFSp, NULL);
+						}
 						break;
+					}
 				}
 				break;
 			
@@ -1210,7 +1252,7 @@ static void HitPreferencesWindow(short windowNum, short item)
 						break;
 					
 					case 6:
-						DoDirSel(&logFolderFSp, 7);
+						DoDirSelRef(&logFolderRef, 7);
 						break;
 				}
 				break;

@@ -248,7 +248,8 @@ enum {
 extern prefsPtr mainPrefs;
 extern linkPrefsRec *linkPrefsArray;
 extern RGBColor *shadowircColors;
-extern FSSpec logFolderFSp, dccFolderFSp;
+extern FSSpec dccFolderFSp;
+extern FSRef logFolderRef;
 
 extern short gApplResFork;
 
