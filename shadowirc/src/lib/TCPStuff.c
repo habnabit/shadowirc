@@ -87,10 +87,6 @@ typedef struct TCPConnection {
 	char inBuf[INCOMINGBUFSIZE];
 } TCPConnection;
 
-#pragma mark -
-#pragma mark ¥¥¥ÊTCPConnections
-#pragma mark -
-
 enum {
     tooManyConnections = -23099,
 
@@ -152,6 +148,8 @@ TCPStateType doTCPActiveOpen(int *sockfd, struct in_addr remotehost, u_short rem
 TCPStateType doTCPListenOpen(int *sockfd, u_short localport, int backlog);
 
 int GetConnectionSocket(long cp);
+
+#pragma mark -
 
 /*
  * inet_ntoa_str
