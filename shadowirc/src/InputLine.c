@@ -401,7 +401,7 @@ void OpenInputLine()
 			{kEventClassWindow, kEventWindowShown},
 			{kEventClassWindow, kEventWindowHidden},
 			{kEventClassKeyboard, kEventRawKeyDown},
-			{kEventClassKeyboard, kEventRawKeyRepeat},
+			{kEventClassKeyboard, kEventRawKeyRepeat}
 		};
 		static EventHandlerUPP ilUPP = NULL;
 
