@@ -918,7 +918,7 @@ pascal void DCCOpen(connectionPtr *x)
 	}
 	else if(d->dccFlags == closed)
 	{
-		if(!NetGetLocalIP(&cc->ip) && !ConnNewPassiveBlankListener(cc))
+		if(!NetGetLocalIP(&cc->ip) && ConnNewPassiveBlankListener(cc))
 		{
 			cc->port=ConnGetLocalPort(cc);
 			ulongstr(cc->ip, ipa);
