@@ -468,10 +468,8 @@ void DoFontSizeWindow(MWPtr mw)
 	DisposeWindow(fsWin);
 	
 	if(sq.size >= 4 && sq.size < 32767)
-	{
 		MWSetFontSize(mw, -1, sq.size);
-		WEActivate(mw->we);
-	}
+	
 CantFindDialogNib:
 CantCreateDialogWindow:
 CantInstallDialogHandler:

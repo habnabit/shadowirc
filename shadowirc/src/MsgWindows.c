@@ -951,54 +951,62 @@ void MWSetDimen(MWPtr win, short left, short top, short width, short height)
 	}
 }
 
-pascal void MWSetFontSize(MWPtr win, short font, short size)
+void MWSetFontSize(MWPtr mw, short font, short size)
 {
 	FontInfo f;
 	TextStyle s;
 	long s0,s1;
+	Boolean isActive;
 	myScrpSTElement *st;
 	GrafPtr gp;
 	
-	if(win)
+	if(mw)
 	{
 		GetPort(&gp);
-		SetPortWindowPort(win->w);
+		SetPortWindowPort(mw->w);
 		
-		if(font!=-1)
+		if(font != -1)
 		{
-			win->font=font;
+			mw->font = font;
 			TextFont(font);
 		}
-		if(size!=-1)
+		if(size != -1)
 		{
-			win->size=size;
+			mw->size = size;
 			TextSize(size);
 		}
 
 		GetFontInfo(&f);
 		SetPort(gp);
 
-		win->scrpHeight=f.descent+f.leading+f.ascent;
+		mw->scrpHeight = f.descent + f.leading + f.ascent;
 		
-		st=(**(win->sty)).scrpStyleTab;
+		st = (**(mw->sty)).scrpStyleTab;
 		st->scrpStartChar = 1;
-		st->scrpHeight = win->scrpHeight;
+		st->scrpHeight = mw->scrpHeight;
 		st->scrpAscent = f.ascent;
-		st->scrpFont = win->font;
-		st->scrpSize = win->size;
-		st->scrpFace=0;
-		st->scrpColor=shadowircColors[sicStandard];
+		st->scrpFont = mw->font;
+		st->scrpSize = mw->size;
+		st->scrpFace = 0;
+		st->scrpColor = shadowircColors[sicStandard];
 
-		s.tsFont = win->font;
+		s.tsFont = mw->font;
 		s.tsFace = 0;
-		s.tsSize = win->size;
-		s.tsColor=st->scrpColor;
+		s.tsSize = mw->size;
+		s.tsColor = st->scrpColor;
 		
-		WEGetSelection(&s0, &s1, win->we);
-		WEDeactivate(win->we);
-		WESetSelection(0, 0x7FFFFFFF, win->we);
-		WESetStyle(weDoFont + weDoSize, &s, win->we);
-		WESetSelection(s0, s1, win->we);
+		WEGetSelection(&s0, &s1, mw->we);
+		
+		isActive = WEIsActive(mw->we);
+		if(isActive)
+			WEDeactivate(mw->we);
+		
+		WESetSelection(0, 0x7FFFFFFF, mw->we);
+		WESetStyle(weDoFont + weDoSize, &s, mw->we);
+		WESetSelection(s0, s1, mw->we);
+		
+		if(isActive)
+			WEActivate(mw->we);
 	}
 }
 

@@ -192,7 +192,7 @@ MWPtr GetActiveMW(void);
 pascal char MWValid(MWPtr mw);
 pascal MWPtr NewPluginMWindow(ConstStr255Param title);
 void MWSetDimen(MWPtr win, short left, short top, short width, short height);
-pascal void MWSetFontSize(MWPtr win, short font, short size);
+pascal void MWSetFontSize(MWPtr mw, short font, short size);
 pascal void MWDelete(MWPtr w);
 
 pascal struct Channel* MWGetChannel(MWPtr mw);
