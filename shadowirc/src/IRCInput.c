@@ -753,42 +753,6 @@ void processSOCKS(CEPtr c, connectionPtr conn)
 	}
 }
 
-void processIdentd(CEPtr c, connectionPtr conn)
-{
-	int i;
-	Str255 s;
-	long nn;
-	LongString ls;
-	
-	if(c->event==C_CharsAvailable)
-	{
-		nn = ConnGetUntil(conn, (Ptr)&s[1], '\n', 250);
-		while((nn>0) && ((s[nn]==10)||(s[nn]==13)))
-			nn--;
-		if(nn)
-		{
-			s[0]=nn;
-			for(i=1;i<=nn;i++)
-				s[i]=ISODecode[s[i]];
-			
-			LSGetIntString(&ls, spError, sCIdentdCalled);
-			SMPrefixLink(conn->link,&ls, dsConsole);
-			
-			LSConcatStrAndStrAndStr(s, "\p : USERID : MACOS : ", (StringPtr)conn->refCon, &ls);
-			DisposePtr((Ptr)conn->refCon);
-			ConnPutLS(&conn, &ls);
-			
-			conn->link->identConn = 0; //detach this from the link
-			if(conn)
-			{
-				conn->lastData = now; //let the server close it, or close it if it's stale...
-				conn->closeTime = now + 30; // Give it 30 seconds.
-				ConnStale(conn);
-			}
-		}
-	}
-}
-
 static void processServerData(CEPtr c, connectionPtr conn)
 {
 	LongString ls;
@@ -986,13 +950,7 @@ void processStale(CEPtr c, connectionPtr conn)
 	
 	if(!c || c->event == C_Closed)
 	{
-		if(conn->realConnType == connIDENTD)
-		{
-			LSGetIntString(&ls, spError, sCIdentdClosed);
-			SMPrefixLink(conn->link, &ls, dsConsole);
-			deleteConnection(&conn);
-		}
-		else if(conn->realConnType == connIRC)
+		if(conn->realConnType == connIRC)
 		{
 			if(debugOn)
 			{

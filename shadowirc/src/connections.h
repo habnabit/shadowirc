@@ -46,7 +46,7 @@
 #define CONST
 #endif
 
-enum connTypes {connNIL, connIRC, connIDENTD, connDCC, connDNSIP, connDNSNAME, connPLUGIN, connSOCKS, connSTALE};
+enum connTypes {connNIL, connIRC, connDCC, connDNSIP, connDNSNAME, connPLUGIN, connSOCKS, connSTALE};
 
 enum connectStage {
 	csNil = 0,								//No connection in progress
@@ -138,7 +138,6 @@ enum maxLinks {
 typedef struct Link Link;
 struct Link {
 	connectionPtr conn;
-	connectionPtr identConn;
 	long connectedTime;
 	
 	short serverStatus;

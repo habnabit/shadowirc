@@ -226,34 +226,6 @@ pascal void LinkSuccessfulConnection(linkPtr link, char reg)
 		RegUser(link);
 }
 
-static pascal void CreateIdentdConn(connectionPtr conn)
-{
-	if(mainPrefs->firewallType != fwSOCKS5) //Why?
-	{
-		LongString ls;
-		connectionPtr identConn;
-		linkPtr link = conn->link;
-		
-		link->identConn = identConn = newConnection(connIDENTD);
-		if(identConn)
-		{
-			LSGetIntString(&ls, spError, sOpeningIdentd);
-			SMPrefixLink(link, &ls, 1);
-			
-			identConn->ip = conn->ip;
-			identConn->port = 113;
-			identConn->link=link;
-			if(mainPrefs->firewallType == fwSOCKS4A || mainPrefs->firewallType == fwSOCKS4)
-				identConn->refCon = NewPString(mainPrefs->socksUser);
-			else
-				identConn->refCon = NewPString(conn->link->linkPrefs->user);
-			
-			//Allow for a 10 connection backlog. This is more than enough.
-			ConnNewListen(identConn, 10);
-		}
-	}
-}
-
 void DisplayLookupResult(connectionPtr conn)
 {
 	LongString ls;
@@ -264,15 +236,13 @@ void DisplayLookupResult(connectionPtr conn)
 	SMPrefix(&ls, dsConsole);
 }
 
-//We found the IP for the server we're trying to connect to.
-//connect to the server, and then open the identd connection
+//We found the IP for the server we're trying to connect to. Connect to the server.
 pascal void connection2(connectionPtr conn)
 {
 	if(ConnNewActive(conn)) //this makes the connection to the (socks) server
 	{
 		if(conn->socks.type == connIRC)
 		{
-			CreateIdentdConn(conn);
 			LinkSetStage(conn->link, csOpeningConnection);
 			conn->link->serverStatus=S_OPENING;
 			UpdateStatusLine();
@@ -294,10 +264,6 @@ pascal void startConnection(linkPtr link)
 	LongString ls;
 	StringPtr search;
 	
-//identd
-	if(link->identConn)
-		deleteConnection(&link->identConn);
-
 	pstrcpy(lp->nick, link->CurrentNick);
 	pstrcpy(lp->serverName, link->CurrentServer);
 	

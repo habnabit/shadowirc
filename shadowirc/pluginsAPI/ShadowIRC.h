@@ -371,7 +371,6 @@ enum navPrefKey {
 enum connTypeRec {
 	connNIL,				//no connection
 	connIRC,				//IRC server connection
-	connIDENTD,			//identd connection
 	connDCC,				//DCC connection
 	connDNSIP,			//DNS name -> IP lookup
 	connDNSNAME,		//DNS ip -> name lookup
@@ -520,7 +519,6 @@ enum linkStatus {
 */
 struct Link {
 	connectionPtr conn;					//The IRC connection for this link, or nil
-	connectionPtr identConn;			//The identd connection for this link, or nil
 	long connectedTime;					//The time the connection was established, in seconds.
 	
 	short serverStatus;					//Server status. see enum linkStatus

@@ -545,9 +545,6 @@ pascal void MenuSignoffConnectionList(short item)
 		if(link->serverStatus==S_CONN)
 			DoSignoff(link, 0);
 		
-		if(link->identConn)
-			deleteConnection(&link->identConn);
-
 		if(CurrentTarget.link == link)
 			InvalTarget(&CurrentTarget);
 		UpdateStatusLine();
