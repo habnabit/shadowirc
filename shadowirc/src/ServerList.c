@@ -644,7 +644,7 @@ pascal void DoServerSelect(ServerListServiceData *p)
 	UseResFile(mainResNum);
 
 	GetThemeDrawingState(&ts);
-	NormalizeDrawingState();
+	NormalizeThemeDrawingState();
 	
 	fillNetsList(nets);
 	

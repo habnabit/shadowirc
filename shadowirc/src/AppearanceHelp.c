@@ -117,28 +117,3 @@ pascal void SetBackground(short color)
 {
 	SetThemeBackground(color, 16, true);
 }
-
-#pragma mark -
-
-//Replacments for the color/pen state stuff that's in Appearance 1.1
-//Copied from Apple's code from somewhere, I think
-//But, assuming we have a color port, since ShadowIRC only generates color windows...
-
-pascal void NormalizeDrawingState()
-{
-	Pattern			whitePat;
-	GrafPtr			curPort;
-	
-	GetQDGlobalsWhite(&whitePat);
-	GetPort( &curPort );
-	
-	if(IsPortColor( curPort ) )
-	{
-		RGBForeColor( &black );
-		RGBBackColor( &white );
-	}
-	PenNormal();
-	BackPat( &whitePat );
-	TextMode( srcOr );
-}
-

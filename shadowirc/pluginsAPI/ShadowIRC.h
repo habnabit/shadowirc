@@ -1,5 +1,5 @@
 /*	ShadowIRC Plugins Header File
-		Version 2.0
+		Version 2.0-preliminary
 		© John Bafford 1997-2002. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
@@ -2640,12 +2640,6 @@ pascal void DrawBorder(const Rect *r, long state, char draggable);
 		Input:	r - Rect to draw in
 					state - kThemeStateActive, kThemeStatePressed, kThemeStateInactive
 					draggable - if true, draw border with dragging indicator
-		Output:	none
-*/
-
-pascal void NormalizeDrawingState();
-/*	Sets the foreground color to black and the background color/pattern to white.
-		Input:	none
 		Output:	none
 */
 

@@ -45,6 +45,4 @@ pascal void SetBackground(short color);
 
 pascal void DrawBorder(const Rect *rIn, long state, char draggable);
 
-pascal void NormalizeDrawingState();
-
 #endif
