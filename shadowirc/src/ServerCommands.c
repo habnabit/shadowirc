@@ -34,7 +34,6 @@
 #include "plugins.h"
 #include "IRCCommands.h"
 #include "utils.h"
-#include "IRCAux.h"
 #include "Sound.h"
 #include "Inline.h"
 #include "Floaters.h"

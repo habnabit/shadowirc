@@ -58,6 +58,23 @@ enum siColors {
 	sicDontProcess=255					//any styles after this color token aren't processed.
 };
 
+enum nickFormats
+{
+	//Source. One must be selected, or normal is assumed.
+	kNickNormal = (1 << 0),
+	kNickNotice = (1 << 1),
+	kNickPrivmsg = (1 << 2),
+	kNickOther = (1 << 3),
+	
+	//Display modifications
+	kNickAction = (1 << 4),
+	kNickSend = (1 << 5)
+};
+
+
+pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nickC, int type);
+pascal void FormatMessage(ConstStr255Param nick, const LongString *text, ConstStringPtr nickC, ConstStringPtr textC, int type, LongString *out);
+
 #pragma lib_export on
 #pragma export on
 

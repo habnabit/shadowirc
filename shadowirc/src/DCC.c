@@ -31,7 +31,6 @@
 #include "connections.h"
 #include "utils.h"
 #include "IRCChannels.h"
-#include "IRCAux.h"
 #include "CTCP.h"
 #include "InputLine.h"
 #include "plugins.h"

@@ -28,7 +28,6 @@
 #include "CTCP.h"
 #include "DCC.h"
 #include "connections.h"
-#include "IRCAux.h"
 #include "plugins.h"
 #include "IRCCommands.h"
 #include "Inline.h"

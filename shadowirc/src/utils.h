@@ -84,6 +84,8 @@ pascal void pstrcpymax(ConstStringPtr src, StringPtr dest, char max);
 pascal OSErr CopyResource(ResType type, short id, short src, short des);
 pascal void pstrcat(ConstStr255Param src1, ConstStr255Param src2, StringPtr des);
 
+pascal void NextArg(StringPtr from, StringPtr arg);
+
 #pragma export off
 #pragma lib_export off
 

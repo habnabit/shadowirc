@@ -22,23 +22,9 @@
 #ifndef _IRCAux
 #define _IRCAux
 
-enum nickFormats
-{
-	//Source. One must be selected, or normal is assumed.
-	kNickNormal = (1 << 0),
-	kNickNotice = (1 << 1),
-	kNickPrivmsg = (1 << 2),
-	kNickOther = (1 << 3),
-	
-	//Display modifications
-	kNickAction = (1 << 4),
-	kNickSend = (1 << 5)
-};
-
 #pragma lib_export on
 #pragma export on
 pascal void MakeChannel(StringPtr s);
-pascal void NextArg(StringPtr from, StringPtr arg);
 
 #ifdef _connections
 pascal void putServer(linkPtr link, LongString *ls);
@@ -53,10 +39,6 @@ pascal void ConnPutLS(connectionPtr *conn, LongString *ls);
 #pragma lib_export off
 
 #pragma internal on
-pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nickC, int type);
-pascal void FormatMessage(ConstStr255Param nick, const LongString *text, ConstStringPtr nickC, ConstStringPtr textC, int type, LongString *out);
-
-
 pascal void ConnectionMenuSetup(void);
 pascal void ConnectionMenuHilites(void);
 

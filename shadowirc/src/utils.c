@@ -1414,6 +1414,29 @@ pascal void strp2c(unsigned char *pstr)
 	pstr[len] = 0;
 }
 
+pascal void NextArg(StringPtr from, StringPtr arg)
+{
+	short i = pos(' ',from);
+	if(!i)
+	{
+		if(arg)
+			pstrcpy(from,arg);
+		from[0]=0;
+	}
+	else
+	{
+		if(arg)
+			myCopy(from,1,i-1, arg);
+		while(i<from[0])
+		{
+			if((from[i+1]!=':') && (from[i+1]!=' '))
+				break;
+			i++;
+		}
+		pdelete(from,1,i);
+	}
+}
+
 pascal StringPtr NewPString(const unsigned char *pstr)
 {
 	StringPtr str;

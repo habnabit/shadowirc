@@ -27,7 +27,6 @@
 #include "channels.h"
 #include "filesMan.h"
 #include "utils.h"
-#include "IRCAux.h"
 #include "Inline.h"
 #include "plugins.h"
 

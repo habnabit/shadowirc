@@ -27,6 +27,7 @@
 #include "IRCChannels.h"
 #include "TextManip.h"
 #include "inline.h"
+#include "utils.h"
 
 pascal void MWColor(LongString *ls, short colorNum)
 {
@@ -55,6 +56,115 @@ pascal void MWIrcleColor(LongString *ls, short colorNum)
 	ls->data[2] = colorNum;
 	ls->len = i + 2;
 }
+
+#pragma mark -
+
+pascal void FormatMessage(ConstStr255Param nick, const LongString *text, ConstStringPtr nickC, ConstStringPtr textC, int type, LongString *out)
+{
+	LongString o;
+	
+	//First off, format the nick
+	if(nick[0])
+		FormatNick(nick, &o, nickC, type);
+	else
+		o.len = 0;
+	
+	//Prepare the text
+	if(!textC)
+	{
+		if(type & kNickSend)
+			textC = "\p\xE\x8\x4";
+		else if(type & kNickPrivmsg)
+			textC = "\p\xE\x8\x2"; //should be E and not F?
+		else if(type & kNickNotice)
+			textC = "\p\xE\x8\x5";
+		else //if(type & kNickNormal)
+			textC = "\p\xE";
+	}
+	
+	LSConcatLSAndStrAndLS(&o, textC, text, out);
+}
+
+pascal void FormatNick(ConstStr255Param nick, LongString *ls, ConstStringPtr nickC, int type)
+{	
+	//Set the coloration on the nick
+	if(!nickC)
+	{
+		if(type & kNickSend)
+			nickC = "\p\xE\x8\x4";
+		else if(type & kNickPrivmsg)
+			nickC = "\p\xE\x8\x2"; //should be E and not F?
+		else if(type & kNickNotice)
+			nickC = "\p\xE\x8\x5";
+		else //if(type & kNickNormal)
+			nickC = "\p\xE";
+	}
+	
+	//Tack the nick into the LS
+	pstrcpy(nickC, ls->data);
+	ls->len = ls->data[0];
+	
+	if(type & (kNickNormal | kNickPrivmsg | kNickOther | kNickAction))
+	{
+		int extraSpace;
+		
+		if(type & kNickAction)
+		{
+			extraSpace = -1;
+			if(mainPrefs->textIndenting)
+				LSConcatLSAndStrAndStr(ls, "\p             ", nick, ls);
+			else
+				LSConcatLSAndStrAndStr(ls, "\p * ", nick, ls);
+			LSAppend1(*ls, ' ');
+		}
+		else if(type & kNickPrivmsg)
+		{
+			extraSpace =1;
+			LSConcatLSAndStr(ls, nickC, ls);
+			LSAppend1(*ls, '*');
+			LSConcatLSAndStr(ls, nick, ls);
+			LSAppend2(*ls, '* ');
+		}
+		else if(type & kNickOther)
+		{
+			extraSpace =1;
+			LSConcatLSAndStr(ls, nickC, ls);
+			LSAppend1(*ls, '(');
+			LSConcatLSAndStr(ls, nick, ls);
+			LSAppend2(*ls, ') ');
+		}
+		else if(mainPrefs->ircIIDisplay)
+		{
+			extraSpace = 1;
+			LSConcatLSAndStr(ls, nickC, ls);
+			LSAppend1(*ls, '<');
+			LSConcatLSAndStr(ls, nick, ls);
+			LSAppend2(*ls, '> ');
+		}
+		else
+		{
+			extraSpace = 0;
+			LSConcatLSAndStr(ls, nick, ls);
+			LSAppend2(*ls, ': ');
+		}
+		
+		if(mainPrefs->textIndenting && extraSpace != -1)
+		{
+			LSMakeStr(*ls);
+			padBegin(ls->data, 12 + extraSpace, ls->data);
+			ls->len = ls->data[0];
+		}
+	}
+	else if(type & kNickNotice)
+	{
+		if(type & kNickSend)
+			LSConcatLSAndStrAndStr(ls, "\p> -", nick, ls);
+		else
+			LSConcatLSAndStrAndStr(ls, "\p-", nick, ls);
+		LSAppend2(*ls, '- ');
+	}
+}
+
 
 #pragma mark -
 
