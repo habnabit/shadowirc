@@ -199,7 +199,7 @@ static void nPrivmsg(linkPtr link, LongString *ls, StringPtr fromuser, StringPtr
 		p.autoQuery = 0;
 		p.redirect = 0;
 		p.nickStyleP = p_nickStyle;
-		p.nickStyleP = p_nickStyle;
+		p.textStyleP = p_textStyle;
 		
 		if(!(p.targChan = (p.chan = ChFind(target, link)) != 0)) //not channel
 		{
