@@ -74,6 +74,8 @@ static void RollCSMouseCall(short l, char mc, char cl, Rect *cr, Point p, LongSt
 
 #define kNibChannel CFSTR("channel")
 #define kNibWinChannelTopic CFSTR("Channel Topic")
+#define kNibWinModeL CFSTR("modeL")
+#define kNibWinModeK CFSTR("modeK")
 
 enum {
 	kSIRCTopicOKControlID = 1,
@@ -579,7 +581,7 @@ static pascal OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandl
 	
 	return result;
 }
- 
+
 void ChTopicWindow(channelPtr ch)
 {
 	IBNibRef mainNibRef;
@@ -638,48 +640,126 @@ static void DoTopicWidget(mwWidgetPtr o)
 
 #pragma mark -
 
-void DoModeLWindow(channelPtr ch, LongString *ls)
+typedef struct sqData {
+	WindowRef win;
+	long size;
+} sqData;
+
+static pascal OSStatus ModeLEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
-	char b;
-	DialogPtr d;
-	short i;
-	Str255 s;
+	OSStatus result = eventNotHandledErr;
+	UInt32 eventClass, eventKind;
+	WindowRef aboutWindow;
+	sqData *data = (sqData*)userData;
 	
-	EnterModalDialog();
-	d=GetNewDialog(10001, 0,(WindowPtr)-1);
-	NumToString(ch->limit, s);
-	SetText(d, 4, s);
-	ParamText(ch->chName, "\p", "\p", "\p");
-	SelectDialogItemText(d, 4, 0, 255);
-	SetupModalDialog(d, 1, 2);
-	b=0;
-	do
-	{
-		ModalDialog(StdDlgFilter, &i);
-		if((i==1) || (i==2))
-			b=1;
-	} while(!b);
+	eventClass = GetEventClass(event);
+	eventKind = GetEventKind(event);
 	
-	b=0;
-	if(i==1)
+	aboutWindow = (WindowRef)userData;
+	
+	switch(eventClass)
 	{
-		GetText(d, 4, s);
-		if(s[0])
+		case kEventClassControl:
 		{
-			long l;
-			StringToNum(s, &l);
-			if(l>0)
+			ControlRef theControl = NULL;
+			UInt32 cmd;
+			ControlRef itemCtrl;
+			const ControlID item = {'SIRC', 4};
+			CFStringRef theStr;
+			Str255 s;
+			
+			GetEventParameter(event, kEventParamDirectObject, typeControlRef, NULL, sizeof(ControlRef), NULL, &theControl);
+			GetControlCommandID(theControl, &cmd);
+			
+			switch(cmd)
 			{
-				LSAppend1(*ls, ' ');
-				LSConcatLSAndStr(ls, s, ls);
-				b=1;
+				case kHICommandOK:
+					GetControlByID(data->win, &item, &itemCtrl);
+					
+					GetControlData(itemCtrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theStr, NULL);
+					CFStringGetPascalString(theStr, s, sizeof(Str255), CFStringGetSystemEncoding());
+					StringToNum(s, &data->size);
+					
+					if(0)
+				case kHICommandCancel:
+						data->size = -1;
+					QuitAppModalLoopForWindow(data->win);
+					result = noErr;
+					break;
 			}
+			break;
 		}
 	}
-	else //canceled
-		ls->len = 0;
-	DisposeDialog(d);
-	FinishModalDialog();
+	
+	return result;
+}
+
+void DoModeLWindow(channelPtr ch, LongString *ls)
+{
+	static EventHandlerUPP swUPP = NULL;
+	WindowRef fsWin;
+	IBNibRef channelsNib;
+	OSStatus status;
+	sqData sq;
+	ControlRef itemCtrl;
+	const ControlID item = {'SIRC', 4};
+	CFStringRef theStr;
+	Str255 s;
+	
+	const EventTypeSpec ctSpec[] = {
+		{ kEventClassControl, kEventControlHit }
+	};
+	
+	if(!swUPP)
+		swUPP = NewEventHandlerUPP(ModeLEventHandler);
+	
+	status = CreateNibReference(kNibChannel, &channelsNib);
+	require_noerr(status, CantFindDialogNib);
+	
+	status = CreateWindowFromNib(channelsNib, kNibWinModeL, &fsWin);
+	require_noerr(status, CantCreateDialogWindow);
+	
+	DisposeNibReference(channelsNib);
+	
+	status = InstallWindowEventHandler(fsWin, swUPP, GetEventTypeCount(ctSpec), ctSpec, (void *)&sq, NULL);
+	require_noerr(status, CantInstallDialogHandler);
+	
+	//Put the current font size here.
+	
+	sq.win = fsWin;
+	sq.size = ch->limit;
+	
+	NumToString(ch->limit, s);
+	ParamText(ch->chName, "\p", "\p", "\p");
+	
+	GetControlByID(fsWin, &item, &itemCtrl);
+	theStr = CFStringCreateWithPascalString(NULL, s, kCFStringEncodingMacRoman);
+	SetControlData(itemCtrl, kControlEntireControl, kControlEditTextCFStringTag, sizeof(CFStringRef), &theStr);
+	CFRelease(theStr);
+	
+	ShowWindow(fsWin);
+	SelectWindow(fsWin);
+	
+	SetKeyboardFocus(fsWin, itemCtrl, kControlFocusNextPart);
+	
+	status = RunAppModalLoopForWindow(fsWin);
+	
+	DisposeWindow(fsWin);
+	
+	if(sq.size >= 0)
+	{
+		NumToString(sq.size, s);
+		LSAppend1(*ls, ' ');
+		LSConcatLSAndStr(ls, s, ls);
+		
+		return;
+	}
+	
+	//Fall-through if cancel button hit
+CantFindDialogNib:
+CantCreateDialogWindow:
+CantInstallDialogHandler:
+	ls->len = 0;
 }
 
 void DoModeKWindow(channelPtr ch, LongString *ls)
