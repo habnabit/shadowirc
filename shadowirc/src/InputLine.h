@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford
+	Copyright (C) 1996-2002 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -22,7 +22,6 @@
 #ifndef _InputLine_
 #define _InputLine_
 
-#define MAXLINE 500
 #define MAXHIST 4096
 
 #ifndef __INPUTLINE__
