@@ -1106,14 +1106,17 @@ static void _ucWallops(linkPtr link, ConstStr255Param com, LongString *rest, Lon
 
 static void _ucWallchops(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
 {
-#pragma unused(link,com)
-	Str255 s1;
+#pragma unused(com)
+	Str255 chan;
 	
-	LSNextArg(rest, s1);
-	if(s1[0] && rest->len)
+	LSNextArg(rest, chan);
+	if(chan[0] && rest->len)
 	{
-		LSConcatStrAndStrAndStr("\pWALLCHOPS ", s1, "\p :", s);
+		LSConcatStrAndStrAndStr("\pWALLCHOPS ", chan, "\p :", s);
 		LSConcatLSAndLS(s, rest, s);
+		
+		FormatMessage(link->CurrentNick, rest, NULL, NULL, kNickNotice | kNickSend, rest);
+		ChannelMsg(link, chan, rest); //might be a channel
 	}
 }
 
