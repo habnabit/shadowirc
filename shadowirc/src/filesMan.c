@@ -865,9 +865,9 @@ static void CreateNewPrefsLinks(void)
 		lp->autoConnect=false;
 		lp->reconnect=false;
 		lp->displayMOTD=true;
-		lp->useConnectMacro=true;
+		lp->useConnectMacro = false;
 		pstrcpy("\p/join #macintosh", lp->connectMacro);
-		pstrcpy("\pnewbrunswick.nj.us.undernet.org", lp->serverName);
+		pstrcpy("\pmesa.az.us.undernet.org", lp->serverName);
 		lp->networkID = 'unet';
 		lp->serverPass[0]=0;
 		lp->serverPort=6667;
