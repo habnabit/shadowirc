@@ -61,7 +61,7 @@ static void UpdateInputRegion(mwPanePtr w)
 
 static void MWInputPaneClick(mwPanePtr o, Point where, float time, UInt32 modifiers)
 {
-	#pragma unused(time, modifiers)
+	#pragma unused(time)
 	extern char iwFront;
 	
 	iwFront = true;
@@ -92,13 +92,16 @@ static void MWInputPaneClick(mwPanePtr o, Point where, float time, UInt32 modifi
 			MWPaneRecalculate(o->mw);
 			MWPaneResize(o->mw);
 			MWPaneUpdate(o->mw);
+			
+			if(modifiers & shiftKey)
+				mainPrefs->inlineInputDefaultHeight = o->drawArea.bottom - o->drawArea.top;
 		}
 
 		r = o->drawArea;
 		r.bottom = r.top + 5;
 		DrawBorder(&r, kThemeStateActive, true);
 	}
-	else if(where.v >= o->drawArea.top + 8) //field
+	else  //field
 	{
 		//We don't do anything here, the control handles it
 	}

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2003 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -549,7 +549,7 @@ enum PrefsData {
 	kShadowIRC11PreferencesVersion = 3,
 	kShadowIRC20Alpha10PreferencesVersion = 4,
 	PreferencesVersion = kShadowIRC20Alpha10PreferencesVersion,
-	PrefsUpdateLevel = 0,
+	PrefsUpdateLevel = 6,
 	SizeOfPrefsDataArea = sizeof(prefsRec) + (sizeof(linkPrefsRec)*maxLinks),
 	SizeOfPrefs = sizeof(prefsStruct) + SizeOfPrefsDataArea
 };
@@ -622,6 +622,16 @@ static void ReadInPrefs(void)
 			return;
 		}
 	}
+	else if(p.version > PreferencesVersion)
+	{
+		s2 = GetIntStringPtr(spError, sErrorLoadingPrefs);
+		s = GetIntStringPtr(spError, sPrefsVersionError);
+//		else
+//			s = GetIntStringPtr(spError, sUnrecognizedPrefs);
+		ParamText(s2, "\p", s, "\p");
+		Alert(130,0);
+		ExitToShell();
+	}
 	
 	//Prefs are ok.
 	l=sizeof(prefsRec);
@@ -638,60 +648,55 @@ static void ReadInPrefs(void)
 	l=sizeof(linkPrefsRec) * 10;
 	FSRead(mainRefNum, &l, (Ptr)linkPrefsArray);
 	
-	if(p.version == kShadowIRC11PreferencesVersion)
+	//Check to see if the prefs need updating
+	if(p.version == kShadowIRC20Alpha10PreferencesVersion && p.prefsUpdate == 0)
+		p.prefsUpdate = 5;
+	
+	switch(p.prefsUpdate)
 	{
-		switch(p.prefsUpdate)
-		{
-			case 2:
-				mainPrefs->displayJoin =
-				mainPrefs->displayPart =
-				mainPrefs->displayQuit =
-				mainPrefs->displayModes = 
-				mainPrefs->displayNicks = 
-				mainPrefs->displayKicks = 
-				mainPrefs->displayInvites = 1;
-				mainPrefs->dccSendPacketSize = 4096;
-
-				shadowircColors[13].red=25368;
-				shadowircColors[13].green=0;
-				shadowircColors[13].blue=25368;
-
-				shadowircColors[14].red=
-				shadowircColors[14].green=
-				shadowircColors[14].blue=0;
-				
-				mainPrefs->userlistInWindowRight = 1;
-				mainPrefs->nonGlobalInput = 0;
-				
-				for(x=0;x<17;x++)
-					p.padding[x] = 0;
+		case 2:
+			mainPrefs->displayJoin =
+			mainPrefs->displayPart =
+			mainPrefs->displayQuit =
+			mainPrefs->displayModes = 
+			mainPrefs->displayNicks = 
+			mainPrefs->displayKicks = 
+			mainPrefs->displayInvites = 1;
+			mainPrefs->dccSendPacketSize = 4096;
 			
-			case 3: //fix the position of recent nicks/channels
-				for(x = 0; x < 10; x++)
-				{
-					linkPrefsPtr lpp = &linkPrefsArray[x];
-					BlockMoveData(&lpp->unusedX, lpp->recentNicks, (64 * 10 + 256 * 10));
-					lpp->unusedX = 0;
-					lpp->regainNick = 0;
-				}
-				
-			case 4:
-				mainPrefs->dccUsePortRange = 0;
-				mainPrefs->dccPortRangeLow = 2048;
-				mainPrefs->dccPortRangeHigh = 4096;
-				
-				p.prefsUpdate = PrefsUpdateLevel;
-		}
-	}
-	else if(p.version > PreferencesVersion)
-	{
-		s2 = GetIntStringPtr(spError, sErrorLoadingPrefs);
-		s = GetIntStringPtr(spError, sPrefsVersionError);
-//		else
-//			s = GetIntStringPtr(spError, sUnrecognizedPrefs);
-		ParamText(s2, "\p", s, "\p");
-		Alert(130,0);
-		ExitToShell();
+			shadowircColors[13].red=25368;
+			shadowircColors[13].green=0;
+			shadowircColors[13].blue=25368;
+			
+			shadowircColors[14].red=
+			shadowircColors[14].green=
+			shadowircColors[14].blue=0;
+			
+			mainPrefs->userlistInWindowRight = 1;
+			mainPrefs->nonGlobalInput = 0;
+			
+			for(x=0;x<17;x++)
+				p.padding[x] = 0;
+		
+		case 3: //fix the position of recent nicks/channels
+			for(x = 0; x < 10; x++)
+			{
+				linkPrefsPtr lpp = &linkPrefsArray[x];
+				BlockMoveData(&lpp->unusedX, lpp->recentNicks, (64 * 10 + 256 * 10));
+				lpp->unusedX = 0;
+				lpp->regainNick = 0;
+			}
+			
+		case 4:
+			mainPrefs->dccUsePortRange = 0;
+			mainPrefs->dccPortRangeLow = 2048;
+			mainPrefs->dccPortRangeHigh = 4096;
+		
+		case 5: //actually 2.0a10 prefsUpdate #0, but we're kludging it for simplicity
+			mainPrefs->inlineInputDefaultHeight = 32;
+		
+		case 6: //2.0a14
+			p.prefsUpdate = PrefsUpdateLevel;
 	}
 	
 	//Note that the links haven't been set up yet!!
@@ -757,7 +762,7 @@ static void CreateNewPrefsMain(void)
 	pstrcpy("\p*** ", mp->serverMessagePrefix);
 	ZeroRect(mp->consoleLoc);
 	ZeroRect(mp->inputLoc);
-mp->unusedIW=0;
+	mp->inlineInputDefaultHeight = 32;
 	mp->consoleOpen=true;
 	mp->userListOpen=0;
 	ZeroRect(mp->userListRect);

@@ -1210,7 +1210,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			
 			h->font=fontNum;
 			h->size=mainPrefs->defaultFontSize;
-
+ 
 			if(!h->protect)
 			{
 				SetWindowContentColor(h->w, &shadowircColors[sicWindowBG]);
@@ -1232,7 +1232,15 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 				if(noFloatingInput && !h->protect)
 				{
 					Rect zeroRect = {0, 0, 0, 0};
-					MWNewPane(h, mwInputPane, mwPaneBottom, 32, -1);
+					short inlineHeight = (windowSize.bottom - windowSize.top) / 2;
+					
+					if(mainPrefs->inlineInputDefaultHeight < inlineHeight)
+						inlineHeight = mainPrefs->inlineInputDefaultHeight;
+					
+					if(inlineHeight < 32)
+						inlineHeight = 32;
+					
+					MWNewPane(h, mwInputPane, mwPaneBottom, inlineHeight, -1);
 					
 					h->inputData = IADNew(h->w, zeroRect, NewKey, false);
 				}

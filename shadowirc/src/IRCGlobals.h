@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2004 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -102,7 +102,7 @@ typedef struct prefsRec {
 	Str255 serverMessagePrefix;	//Prefix for server messages
 	Rect consoleLoc;
 	Rect inputLoc;							//Position and size of inputline.
-short unusedIW;
+	short inlineInputDefaultHeight;	//Default height for inputlines in the channel window
 	char consoleOpen;						//Is console window open?
 	char userListOpen;
 	Rect userListRect;
