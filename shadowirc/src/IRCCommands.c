@@ -1406,6 +1406,14 @@ static void _ucUserhost(linkPtr link, ConstStr255Param com, LongString *rest, Lo
 		link->outstandingUSERHOST++;
 }
 
+pascal void ServerCommands(LongString *ls, linkPtr link);
+static void _ucServerCommand(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s)
+{
+	if(debugOn)
+		ServerCommands(rest, link);
+	s->len = 0;
+}
+
 typedef void (*UserCommandProcPtr)(linkPtr link, ConstStr255Param com, LongString *rest, LongString *s);
 
 typedef struct UserCommandItem {
@@ -1478,6 +1486,10 @@ static const UserCommandItem TranslateCommandList[] = {
 	{"\pKICK",	_ucKick},
 	{"\pME",	_ucMe},
 	{"\pUSERHOST",	_ucUserhost},
+	
+	//Debugging commands
+	{"\pSERVERCOMMAND", _ucServerCommand},
+	
 	{0, 0}
 };
 
