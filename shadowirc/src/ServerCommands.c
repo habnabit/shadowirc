@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -389,10 +389,9 @@ static void nPart(linkPtr link, LongString *target, StringPtr from, StringPtr fr
 		LSConcatStrAndStrAndStr(from, "\p has left ", channel, &tls);
 		if(targ[0])
 		{
-			LSAppend2(tls, ' (');
-			LSAppend2(tls, 0x08FA); //save text style
+			LSConcatLSAndStr(&tls, "\p (\x08\xFA", &tls); //open paren and save color style
 			LSConcatLSAndLS(&tls, target, &tls);
-			LSAppend3(tls, 0x08FB2900); //restore style+ )
+			LSConcatLSAndStr(&tls, "\p\x08\xFB)", &tls); //restore color style and close paren
 		}
 
 		SMPrefix(&tls, dsNowhere);
