@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2003 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -146,17 +146,12 @@ resource 'STR#' (256, "Error Strings", locked, preload)
 		"Registration failed, trying again...",
 		"ERROR: Can't create log folder for this connection!",
 		"ERROR: The log folder for this connection is a file!",
-		"ShadowIRC is running low on memory.",
-		"Please close some windows or extra IRC connections to free up memory.",
-		"ShadowIRC requires System 8.1 or later to run.",
 		"There is no topic set.",
 		"You do not have ops, so you can not change the topic.",
-		"WARNING: ShadowIRC is running low on memory.",
 		"You must give this connection a name.",
 		"Identd closed",
 		"DNS ^0: Can't lookup yet.",
 		"DNS ^0: Not in userlist; can't lookup.",
-		"ShadowIRC ran out of memory.",
 		"^0 is not on channel ^1",
 		"The server thinks your nick is something other than what I think it is. Check your settings."
 	};
@@ -275,7 +270,6 @@ resource 'STR#' (261, "URL Menu", locked, preload)
 	{
 		"ShadowIRC Home Page", "http://www.shadowirc.com/",
 		"SourceForge Project Page", "http://sourceforge.net/projects/shadowirc/",
-//		"Comments and Suggestions", "http://www.shadowirc.com/comment.phtml",
 		"ShadowIRC Support", "http://www.shadowirc.com/support.phtml",
 		"ShadowIRC Plugins", "http://plugins.shadowirc.com/",
 		"-", "-",
