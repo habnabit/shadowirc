@@ -20,6 +20,7 @@
 */
 
 #include <Appearance.h>
+#include <ControlDefinitions.h>
 
 #include "userlist.h"
 #include "ULList.h"
