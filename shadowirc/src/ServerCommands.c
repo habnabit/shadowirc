@@ -556,6 +556,11 @@ static void nNick(linkPtr link, LongString *ls, StringPtr from, StringPtr fromus
 #define kNibKill CFSTR("kill")
 #define kNibWinKill CFSTR("Kill")
 
+static const EventTypeSpec killEventTypes[] = {
+	{ kEventClassControl, kEventControlHit },
+	{ kEventClassCommand, kEventProcessCommand }
+};
+
 static OSStatus KillWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 #pragma unused(myHandler)
@@ -614,11 +619,6 @@ static void NewKillWindow(StringPtr from, LongString *reason)
 	OSStatus status;
 	CFStringRef theStr;
 	
-	const EventTypeSpec ctSpec[] = {
-		{ kEventClassControl, kEventControlHit },
-		{ kEventClassCommand, kEventProcessCommand }
-	};
-	
 	const ControlID serverID = { kApplicationSignature, 1};
 	const ControlID reasonID = { kApplicationSignature, 2};
 	ControlRef ctrl;
@@ -634,7 +634,7 @@ static void NewKillWindow(StringPtr from, LongString *reason)
 	
 	DisposeNibReference(theNib);
 	
-	status = InstallWindowEventHandler(win, handlerUPP, GetEventTypeCount(ctSpec), ctSpec,(void *)win, NULL);
+	status = InstallWindowEventHandler(win, handlerUPP, GetEventTypeCount(killEventTypes), killEventTypes, (void *)win, NULL);
 	require_noerr(status, CantInstallDialogHandler);
 	
 	GetControlByID(win, &serverID, &ctrl);

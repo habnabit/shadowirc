@@ -136,6 +136,14 @@ static void SetShortcutWindow(WindowRef shortcutsWin, int group)
 	}
 }
 
+static const EventTypeSpec shortEventTypes[] = {
+	{ kEventClassWindow, kEventWindowActivated },
+	{ kEventClassWindow, kEventWindowDeactivated },
+	{ kEventClassWindow, kEventWindowClosed },
+	{ kEventClassControl, kEventControlHit },
+	{ kEventClassCommand, kEventProcessCommand }
+};
+
 static OSStatus ShortcutsEditorEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 #pragma unused(myHandler)
@@ -244,14 +252,6 @@ void DoShortcutsEditor(void)
 	IBNibRef shortcutsNib;
 	OSStatus status;
 	
-	const EventTypeSpec ctSpec[] = {
-		{ kEventClassWindow, kEventWindowActivated },
-		{ kEventClassWindow, kEventWindowDeactivated },
-		{ kEventClassWindow, kEventWindowClosed },
-		{ kEventClassControl, kEventControlHit },
-		{ kEventClassCommand, kEventProcessCommand }
-	};
-	
 	if(++gShortcutsWindowCount > 1)
 	{
 		//Undo the change to the count and select the shortcuts window.
@@ -276,7 +276,7 @@ void DoShortcutsEditor(void)
 	
 	SetWindowProperty(shortcutsWin, kApplicationSignature, kShortcutDataProperty, sizeof(sdp), &sdp);
 	
-	status = InstallWindowEventHandler(shortcutsWin, swUPP, GetEventTypeCount(ctSpec), ctSpec,(void *)shortcutsWin, NULL);
+	status = InstallWindowEventHandler(shortcutsWin, swUPP, GetEventTypeCount(shortEventTypes), shortEventTypes, (void *)shortcutsWin, NULL);
 	require_noerr(status, CantInstallDialogHandler);
 	
 	SetShortcutWindow(shortcutsWin, 0);

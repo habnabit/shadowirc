@@ -169,6 +169,10 @@ void IADDispose(inputAreaDataPtr iad)
 }
 
 //Separate out the text event handler, so that it runs quickly
+static const EventTypeSpec iadTextEventTypes[] = {
+		{kEventClassTextInput, kEventUnicodeForKeyEvent},
+};
+
 static OSStatus InputLineControlTextEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
 #pragma unused(handlerCallRef)
@@ -233,6 +237,10 @@ OSStatus IADHandleTextEvent(inputAreaDataPtr iad, EventRef event)
 {
 	return SendEventToControl(event, iad->inputControl);
 }
+
+static const EventTypeSpec iadControlEventTypes[] = {
+		{kEventClassControl, kEventControlDispose},
+};
 
 static OSStatus InputLineControlEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
@@ -317,13 +325,8 @@ inputAreaDataPtr IADNew(WindowPtr window, Rect textRect, InputControlTextProc in
 	Boolean b;
 	inputAreaDataPtr iad  = malloc(sizeof(inputAreaData));
 	Size size;
-	const EventTypeSpec textHandlerSpec[] = {
-			{kEventClassTextInput, kEventUnicodeForKeyEvent},
-	};
-	const EventTypeSpec controlHandlerSpec[] = {
-			{kEventClassControl, kEventControlDispose},
-	};
-	static EventHandlerUPP thUPP = NULL, chUPP = NULL;
+	static EventHandlerUPP thUPP = NULL;
+	static EventHandlerUPP chUPP = NULL;
 	
 	CreateYASTControl(window, &textRect, &inputLineControl);
 	b = false;
@@ -345,8 +348,8 @@ inputAreaDataPtr IADNew(WindowPtr window, Rect textRect, InputControlTextProc in
 		chUPP = NewEventHandlerUPP(InputLineControlEventHandler);
 	}
 
-	InstallControlEventHandler(inputLineControl, thUPP, GetEventTypeCount(textHandlerSpec), textHandlerSpec, iad, NULL);
-	InstallControlEventHandler(inputLineControl, chUPP, GetEventTypeCount(controlHandlerSpec), controlHandlerSpec, iad, NULL);
+	InstallControlEventHandler(inputLineControl, thUPP, GetEventTypeCount(iadTextEventTypes), iadTextEventTypes, iad, NULL);
+	InstallControlEventHandler(inputLineControl, chUPP, GetEventTypeCount(iadControlEventTypes), iadControlEventTypes, iad, NULL);
 	
 	return iad;
 }

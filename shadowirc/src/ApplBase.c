@@ -187,6 +187,10 @@ typedef struct sqData {
 	int save;
 } sqData;
 
+static const EventTypeSpec cqEventTypes[] = {
+	{ kEventClassControl, kEventControlHit }
+};
+
 static OSStatus ConfirmQuitEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 #pragma unused(myHandler)
@@ -248,10 +252,6 @@ char doQuit(LongString *reason)
 			IBNibRef mainNibRef;
 			OSStatus status;
 			
-			const EventTypeSpec ctSpec[] = {
-				{ kEventClassControl, kEventControlHit }
-			};
-			
 			if(!swUPP)
 				swUPP = NewEventHandlerUPP(ConfirmQuitEventHandler);
 			
@@ -263,7 +263,7 @@ char doQuit(LongString *reason)
 			
 			DisposeNibReference(mainNibRef);
 			
-			status = InstallWindowEventHandler(cqWin, swUPP, GetEventTypeCount(ctSpec), ctSpec, (void*)&sq, NULL);
+			status = InstallWindowEventHandler(cqWin, swUPP, GetEventTypeCount(cqEventTypes), cqEventTypes, (void*)&sq, NULL);
 			require_noerr(status, CantInstallDialogHandler);
 			
 			ShowWindow(cqWin);
@@ -488,6 +488,14 @@ static void InitTimers()
 
 #pragma mark -
 
+static const EventTypeSpec appEventTypes[] = {
+	{kEventClassApplication, kEventAppActivated},
+	{kEventClassApplication, kEventAppDeactivated},
+	{kEventClassWindow, kEventWindowActivated},
+	{kEventClassWindow, kEventWindowDeactivated},
+	{kEventClassWindow, kEventWindowHandleContentClick},
+};
+
 static OSStatus EventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
 {
 #pragma unused(handlerCallRef, data)
@@ -499,6 +507,35 @@ static OSStatus EventHandler(EventHandlerCallRef handlerCallRef, EventRef event,
 	
 	switch(eventClass)
 	{
+		case kEventClassApplication:
+		{
+			switch(eventKind)
+			{
+				case kEventAppActivated:
+				case kEventAppDeactivated:
+				{
+					pContextSwitchDataRec p;
+					
+					p.inBackground = inBackground = eventKind == kEventAppDeactivated;
+					
+					if(!noFloatingInput)
+						IADActivate(ILGetInputDataFromMW(0), !inBackground);
+					
+					if(!inBackground)
+					{
+						InitCursor();
+						NotifyRemove();
+					}
+					
+					runPlugins(pContextSwitchMessage, &p);
+					
+					result = noErr;
+					break;
+				}
+			}
+			break;
+		}
+		
 		case kEventClassWindow:
 		{
 			WindowRef win;
@@ -575,41 +612,6 @@ static OSStatus DoModifierKeysChangedEvent(EventHandlerCallRef handlerCallRef, E
 	return result;
 }
 
-static OSStatus DoResumeEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
-{
-#pragma unused(handlerCallRef, event, data)
-	pContextSwitchDataRec p;
-	
-	inBackground=0;
-	InitCursor();
-	
-	if(!noFloatingInput)
-		IADActivate(ILGetInputDataFromMW(0), true);
-	
-	NotifyRemove(); //Clear notification manager requests.
-
-	p.inBackground=inBackground;
-	runPlugins(pContextSwitchMessage, &p);
-	
-	return noErr;
-}
-
-static OSStatus DoSuspendEvent(EventHandlerCallRef handlerCallRef, EventRef event, void *data)
-{
-#pragma unused(handlerCallRef, event, data)
-	pContextSwitchDataRec p;
-	
-	inBackground=1;
-	
-	if(!noFloatingInput)
-		IADActivate(ILGetInputDataFromMW(0), false);
-	
-	p.inBackground=inBackground;
-	runPlugins(pContextSwitchMessage, &p);
-	
-	return noErr;
-}
-
 static void doTCPEvent(CEPtr c)
 {
 	connectionPtr conn;
@@ -657,27 +659,13 @@ void ApplRun(void)
 	ApplExit();
 }
 
-static void MyIAEH(long class, long type, EventHandlerProcPtr handlerFunc)
-{
-	EventTypeSpec eventType = {class, type};
-	
-	InstallApplicationEventHandler(NewEventHandlerUPP(handlerFunc), 1, &eventType, NULL, NULL);
-}
-
 static void InitLocalEventHandlers()
 {
-	EventTypeSpec events[] = 
-	{
-		{kEventClassWindow, kEventWindowActivated},
-		{kEventClassWindow, kEventWindowDeactivated},
-		{kEventClassWindow, kEventWindowHandleContentClick},
-	};
+	static const EventTypeSpec eventType = {kEventClassKeyboard, kEventRawKeyModifiersChanged};
 	
-	MyIAEH(kEventClassApplication, kEventAppActivated, DoResumeEvent);
-	MyIAEH(kEventClassApplication, kEventAppDeactivated, DoSuspendEvent);
-	MyIAEH(kEventClassKeyboard, kEventRawKeyModifiersChanged, DoModifierKeysChangedEvent);
+	InstallApplicationEventHandler(NewEventHandlerUPP(DoModifierKeysChangedEvent), 1, &eventType, NULL, NULL);
 	
-	InstallApplicationEventHandler(NewEventHandlerUPP(EventHandler), GetEventTypeCount(events), events, NULL, NULL);
+	InstallApplicationEventHandler(NewEventHandlerUPP(EventHandler), GetEventTypeCount(appEventTypes), appEventTypes, NULL, NULL);
 }
 
 void ApplInit(void)
@@ -687,7 +675,7 @@ void ApplInit(void)
 
 	FlushEvents(everyEvent, 0);
 	
-	scb=NewSndCallBackUPP(AsyncSoundCallback);
+	scb = NewSndCallBackUPP(AsyncSoundCallback);
 	
 	InitTimers();
 }

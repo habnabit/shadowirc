@@ -171,6 +171,14 @@ static void ServicePasteHandler(EventRef theEvent, MWPtr mw)
 	processPaste(mw, FALSE);
 }
 
+static const EventTypeSpec mwCommandEventTypes[] = {
+		{kEventClassService, kEventServiceGetTypes},
+		{kEventClassService, kEventServiceCopy}, 
+		{kEventClassService, kEventServicePaste}, 
+		{kEventClassCommand, kEventCommandUpdateStatus},
+		{kEventClassCommand, kEventProcessCommand}
+};
+
 static OSStatus MWUICommandHandler(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
 {
 #pragma unused(nextHandler)
@@ -322,6 +330,16 @@ static OSStatus MWConsoleEventHandler(EventHandlerCallRef handlerCallRef, EventR
 	return result;
 }
 
+static const EventTypeSpec mwEventTypes[] = {
+		{kEventClassWindow, kEventWindowActivated},
+		{kEventClassWindow, kEventWindowDeactivated},
+		{kEventClassWindow, kEventWindowDrawContent},
+		{kEventClassWindow, kEventWindowGetMinimumSize},
+		{kEventClassWindow, kEventWindowBoundsChanged},
+		{kEventClassWindow, kEventWindowClose},
+		{kEventClassWindow, kEventWindowHandleContentClick},
+};
+
 static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
 #pragma unused(handlerCallRef)
@@ -410,7 +428,7 @@ static OSStatus MWEventHandler(EventHandlerCallRef handlerCallRef, EventRef even
 	return result;
 }
 
-static const EventTypeSpec mwTextEvents[] = {
+static const EventTypeSpec mwTextEventTypes[] = {
 	{kEventClassTextInput, kEventUnicodeForKeyEvent},
 };
 
@@ -427,22 +445,6 @@ void MWInstallEventHandlers(MWPtr mw)
 	static EventHandlerUPP uiCommandHandler = NULL;
 	static EventHandlerUPP mwEventHandler = NULL;
 	static EventHandlerUPP mwTextEventHandler = NULL;
-	const EventTypeSpec commandType[] = {
-			{kEventClassService, kEventServiceGetTypes},
-			{kEventClassService, kEventServiceCopy}, 
-			{kEventClassService, kEventServicePaste}, 
-			{kEventClassCommand, kEventCommandUpdateStatus},
-			{kEventClassCommand, kEventProcessCommand}
-	};
-	const EventTypeSpec mwEvents[] = {
-			{kEventClassWindow, kEventWindowActivated},
-			{kEventClassWindow, kEventWindowDeactivated},
-			{kEventClassWindow, kEventWindowDrawContent},
-			{kEventClassWindow, kEventWindowGetMinimumSize},
-			{kEventClassWindow, kEventWindowBoundsChanged},
-			{kEventClassWindow, kEventWindowClose},
-			{kEventClassWindow, kEventWindowHandleContentClick},
-	};
 	
 	if(!uiCommandHandler)
 	{
@@ -451,9 +453,9 @@ void MWInstallEventHandlers(MWPtr mw)
 		mwTextEventHandler = NewEventHandlerUPP(MWTextEventHandler);
 	}
 	
-	InstallWindowEventHandler(mw->w, uiCommandHandler, GetEventTypeCount(commandType), commandType, mw, NULL);
-	InstallWindowEventHandler(mw->w, mwEventHandler, GetEventTypeCount(mwEvents), mwEvents, mw, NULL);
-	InstallWindowEventHandler(mw->w, mwTextEventHandler, GetEventTypeCount(mwTextEvents), mwTextEvents, mw, NULL);
+	InstallWindowEventHandler(mw->w, uiCommandHandler, GetEventTypeCount(mwCommandEventTypes), mwCommandEventTypes, mw, NULL);
+	InstallWindowEventHandler(mw->w, mwEventHandler, GetEventTypeCount(mwEventTypes), mwEventTypes, mw, NULL);
+	InstallWindowEventHandler(mw->w, mwTextEventHandler, GetEventTypeCount(mwTextEventTypes), mwTextEventTypes, mw, NULL);
 	
 	if(mw->winType == conWin)
 	{
@@ -474,8 +476,12 @@ void MWInstallEventHandlers(MWPtr mw)
 
 #pragma mark -
 
+static const EventTypeSpec awEventTypes[] = {
+	{ kEventClassControl, kEventControlHit }
+};
+
 static OSStatus AboutWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
- {
+{
 #pragma unused(myHandler)
 	OSStatus result = eventNotHandledErr;
 	UInt32 eventClass, eventKind;
@@ -517,7 +523,6 @@ static void DoAbout(void)
 	IBNibRef mainNibRef;
 	WindowRef aboutWindow = NULL;
 	static EventHandlerUPP awUPP = NULL;
-	const EventTypeSpec awSpec = { kEventClassControl, kEventControlHit };
 	OSStatus status;
 	
 	if(!awUPP)
@@ -560,7 +565,7 @@ static void DoAbout(void)
 		SetRect(&boundsRect, 0, 0, 360, 144);
 		CreatePictureControl(aboutWindow, &boundsRect, &content, TRUE, &theControl);
 		
-		status = InstallWindowEventHandler(aboutWindow, awUPP, 1, &awSpec,(void *)aboutWindow, NULL);
+		status = InstallWindowEventHandler(aboutWindow, awUPP, GetEventTypeCount(awEventTypes), awEventTypes, (void *)aboutWindow, NULL);
 		
 		ShowWindow(aboutWindow);
 		SelectWindow(aboutWindow);

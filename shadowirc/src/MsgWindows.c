@@ -448,6 +448,10 @@ void MWPage(MWPtr mw, char scrollType)
 		MWScroll(mw, scrollDiff);
 }
 
+static const EventTypeSpec mwWheelEventTypes[] = {
+	{ kEventClassMouse, kEventMouseWheelMoved },
+};
+
 static OSStatus MWDoMouseWheelEvent(EventHandlerCallRef nextHandler, EventRef theEvent, void *userData)
 {
 #pragma unused(nextHandler)
@@ -1163,7 +1167,6 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 			const long translucencyTreshold = 200000;
 			static ControlActionUPP caction = NULL;
 			static EventHandlerUPP mouseWheelHandler = NULL;
-			static const EventTypeSpec wheelType = {kEventClassMouse, kEventMouseWheelMoved};
 			
 			SetPortWindowPort(h->w);
 			TextFont(fontNum);
@@ -1258,7 +1261,7 @@ pascal MWPtr MWNew(ConstStr255Param title, short winType, linkPtr link, long mwi
 				h->next->prev = h;
 			mwl = h;
 			
-			InstallWindowEventHandler(h->w, mouseWheelHandler, 1, &wheelType, h, NULL);
+			InstallWindowEventHandler(h->w, mouseWheelHandler, GetEventTypeCount(mwWheelEventTypes), mwWheelEventTypes, h, NULL);
 
 			MWInstallEventHandlers(h);
 		}

@@ -511,6 +511,12 @@ static void UpdateTopicLength(WindowRef sheet, channelPtr ch)
 	DrawOneControl(topicOpsControl);
 }
 
+static const EventTypeSpec ctEventTypes[] = {
+	{ kEventClassTextInput, kEventTextInputUnicodeForKeyEvent },
+	{ kEventClassControl, kEventControlHit },
+	{ kEventClassWindow, kEventWindowGetMinimumSize }
+};
+
 static OSStatus TopicWidgetDialogEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 	OSStatus result = eventNotHandledErr;
@@ -602,11 +608,6 @@ void ChTopicWindow(channelPtr ch)
 	IBNibRef mainNibRef;
 	WindowRef channelTopicSheet = NULL;
 	static EventHandlerUPP ctUPP = NULL;
-	const EventTypeSpec ctSpec[] = {
-		{ kEventClassTextInput, kEventTextInputUnicodeForKeyEvent },
-		{ kEventClassControl, kEventControlHit },
-		{ kEventClassWindow, kEventWindowGetMinimumSize }
-	};
 	OSStatus status;
 	WindowPtr parent;
 	
@@ -621,7 +622,7 @@ void ChTopicWindow(channelPtr ch)
 
 	DisposeNibReference(mainNibRef);
 
-	status = InstallWindowEventHandler(channelTopicSheet, ctUPP, GetEventTypeCount(ctSpec), ctSpec,(void *)channelTopicSheet, NULL);
+	status = InstallWindowEventHandler(channelTopicSheet, ctUPP, GetEventTypeCount(ctEventTypes), ctEventTypes, (void *)channelTopicSheet, NULL);
 	require_noerr(status, CantInstallDialogHandler);
 	
 	parent = ch->window->w;

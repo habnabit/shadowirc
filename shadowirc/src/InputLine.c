@@ -961,6 +961,15 @@ static void IWGrow(WindowRef window, Rect r)
 	InvalWindowRect(window, &r);
 }
 
+static const EventTypeSpec ilEventTypes[] = {
+	{kEventClassWindow, kEventWindowGetMinimumSize},
+	{kEventClassWindow, kEventWindowBoundsChanged},
+	{kEventClassWindow, kEventWindowActivated},
+	{kEventClassWindow, kEventWindowDeactivated},
+	{kEventClassWindow, kEventWindowShown},
+	{kEventClassWindow, kEventWindowHidden},
+};
+
 static OSStatus InputLineWindowEventHandler(EventHandlerCallRef handlerCallRef, EventRef event, void *userData)
 {
 #pragma unused(handlerCallRef, userData)
@@ -1063,14 +1072,6 @@ void OpenInputLine()
 		CFStringRef inputWindowTitle;
 		Rect wr;
 		Rect statusControlRect;
-		const EventTypeSpec ilSpec[] = {
-			{kEventClassWindow, kEventWindowGetMinimumSize},
-			{kEventClassWindow, kEventWindowBoundsChanged},
-			{kEventClassWindow, kEventWindowActivated},
-			{kEventClassWindow, kEventWindowDeactivated},
-			{kEventClassWindow, kEventWindowShown},
-			{kEventClassWindow, kEventWindowHidden},
-		};
 		static EventHandlerUPP ilUPP = NULL;
 		static DragTrackingHandlerUPP iwTrackingHandlerUPP = nil;
 		static DragReceiveHandlerUPP iwReceiveHandlerUPP = nil;
@@ -1171,7 +1172,7 @@ void OpenInputLine()
 			if(!ilUPP)
 				ilUPP = NewEventHandlerUPP(InputLineWindowEventHandler);
 	
-			InstallWindowEventHandler(inputLine.w, ilUPP, GetEventTypeCount(ilSpec), ilSpec, NULL, NULL);
+			InstallWindowEventHandler(inputLine.w, ilUPP, GetEventTypeCount(ilEventTypes), ilEventTypes, NULL, NULL);
 
 			SetPort(p0);
 		}

@@ -102,6 +102,11 @@ static void FindWindowSet(WindowPtr findWin)
 	SetControlValue(ctrl, find.reverse);
 }
 
+static const EventTypeSpec findEventTypes[] = {
+	{ kEventClassControl, kEventControlHit },
+	{ kEventClassCommand, kEventProcessCommand }
+};
+
 static OSStatus FindWindowEventHandler(EventHandlerCallRef myHandler, EventRef event, void *userData)
 {
 #pragma unused(myHandler)
@@ -174,10 +179,6 @@ void DoFind(MWPtr mw, char again)
 	WindowRef findWin;
 	IBNibRef findNib;
 	OSStatus status;
-	const EventTypeSpec ctSpec[] = {
-		{ kEventClassControl, kEventControlHit },
-		{ kEventClassCommand, kEventProcessCommand }
-	};
 	
 	if(again && find.searchFor[0])
 	{
@@ -206,7 +207,7 @@ void DoFind(MWPtr mw, char again)
 		
 		DisposeNibReference(findNib);
 		
-		status = InstallWindowEventHandler(findWin, fwUPP, GetEventTypeCount(ctSpec), ctSpec, (void *)findWin, NULL);
+		status = InstallWindowEventHandler(findWin, fwUPP, GetEventTypeCount(findEventTypes), findEventTypes, (void *)findWin, NULL);
 		require_noerr(status, CantInstallDialogHandler);
 		
 		FindWindowSet(findWin);
