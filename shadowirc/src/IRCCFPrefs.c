@@ -99,7 +99,6 @@ OSStatus WriteDirURLRef(CFStringRef prefName, const FSRef *ref)
 			CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication);
 		}
 		
-		CFRelease(urlString);
 		CFRelease(url);
 	}
 	else
