@@ -78,8 +78,6 @@ static pascal void AsyncSoundCallback(SndChannelPtr theSoundChannel, SndCommand 
 
 static RgnHandle mouseRgn;
 
-long sScrollStep;
-
 static plugsPtr mouseDownPluginRef=0;
 
 typedef struct aspData {
@@ -671,8 +669,6 @@ static pascal void inContentHandler(EventRecord *e)
 	ControlHandle c;
 	short pa;
 	ControlActionUPP upp;
-	long pageSize;
-	LongRect viewRect;
 	pUIMouseUpDownData pdd;
 	GrafPtr gp;
 	
@@ -693,17 +689,6 @@ static pascal void inContentHandler(EventRecord *e)
 				case kControlPageDownPart:
 				case kControlUpButtonPart:
 				case kControlDownButtonPart:
-					WEGetViewRect(&viewRect, p->we);
-					pageSize=viewRect.bottom-viewRect.top;
-					if(pa== kControlUpButtonPart)
-						sScrollStep=-p->scrpHeight;
-					else if(pa == kControlDownButtonPart)
-						sScrollStep=p->scrpHeight;
-					else if(pa == kControlPageUpPart)
-						sScrollStep=-(pageSize-p->scrpHeight);
-					else// if(pa == kControlPageDownPart)
-						sScrollStep=(pageSize-p->scrpHeight);
-
 					upp = NewControlActionUPP(MWVScrollTrack);
 					pa=TrackControl(c, e->where, upp);
 					DisposeControlActionUPP(upp);

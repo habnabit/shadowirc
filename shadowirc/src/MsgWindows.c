@@ -276,13 +276,40 @@ pascal void MWLiveScroll(MWPtr mw, Point pt)
 }
 
 
-//GetControlOwner
 pascal void MWVScrollTrack(ControlHandle vscr, short part)
 {
-	extern long sScrollStep;
+	MWPtr mw;
+	long scrollStep;
+	long pageSize;
+	LongRect viewRect;
 	
-	if(part!=kControlNoPart)
-		MWScroll(MWFromWindow(GetControlOwner(vscr)), sScrollStep);
+	if(part == kControlNoPart)
+		return;
+	
+	mw = MWFromWindow(GetControlOwner(vscr));
+	WEGetViewRect(&viewRect, mw->we);
+	pageSize = viewRect.bottom - viewRect.top;
+	
+	switch(part)
+	{
+		case kControlPageUpPart:
+			scrollStep = -(pageSize - mw->scrpHeight);
+			break;
+			
+		case kControlPageDownPart:
+			scrollStep = (pageSize - mw->scrpHeight);
+			break;
+			
+		case kControlUpButtonPart:
+			scrollStep=- mw->scrpHeight;
+			break;
+			
+		case kControlDownButtonPart:
+			scrollStep = mw->scrpHeight;
+			break;
+	}
+	
+	MWScroll(mw, scrollStep);
 }
 
 static pascal void ScrollBarChanged(WEReference we, long val)

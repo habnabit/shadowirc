@@ -30,8 +30,6 @@
 
 extern WindowPtr ContextWindow;
 
-extern long sScrollStep;
-
 pascal void ApplRun(void);
 pascal void ApplInit(void);
 pascal char doQuit(LongString *reason);
