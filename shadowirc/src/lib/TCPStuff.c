@@ -419,13 +419,13 @@ static size_t TCPCharsAvailable(int sockfd)
         return(nbytes);
 }
 
-    /*
+/*
  * sockaddr_union
  * utilized by getsockname below in:
  * TCPLocalPort
  * TCPLocalIP
  * TCPRemoteIP
-     */
+ */
 
 typedef union {
         struct sockaddr sa;
