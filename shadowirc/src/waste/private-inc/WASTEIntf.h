@@ -35,18 +35,6 @@
 #if defined(UNIVERSAL_INTERFACES_VERSION) && (UNIVERSAL_INTERFACES_VERSION >= 0x300)
 	//	we're using Universal Headers 3.0 or later
 	#define		kNullDrag							nil
-#else
-	//	we're using Universal Headers 2.1.x: we need to define some additional symbols
-	#define		kNullDrag							0L
-	#define		kDragTrackingEnterWindow			dragTrackingEnterWindow
-	#define		kDragTrackingInWindow				dragTrackingInWindow
-	#define		kDragTrackingLeaveWindow			dragTrackingLeaveWindow
-	#define		kDragHasLeftSenderWindow			dragHasLeftSenderWindow
-	#define		kDragStandardTranslucency			0L
-	typedef		UInt32								DragImageFlags ;
-	extern pascal OSErr SetDragImage(DragReference drag, PixMapHandle imagePixMap,
-		RgnHandle imageRgn, Point imageOffsetPt, DragImageFlags imageFlags)
- 		TWOWORDINLINE(0x7027,0xABED);
 #endif
 
 // MPW needs topLeft and botRight defined here
@@ -116,18 +104,6 @@
 // set WASTE_DRAG_AND_DROP to 0 to disable support for the Drag Manager
 #ifndef WASTE_DRAG_AND_DROP
 #define WASTE_DRAG_AND_DROP				1
-#endif
-
-// set WASTE_USE_UPPS to 0 if you don't need UPPs
-// carbon builds are by definition powerpc-only, so no UPPs
-#if UNIVERSAL_INTERFACES_VERSION >= 0x0330
-  #ifndef WASTE_USE_UPPS
-  #define WASTE_USE_UPPS					TARGET_RT_MAC_CFM && !TARGET_API_MAC_CARBON
-  #endif
-#else
-  #ifndef WASTE_USE_UPPS
-  #define WASTE_USE_UPPS					GENERATINGCFM && !TARGET_API_MAC_CARBON
-  #endif
 #endif
 
 // set WASTE_NO_SYNCH to 1 if you don't want WASTE to synchronize keyboard and fonts
@@ -697,136 +673,6 @@ typedef pascal Boolean (*WEClickObjectProcPtr)(Point hitPt, EventModifiers modif
 typedef pascal OSErr (*WEStreamObjectProcPtr)(SInt16 destKind, FlavorType *theType, Handle putDataHere, WEObjectDescHandle hObjectDesc);
 
 
-// UPP proc info
-
-enum
-{
-	uppWEClickLoopProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(Boolean)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWEScrollProcInfo = kPascalStackBased
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWETSMPreUpdateProcInfo = kPascalStackBased
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWETSMPostUpdateProcInfo = kPascalStackBased
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(WEHandle /*hWE*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt32 /*fixLength*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(SInt32 /*inputAreaStart*/)))
-		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(SInt32 /*inputAreaEnd*/)))
-		| STACK_ROUTINE_PARAMETER(5,SIZE_CODE(sizeof(SInt32 /*pinRangeStart*/)))
-		| STACK_ROUTINE_PARAMETER(6,SIZE_CODE(sizeof(SInt32 /*pinRangeEnd*/))),
-	uppWEPreTrackDragProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(DragReference /*drag*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWETranslateDragProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(DragReference /*drag*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(ItemReference /*dragItem*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(FlavorType /*requestedType*/)))
-		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(Handle /*putDataHere*/)))
-		| STACK_ROUTINE_PARAMETER(5,SIZE_CODE(sizeof(SInt32 /*dropOffset*/)))
-		| STACK_ROUTINE_PARAMETER(6,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWEHiliteDropAreaProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(DragReference /*drag*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(Boolean /*hiliteFlag*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWEFontIDToNameProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(SInt16 /*fontID*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(StringPtr /*fontName*/))),
-	uppWEFontNameToIDProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(ConstStr255Param /*fontName*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt16 /*oldFontID*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(SInt16 * /*newFontID*/))),
-	uppWEDrawTextProcInfo = kPascalStackBased
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Ptr /*pText*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt32 /*textLength*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(Fixed /*slop*/)))
-		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(JustStyleCode /*styleRunPosition*/)))
-		| STACK_ROUTINE_PARAMETER(5,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWEPixelToCharProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(SInt32)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Ptr /*pText*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt32 /*textLength*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(Fixed /*slop*/)))
-		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(Fixed * /*pixelWidth*/)))
-		| STACK_ROUTINE_PARAMETER(5,SIZE_CODE(sizeof(WEEdge * /*edge*/)))
-		| STACK_ROUTINE_PARAMETER(6,SIZE_CODE(sizeof(JustStyleCode /*styleRunPosition*/)))
-		| STACK_ROUTINE_PARAMETER(7,SIZE_CODE(sizeof(Fixed /*hPos*/)))
-		| STACK_ROUTINE_PARAMETER(8,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWECharToPixelProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(SInt16)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Ptr /*pText*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt32 /*textLength*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(Fixed /*slop*/)))
-		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(SInt32 /*offset*/)))
-		| STACK_ROUTINE_PARAMETER(5,SIZE_CODE(sizeof(SInt16 /*direction*/)))
-		| STACK_ROUTINE_PARAMETER(6,SIZE_CODE(sizeof(JustStyleCode /*styleRunPosition*/)))
-		| STACK_ROUTINE_PARAMETER(7,SIZE_CODE(sizeof(SInt16 /*hPos*/)))
-		| STACK_ROUTINE_PARAMETER(8,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWELineBreakProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(StyledLineBreakCode )))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Ptr /*pText*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt32 /*textLength*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(SInt32 /*textStart*/)))
-		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(SInt32 /*textEnd*/)))
-		| STACK_ROUTINE_PARAMETER(5,SIZE_CODE(sizeof(Fixed * /*textWidth*/)))
-		| STACK_ROUTINE_PARAMETER(6,SIZE_CODE(sizeof(SInt32 * /*textOffset*/)))
-		| STACK_ROUTINE_PARAMETER(7,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWEWordBreakProcInfo = kPascalStackBased
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Ptr /*pText*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt16 /*textLength*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(SInt16 /*offset*/)))
-		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(WEEdge /*edge*/)))
-		| STACK_ROUTINE_PARAMETER(5,SIZE_CODE(sizeof(OffsetTable * /*breakOffsets*/)))
-		| STACK_ROUTINE_PARAMETER(6,SIZE_CODE(sizeof(ScriptCode /*script*/)))
-		| STACK_ROUTINE_PARAMETER(7,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWECharByteProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(SInt16 )))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Ptr /*pText*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt16 /*textOffset*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(ScriptCode /*script*/)))
-		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWECharTypeProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(SInt16 )))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Ptr /*pText*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt16 /*textOffset*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(ScriptCode /*script*/)))
-		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWEEraseProcInfo = kPascalStackBased
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(const Rect * /*area*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWEFluxProcInfo = kPascalStackBased
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(SInt32 /*offset*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt32 /*delta*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(WEHandle /*hWE*/))),
-	uppWENewObjectProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Point * /*defaultObjectSize*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(WEObjectDescHandle /*hObjectDesc*/))),
-	uppWEDisposeObjectProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(WEObjectDescHandle /*hObjectDesc*/))),
-	uppWEDrawObjectProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(const Rect * /*destRect*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(WEObjectDescHandle /*hObjectDesc*/))),
-	uppWEClickObjectProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(Boolean)))
-		| STACK_ROUTINE_PARAMETER(1,SIZE_CODE(sizeof(Point /*hitPt*/)))
-		| STACK_ROUTINE_PARAMETER(2,SIZE_CODE(sizeof(SInt16 /*modifiers*/)))
-		| STACK_ROUTINE_PARAMETER(3,SIZE_CODE(sizeof(float /*clickTime*/)))
-		| STACK_ROUTINE_PARAMETER(4,SIZE_CODE(sizeof(WEObjectDescHandle /*hObjectDesc*/))),
-	uppWEStreamObjectProcInfo = kPascalStackBased
-		| RESULT_SIZE(SIZE_CODE(sizeof(OSErr)))
-		| STACK_ROUTINE_PARAMETER(1, SIZE_CODE(sizeof(SInt16 /*destKind*/)))
-		| STACK_ROUTINE_PARAMETER(2, SIZE_CODE(sizeof(FlavorType * /*theType*/)))
-		| STACK_ROUTINE_PARAMETER(3, SIZE_CODE(sizeof(Handle /*putDataHere*/)))
-		| STACK_ROUTINE_PARAMETER(4, SIZE_CODE(sizeof(WEObjectDescHandle /*hObjectDesc*/)))
-};
 
 
 /*	UPPs, New≈Proc macros & Call≈Proc macros */
@@ -842,128 +688,6 @@ enum
 		CallFooProc(userRoutine, ...)
 
 */
-
-#if WASTE_USE_UPPS
-
-typedef UniversalProcPtr WEClickLoopUPP;
-typedef UniversalProcPtr WEScrollUPP;
-typedef UniversalProcPtr WETSMPreUpdateUPP;
-typedef UniversalProcPtr WETSMPostUpdateUPP;
-typedef UniversalProcPtr WEPreTrackDragUPP;
-typedef UniversalProcPtr WETranslateDragUPP;
-typedef UniversalProcPtr WEHiliteDropAreaUPP;
-typedef UniversalProcPtr WEFontIDToNameUPP;
-typedef UniversalProcPtr WEFontNameToIDUPP;
-typedef UniversalProcPtr WEDrawTextUPP;
-typedef UniversalProcPtr WEPixelToCharUPP;
-typedef UniversalProcPtr WECharToPixelUPP;
-typedef UniversalProcPtr WELineBreakUPP;
-typedef UniversalProcPtr WEWordBreakUPP;
-typedef UniversalProcPtr WECharByteUPP;
-typedef UniversalProcPtr WECharTypeUPP;
-typedef UniversalProcPtr WEEraseUPP;
-typedef UniversalProcPtr WEFluxUPP;
-typedef UniversalProcPtr WENewObjectUPP;
-typedef UniversalProcPtr WEDisposeObjectUPP;
-typedef UniversalProcPtr WEDrawObjectUPP;
-typedef UniversalProcPtr WEClickObjectUPP;
-typedef UniversalProcPtr WEStreamObjectUPP;
-
-#define NewWEClickLoopProc(userRoutine) \
-	(WEClickLoopUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEClickLoopProcInfo, GetCurrentArchitecture())
-#define NewWEScrollProc(userRoutine) \
-	(WEScrollUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEScrollProcInfo, GetCurrentArchitecture())
-#define NewWETSMPreUpdateProc(userRoutine) \
-	(WETSMPreUpdateUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWETSMPreUpdateProcInfo, GetCurrentArchitecture())
-#define NewWETSMPostUpdateProc(userRoutine) \
-	(WETSMPostUpdateUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWETSMPostUpdateProcInfo, GetCurrentArchitecture())
-#define NewWEPreTrackDragProc(userRoutine) \
-	(WEPreTrackDragUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEPreTrackDragProcInfo, GetCurrentArchitecture())
-#define NewWETranslateDragProc(userRoutine) \
-	(WETranslateDragUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWETranslateDragProcInfo, GetCurrentArchitecture())
-#define NewWEHiliteDropAreaProc(userRoutine) \
-	(WEHiliteDropAreaUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEHiliteDropAreaProcInfo, GetCurrentArchitecture())
-#define NewWEFontIDToNameProc(userRoutine) \
-	(WEFontIDToNameUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEFontIDToNameProcInfo, GetCurrentArchitecture())
-#define NewWEFontNameToIDProc(userRoutine) \
-	(WEFontNameToIDUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEFontNameToIDProcInfo, GetCurrentArchitecture())
-#define NewWEDrawTextProc(userRoutine) \
-	(WEDrawTextUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEDrawTextProcInfo, GetCurrentArchitecture())
-#define NewWEPixelToCharProc(userRoutine) \
-	(WEPixelToCharUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEPixelToCharProcInfo, GetCurrentArchitecture())
-#define NewWECharToPixelProc(userRoutine) \
-	(WECharToPixelUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWECharToPixelProcInfo, GetCurrentArchitecture())
-#define NewWELineBreakProc(userRoutine) \
-	(WELineBreakUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWELineBreakProcInfo, GetCurrentArchitecture())
-#define NewWEWordBreakProc(userRoutine) \
-	(WEWordBreakUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEWordBreakProcInfo, GetCurrentArchitecture())
-#define NewWECharByteProc(userRoutine) \
-	(WECharByteUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWECharByteProcInfo, GetCurrentArchitecture())
-#define NewWECharTypeProc(userRoutine) \
-	(WECharTypeUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWECharTypeProcInfo, GetCurrentArchitecture())
-#define NewWEEraseProc(userRoutine) \
-	(WEEraseUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEEraseProcInfo, GetCurrentArchitecture())
-#define NewWEFluxProc(userRoutine) \
-	(WEFluxUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEFluxProcInfo, GetCurrentArchitecture())
-#define NewWENewObjectProc(userRoutine) \
-	(WENewObjectUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWENewObjectProcInfo, GetCurrentArchitecture())
-#define NewWEDisposeObjectProc(userRoutine) \
-	(WEDisposeObjectUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEDisposeObjectProcInfo, GetCurrentArchitecture())
-#define NewWEDrawObjectProc(userRoutine) \
-	(WEDrawObjectUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEDrawObjectProcInfo, GetCurrentArchitecture())
-#define NewWEClickObjectProc(userRoutine) \
-	(WEClickObjectUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEClickObjectProcInfo, GetCurrentArchitecture())
-#define NewWEStreamObjectProc(userRoutine) \
-	(WEStreamObjectUPP) NewRoutineDescriptor((ProcPtr) (userRoutine), uppWEStreamObjectProcInfo, GetCurrentArchitecture())
-
-#define CallWEClickLoopProc(hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEClickLoopProcInfo, (hWE))
-#define CallWEScrollProc(hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEScrollProcInfo, (hWE))
-#define CallWETSMPreUpdateProc(hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWETSMPreUpdateProcInfo, (hWE))
-#define CallWETSMPostUpdateProc(hWE, fixLength, inputAreaStart, inputAreaEnd, pinRangeStart, pinRangeEnd, userRoutine) \
-	CallUniversalProc((userRoutine), uppWETSMPostUpdateProcInfo, (hWE), (fixLength), (inputAreaStart), (inputAreaEnd), (pinRangeStart), (pinRangeEnd))
-#define CallWEPreTrackDragProc(drag, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEPreTrackDragProcInfo, (drag), (hWE))
-#define CallWETranslateDragProc(drag, dragItem, requestedType, putDataHere, dropOffset, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWETranslateDragProcInfo, (drag), (dragItem), (requestedType), (putDataHere), (dropOffset), (hWE))
-#define CallWEHiliteDropAreaProc(drag, hiliteFlag, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEHiliteDropAreaProcInfo, (drag), (hiliteFlag), (hWE))
-#define CallWEFontIDToNameProc(fontID, fontName, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEFontIDToNameProcInfo, (fontID), (fontName))
-#define CallWEFontNameToIDProc(fontName, oldFontID, fontID, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEFontNameToIDProcInfo, (fontName), (oldFontID), (fontID))
-#define CallWEDrawTextProc(pText, textLength, slop, styleRunPosition, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEDrawTextProcInfo, (pText), (textLength), (slop), (styleRunPosition), (hWE))
-#define CallWEPixelToCharProc(pText, textLength, slop, pixelWidth, edge, styleRunPosition, hPos, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEPixelToCharProcInfo, (pText), (textLength), (slop), (pixelWidth), (edge), (styleRunPosition), (hPos), (hWE))
-#define CallWECharToPixelProc(pText, textLength, slop, offset, direction, styleRunPosition, hPos, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWECharToPixelProcInfo, (pText), (textLength), (slop), (offset), (direction), (styleRunPosition), (hPos), (hWE))
-#define CallWELineBreakProc(pText, textLength, textStart, textEnd, textWidth, textOffset, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWELineBreakProcInfo, (pText), (textLength), (textStart), (textEnd), (textWidth), (textOffset), (hWE))
-#define CallWEWordBreakProc(pText, textLength, offset, edge, breakOffsets, script, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEWordBreakProcInfo, (pText), (textLength), (offset), (edge), (breakOffsets), (script), (hWE))
-#define CallWECharByteProc(pText, textOffset, script, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWECharByteProcInfo, (pText), (textOffset), (script), (hWE))
-#define CallWECharTypeProc(pText, textOffset, script, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWECharTypeProcInfo, (pText), (textOffset), (script), (hWE))
-#define CallWEEraseProc(area, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEEraseProcInfo, (area), (hWE))
-#define CallWEFluxProc(offset, delta, hWE, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEFluxProcInfo, (offset), (delta), (hWE))
-#define CallWENewObjectProc(defaultObjectSize, hObjectDesc, userRoutine) \
-	CallUniversalProc((userRoutine), uppWENewObjectProcInfo, (defaultObjectSize), (hObjectDesc))
-#define CallWEDisposeObjectProc(hObjectDesc, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEDisposeObjectProcInfo, (hObjectDesc))
-#define CallWEDrawObjectProc(destRect, hObjectDesc, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEDrawObjectProcInfo, (destRect), (hObjectDesc))
-#define CallWEClickObjectProc(hitPt, modifiers, clickTime, hObjectDesc, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEClickObjectProcInfo, (hitPt), (modifiers), (clickTime), (hObjectDesc))
-#define CallWEStreamObjectProc(destKind, theType, putDataHere, hObjectDesc, userRoutine) \
-	CallUniversalProc((userRoutine), uppWEStreamObjectProcInfo, (destKind), (theType), (putDataHere), (hObjectDesc))
-
-#else
 
 typedef WEClickLoopProcPtr WEClickLoopUPP;
 typedef WEScrollProcPtr WEScrollUPP;
@@ -1059,8 +783,6 @@ typedef WEStreamObjectProcPtr WEStreamObjectUPP;
 	(*(userRoutine))((hitPt), (modifiers), (clickTime), (hObjectDesc))
 #define CallWEStreamObjectProc(destKind, theType, putDataHere, hObjectDesc, userRoutine) \
 	(*(userRoutine))((destKind), (theType), (putDataHere), (hObjectDesc))
-
-#endif
 
 typedef Boolean (*WESegmentLoopProcPtr)
 	(
