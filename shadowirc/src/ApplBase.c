@@ -705,7 +705,5 @@ static void ApplExit(void)
 	
 	UnregisterAppearanceClient();
 	
-	NavUnload();
-	
 	ExitToShell();
 }
