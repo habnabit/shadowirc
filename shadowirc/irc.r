@@ -1131,7 +1131,7 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			""
 		},
 		/* [7] */
-		{102, 379, 115, 477},
+		{125, 379, 138, 477},
 		EditText {
 			enabled,
 			""
@@ -1155,13 +1155,13 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			10124
 		},
 		/* [11] */
-		{176, 121, 291, 511},
+		{176, 121, 297, 511},
 		Control {
 			enabled,
 			10100
 		},
 		/* [12] */
-		{198, 128, 213, 278},
+		{198, 128, 213, 295},
 		CheckBox {
 			enabled,
 			"Auto-connect on startup"
@@ -1179,7 +1179,7 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			"(optional)"
 		},
 		/* [15] */
-		{213, 128, 228, 278},
+		{215, 128, 230, 278},
 		CheckBox {
 			enabled,
 			"Reconnect to Server"
@@ -1197,13 +1197,13 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			"Display Server MOTD"
 		},
 		/* [18] */
-		{247, 339, 262, 507},
+		{250, 339, 265, 507},
 		CheckBox {
 			enabled,
 			"Show server messages"
 		},
 		/* [19] */
-		{231, 339, 247, 439},
+		{232, 339, 248, 439},
 		CheckBox {
 			enabled,
 			"Show Wallops"
@@ -1215,7 +1215,7 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			"Alternate:"
 		},
 		/* [21] */
-		{101, 318, 113, 374},
+		{125, 318, 137, 374},
 		StaticText {
 			disabled,
 			"User Name:"
@@ -1233,7 +1233,7 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			"Real name:"
 		},
 		/* [24] */
-		{213, 339, 228, 507},
+		{215, 339, 230, 507},
 		CheckBox {
 			enabled,
 			"Go \"Invisible\""
@@ -1245,19 +1245,19 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			"Server Password:"
 		},
 		/* [26] */
-		{229, 135, 243, 289},
+		{232, 135, 245, 289},
 		StaticText {
 			disabled,
 			"Maximum Connection Attempts:"
 		},
 		/* [27] */
-		{252, 170, 266, 289},
+		{252, 170, 265, 289},
 		StaticText {
 			disabled,
 			"Connection Retry Delay:"
 		},
 		/* [28] */
-		{229, 294, 242, 324},
+		{232, 294, 245, 324},
 		EditText {
 			enabled,
 			""
@@ -1275,7 +1275,7 @@ resource 'DITL' (1001, "Prefs.Conn") {
 			"Attempt to Regain Lost Nicks"
 		},
 		/* [31] */
-		{76, 421, 96, 518},
+		{76, 407, 96, 510},
 		Button {
 			enabled,
 			"Select Server"
@@ -1555,7 +1555,7 @@ resource 'DITL' (1004, "Prefs.MAIN") {
 			"Done"
 		},
 		/* [2] */
-		{355, 3, 375, 61},
+		{355, 3, 375, 67},
 		Button {
 			enabled,
 			"Cancel"
