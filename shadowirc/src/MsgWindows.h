@@ -218,8 +218,14 @@ pascal void MWSetNameQuery(MWPtr mw, ConstStr255Param from, linkPtr link);
 
 extern MWPtr MWActive, consoleWin, MWLast;
 extern Rect cornerstone;
-extern const RGBColor macColors[28];
-extern const RGBColor mircColors[16];
+
+enum {
+	kMaxMacColors = 28,
+	kMaxMircColors = 16
+};
+
+extern const RGBColor macColors[kMaxMacColors];
+extern const RGBColor mircColors[kMaxMircColors];
 
 pascal void MWLiveScroll(MWPtr mw, Point pt);
 pascal void MWPage(MWPtr mw, char up);

@@ -62,7 +62,7 @@ enum colorRamp {
 	pct1000 = -1
 };
 
-const RGBColor macColors[28]=	{	{pct1000,	pct1000,	pct1000},
+const RGBColor macColors[kMaxMacColors]=	{	{pct1000,	pct1000,	pct1000},
 												{0	,			0,				0},
 												{pct1000,	0,				0},
 												{pct1000,	pct516,	0},
@@ -92,7 +92,7 @@ const RGBColor macColors[28]=	{	{pct1000,	pct1000,	pct1000},
 												{pct516,	0,				pct258}
 											};
 
-const RGBColor mircColors[16]=	{	{pct1000,	pct1000,	pct1000},
+const RGBColor mircColors[kMaxMircColors]=	{	{pct1000,	pct1000,	pct1000},
 												{0, 			0,				0},
 												{0,			0,				pct516},
 												{0,			pct516,	0},
@@ -1219,9 +1219,9 @@ static pascal Style DoAddColorHunk(Style s, myStScrpHandle sty, int i, int *nsty
 	
 	if(colornum>=0)
 	{
-		if(colorMethod==cmIrcle)
+		if(colorMethod==cmIrcle && colornum < kMaxMacColors)
 			q->scrpColor=macColors[colornum];
-		else if(colorMethod==cmMIRC)
+		else if(colorMethod==cmMIRC && colornum < kMaxMircColors)
 			q->scrpColor=mircColors[colornum];
 	}
 	else

@@ -885,15 +885,12 @@ inline void DrawTopic(mwWidgetPtr o, char winActive)
 							{
 								x++;
 								c=ch->topic[x]-'0';
-								if(c<28 && !mainPrefs->disableColor)
+								//Can't have color less than zero...could crash.
+								if((c >= 0 && c<kMaxMacColors) && !mainPrefs->disableColor)
 								{
-									if(winActive)
-										rgb2 = macColors[c];
-									else
-									{
-										rgb2=macColors[c];
+									rgb2 = macColors[c];
+									if(!winActive)
 										LightenColor(&rgb2);
-									}
 								}
 							}
 						}
