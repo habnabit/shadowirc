@@ -796,7 +796,7 @@ pascal void processServer(CEPtr c, connectionPtr conn)
 	long nn, i;
 	size_t abytes = c->value;
 	linkPtr link = conn->link;
-	char cr = 0;
+	char cr;
 	
 	if(c->event==C_CharsAvailable)
 	{
@@ -810,6 +810,7 @@ pascal void processServer(CEPtr c, connectionPtr conn)
 			
 			conn->dataIn += nn;
 			abytes -= nn;
+			cr = 0;
 			//kill CR/LF at end
 			while(nn>0 && (ls.data[nn]=='\n' || ls.data[nn]=='\r'))
 			{
