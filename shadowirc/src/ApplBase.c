@@ -859,14 +859,13 @@ static pascal void doMouseDown(EventRecord *e)
 			}
 			else
 			{
-				if(CMClick(p, e))
-					break;
-				
 				e->message=(long)p;
 				switch(i)
 				{
 					case inContent:
-						if(WIsFloater(p))
+						if(CMClick(p, e))
+							;
+						else if(WIsFloater(p))
 							floatingWindowClick(e);
 						else
 						{
