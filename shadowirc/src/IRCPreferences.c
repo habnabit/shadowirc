@@ -316,7 +316,8 @@ pascal void SetColorsPanel(void)
 	{
 		GetDialogItem(PrefsDlg, x+4, &itemType, (Handle*)&item, &box);
 		rgbc=(RGBColorHdl)GetControlDataHandle(item);
-		**rgbc = shadowircColors[x];
+		if(rgbc)
+			**rgbc = shadowircColors[x];
 		Draw1Control(item);
 	}
 }
