@@ -134,7 +134,7 @@ long HTFindNumericDefault(HTPtr table, ConstStr255Param name, long def)
 		return def;
 }
 
-static void _HTStrDup(ConstStringPtr str, void** dest)
+static void _HTStrDup(ConstStringPtr str, StringPtr* dest)
 {
 	*dest = NewPString(str);
 }
@@ -145,7 +145,7 @@ static void _HTSetElt(htEltPtr elt, void* newData, int type)
 	if(type == htTypeInt)
 		elt->data = newData;
 	else
-		_HTStrDup(newData, &elt->data);
+		_HTStrDup(newData, &(StringPtr)elt->data);
 }
 
 

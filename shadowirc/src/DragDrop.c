@@ -164,7 +164,7 @@ pascal char DragGetPtr(DragReference drag, long type, void* *data)
 	Ptr d;
 	char b;
 	
-	b=DragGetType(drag, type, &d, 0);
+	b=DragGetType(drag, type, &(void*)d, 0);
 	*data = *(Ptr*)d;
 	DisposePtr(d);
 	return b;
@@ -212,7 +212,7 @@ static pascal OSErr MWWidgetReceiveDrag(MWPtr mw, Point mouse, DragReference dra
 						long idx;
 						Str255 s;
 						LongString ls;
-						DragGetType(drag, kTextFlavor, &text, &size);
+						DragGetType(drag, kTextFlavor, &(void*)text, &size);
 						for(idx=0;idx<=size && text[idx]!=13;idx++)
 							;
 						
@@ -503,10 +503,10 @@ static pascal OSErr MWTextPaneReceiveDrag(MWPtr mw, DragReference drag)
 			Ptr text;
 			long size;
 			
-			DragGetType(drag, kTextFlavor, &text, &size);
+			DragGetType(drag, kTextFlavor, &(void*)text, &size);
 			mwFrom = 0;
 			if(DragIsTypeAvail(drag, kMWinFlavor))
-				DragGetPtr(drag, kMWinFlavor, &mwFrom);
+				DragGetPtr(drag, kMWinFlavor, &(void*)mwFrom);
 			
 			ok=1;
 			if(mw->winType == chanWin && DragIsTypeAvail(drag, kUserFlavor))
@@ -514,7 +514,7 @@ static pascal OSErr MWTextPaneReceiveDrag(MWPtr mw, DragReference drag)
 				channelPtr ch;
 				UserListPtr user;
 				
-				DragGetPtr(drag, kUserFlavor, &user);
+				DragGetPtr(drag, kUserFlavor, &(void*)user);
 				ch = MWGetChannel(mw);
 				if(ch)
 				{
