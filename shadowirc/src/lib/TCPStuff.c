@@ -749,7 +749,7 @@ static void TCPSendComplete(MyControlBlockPtr cbp)
 /*
  * InitConnections
  * Set up connections
- * Zero out fd_set readfds
+ * Zero out fd_set readfds, set fd_max to 0
  * Set SIGPIPE handler to SIG_IGN
  * Replaces functionality of old TCPInit
  */
@@ -763,6 +763,7 @@ OSErr InitConnections(void)
 	connectionmagic = 0;
 	signal(SIGPIPE, SIG_IGN);
         FD_ZERO(&readfds);
+	fd_max = 0;
         TCPFinish();
         return noErr;
 }
