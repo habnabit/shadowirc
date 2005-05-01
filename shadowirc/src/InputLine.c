@@ -1090,7 +1090,7 @@ void OpenInputLine()
 		if(inputLine.w)
 		{
 			// Get rid of the close box
-			ChangeWindowAttributes(inputLine.w, NULL, kWindowCloseBoxAttribute);
+			ChangeWindowAttributes(inputLine.w, 0, kWindowCloseBoxAttribute);
 			
 			GetPort(&p0);
 			SetPortWindowPort(inputLine.w);
