@@ -59,14 +59,14 @@ pascal OSErr _WEHiliteRangeArray(TextRangeArrayHandle hTray, WEHandle hWE)
 		hiliteStyle = ABS(hiliteStyle);
 
 		// if hiliteStyle is kCaretPosition, set the selection range
-		if (hiliteStyle == kCaretPosition)
+		if (hiliteStyle == kTSMHiliteCaretPosition)
 		{
 			pWE->selStart = rangeStart;
 			pWE->selEnd = rangeEnd;
 		}
 		else
 		{
-			hiliteStyle -= kRawText;
+			hiliteStyle -= kTSMHiliteRawText;
 			// otherwise set the WETextStyle flags of the specified range appropriately
 			if ((hiliteStyle >= 0) && (hiliteStyle <= 3))
 			{
