@@ -25,10 +25,6 @@
 	Note: This code was originally based on Peter N. Lewis's MacTCP source code.
 */
 
-#pragma mark -
-#pragma mark ¥¥¥ÊTCPStuff
-#pragma mark -
-
 #define TCPCONTROL
 #define __TCPSTUFF__
 #define __TCPCONNECTIONS__
@@ -80,7 +76,7 @@ typedef enum TCPStateType {
  * DNS states
  */
 enum {
-        inProgress = 1
+	inProgress = 1
 };
 
 typedef struct TCPConnection {
@@ -92,19 +88,19 @@ typedef struct TCPConnection {
 } TCPConnection;
 
 enum {
-    tooManyConnections = -23099,
-
-    max_connections = 32,
-    TO_FindAddress = 40 * 60,
-    TO_ActiveOpen = 20 * 60,
-    TO_ListenOpen = 365 * 24 * 2600 * 60,
-
-    TCPCMagic = 'TCPC',
-    TCPCBadMagic = 'badc'
+	tooManyConnections = -23099,
+	
+	max_connections = 32,
+	TO_FindAddress = 40 * 60,
+	TO_ActiveOpen = 20 * 60,
+	TO_ListenOpen = 365 * 24 * 2600 * 60,
+	
+	TCPCMagic = 'TCPC',
+	TCPCBadMagic = 'badc'
 };
 
 enum statusType {
-    CS_None, CS_Searching, CS_Opening, CS_Established, CS_Closing
+	CS_None, CS_Searching, CS_Opening, CS_Established, CS_Closing
 };
 
 /*
@@ -114,28 +110,28 @@ enum statusType {
  * name is packed with the hostname we are looking for
  */
 typedef struct DNRRecord {
-    OSErr ioResult;
-    pthread_t thread;
-    pthread_mutex_t lock;
-    Str255 name;
-    struct addrinfo *addr_list;
+	OSErr ioResult;
+	pthread_t thread;
+	pthread_mutex_t lock;
+	Str255 name;
+	struct addrinfo *addr_list;
 } DNRRecord, *DNRRecordPtr;
 
 typedef long connectionIndex;
 
 typedef struct tcpConnectionRecord {
-    OSType magic;
-    long conmagic;
-    /*
-     * sockfd contains socket file descriptor
-     * state contains MacTCP-style socket state
-     */
-    int sockfd;
-    TCPStateType state;
-    DNRRecordPtr dnrrp;
-    long timeout;
-    short status;
-    char closedone;
+	OSType magic;
+	long conmagic;
+	/*
+	 * sockfd contains socket file descriptor
+	 * state contains MacTCP-style socket state
+	 */
+	int sockfd;
+	TCPStateType state;
+	DNRRecordPtr dnrrp;
+	long timeout;
+	short status;
+	char closedone;
 } tcpConnectionRecord;
 
 static tcpConnectionRecord connections[max_connections];
@@ -166,10 +162,10 @@ static int ident_bind(void);
  */
 void inet_ntoa_str(struct in_addr addr, StringPtr string)
 {
-    char *cstr;
-    
-    cstr = inet_ntoa(addr);
-    CopyCStringToPascal(cstr, string);
+	char *cstr;
+	
+	cstr = inet_ntoa(addr);
+	CopyCStringToPascal(cstr, string);
 }
 
 /*
@@ -180,12 +176,12 @@ void inet_ntoa_str(struct in_addr addr, StringPtr string)
  */
 void ntohl_str(u_int32_t net32, StringPtr string)
 {
-    char cstr[INET_ADDRSTRLEN];
-    u_int32_t host32;
-    
-    host32 = ntohl(net32);
-    sprintf(cstr, "%u", host32);
-    CopyCStringToPascal(cstr, string);
+	char cstr[INET_ADDRSTRLEN];
+	u_int32_t host32;
+	
+	host32 = ntohl(net32);
+	sprintf(cstr, "%u", host32);
+	CopyCStringToPascal(cstr, string);
 }
 
 /*
@@ -196,21 +192,21 @@ void ntohl_str(u_int32_t net32, StringPtr string)
  */
 u_int32_t str_htonl(StringPtr string)
 {
-    char *cstr, *end_ptr;
-    size_t size;
-    u_int32_t net32;
-    
-    cstr = string;
-    size = *string;
-    cstr = safe_malloc(size);
-    
-    CopyPascalStringToC(string, cstr);
-    net32 = strtoul(cstr, &end_ptr, 0);
-    if (errno == ERANGE || *end_ptr != '\0')
-        net32 = 0;
-        
-    free(cstr);
-    return(net32);
+	char *cstr, *end_ptr;
+	size_t size;
+	u_int32_t net32;
+	
+	cstr = string;
+	size = *string;
+	cstr = safe_malloc(size);
+	
+	CopyPascalStringToC(string, cstr);
+	net32 = strtoul(cstr, &end_ptr, 0);
+	if (errno == ERANGE || *end_ptr != '\0')
+		net32 = 0;
+			
+	free(cstr);
+	return(net32);
 }
 
 /*
@@ -228,16 +224,16 @@ static int fd_max;
  */
 static int fd_add (int fd)
 {
-        if (fd < 0)
-            return fd;
-            
-        if (!FD_ISSET(fd, &readfds))
-                FD_SET(fd, &readfds);
-        
-        if (fd > fd_max)
-                fd_max = fd;
-        
-        return fd;
+	if(fd < 0)
+		return fd;
+			
+	if(!FD_ISSET(fd, &readfds))
+		FD_SET(fd, &readfds);
+	
+	if(fd > fd_max)
+		fd_max = fd;
+	
+	return fd;
 }
 
 /*
@@ -246,42 +242,43 @@ static int fd_add (int fd)
  */
 static int fd_remove (int fd)
 {
-        if (fd < 0)
-            return fd;
-        if (FD_ISSET(fd, &readfds))
-                FD_CLR(fd, &readfds);
-        
-        close(fd);
-        if (fd == fd_max && fd_max != 0) {
-                do
-                    fd--;
-                while(!FD_ISSET(fd, &readfds) && fd > 0);
-                fd_max = fd;
-        }
-        
-        return (0);
+	if(fd < 0)
+		return fd;
+	if(FD_ISSET(fd, &readfds))
+		FD_CLR(fd, &readfds);
+	
+	close(fd);
+	if(fd == fd_max && fd_max != 0)
+	{
+		do {
+			fd--;
+		} while(!FD_ISSET(fd, &readfds) && fd > 0);
+		fd_max = fd;
+	}
+	
+	return (0);
 }
 
 /*
  * Socket supporting functions
  * writen() and readn() from Richard Stevens
  */
- 
+
 /*
  * set_nblk
  * Set O_NONBLOCK flag on sockfd
  */
 static int set_nblk(int sockfd)
 {
-    int flags;
-    /*
-     * Set O_NONBLOCK flag
-     */
-    if((flags = fcntl(sockfd, F_GETFL, 0)) < 0)
-        return (-1);
-    if((fcntl(sockfd, F_SETFL, flags | O_NONBLOCK)) < 0)
-        return (-1);
-    return (0);
+	int flags;
+	/*
+	 * Set O_NONBLOCK flag
+	 */
+	if((flags = fcntl(sockfd, F_GETFL, 0)) < 0)
+		return (-1);
+	if((fcntl(sockfd, F_SETFL, flags | O_NONBLOCK)) < 0)
+		return (-1);
+	return (0);
 }
 
 /*
@@ -290,17 +287,17 @@ static int set_nblk(int sockfd)
  */
 static int set_blk(int sockfd)
 {
-    int flags;
-    if((flags = fcntl(sockfd, F_GETFL, 0)) == -1)
-        return (-1);
-    /*
-     * Remove O_NONBLOCK flag
-     */
-    if(fcntl(sockfd, F_SETFL, flags & ~O_NONBLOCK) < 0)
-        return (-1);
-    return (0);
+	int flags;
+	if((flags = fcntl(sockfd, F_GETFL, 0)) == -1)
+		return (-1);
+	/*
+	 * Remove O_NONBLOCK flag
+	 */
+	if(fcntl(sockfd, F_SETFL, flags & ~O_NONBLOCK) < 0)
+		return (-1);
+	return (0);
 }
-    
+ 
 /*
  * readn macro
  * Use MSG_WAITALL flag to cause read() to block until all requested bytes are read
@@ -341,11 +338,13 @@ static ssize_t writen(int fd, const void *vptr, size_t n)
 
 static int nblk_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
-        int retval;
-        set_nblk(sockfd);
-        retval = accept(sockfd, addr, addrlen);
-        set_blk(sockfd);
-        return retval;
+	int retval;
+	
+	set_nblk(sockfd);
+	retval = accept(sockfd, addr, addrlen);
+	set_blk(sockfd);
+	
+	return retval;
 }
 
 static ssize_t read_fd(int fd, void *ptr, size_t nbytes, int *recvfd)
@@ -391,28 +390,28 @@ static int ident_bind(void)
 {
 	int fd = -1, sockfd[2], status;
 	char c, path[MAXPATHLEN];
-        CFBundleRef bundle;
-        CFURLRef resources, toolURL;
+	CFBundleRef bundle;
+	CFURLRef resources, toolURL;
 	pid_t pid;
-        
-        /* Get path to ident_tool */
-        bundle = CFBundleGetMainBundle();
-        if (!bundle)
-            return -1;
-        
-        resources = CFBundleCopyResourcesDirectoryURL(bundle);
-        if (!resources)
-            return -1;
-            
-        toolURL = CFURLCreateCopyAppendingPathComponent(NULL, resources, CFSTR(IDENT_TOOL), FALSE);
-        CFRelease(resources);
-        if (!toolURL)
-            return FALSE;
-            
-        CFURLGetFileSystemRepresentation(toolURL, TRUE, (UInt8 *) &path, MAXPATHLEN);
-        CFRelease(toolURL);
-
-	if (socketpair(AF_LOCAL, SOCK_STREAM, 0, sockfd) != 0)
+	
+	/* Get path to ident_tool */
+	bundle = CFBundleGetMainBundle();
+	if(!bundle)
+		return -1;
+	
+	resources = CFBundleCopyResourcesDirectoryURL(bundle);
+	if(!resources)
+		return -1;
+			
+	toolURL = CFURLCreateCopyAppendingPathComponent(NULL, resources, CFSTR(IDENT_TOOL), FALSE);
+	CFRelease(resources);
+	if(!toolURL)
+		return FALSE;
+			
+	CFURLGetFileSystemRepresentation(toolURL, TRUE, (UInt8 *) &path, MAXPATHLEN);
+	CFRelease(toolURL);
+	
+	if(socketpair(AF_LOCAL, SOCK_STREAM, 0, sockfd) != 0)
 		return -1;
 
 	switch(pid = fork()) {
@@ -434,7 +433,7 @@ static int ident_bind(void)
 		goto exit;
 	}
 	if ((status = WEXITSTATUS(status)) == 0) {
-                read_fd(sockfd[0], &c, 1, &fd);
+		read_fd(sockfd[0], &c, 1, &fd);
 	} else {
 		errno = status;
 	}
@@ -451,8 +450,8 @@ exit:
  * Return number of bytes read
  */
 size_t TCPReceiveChars(int sockfd, Ptr d, size_t len)
-{        
-        return(readn(sockfd, d, len));
+{
+	return(readn(sockfd, d, len));
 }
 
 /* TCPReceiveUntil
@@ -463,48 +462,49 @@ size_t TCPReceiveChars(int sockfd, Ptr d, size_t len)
  */
 size_t TCPReceiveUntil(int sockfd, Ptr d, char c, size_t len)
 {
-        char *buffer;
-        char *ptr;
-        size_t nbytes;
-        
-        nbytes = 0;
-        buffer = safe_malloc(len);
-        len = recv(sockfd, buffer, len, MSG_PEEK);
-        if(len > 0) {
-                ptr = buffer;
-                while(ptr != buffer + len)
-                {
-                        nbytes++;
-                        if(*ptr == c) {
-                                break;
-                        }
-                        ptr++;
-                }
-                if (nbytes == len && *ptr != c)
-                {
-                        /*
-                         * XXX
-                         * This can occur under two conditions. The second is the dangerous one
-                         * 1) Not enough data is available on the socket, terminating characters are not found
-                         * 2) Server/Client doesn't follow spec and sends > max len bytes without terminating character
-                         * 	This should be solved by having dynamically allocated LongStrings that can handle
-                         *	this condition, or by dropping data when this occurs
-                         */
-                        nbytes = 0;
-                } else
-                        nbytes = readn(sockfd, d, nbytes);
-         
-        }
-        free(buffer);
-        return (nbytes);
+	char *buffer;
+	char *ptr;
+	size_t nbytes;
+	
+	nbytes = 0;
+	buffer = safe_malloc(len);
+	len = recv(sockfd, buffer, len, MSG_PEEK);
+	if(len > 0) {
+		ptr = buffer;
+		while(ptr != buffer + len)
+		{
+			nbytes++;
+			if(*ptr == c)
+				break;
+			ptr++;
+		}
+		
+		if(nbytes == len && *ptr != c)
+		{
+			/*
+			 * XXX
+			 * This can occur under two conditions. The second is the dangerous one
+			 * 1) Not enough data is available on the socket, terminating characters are not found
+			 * 2) Server/Client doesn't follow spec and sends > max len bytes without terminating character
+			 * 	This should be solved by having dynamically allocated LongStrings that can handle
+			 *	this condition, or by dropping data when this occurs
+			 */
+			nbytes = 0;
+		}
+		else
+			nbytes = readn(sockfd, d, nbytes);
+	}
+	free(buffer);
+	
+	return nbytes;
 }
 
 OSErr TCPSendChars(int sockfd, const void* d, size_t len)
 {
-    if((writen(sockfd, d, len) == len))
-        return (noErr);
-    else
-        return (C_Closed);
+	if((writen(sockfd, d, len) == len))
+		return (noErr);
+	else
+		return (C_Closed);
 }
 
 static size_t TCPCharsAvailable(int sockfd)
@@ -522,50 +522,50 @@ static size_t TCPCharsAvailable(int sockfd)
  */
 int TCPLocalPort(int sockfd)
 {
-    struct sockaddr_storage sas;
-    socklen_t len;
-    
-    len = sizeof(sas);
-    if(getsockname(sockfd, (SA *) &sas, &len) < 0)
-        return (-1);
-    
-    switch(sas.ss_family)
-    {
-	    case AF_INET6:
-		    return (ntohs(((struct sockaddr_in6 *)&sas)->sin6_port));
-		    break;
-	    case AF_INET:
-		    return (ntohs(((struct sockaddr_in *)&sas)->sin_port));
-		    break;
-	    default:
-		    return (-1);
-    }
+	struct sockaddr_storage sas;
+	socklen_t len;
+	
+	len = sizeof(sas);
+	if(getsockname(sockfd, (SA *) &sas, &len) < 0)
+		return (-1);
+	
+	switch(sas.ss_family)
+	{
+		case AF_INET6:
+			return (ntohs(((struct sockaddr_in6 *)&sas)->sin6_port));
+			break;
+		case AF_INET:
+			return (ntohs(((struct sockaddr_in *)&sas)->sin_port));
+			break;
+		default:
+			return (-1);
+	}
 }
 
 int TCPLocalIP(int sockfd, struct sockaddr *sa)
 {
-    struct sockaddr_storage sas;
-    socklen_t len;
-    
-    len = sizeof(sas);
-    if(getsockname(sockfd, (SA *) &sas, &len) < 0)
-        return (-1);
-    
-    memcpy(sa, &sas, sizeof(struct sockaddr_storage));
-    return (0);
+	struct sockaddr_storage sas;
+	socklen_t len;
+	
+	len = sizeof(sas);
+	if(getsockname(sockfd, (SA *) &sas, &len) < 0)
+		return (-1);
+	
+	memcpy(sa, &sas, sizeof(struct sockaddr_storage));
+	return (0);
 }
 
 int TCPRemoteIP(int sockfd, struct sockaddr *sa)
 {
-    struct sockaddr_storage sas;
-    socklen_t len;
-    
-    len = sizeof(sas);
-    if(getpeername(sockfd, (SA *) &sas, &len) < 0)
-        return (-1);
-    
-    memcpy(sa, &sas, sizeof(struct sockaddr_storage));
-    return (0);
+	struct sockaddr_storage sas;
+	socklen_t len;
+	
+	len = sizeof(sas);
+	if(getpeername(sockfd, (SA *) &sas, &len) < 0)
+		return (-1);
+	
+	memcpy(sa, &sas, sizeof(struct sockaddr_storage));
+	return (0);
 }
 
 
@@ -577,43 +577,44 @@ int TCPRemoteIP(int sockfd, struct sockaddr *sa)
 
 TCPStateType doTCPActiveOpen(int *sockfd, struct sockaddr *remotehost, u_short remoteport)
 {
-        int n;
-        u_short net_port;
-        
-        if((*sockfd = socket(remotehost->sa_family, SOCK_STREAM, 0)) == -1)
-                return (T_Failed);
-                
-        set_nblk(*sockfd);
-        
-        net_port = htons(remoteport);
-        
-        switch(remotehost->sa_family)
-        {
-                case AF_INET6:
-                        memcpy(&((struct sockaddr_in6 *)remotehost)->sin6_port, &net_port, sizeof(net_port));
-                        break;
-                case AF_INET:
-                        memcpy(&((struct sockaddr_in *)remotehost)->sin_port, &net_port, sizeof(net_port));
-                        break;
-                default:
-                        /* NOTE: This should never happen! */
-                        break;
-        }
-        
-        fd_add(*sockfd);
-        n = connect(*sockfd, remotehost, remotehost->sa_len);
+	int n;
+	u_short net_port;
+	
+	if((*sockfd = socket(remotehost->sa_family, SOCK_STREAM, 0)) == -1)
+		return (T_Failed);
+					
+	set_nblk(*sockfd);
+	
+	net_port = htons(remoteport);
+	
+	switch(remotehost->sa_family)
+	{
+		case AF_INET6:
+			memcpy(&((struct sockaddr_in6 *)remotehost)->sin6_port, &net_port, sizeof(net_port));
+			break;
+		case AF_INET:
+			memcpy(&((struct sockaddr_in *)remotehost)->sin_port, &net_port, sizeof(net_port));
+			break;
+		default:
+			/* NOTE: This should never happen! */
+			break;
+	}
+	
+	fd_add(*sockfd);
+	n = connect(*sockfd, remotehost, remotehost->sa_len);
 
-        if((set_blk(*sockfd)) == -1)
-                return(T_Failed);
+	if((set_blk(*sockfd)) == -1)
+		return(T_Failed);
 
-        if (n == -1) {
-                if(errno != EINPROGRESS)
-                        return (T_Failed);
-                else
-                        return (T_Opening);
-        }
-        
-        return (T_Established);
+	if (n == -1)
+	{
+		if(errno != EINPROGRESS)
+			return (T_Failed);
+		else
+			return (T_Opening);
+	}
+	
+	return (T_Established);
 }
 
 /*
@@ -623,54 +624,60 @@ TCPStateType doTCPActiveOpen(int *sockfd, struct sockaddr *remotehost, u_short r
 
 TCPStateType doTCPListenOpen(int af, int *sockfd, u_short localport, int backlog)
 {
-        /*
-         * Special case (low) ident port
-         */
-        if(localport == 113) {
-            if((*sockfd = ident_bind()) < 0)
-                    return (T_Failed);
-        } else {
-	    struct addrinfo hints, *res, *res_saved;
-	    char *portstr;
-	    
-	    memset(&hints, 0, sizeof(hints));
-	    hints.ai_family = af;
-	    hints.ai_flags = AI_ADDRCONFIG | AI_PASSIVE;
-	    hints.ai_socktype = SOCK_STREAM;
+	/*
+	 * Special case (low) ident port
+	 */
+	if(localport == 113)
+	{
+		if((*sockfd = ident_bind()) < 0)
+			return (T_Failed);
+	}
+	else
+	{
+		struct addrinfo hints, *res, *res_saved;
+		char *portstr;
+		
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_family = af;
+		hints.ai_flags = AI_ADDRCONFIG | AI_PASSIVE;
+		hints.ai_socktype = SOCK_STREAM;
 
-	    if (asprintf(&portstr, "%d", htons(localport)) == -1)
-		    return (T_Failed);
+		if (asprintf(&portstr, "%d", htons(localport)) == -1)
+			return (T_Failed);
 
-	    if (getaddrinfo(NULL, portstr, &hints, &res) != 0)
-		    return (T_Failed);
+		if (getaddrinfo(NULL, portstr, &hints, &res) != 0)
+			return (T_Failed);
 
-	    res_saved = res;
-	    free(portstr);
-	    
-	    while(res)
-	    {
-		    if((*sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
-			    return (T_Failed);
-		    
-		    if ((bind(*sockfd, (struct sockaddr *)res->ai_addr, res->ai_addrlen)) < 0) {
-			    if(res->ai_next != NULL) {
-				    res = res->ai_next;
-			    } else {
-				    freeaddrinfo(res_saved);
-				    return (T_Failed);
-			    }
-		    } else {
-			    freeaddrinfo(res_saved);
-			    break;
-		    }
-	    }
-        }
-        
-        if (listen(*sockfd, backlog) < 0)
-                return (T_Failed);
+		res_saved = res;
+		free(portstr);
+		
+		while(res)
+		{
+			if((*sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
+				return (T_Failed);
+			
+			if ((bind(*sockfd, (struct sockaddr *)res->ai_addr, res->ai_addrlen)) < 0)
+			{
+				if(res->ai_next != NULL) {
+					res = res->ai_next;
+				} else {
+					freeaddrinfo(res_saved);
+					return (T_Failed);
+				}
+			}
+			else
+			{
+				freeaddrinfo(res_saved);
+				break;
+			}
+		}
+	}
+			
+	if (listen(*sockfd, backlog) < 0)
+		return (T_Failed);
 
-        fd_add(*sockfd);
-        return T_Listening;
+	fd_add(*sockfd);
+	return T_Listening;
 }
 
 #pragma mark -
@@ -685,7 +692,6 @@ static char ValidConnection(connectionIndex *cp)
 		return true;
 	
 	return false;
-    return 0;
 }
 
 /*
@@ -694,7 +700,7 @@ static char ValidConnection(connectionIndex *cp)
  */ 
 int GetConnectionSocket(long cp)
 {
-    if(ValidConnection(&cp))
+	if(ValidConnection(&cp))
 		return connections[cp-1].sockfd;
 	else
 		return 0;
@@ -716,9 +722,9 @@ OSErr InitConnections(void)
 	
 	connectionmagic = 0;
 	signal(SIGPIPE, SIG_IGN);
-        FD_ZERO(&readfds);
+	FD_ZERO(&readfds);
 	fd_max = 0;
-        return noErr;
+	return noErr;
 }
 
 /*
@@ -732,11 +738,12 @@ static void CloseConnections(void)
 	for(i=0;i<max_connections;i++)
 		if(connections[i].magic == TCPCMagic)
 			if(connections[i].status == CS_Established || connections[i].status == CS_Opening || connections[i].status == CS_Closing)
-				if(connections[i].state != T_Closed) {
-                                        fd_remove(connections[i].sockfd);
-                                        connections[i].magic = TCPCBadMagic;
-                                        connections[i].state = T_Closed;
-                                }
+				if(connections[i].state != T_Closed)
+				{
+					fd_remove(connections[i].sockfd);
+					connections[i].magic = TCPCBadMagic;
+					connections[i].state = T_Closed;
+				}
 }
 
 /*
@@ -803,7 +810,7 @@ static OSErr CreateConnection(connectionIndex *cp)
 		*cp += connectionmagic;
 		return noErr;
 	}
-    return noErr;
+	return noErr;
 }
 
 /*
@@ -908,7 +915,7 @@ OSErr FindAddress(connectionIndex *cp, ConstStr255Param hostname)
  */
 OSErr NewListenConnection(connectionIndex *cp, int af, u_short localport, int backlog)
 {
-        int err;
+	int err;
 	connectionIndex cpi;
 	
 	err = CreateConnection(cp);
@@ -921,15 +928,15 @@ OSErr NewListenConnection(connectionIndex *cp, int af, u_short localport, int ba
 			connections[cpi].state = doTCPListenOpen(af, &connections[cpi].sockfd, localport, backlog);
 			connections[cpi].timeout = TickCount() + TO_ListenOpen;
 			connections[cpi].status = CS_Opening;
-                        /*
-                         * If doTCPListenOpen failed, deallocate cp
-                         * Set state accordingly.
-                         */
+			/*
+			 * If doTCPListenOpen failed, deallocate cp
+			 * Set state accordingly.
+			 */
 			if(connections[cpi].state == T_Failed)
-                        {
-                                err = -1;
+			{
+				err = -1;
 				DestroyConnection(cp);
-                        }
+			}
 		}
 	}
 	
@@ -956,14 +963,15 @@ OSErr NewActiveConnection(connectionIndex *cp, struct sockaddr *remotehost, u_sh
 			connections[cpi].state = doTCPActiveOpen(&connections[cpi].sockfd, remotehost, remoteport);
 			connections[cpi].timeout = TickCount() + TO_ActiveOpen;
 			connections[cpi].status = CS_Opening;
-                        /*
-                         * If doTCPActiveOpen failed, deallocate cp
-                         * Set state accordingly.
-                         */
-			if(connections[cpi].state == T_Failed) {
-                                err = -1;
+			/*
+			 * If doTCPActiveOpen failed, deallocate cp
+			 * Set state accordingly.
+			 */
+			if(connections[cpi].state == T_Failed)
+			{
+				err = -1;
 				DestroyConnection(cp);
-                        }
+			}
 		}
 	}
 	
@@ -978,10 +986,11 @@ void CloseTCPConnection(connectionIndex cp)
 		
 		if(!c->closedone)
 		{
-			if(c->state != T_Closed) {
-                                fd_remove(c->sockfd);
-                                c->state = T_Closed;
-                        }
+			if(c->state != T_Closed)
+			{
+				fd_remove(c->sockfd);
+				c->state = T_Closed;
+			}
 			c->closedone = true;
 		}
 		c->status = CS_Closing;
@@ -1030,7 +1039,7 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 				 * To maintain integrity, we MUST hold the mutex lock before
 				 * we cancel the DNS thread
 				 */
-                                pthread_cancel(c->dnrrp->thread);
+				pthread_cancel(c->dnrrp->thread);
 				cer->event = C_SearchFailed;
 				cer->value = 1;
 				cer->timedout = true;
@@ -1057,46 +1066,19 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 			switch(c->state)
 			{
 				case T_Opening:
-                                        if(FD_ISSET(c->sockfd, rset) || FD_ISSET(c->sockfd, wset)) {
-                                                if (read(c->sockfd, NULL, 0) != 0) {
-                                                        CloseTCPConnection(rcp);
-                                                        cer->event = C_FailedToOpen;
-                                                        break;
-                                                }
-                                                c->state = T_Established;
-                                                c->status = CS_Established;
-                                                cer->event = C_Established;
-                                                break;
-                                        }
-                                        if(TickCount() > c->timeout)
+					if(FD_ISSET(c->sockfd, rset) || FD_ISSET(c->sockfd, wset))
 					{
-						CloseTCPConnection(rcp);
-						cer->event = C_FailedToOpen;
-						cer->timedout = true;
+						if(read(c->sockfd, NULL, 0) != 0)
+						{
+							CloseTCPConnection(rcp);
+							cer->event = C_FailedToOpen;
+							break;
+						}
+						c->state = T_Established;
+						c->status = CS_Established;
+						cer->event = C_Established;
+						break;
 					}
-					break;
-				case T_Listening:
-                                        /*
-                                         * If a connection is ready to be accepted, call non-blocking
-                                         * accept(). Replace old connection sockfd with new fd.
-                                         * This means that only ONE connection can be made on a listen
-                                         * socket
-                                         */
-                                        if(FD_ISSET(c->sockfd, rset) || FD_ISSET(c->sockfd, wset)) {
-                                                struct sockaddr_storage clientaddr;
-                                                socklen_t len;
-                                                int newfd;
-
-                                                len = sizeof(clientaddr);
-                                                newfd = nblk_accept(c->sockfd, (SA *) &clientaddr, &len);
-                                                fd_remove(c->sockfd);
-                                                c->sockfd = newfd;
-                                                fd_add(c->sockfd);
-                                                c->state = T_Established;
-                                                c->status = CS_Established;
-                                                cer->event = C_Established;
-                                                break;
-                                        }
 					if(TickCount() > c->timeout)
 					{
 						CloseTCPConnection(rcp);
@@ -1104,10 +1086,40 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 						cer->timedout = true;
 					}
 					break;
-                                case T_Failed:
-                                        CloseTCPConnection(rcp);
-                                        cer->event = C_FailedToOpen;
-                                        break;
+				case T_Listening:
+					/*
+					 * If a connection is ready to be accepted, call non-blocking
+					 * accept(). Replace old connection sockfd with new fd.
+					 * This means that only ONE connection can be made on a listen
+					 * socket
+					 */
+					if(FD_ISSET(c->sockfd, rset) || FD_ISSET(c->sockfd, wset))
+					{
+						struct sockaddr_storage clientaddr;
+						socklen_t len;
+						int newfd;
+
+						len = sizeof(clientaddr);
+						newfd = nblk_accept(c->sockfd, (SA *) &clientaddr, &len);
+						fd_remove(c->sockfd);
+						c->sockfd = newfd;
+						fd_add(c->sockfd);
+						c->state = T_Established;
+						c->status = CS_Established;
+						cer->event = C_Established;
+						break;
+					}
+					if(TickCount() > c->timeout)
+					{
+						CloseTCPConnection(rcp);
+						cer->event = C_FailedToOpen;
+						cer->timedout = true;
+					}
+					break;
+				case T_Failed:
+					CloseTCPConnection(rcp);
+					cer->event = C_FailedToOpen;
+					break;
 				case T_Established:
 					cer->event = C_Established;
 					c->status = CS_Established;
@@ -1119,11 +1131,11 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 					cer->event = C_FailedToOpen;
 					c->timeout = 0;
 					break;
-                                default:
-                                        /*
-                                         * XXX landonf
-                                         * Do nothing. Should we handle T_Unknown here?
-                                         */
+				default:
+					/*
+					 * XXX landonf
+					 * Do nothing. Should we handle T_Unknown here?
+					 */
 					break;
 			}
 			break;
@@ -1132,25 +1144,28 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 			switch(c->state)
 			{
 				case T_Established:
-                                        if(FD_ISSET(c->sockfd, rset)) {
-                                                cer->value = TCPCharsAvailable(c->sockfd);
-                                                if(cer->value > 0) {
-                                                    cer->event = C_CharsAvailable;
-                                                } else {
-                                                    c->status = CS_Closing;
-                                                    cer->event = C_Closed;
-                                                    CloseTCPConnection(rcp);
-                                                }
-                                        }
+					if(FD_ISSET(c->sockfd, rset))
+					{
+						cer->value = TCPCharsAvailable(c->sockfd);
+						if(cer->value > 0) {
+								cer->event = C_CharsAvailable;
+						}
+						else
+						{
+								c->status = CS_Closing;
+								cer->event = C_Closed;
+								CloseTCPConnection(rcp);
+						}
+					}
 					break;
 				case T_Closed:
 					c->status = CS_Closing;
 					cer->event = C_Closed;
 					break;
-                                default:
-                                        /*
-                                         * XXX do what here
-                                         */
+				default:
+					/*
+					 * XXX do what here
+					 */
 					break;
 			}
 			break;
@@ -1163,19 +1178,19 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
 					//DebugStr("\pStrange State 2");
 					break;
 				case T_Established:
-                                        cer->event = C_Closed;
-                                        cer->timedout = true;
-                                        DestroyConnection(&rcp);
+					cer->event = C_Closed;
+					cer->timedout = true;
+					DestroyConnection(&rcp);
 					break;
 				case T_Closed:
 					cer->event = C_Closed;
 					DestroyConnection(&rcp);
 					break;
-                                default:
-                                        /*
-                                         * XXX Do what here?
-                                         */
-                                         break;
+				default:
+					/*
+					 * XXX Do what here?
+					 */
+					 break;
 			}
 			break;
 	}
@@ -1194,7 +1209,7 @@ char GetConnectionEvent(connectionEventRecord *cer)
 	
 	cer->event = C_NoEvent;
 	oci = connectionItem;
-        
+	
 	select(fd_max + 1, &rset, &wset, NULL, &ts);
 	do {
 		if(connections[connectionItem].magic == TCPCMagic)
