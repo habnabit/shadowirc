@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2004 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -31,12 +31,12 @@ TXNObject IADGetTXN(inputAreaDataPtr iad);
 void IADSetFieldBounds(inputAreaDataPtr iad, Rect *r);
 
 #pragma mark Text Actions
-void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish);
-void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish);
-void IADSetTextPtrRange(inputAreaDataPtr iad, Ptr text, long length, int start, int end);
-void IADSetTextPtr(inputAreaDataPtr iad, Ptr text, long length);
+void IADSetCursorSelection(inputAreaDataPtr iad, UInt32 start, UInt32 finish);
+void IADGetCursorSelection(inputAreaDataPtr iad, UInt32 *start, UInt32 *finish);
+void IADSetTextPtrRange(inputAreaDataPtr iad, Ptr text, UInt32 length, UInt32 start, UInt32 end);
+void IADSetTextPtr(inputAreaDataPtr iad, Ptr text, UInt32 length);
 void IADSetText(inputAreaDataPtr iad, LongString *ls);
-long IADGetTextHandleRange(inputAreaDataPtr iad, Handle *text, int start, int end);
+long IADGetTextHandleRange(inputAreaDataPtr iad, Handle *text, UInt32 start, UInt32 end);
 long IADGetTextHandle(inputAreaDataPtr iad, Handle *text);
 long IADGetText(inputAreaDataPtr iad, LongString *ls);
 OSStatus IADHandleTextEvent(inputAreaDataPtr iad, EventRef event);

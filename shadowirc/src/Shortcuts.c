@@ -416,7 +416,7 @@ static void ParseShortcutText(ConstStr255Param s)
 	int x;
 	short cp, ep;
 	Handle h;
-	long l1,l2;
+	UInt32 l1,l2;
 	inputAreaDataPtr iad = ILGetInputDataFromMW(0);
 	
 	if(!iad)

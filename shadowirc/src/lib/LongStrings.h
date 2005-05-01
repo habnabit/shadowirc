@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2004 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -26,7 +26,7 @@
 
 typedef struct LongString
 {
-	short len;
+	UInt16 len;
 //MISALIGNED 2
 	unsigned char data[maxLSlen + 1];
 } LongString;

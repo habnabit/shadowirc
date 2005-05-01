@@ -1,5 +1,5 @@
 /*	ShadowIRC Plugins Header File
-		Version 2.0a14-preliminary
+		Version 2.0a15-preliminary
 		© John Bafford 1997-2005. All Rights Reserved.
 		dshadow@shadowirc.com
 		http://www.shadowirc.com
@@ -26,7 +26,7 @@
 #ifndef __ShadowIRC_Headers__
 #define __ShadowIRC_Headers__
 
-#define _ShadowIRC_API_Version_ 0x0200000E
+#define _ShadowIRC_API_Version_ 0x0200000F
 
 #include <Carbon/Carbon.h>
 #include <netinet/in.h>
@@ -237,7 +237,7 @@ enum {
 };
 
 typedef struct LongString {
-	short len;											//Length of a longstring. Functions as a C-string strlen() or a pascal string length byte would.
+	UInt16 len;											//Length of a longstring. Functions as a C-string strlen() or a pascal string length byte would.
 	unsigned char data[maxLSlen + 1];	//The string. data[1] is the _first_ character of the string. data[0] has no specific value.
 } LongString;
 
@@ -2251,7 +2251,7 @@ void IADSetText(inputAreaDataPtr iad, LongString *ls);
 		Output:	ls - The text to set the inputfield to.
 */
 
-void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish);
+void IADSetCursorSelection(inputAreaDataPtr iad, UInt32 start, UInt32 finish);
 /*	Sets the position of the selection on the input line.
 		Input:	iad - The IAD reference of the input field
 					start - The start of the selection.
@@ -2259,7 +2259,7 @@ void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish);
 		Output:	none
 */
 
-void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish);
+void IADGetCursorSelection(inputAreaDataPtr iad, UInt32 *start, UInt32 *finish);
 /*	Gets the selection in the inputline.
 		Input:	iad - The IAD reference of the input field
 		Output:	start - The start of the selection.

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2004 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -62,22 +62,22 @@ void IADSetFieldBounds(inputAreaDataPtr iad, Rect *r)
 
 #pragma mark Text Actions
 
-void IADSetCursorSelection(inputAreaDataPtr iad, long start, long finish)
+void IADSetCursorSelection(inputAreaDataPtr iad, UInt32 start, UInt32 finish)
 {
 	TXNSetSelection(iad->il, start, finish);
 }
 
-void IADGetCursorSelection(inputAreaDataPtr iad, long *start, long *finish)
+void IADGetCursorSelection(inputAreaDataPtr iad, UInt32 *start, UInt32 *finish)
 {
 	TXNGetSelection(iad->il, start, finish);
 }
 
-void IADSetTextPtrRange(inputAreaDataPtr iad, Ptr text, long length, int start, int end)
+void IADSetTextPtrRange(inputAreaDataPtr iad, Ptr text, UInt32 length, UInt32 start, UInt32 end)
 {
 	TXNSetData(iad->il, kTXNTextData, text, length, start, end);
 }
 
-void IADSetTextPtr(inputAreaDataPtr iad, Ptr text, long length)
+void IADSetTextPtr(inputAreaDataPtr iad, Ptr text, UInt32 length)
 {
 	TXNSetData(iad->il, kTXNTextData, text, length, kTXNStartOffset, kTXNEndOffset);
 }
@@ -92,7 +92,7 @@ void IADSetText(inputAreaDataPtr iad, LongString *ls)
 	IADSetTextPtr(iad, &ls->data[1], ls->len);
 }
 
-long IADGetTextHandleRange(inputAreaDataPtr iad, Handle *text, int start, int end)
+long IADGetTextHandleRange(inputAreaDataPtr iad, Handle *text, UInt32 start, UInt32 end)
 {
 	TXNGetDataEncoded(iad->il, start, end, text, kTXNTextData);
 	

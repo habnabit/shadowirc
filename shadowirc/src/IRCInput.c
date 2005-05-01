@@ -379,7 +379,7 @@ static char IsWS(char c)
 }
 
 
-static void _HNCFindWord(long cStart, long *wStart, long *wEnd, Ptr text, long textLen)
+static void _HNCFindWord(UInt32 cStart, UInt32 *wStart, UInt32 *wEnd, Ptr text, UInt32 textLen)
 {
 	int curPos = cStart;
 	
@@ -422,8 +422,8 @@ static void _HNCFindWord(long cStart, long *wStart, long *wEnd, Ptr text, long t
 //WARNING: This doesn't work when you ctrl-w starting from whitespace
 static void BackwordDel(inputAreaDataPtr iad)
 {
-	long selStart, selEnd;
-	long wordStart, wordEnd;
+	UInt32 selStart, selEnd;
+	UInt32 wordStart, wordEnd;
 	LongString ls;
 	
 	IADGetText(iad, &ls);
@@ -444,9 +444,9 @@ static void HandleNickComplete(inputAreaDataPtr iad)
 	if(!CurrentTarget.inactive && CurrentTarget.type == targChannel)
 	{
 		LongString ls;
-		long cStart, cEnd;
-		long wStart, wEnd;
-		long sel;
+		UInt32 cStart, cEnd;
+		UInt32 wStart, wEnd;
+		UInt32 sel;
 		
 		IADGetText(iad, &ls);
 		IADGetCursorSelection(iad, &cStart, &cEnd);
