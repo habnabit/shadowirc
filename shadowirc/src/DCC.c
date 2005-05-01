@@ -561,7 +561,7 @@ static char DCCPutFile(connectionPtr x, char forceSave)
 
 static void StartDCCGet(connectionPtr x)
 {
-	if(x->dcc->dccFlags == opening || x->dcc->dccFlags == open) //already open!!
+	if(x->dcc->dccFlags == dccOpening || x->dcc->dccFlags == dccOpen) //already open!!
 		return;
 	
 	if(mainPrefs->autoSaveDCC) //go ahead
@@ -596,7 +596,7 @@ pascal char DoDCCSendFile(linkPtr link, ConstStr255Param name, const FSSpec *fil
 		dd = (dccSENDDataPtr)d->dccData;
 		if(sendRev)
 		{
-			d->dccFlags = waitingRev;
+			d->dccFlags = dccWaitingRev;
 			d->reverse = true;
 		}
 		
@@ -746,7 +746,7 @@ pascal void DCCCommand(linkPtr link, Str255 s)
 						if(DCCCreate(link, dccCHAT, name, &x)) //if true, then created...
 						{
 						}
-						if(x->dcc->dccFlags == closed || x->dcc->dccFlags == waiting || x->dcc->dccFlags == offered)
+						if(x->dcc->dccFlags == dccClosed || x->dcc->dccFlags == dccWaiting || x->dcc->dccFlags == dccOffered)
 							DCCOpen(&x);
 					}
 					else
@@ -806,9 +806,9 @@ pascal void DCCOpen(connectionPtr *x)
 	pDCCOpenedData p;
 	ConstStringPtr sp;
 	
-	if(d->dccFlags==waitingRev)
+	if(d->dccFlags == dccWaitingRev)
 	{
-		d->dccFlags=offered;
+		d->dccFlags = dccOffered;
 		//Make a fake
 		d->refcon = (void*)++dccSENDRevCount;
 		
@@ -839,9 +839,9 @@ pascal void DCCOpen(connectionPtr *x)
 		SendCommand(cc->link, &ls);
 		LSParamString(&ls, GetIntStringPtr(spDCC, sRequestingRevDCC), sp, d->dccUserName, 0, 0);
 		SMPrefixLinkColor(cc->link, &ls, dsFrontWin, sicCTCP);
-		d->dccFlags=waiting;
+		d->dccFlags = dccWaiting;
 	}
-	else if(d->dccFlags == closed)
+	else if(d->dccFlags == dccClosed)
 	{
 		if(ConnNewListen(cc, AF_UNSPEC, 10))
 		{
@@ -908,13 +908,13 @@ pascal void DCCOpen(connectionPtr *x)
 			SendCommand(cc->link, &ls);
 			LSParamString(&ls, GetIntStringPtr(spDCC, sRequestingDCC), sp, d->dccUserName, 0, 0);
 			SMPrefixLinkColor(cc->link, &ls, dsFrontWin, sicCTCP);
-			d->dccFlags=waiting;
+			d->dccFlags = dccWaiting;
 			opened=1;
 		}
 		else
 			DCCFailed(x, GetIntStringPtr(spDCC, sFailedToCreate));
 	}
-	else if(d->dccFlags==offered)
+	else if(d->dccFlags == dccOffered)
 	{
 		char hbuf[NI_MAXHOST];
 		
@@ -929,7 +929,7 @@ pascal void DCCOpen(connectionPtr *x)
 		
 		if(1)
 		{
-			d->dccFlags=opening;
+			d->dccFlags = dccOpening;
 			LSParamString(&ls, GetIntStringPtr(spDCC, sOpeningDCC), d->dccUserName, des, args, 0);
 			SMPrefixLinkColor(cc->link, &ls, dsFrontWin, sicCTCP);
 			opened=1;
@@ -1244,7 +1244,7 @@ pascal void DCCConnOpened(connectionPtr *cn)
 	
 	conn = *cn;
 	d=conn->dcc;
-	d->dccFlags=open;
+	d->dccFlags = dccOpen;
 	switch(d->dccType)
 	{
 		case dccCHAT:
@@ -1736,7 +1736,7 @@ static void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param u
 //		SMPrefixLinkColor(link, &ls, dsFrontWin, sicCTCP);
 
 		//but only if the chat's not going already...
-		if(x->dcc->dccFlags == open)
+		if(x->dcc->dccFlags == dccOpen)
 			return;
 		
 		DCCClose(&x, true);
@@ -1759,7 +1759,7 @@ static void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param u
 		BlockZero(x->sas, sizeof(struct sockaddr_storage));
 		x->port = 0;
 		d->refcon = (void*)revNum;
-		d->dccFlags = closed;
+		d->dccFlags = dccClosed;
 		d->reverse = true;
 	}
 	else
@@ -1786,7 +1786,7 @@ static void DCCProcessChat(linkPtr link, ConstStr255Param fr, ConstStr255Param u
 		NextArg(s, c); //port
 		StringToNum(c, &l);
 		x->port=l;
-		d->dccFlags=offered;
+		d->dccFlags = dccOffered;
 	}
 
 
@@ -1851,7 +1851,7 @@ static void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param ua
 		BlockZero(x->sas, sizeof(struct sockaddr_storage));
 		x->port = 0;
 		d->refcon = (void*)revNum;
-		d->dccFlags = closed;
+		d->dccFlags = dccClosed;
 		d->reverse = true;
 	}
 	else
@@ -1878,7 +1878,7 @@ static void DCCProcessGet(linkPtr link, ConstStr255Param fr, ConstStr255Param ua
 		NextArg(s, c); //port
 		StringToNum(c, &l);
 		x->port=l;
-		d->dccFlags=offered;
+		d->dccFlags = dccOffered;
 	}
 	
 	dd = (dccGETDataPtr)d->dccData;
@@ -2043,7 +2043,7 @@ static void DCCProcessRequest(linkPtr link,ConstStr255Param fr, ConstStr255Param
 						StringToNum(c, &l);
 						x->port=l;
 						
-						x->dcc->dccFlags = offered;
+						x->dcc->dccFlags = dccOffered;
 						DCCOpen(&x);
 					}
 					else
@@ -2185,15 +2185,15 @@ pascal ConstStringPtr dccFlagTypToStr(short d)
 {
 	switch(d)
 	{
-		case closed:
+		case dccClosed:
 			return "\pCLOSED";
-		case waiting:
+		case dccWaiting:
 			return "\pWAITING";
-		case offered:
+		case dccOffered:
 			return "\pOFFERED";
-		case opening:
+		case dccOpening:
 			return "\pOPENING";
-		case open:
+		case dccOpen:
 			return "\pOPEN";
 		default:
 			return "\pUNKNOWN";

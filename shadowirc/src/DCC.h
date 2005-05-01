@@ -64,7 +64,7 @@ enum DCCStrings {
 };
 
 enum dccTypes {dccNIL, dccCHAT, dccGET, dccSEND, dccRESUME, dccREVERSE, dccNIL2, dcccLIST, dcccCLOSE, dcccMAXIMUM};
-enum dccFlags {closed, waiting, offered, opening, open, waitingRev};
+enum dccFlags {dccClosed, dccWaiting, dccOffered, dccOpening, dccOpen, dccWaitingRev};
 enum dccSendStage {sendNIL, sendHeader, sendDF, sendRF, sendDone};
 
 typedef struct dccTypeRec {
