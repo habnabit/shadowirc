@@ -1,11 +1,11 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2000 John Bafford <dshadow@shadowirc.com>
+	Copyright (C) 1996-2005 John Bafford <dshadow@shadowirc.com>
 	Re-written for MacOS X by:
 			Landon Fuller <landonf@fullers.org>
 			Chris Campbell <chris_campbell@mac.com>
 			Sean McGovern <smcgovern@users.sourceforge.net>
-	Copyright (C) 2002-2003 Landon Fuller, Chris Campbell, John Bafford, Sean McGovern
+	Copyright (C) 2002-2005 Landon Fuller, Chris Campbell, John Bafford, Sean McGovern
 	http://www.shadowirc.com
 
 	This program is free software; you can redistribute it and/or
@@ -49,7 +49,7 @@
 #include "TCPStuff.h"
 #include "TCP.h"
 
-#include "inline.h"
+#include "Inline.h"
 
 #ifndef _utils_
 #include "utils.h"
