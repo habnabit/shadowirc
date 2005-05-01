@@ -11,7 +11,7 @@
  *
  */
 
-
+#include <AvailabilityMacros.h>
 #include "WASTEIntf.h"
 
 // special event ID used by Kotoeri and other input methods
@@ -29,6 +29,11 @@ static AEEventHandlerUPP _weUpdateActiveInputAreaHandler = nil;
 static AEEventHandlerUPP _wePositionToOffsetHandler = nil;
 static AEEventHandlerUPP _weOffsetToPositionHandler = nil;
 static AEEventHandlerUPP _weGetTextHandler = nil;
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_3
+#define kTSMHiliteCaretPosition kCaretPosition
+#define kTSMHiliteRawText kRawText
+#endif
 
 pascal OSErr _WEHiliteRangeArray(TextRangeArrayHandle hTray, WEHandle hWE)
 {
