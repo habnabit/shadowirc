@@ -606,6 +606,7 @@ static void ULDragReceive(pUIDragReceiveData *p)
 #pragma mark -
 
 
+/*
 inline void RepeatMunger(Handle text, long offset, const void* ptr1, long len1, const void* ptr2, long len2)
 {
 	int i;
@@ -613,6 +614,7 @@ inline void RepeatMunger(Handle text, long offset, const void* ptr1, long len1, 
 		i = Munger(text, offset, ptr1, len1, ptr2, len2);
 	} while(i >= 0);
 }
+*/
 
 static void ProcessShortcuts(pShortcutProcessData *p)
 {
@@ -851,7 +853,7 @@ static void DBItemNotify(ControlRef browser, DataBrowserItemID item, DataBrowser
 	}
 }
 
-void DBCustomDrawItem(ControlRef browser, DataBrowserItemID item, DataBrowserPropertyID property, DataBrowserItemState itemState, const Rect* theRect, SInt16 gdDepth, Boolean colorDevice)
+static void DBCustomDrawItem(ControlRef browser, DataBrowserItemID item, DataBrowserPropertyID property, DataBrowserItemState itemState, const Rect* theRect, SInt16 gdDepth, Boolean colorDevice)
 {
 	UserListPtr user = (UserListPtr)item;
 	

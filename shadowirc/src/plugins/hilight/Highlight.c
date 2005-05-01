@@ -93,6 +93,8 @@ static struct {
 
 /* ** ****************************************************** ** */
 
+inline char IsWS(char c);
+
 inline char IsWS(char c)
 {
 	if(c==' ' || c== 10 || c==13 || c=='\t')
