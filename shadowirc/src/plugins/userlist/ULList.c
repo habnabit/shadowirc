@@ -1,6 +1,6 @@
 /*
 	ShadowIRC Userlist
-	Copyright (C) 1997-2002 John Bafford
+	Copyright (C) 1997-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -152,7 +152,7 @@ void ListSetWTitle(ULI ul)
 	Str255 s;
 	Str255 s2;
 	channelPtr ch;
-	long num;
+	UInt32 num;
 	
 	if(!ul || ul->ulType != ulGlobal)
 		return;

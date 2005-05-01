@@ -1,6 +1,6 @@
 /*
 	ShadowIRC Userlist
-	Copyright (C) 1997-2004 John Bafford
+	Copyright (C) 1997-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -110,7 +110,7 @@ static void ULSetWindowProperty(ULI ul)
 static ULI ULGetWindowProperty(WindowPtr w)
 {
 	ULI ul;
-	long actualSize;
+	UInt32 actualSize;
 	
 	GetWindowProperty(w, kUserlistSignature, kUserlistWindow, sizeof(ul), &actualSize, &ul);
 	
@@ -603,7 +603,6 @@ static void ULDragReceive(pUIDragReceiveData *p)
 	}
 }
 */
-
 #pragma mark -
 
 
@@ -840,7 +839,7 @@ static void ULDoubleClick(ULI ul, UserListPtr u)
 static void DBItemNotify(ControlRef browser, DataBrowserItemID item, DataBrowserItemNotification message)
 {
 	ULI ul;
-	long actualSize;
+	UInt32 actualSize;
 	UserListPtr u = (UserListPtr)item;
 	
 	switch(message)
@@ -1268,7 +1267,7 @@ static void ULIPaneDrawBorder(ULI ul, mwPanePtr o, char pressed)
 			LineTo(r.right, r.top);
 		}
 		
-/* еее */
+// еее
 		if(ul->rightSide)
 		{
 			r.left += kInWindowBorder;
@@ -1287,7 +1286,6 @@ static void ULIPaneDrawBorder(ULI ul, mwPanePtr o, char pressed)
 		LineTo(r.left, r.top);
 		LineTo(r.right, r.top);
 		ValidWindowRect(ul->uwin, &r);
-/* еее */
 	}
 }
 
@@ -1804,7 +1802,7 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 			shadowircColors = sidrIN->shadowircColors;
 			
 			l=((pVersionCheckDataPtr)sidrIN->messageData)->version;
-			if(l<0x0200000C) //2.0a12
+			if(l<0x0200000F) //2.0a15
 			{
 				((pVersionCheckDataPtr)sidrIN->messageData)->version = pVersionShadowIRCTooOld;
 				displayOldVersionMsg();

@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2002 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -26,7 +26,7 @@ static ShadowIRCDataRecord* sidr;
 typedef struct WordPref
 {
 	Str63 word;	//Size should to match length of nick
-	char matchStrict;
+	Boolean matchStrict;
 	char unused[3];
 } WordPref, *WordPrefPtr, **WordPrefHand;
 
@@ -83,8 +83,8 @@ static ListHandle aliasList;
 static WordPrefs wordPrefs;
 
 static struct {
-	char boldToken, boldNick;
-	char autoHilightCurNick;
+	Boolean boldToken, boldNick;
+	Boolean autoHilightCurNick;
 } prefs = {
 	1, 1,
 	1
@@ -708,7 +708,7 @@ void pluginMain(ShadowIRCDataRecord* sidrIN)
 		case pVersionCheckMessage:
 			sidr=sidrIN;
 			l=((pVersionCheckDataPtr)sidrIN->messageData)->version;
-			if(l<0x02000008) //we must have ShadowIRC 2.0d8 or later.
+			if(l<0x0200000F) //we must have ShadowIRC 2.0a15 or later.
 			{
 				((pVersionCheckDataPtr)sidrIN->messageData)->version = pVersionShadowIRCTooOld;
 				displayOldVersionMsg();
