@@ -339,7 +339,7 @@ static ssize_t writen(int fd, const void *vptr, size_t n)
 	return (n);
 }
 
-static int nblk_accept(int sockfd, struct sockaddr *addr, int *addrlen)
+static int nblk_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 {
         int retval;
         set_nblk(sockfd);
@@ -523,7 +523,7 @@ static size_t TCPCharsAvailable(int sockfd)
 int TCPLocalPort(int sockfd)
 {
     struct sockaddr_storage sas;
-    int len;
+    socklen_t len;
     
     len = sizeof(sas);
     if(getsockname(sockfd, (SA *) &sas, &len) < 0)
@@ -545,7 +545,7 @@ int TCPLocalPort(int sockfd)
 int TCPLocalIP(int sockfd, struct sockaddr *sa)
 {
     struct sockaddr_storage sas;
-    int len;
+    socklen_t len;
     
     len = sizeof(sas);
     if(getsockname(sockfd, (SA *) &sas, &len) < 0)
@@ -558,7 +558,7 @@ int TCPLocalIP(int sockfd, struct sockaddr *sa)
 int TCPRemoteIP(int sockfd, struct sockaddr *sa)
 {
     struct sockaddr_storage sas;
-    int len;
+    socklen_t len;
     
     len = sizeof(sas);
     if(getpeername(sockfd, (SA *) &sas, &len) < 0)
@@ -1084,7 +1084,8 @@ inline void HandleConnection(tcpConnectionRecord *c, connectionEventRecord *cer,
                                          */
                                         if(FD_ISSET(c->sockfd, rset) || FD_ISSET(c->sockfd, wset)) {
                                                 struct sockaddr_storage clientaddr;
-                                                int len, newfd;
+                                                socklen_t len;
+                                                int newfd;
 
                                                 len = sizeof(clientaddr);
                                                 newfd = nblk_accept(c->sockfd, (SA *) &clientaddr, &len);
