@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2004 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -290,7 +290,7 @@ static char CTCPComm(linkPtr link, ConstStr255Param fr, ConstStr255Param uah, Co
 	}
 	else if(pstrcmp(co, "\pVERSION"))
 	{
-		LSConcatStrAndStrAndStr("\pShadowIRC ", CL_VERSION, "\p © John Bafford 1996-2004 (", &ls);
+		LSConcatStrAndStrAndStr("\pShadowIRC ", CL_VERSION, "\p © John Bafford 1996-2005 (", &ls);
 		LSConcatLSAndStrAndStr(&ls, cdt, "\p)", &ls);
 		CTCPSendReply(link, fr, co, &ls);
 	}
