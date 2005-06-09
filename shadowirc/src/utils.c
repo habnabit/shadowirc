@@ -1,6 +1,6 @@
 /*
 	ShadowIRC - A Mac OS IRC Client
-	Copyright (C) 1996-2004 John Bafford
+	Copyright (C) 1996-2005 John Bafford
 	dshadow@shadowirc.com
 	http://www.shadowirc.com
 
@@ -27,8 +27,6 @@
 #include "Floaters.h"
 #include "utils.h"
 #include "ApplBase.h"
-
-#define USE_SHADOWIRC_ASSEMBLY 0
 
 inline char inupc(char c);
 static char matchFrom(ConstStr255Param s, ConstStr255Param mask, int i,  int j);
@@ -408,7 +406,6 @@ pascal void pdelete(StringPtr s, short start, short len)
 	}
 }
 
-#if !USE_SHADOWIRC_ASSEMBLY
 pascal char pstrcmp(ConstStr255Param s1, ConstStr255Param s2)
 {
 	int x=s1[0];
@@ -422,114 +419,7 @@ pascal char pstrcmp(ConstStr255Param s1, ConstStr255Param s2)
 				return 1;
 	return 0; //getting here is an error. return zero!
 }
-#else
-asm pascal char pstrcmp(register ConstStr255Param s1, register ConstStr255Param s2)
-{
-	#pragma unused(s1, s2)
-	lbz	r5, 0(r3);		//Get the byte counts of both strings
-	lbz	r6, 0(r4);
 
-	cmpw	r5, r6;		//If the two lengths aren't the same, fail immediately
-	bne		@fail
-
-	addi		r5, r5, 1;	//Increment the length to include the length byte (for alignment)
-
-	//If the length is <= 12, we can complete the comparison in one pass,
-	//using r6..r8 and r10..r12 as scratch registers
-
-	cmpwi   r5, 12;
-	ble+    @lessThanTwelveBytes;
-
-@twelveOrMoreBytes:
-	// OK...12 or more bytes to compare.  We'll compare 12 bytes and then see if we can finish.
-
-	lwz		r6, 0(r3)
-	lwz		r7, 4(r3)
-	lwz		r8, 8(r3)
-	
-	lwz		r10, 0(r4)
-	lwz		r11, 4(r4)
-	lwz		r12, 8(r4)
-	
-	addi		r3, r3, 12;		//Increment strings by 12
-	addi		r4, r4, 12;
-	subi		r5, r5, 12;		//Decrement size
-	
-	//Compare each of the register pairs R6/R10, R7/R11, R8/R12.  If any differs, exit.
-	cmp		cr1, 0, r6, r10;
-	cmp		cr2, 0, r7, r11
-	cmp		cr3, 0, r8, r12
-	
-	bne		cr1, @fail
-	bne		cr2, @fail
-	bne		cr3, @fail
-	
-	cmpwi	r5, 12;		//If we have more than 12, go back up and do the next 12. Else, continue...
-	bge		@twelveOrMoreBytes
-
-@lessThanTwelveBytes: //test8
-	mtcrf	1, r5		//set CR7 with 8/4/2/1 testers
-	bf			28, @test4	//if less than 8 left, skip
-	
-	lwz		r6, 0(r3)
-	lwz		r7, 4(r3)
-	
-	lwz		r10, 0(r4)
-	lwz		r11, 4(r4)
-	
-	addi		r3, r3, 8
-	addi		r4, r4, 8
-
-	cmp		cr1, 0, r6, r10;
-	cmp		cr2, 0, r7, r11
-	
-	bne		cr1, @fail
-	bne		cr2, @fail
-
-@test4:
-	bf			29, @test2	//if less than 4 left, skip
-
-	lwz		r6, 0(r3)
-	lwz		r10, 0(r4)
-
-	addi		r3, r3, 4
-	addi		r4, r4, 4
-
-	cmp		cr1, 0, r6, r10;
-	bne		cr1, @fail
-
-@test2:
-	bf			30, @test1	//if less than 2 left, skip
-
-	lhz		r6, 0(r3)
-	lhz		r10, 0(r4)
-
-	addi		r3, r3, 2
-	addi		r4, r4, 2
-
-	cmp		cr1, 0, r6, r10;
-	bne		cr1, @fail
-
-@test1:
-	bf			31, @succ		//if less than 1 left, skip
-	
-	lbz		r6, 0(r3)
-	lbz		r10, 0(r4)
-	
-	cmp		cr1, 0, r6, r10;
-	bne		cr1, @fail
-	
-@succ:
-	li		 r3, 1
-	blr
-
-@fail:
-	li		r3, 0
-	blr
-}
-#endif
-
-#if !USE_SHADOWIRC_ASSEMBLY
 inline char inupc(char c)
 {
 	if((c>='a') && (c<='z'))
@@ -550,52 +440,7 @@ pascal char pstrcasecmp(ConstStr255Param s1, ConstStr255Param s2)
 	
 	return 1;
 }
-#else
-asm pascal char pstrcasecmp(register ConstStr255Param s1, register ConstStr255Param s2)
-{
-	#pragma unused(s1, s2)
-	lbz		r5, 0(r3)	//Get lengths
-	lbz		r6, 0(r4)
-	mtctr	r5				//set the counter here to decrease stalls
-	cmpw	r5, r6		//s1[0] == s2[0]
-	beq		@loop		//if equal, branch
 
-@notEqual:
-	li			r3, 0		//else return 0
-	blr						
-	
-@loop:
-	lbz		r5, 1(r3)	//read next character and increment strings
-	addi		r3, r3, 1
-	lbz		r6, 1(r4)
-	addi		r4, r4, 1
-	
-	cmplwi	r5, 'a'		//See if first char is lowercase
-	blt		@nextA
-	cmplwi	r5, 'z'
-	bgt		@nextA
-	
-	subi		r5, r5, 32	//If it is, uppercase
-
-@nextA:
-	cmplwi	r6, 'a'			//See if second char is lowercase
-	blt		@nextB
-	cmplwi	r6, 'z'
-	bgt		@nextB
-	
-	subi		r6, r6, 32	//If it is, uppercase
-
-@nextB:
-	cmpw	r5, r6			//Compare two strings
-	bne		@notEqual		//If not equal, need to return zero
-	bdnz		@loop			//decrement counter and loop
-	
-	li		r3, 1
-	blr
-}
-#endif
-
-#if !USE_SHADOWIRC_ASSEMBLY
 pascal char pstrcasecmp2(ConstStr255Param s1, ConstStr255Param s2)
 {
 	int x, z;
@@ -609,42 +454,6 @@ pascal char pstrcasecmp2(ConstStr255Param s1, ConstStr255Param s2)
 	
 	return 1;
 }
-#else
-asm pascal char pstrcasecmp2(register ConstStr255Param s1, register ConstStr255Param s2)
-{
-	#pragma unused(s1, s2)
-	lbz		r5, 0(r3)	//Get lengths
-	lbz		r6, 0(r4)
-	mtctr	r5				//set the counter here to decrease stalls
-	cmpw	r5, r6		//s1[0] == s2[0]
-	beq		@loop		//if equal, branch
-
-@notEqual:
-	li			r3, 0		//else return 0
-	blr						
-	
-@loop:
-	lbz		r6, 1(r4)
-	addi		r4, r4, 1
-	lbz		r5, 1(r3)	//read next character and increment strings
-	addi		r3, r3, 1
-	
-	cmplwi	r6, 'a'			//See if second char is lowercase
-	blt		@nextB
-	cmplwi	r6, 'z'
-	bgt		@nextB
-	
-	subi		r6, r6, 32	//If it is, uppercase
-
-@nextB:
-	cmpw	r5, r6			//Compare two strings
-	bne		@notEqual		//If not equal, need to return zero
-	bdnz		@loop			//decrement counter and loop
-	
-	li		r3, 1
-	blr
-}
-#endif
 
 pascal OSErr ParamString(StringPtr str, ConstStr255Param r0, ConstStr255Param r1, ConstStr255Param r2, ConstStr255Param r3)
 {
@@ -786,7 +595,6 @@ pascal void ucase(StringPtr str)
 			str[x]-=32;
 }
 
-#if !USE_SHADOWIRC_ASSEMBLY
 pascal void pstrcpyucase(ConstStr255Param src, Str255 dest)
 {
 	int x;
@@ -796,41 +604,6 @@ pascal void pstrcpyucase(ConstStr255Param src, Str255 dest)
 	for(x=1;x<=n;x++)
 		dest[x]=inupc(src[x]);
 }
-#else
-asm pascal void pstrcpyucase(register ConstStr255Param src, register Str255 dest)
-{
-	#pragma unused(src, dest)
-	lbz		r5, 0(r3)	//copy string length
-
-	stb		r5, 0(r4)	//dest[0] = src[0]
-	
-	cmpwi	r5, 1		//is src[0] < 1?
-	bltlr						//if it is, return
-	
-	mtctr	r5				//copy length to counter
-
-	lbz		r5, 1(r3)	//load first character of string
-	addi		r3, r3, 1	//increment strings
-	addi		r4, r4, 1
-
-@loop:	
-	cmplwi	r5, 'a'		//check to see if 'a' <= r5 <= 'z'
-	blt		@next
-	cmplwi	r5, 'z'
-	bgt		@next
-	
-	subi		r5, r5, 32	//it is, so r5 -= 32
-
-@next:
-	stb		r5, 0(r4)		//put r5 into string	
-	addi		r3, r3, 1		//increment r3
-	lbz		r5, 0(r3)		//read next character
-	addi		r4, r4, 1		//increment r4
-	bdnz		@loop			//loop
-	
-	blr							//return
-}
-#endif
 
 pascal unsigned short countChar(short c, const ConstStr255Param s)
 {
@@ -845,7 +618,6 @@ pascal unsigned short countChar(short c, const ConstStr255Param s)
 	return count;
 }
 
-#if !USE_SHADOWIRC_ASSEMBLY
 pascal unsigned short revPos(short c, ConstStr255Param s)
 {
 	int x=s[0];
@@ -856,37 +628,7 @@ pascal unsigned short revPos(short c, ConstStr255Param s)
 	
 	return 0;
 }
-#else
-asm pascal unsigned short revPos(register short c, register ConstStr255Param s)
-{
-	#pragma unused(c, s)
-	clrlwi		r6, r3, 24	//Copy char to r6 and zero high three bytes
-	lbz			r3, 0(r4)		//load length byte
-	lbzx			r7, r3, r4		//load last character
-	cmplwi		r3, 1			//If less than, return 0
-	blt			@notFound
-	
-	mtctr		r3
-	add			r4, r4, r3		//Move to end of string
-	
-@top:
-	cmpw		r6, r7
-	bne+			@loop			//no match. branch. assume likely to branch
-	blr								//found. return.
 
-@loop:
-	lbz			r7	, -1(r4)		//Load next character
-	subi			r4, r4, 1		//decrement string
-	subi			r3, r3, 1		//decrement x
-	bdnz			@top				//continue loop if more string
-	
-@notFound:	
-	li			r3, 0		//not found
-	blr
-}
-#endif
-
-#if !USE_SHADOWIRC_ASSEMBLY
 pascal char isNumber(ConstStr255Param s)
 {
 	int n=s[0], x;
@@ -897,38 +639,6 @@ pascal char isNumber(ConstStr255Param s)
 	
 	return true;
 }
-#else
-asm pascal char isNumber(register ConstStr255Param s)
-{
-	#pragma unused(s)
-	lbz		r0, 0(r3)	//Save length
-	mtctr	r0				//put r0 in counter (assume it's likely to be >=1)
-	
-	cmpwi	r0, 1		//if length < 1
-	blt		@nan			//it's not a number
-	
-	lbz		r0, 1(r3)	//read in first character
-	addi		r3, r3, 1	//move to first character
-
-@loop:
-	cmplwi		r0, '0'	//is it less than zero?
-	blt			@nan		//if so, it's not a number
-	cmplwi		r0, '9'	//is it <= 9?
-	ble			@next	//if so, iterate
-	
-@nan:
-	li			r3, 0		//return 0
-	blr
-
-@next:
-	lbz		r0, 1(r3)	//Read next character. (better for pipelining up here)
-	addi		r3, r3, 1	//Increment string
-	bdnz		@loop		//decrement count and loop if more
-	
-	li			r3, 1		//return 1
-	blr
-}
-#endif
 
 pascal long IPStringToLong(ConstStr255Param s)
 {
@@ -974,7 +684,6 @@ pascal char isIPNumber(ConstStr255Param s)
 	return((n>=7)&&(n<=15));
 }
 
-#if !USE_SHADOWIRC_ASSEMBLY
 pascal unsigned short pos(short c, ConstStr255Param s)
 {
 	int x;
@@ -986,34 +695,6 @@ pascal unsigned short pos(short c, ConstStr255Param s)
 
 	return  0;
 }
-#else
-asm pascal unsigned short pos(register short c, register ConstStr255Param s)
-{
-	#pragma unused(c, s)
-	lbz		r0, 0(r4)				//copy length to r0
-	rlwinm	r5, r3, 0, 24, 31	//copy low-8 of r3 to r5
-	
-	cmpwi	r0, 1					//If length < 1, return false
-	blt 		@notFound	
-	
-	addi		r4, r4, 1				//increment to next position in string
-	li			r3, 1					//start at pos 1 in r3
-	mtctr	r0							//Set counter to length
-	
-@loop
-	lbz		r0, 0(r4)				//Load character
-	addi		r4, r4, 1				//increment to next position in string
-	cmplw	r5, r0					//compare character
-	beqlr									//If they match, return
-
-	addi		r3, r3, 1				//Increment the count
-	bdnz		@loop
-	
-@notFound:	
-	li			r3, 0					//return 0
-	blr
-}
-#endif
 
 /*
 char MaskMatchC(const char* s, const char* mask)

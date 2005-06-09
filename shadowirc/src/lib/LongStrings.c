@@ -24,8 +24,6 @@
 #include "LongStrings.h"
 #include "Inline.h"
 
-#define USE_SHADOWIRC_ASSEMBLY 0
-
 pascal void LSDupe(const LongString * const l1, LongString *l2)
 {
 	int len;
@@ -39,7 +37,6 @@ pascal void LSDupe(const LongString * const l1, LongString *l2)
 	BlockMoveData(l1, l2, len);
 }
 
-#if !USE_SHADOWIRC_ASSEMBLY
 pascal char LSCmp(const LongString *ls1, const LongString *ls2)
 {
 	int x, y;
@@ -59,150 +56,6 @@ pascal char LSCmp(const LongString *ls1, const LongString *ls2)
 		return 1;
 	}
 }
-#else
-asm pascal char LSCmp(register const LongString *ls1, register const LongString *ls2)
-{
-	#pragma unused(ls1, ls2)
-	lhz	r5, 0(r3)		//Get the byte counts of both strings
-	lhz	r6, 0(r4)
-
-	cmpw	r5, r6		//If the two lengths aren't the same, fail immediately
-	beq		@more
-@fail:
-	li			r3, 0
-	blr
-	
-@more:
-	cmpwi	r5, 1		//If the length is less than one succeed.
-	blt		@succ
-	
-	//Test the first byte of each string.
-	lbz		r6, 3(r3)
-	lbz		r7, 3(r4)
-	
-	cmpw	r6, r7	//If not the same, fail
-	bne		@fail
-	
-	subi		r5, r5, 1	//Decrement length to check by one
-	addi		r3, r3, 4	//Increment strings to ls->data[2]
-	addi		r4, r4, 4
-
-	//If the length is <= 12, we can complete the comparison in one pass,
-	//using r6..r8 and r10..r12 as scratch registers
-	cmpwi   r5, 12
-	ble+    @lessThanTwelveBytes
-
-@twelveOrMoreBytes:
-	// OK...more than 1 bytes to compare.  We'll compare 12 bytes and then see if we can finish.
-
-	lwz		r6, 0(r3)
-	lwz		r7, 4(r3)
-	lwz		r8, 8(r3)
-
-	lwz		r10, 0(r4)
-	lwz		r11, 4(r4)
-	lwz		r12, 8(r4)
-
-	subi		r5, r5, 12		//Decrement size
-	addi		r3, r3, 12		//Increment strings by 12
-	addi		r4, r4, 12
-
-	//Compare each of the register pairs R6/R10, R7/R11, R8/R12.  If any differs, exit.
-	cmp		cr1, 0, r6, r10
-	cmp		cr2, 0, r7, r11
-	cmp		cr3, 0, r8, r12
-
-	bne		cr1, @fail
-	bne		cr2, @fail
-	bne		cr3, @fail
-
-	cmpwi	r0, 12		//If we have more than 12, go back up and do the next 16. Else, continue...
-	bge		@twelveOrMoreBytes
-
-@lessThanTwelveBytes:
-	mtcrf	1, r5		//set CR7 with 8/4/2/1 testers
-	bf			28, @test4	//if less than 8 left, skip
-	
-	lwz		r6, 0(r3)
-	lwz		r7, 4(r3)
-	
-	lwz		r10, 0(r4)
-	lwz		r11, 4(r4)
-	
-	addi		r3, r3, 8
-	addi		r4, r4, 8
-
-	cmp		cr1, 0, r6, r10;
-	cmp		cr2, 0, r7, r11
-	
-	bne		cr1, @fail
-	bne		cr2, @fail
-
-@test4:
-	bf			29, @test2	//if less than 4 left, skip
-
-	lwz		r6, 0(r3)
-	lwz		r10, 0(r4)
-
-	addi		r3, r3, 4
-	addi		r4, r4, 4
-
-	cmp		cr1, 0, r6, r10;
-	bne		cr1, @fail
-
-@test2:
-	bf			30, @test1	//if less than 2 left, skip
-
-	lhz		r6, 0(r3)
-	lhz		r10, 0(r4)
-
-	addi		r3, r3, 2
-	addi		r4, r4, 2
-
-	cmp		cr1, 0, r6, r10;
-	bne		cr1, @fail
-
-@test1:
-	bf			31, @succ		//if less than 1 left, skip
-	
-	lbz		r6, 0(r3)
-	lbz		r10, 0(r4)
-	
-	cmp		cr1, 0, r6, r10;
-	bne		cr1, @fail
-
-/*
-	// We complete the comparison here, comparing between 1 and 11 bytes. If r5 is zero, we succeed immediately.
-	cmpwi	r5, 0
-	beq		@succ
-	
-	mr		r0,r5				//Copy length to r0
-	mtxer	r0						//Copy the length to XER register.
-
-	lswx		r5, r0, r3			//Load the strings into R5..R7 and R9..R11.  
-	lswx		r9, r0, r4
-
-	cmp		cr0, 0, r5, r9	//Compare R5 against R9; if they differ, fail. Succed If r0 is <= 4.
-	cmpi		cr1, 0, r0, 4
-
-	bne		cr0, @fail
-	ble		cr1, @succ
-
-	cmp		cr0, 0, r6, r10		//Compare R6 against R10; fail if different.  Succeed if r0 <= 8.
-	cmpi		cr1, 0, r0, 8
-
-	bne		cr0, @fail
-	ble		cr1, @succ
-
-	cmpw	r7, r11		//Compare R7 against R11; fail if different.  succeed if same.
-	bne		@fail
-*/
-		
-@succ:
-	li		 r3, 1
-	blr
-}
-#endif
 
 static inline char inupc(char c);
 static inline char inupc(char c)
@@ -212,7 +65,6 @@ static inline char inupc(char c)
 	return c;
 }
 
-#if !USE_SHADOWIRC_ASSEMBLY
 pascal char LSCaseCmp(const LongString *ls1, const LongString *ls2)
 {
 	int x, y;
@@ -232,57 +84,6 @@ pascal char LSCaseCmp(const LongString *ls1, const LongString *ls2)
 		return 1;
 	}
 }
-#else
-asm pascal char LSCaseCmp(register const LongString *ls1, register const LongString *ls2)
-{
-	#pragma unused(ls1, ls2)
-	lhz		r5, 0(r3)	//Get lengths
-	lhz		r6, 0(r4)
-	mtctr	r5
-	cmpw	r5, r6		//s1[0] == s2[0]
-	beq		@more		//if equal, branch
-
-@notEqual:
-	li			r3, 0		//else return 0
-	blr						
-	
-@more
-	lbz		r5, 3(r3)	//read next character and increment strings
-	addi		r3, r3, 3
-	lbz		r6, 3(r4)
-	addi		r4, r4, 3
-@loop:
-	cmplwi	r5, 'a'		//See if first char is lowercase
-	blt		@nextA
-	cmplwi	r5, 'z'
-	bgt		@nextA
-	
-	subi		r5, r5, 32	//If it is, uppercase
-
-@nextA:
-	cmplwi	r6, 'a'			//See if second char is lowercase
-	blt		@nextB
-	cmplwi	r6, 'z'
-	bgt		@nextB
-	
-	subi		r6, r6, 32	//If it is, uppercase
-
-@nextB:
-	cmpw	r5, r6			//Compare two strings
-	bne		@notEqual		//If not equal, need to return zero
-	bdz		@finish			//decrement counter if zero, finish, otherwise, continue
-	
-	lbz		r5, 1(r3)	//read next character and increment strings
-	addi		r3, r3, 1
-	lbz		r6, 1(r4)
-	addi		r4, r4, 1
-	b			@loop
-
-@finish:	
-	li		r3, 1
-	blr
-}
-#endif
 
 pascal void LSDelete(LongString *ls, short firstpos, short lastpos)
 {
@@ -499,7 +300,6 @@ pascal void LSNextArgND(LongString *ls, StringPtr arg)
 		LSCopyString(ls,1,ls->len, arg);
 }
 
-#if !USE_SHADOWIRC_ASSEMBLY
 pascal short LSPosChar(short c, const LongString *ls)
 {
 	int i=1;
@@ -511,34 +311,6 @@ pascal short LSPosChar(short c, const LongString *ls)
 	//else
 	return 0;
 }
-#else
-asm pascal short LSPosChar(register short c, register const LongString *ls)
-{
-	#pragma unused(c, ls)
-	lhz		r0, 0(r4)				//copy length to r0
-	rlwinm	r5, r3, 0, 24, 31	//copy low-8 of r3 to r5
-	
-	cmpwi	r0, 1					//If length < 1, return false
-	blt 		@notFound	
-	
-	li			r3, 1					//start at pos 1 in r3
-	mtctr	r0							//Set counter to length
-	
-	addi		r4, r4, 3				//move to ls->data[1] = sizeof(short) + sizeof(char)
-@loop
-	lbz		r0, 0(r4)				//Load character
-	cmplw	r5, r0					//compare character
-	beqlr									//If they match, return
-	
-	addi		r3, r3, 1				//Increment the count
-	addi		r4, r4, 1				//increment to next position in string
-	bdnz		@loop
-	
-@notFound:	
-	li			r3, 0					//return 0
-	blr
-}
-#endif
 
 pascal void LSStrLS(ConstStr255Param s, LongString *ls)
 {
