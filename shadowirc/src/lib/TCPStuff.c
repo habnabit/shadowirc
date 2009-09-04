@@ -389,7 +389,7 @@ static ssize_t read_fd(int fd, void *ptr, size_t nbytes, int *recvfd)
 static int ident_bind(void)
 {
 	int fd = -1, sockfd[2], status;
-	char c, path[MAXPATHLEN];
+	char c, path[PATH_MAX];
 	CFBundleRef bundle;
 	CFURLRef resources, toolURL;
 	pid_t pid;
@@ -408,7 +408,7 @@ static int ident_bind(void)
 	if(!toolURL)
 		return FALSE;
 			
-	CFURLGetFileSystemRepresentation(toolURL, TRUE, (UInt8 *) &path, MAXPATHLEN);
+	CFURLGetFileSystemRepresentation(toolURL, TRUE, (UInt8 *) &path, PATH_MAX);
 	CFRelease(toolURL);
 	
 	if(socketpair(AF_LOCAL, SOCK_STREAM, 0, sockfd) != 0)
